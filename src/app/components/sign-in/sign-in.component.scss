@@ -1,0 +1,157 @@
+.outer-container{
+    width: 100%;
+    display: flex;
+    padding: 50px;
+    flex-direction: row;
+    justify-content: center;
+    min-height: 100vh;
+    align-items: stretch;
+
+    .col{
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .formCol{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .logo{
+            width: 195px;
+            margin-bottom: 70px;
+        }
+
+        h1{
+           color: #444444;
+           text-align: center;
+           margin-bottom: 24px;
+        }
+
+        .displayTableCell{
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+
+            label{
+                color: #9A9A9A;
+                text-align: left;
+                margin-bottom: 12px;
+            }
+
+            .authBlock{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: flex-start;
+
+                .formGroup{
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    align-items: flex-start;
+                    margin-bottom: 25px;
+
+                 
+
+                    .password-toggle{
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-between;
+                        align-items: center;
+                        position: relative;
+                        .material-icons{
+                            position: absolute;
+                            top: 11px;
+                            right: 13px;
+                            font-size: 19px;
+                            cursor: pointer;
+                            color: #EBEDEE;
+                        }
+                    }
+
+                   
+
+                    .forgotPassword{
+                        width: 100%;
+                        display: flex;
+                        margin-top: 12px;
+                    }
+                }
+
+                .btnHolder{
+                    align-items: center;
+                    margin-bottom: 23px;
+                }
+
+
+              
+            }
+            
+           
+        }
+        .redirectToLogin{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            .redirect{
+                text-align: center;
+                width: 100%;
+            }
+        }
+        
+    } 
+
+    .downloadappcol{
+        background: #FFF56E;
+        padding: 55px 75px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        .extra-large-text{
+            text-align: left;
+            width: 380px;
+        }
+
+        .phones{
+            position: absolute;
+            left: -50px;
+            top: 220px;
+            transform: rotate(-4.25deg);
+            width: 430px;
+        }
+    }
+
+.downloadappbox{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    width: 100%;
+
+    .downloadappboxinner{
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        justify-content: center;
+        align-items: center;
+    }
+    h3{
+        text-align: center;
+        color: #181818;
+    }
+}
+}
