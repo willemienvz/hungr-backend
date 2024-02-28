@@ -1,4 +1,4 @@
-<div class="displayTable">
+<!--<div class="displayTable">
     <div class="displayTableCell">
       <div class="authBlock">
         <h3>Sign Up</h3>
@@ -38,4 +38,12 @@
         >
       </div>
     </div>
-  </div>
+  </div>-->
+
+<div *ngIf="currentStep === 1">
+  <app-step1 (next)="onNextStep()"></app-step1>
+</div>
+
+<div *ngIf="currentStep === 2">
+  <app-step2 (previous)="onPreviousStep()" (complete)="onComplete()"></app-step2>
+</div>

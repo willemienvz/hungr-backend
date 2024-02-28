@@ -1,0 +1,129 @@
+.form-container {
+    width: 100%;
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+
+    .logo{
+        position: absolute;
+        top:17px;
+        left: 46px;
+        width: 150px;
+    }
+    &-inner {
+        width: 100%;
+        max-width: 630px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 62px;
+    }
+
+    h1{
+        color: #444444;
+    }
+
+    form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        .row {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 56px;
+            .col {
+                width: calc(50% - 28px);
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: flex-start;
+                h6 {
+                    color: #2E3646;
+                    text-align: left;
+                    margin-bottom: 18px;
+                }
+
+                .formGroup {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    align-items: flex-start;
+                    margin-bottom: 25px;
+
+                    label {
+                        color: #9A9A9A;
+                        margin-bottom: 12px;
+                    }
+                }
+
+                .authBlock {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                   
+
+                    .infobox {
+                        width: 100%;
+                        border-radius: 5px;
+                        background: #F8F9FB;
+                        padding: 13px 36px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+
+                        
+                        .font-small-medium{
+                            text-align: left;
+                            color: #5F6D7E;
+
+                        }
+                        
+                        .inner-row {
+                            width: 100%;
+                            display: flex;
+                            flex-wrap: wrap;
+                            flex-direction: row;
+                            p {
+                                width: 50%;
+                                font-family: 'Barlow', sans-serif;
+                                font-size: 9px;
+                                font-weight: 500;
+                                line-height: 14px;
+                                letter-spacing: -0.001em;
+                                text-align: left;
+                            }
+                            .vaild {
+                                color: #3CE1AF;
+                            }
+                            
+    
+                        }
+                    }
+
+                 
+                }
+                .inner-row-form-group {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: row;
+                    gap: 23px;
+                    .formGroup{
+                        width: calc(50% - 12px);
+                    }
+                }
+            }
+        }
+    }
+}

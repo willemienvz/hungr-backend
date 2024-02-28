@@ -27,7 +27,8 @@
                 <i class="material-icons" (click)="togglePasswordVisibility()">{{ showPassword ? 'visibility' : 'visibility_off' }}</i>
             </div>
             <div class="forgotPassword">
-              <span routerLink="/forgot-password" class="mainLink">Forgot Password?</span>
+              <span  class="mainLink" (click)="forgotPassword.openPopup()">Forgot Password?</span>
+              <!--<span routerLink="/forgot-password" class="mainLink">Forgot Password?</span>-->
             </div>
           </div>
           <!-- Calling SignIn Api from AuthService -->
@@ -65,3 +66,5 @@
         </div>
     </div>
   </div>
+
+  <app-forgot-password #forgotPassword></app-forgot-password>

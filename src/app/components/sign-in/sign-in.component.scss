@@ -119,6 +119,7 @@
         position: relative;
         justify-content: space-between;
         align-items: flex-start;
+        max-width: 640px;
 
         .extra-large-text{
             text-align: left;
@@ -130,7 +131,7 @@
             left: -50px;
             top: 220px;
             transform: rotate(-4.25deg);
-            width: 430px;
+            height:60%;
         }
     }
 

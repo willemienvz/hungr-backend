@@ -1,0 +1,109 @@
+<div class="form-container">
+    <img class="logo" src="../../../../assets/images/shared/logo.png" alt="" />
+    <div class="form-container-inner">
+        <h1>Sign Up</h1>
+        <form [formGroup]="step1Form">
+            <div class="row">
+                <div class="col">
+                    <h6>Your details</h6>
+                    <div class="authBlock">
+                        <div class="formGroup">
+                            <div class="label-container">
+                                <label>First name</label>
+                            </div>
+                            <input type="text" class="formControl" placeholder="John" #firstName required />
+                        </div>
+                        <div class="formGroup">
+                            <div class="label-container">
+                                <label>Surname</label>
+                            </div>
+                            <input type="text" class="formControl" placeholder="Smith" #surname required />
+                        </div>
+                        <div class="formGroup">
+                            <div class="label-container">
+                                <label>Username</label>
+                            </div>
+                            <input type="text" class="formControl" placeholder="John99" #username required />
+                        </div>
+                        <div class="formGroup" [ngClass]="{'green-text': isPasswordValid()}">
+                            <div class="label-container">
+                                <label>Password</label>
+                            </div>
+                            <input type="password" class="formControl" placeholder="Password"
+                                formControlName="password" />
+                        </div>
+
+                        <div class="formGroup">
+                            <div class="label-container">
+                                <label>Confirm Password</label>
+                                <div *ngIf="isPasswordMismatch()" class="error-message">
+                                    Passwords do not match.
+                                </div>
+                            </div>
+                            <input type="password" class="formControl" placeholder="Password" #userPwdConfrim
+                                required />
+                        </div>
+                        <div class="infobox">
+                            <p class="font-small-medium">Make sure your password has:</p>
+                            <div class="inner-row">
+                                <p [ngClass]="{'vaild': isLengthValid()}">10 characters</p>
+                                <p [ngClass]="{'vaild': isUppercaseValid()}">an uppercase letter</p>
+                                <p [ngClass]="{'vaild': isSpecialCharValid()}">a special character</p>
+                                <p [ngClass]="{'vaild': isLowercaseValid()}">a lowercase letter</p>
+                                <p [ngClass]="{'vaild': isNumberValid()}">a number</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <h6>Contact Details</h6>
+                    <div class="formGroup">
+                        <div class="label-container">
+                            <label>Email</label>
+                        </div>
+                        <input type="email" class="formControl" placeholder="email@address.co.za" #userEmail required />
+                    </div>
+                    <div class="formGroup">
+                        <div class="label-container">
+                            <label>Cellphone number</label>
+                        </div>
+                        <input type="tel" class="formControl" placeholder="+27 (0)12 345 6789" #cellphone required />
+                    </div>
+                    <h6>Billing Information</h6>
+                    <div class="formGroup">
+                        <div class="label-container">
+                            <label>Card holder name</label>
+                        </div>
+                        <input type="text" class="formControl" placeholder="JS Smith" #cardname required />
+                    </div>
+                    <div class="formGroup">
+                        <div class="label-container">
+                            <label>Card number</label>
+                        </div>
+                        <input type="text" class="formControl" placeholder="xxxx xxxx 1234" #cardnumber required />
+                    </div>
+                    <div class="inner-row-form-group">
+                        <div class="formGroup">
+                            <div class="label-container">
+                                <label>CVV</label>
+                            </div>
+                            <input type="number" class="formControl" placeholder="123" #cvv required />
+                        </div>
+                        <div class="formGroup">
+                            <div class="label-container">
+                                <label>Expiry Date</label>
+                            </div>
+                            <input type="text" class="formControl" placeholder="mm/yy" #expirydate required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button (click)="onNext()" class="btnPrimary">Next</button>
+            <div class="redirectToLogin">
+                <span class="redirect mainLink" routerLink="/sign-in">
+                    Already have an account? Log In</span>
+            </div>
+        </form>
+    </div>
+
+</div>
