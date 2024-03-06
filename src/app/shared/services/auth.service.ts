@@ -7,6 +7,9 @@ import {
 import * as auth from 'firebase/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { ContentfulService } from './contentful.service';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +19,8 @@ export class AuthService {
     public afs: AngularFirestore, // Inject Firestore service
     public afAuth: AngularFireAuth, // Inject Firebase auth service
     public router: Router,
-    public ngZone: NgZone // NgZone service to remove outside scope warning
+    public ngZone: NgZone,
+    private contentfulService: ContentfulService
   ) {
     /* Saving user data in localstorage when 
     logged in and setting up null when logged out */
@@ -56,6 +60,7 @@ export class AuthService {
         up and returns promise */
         this.SendVerificationMail();
         this.SetUserData(result.user);
+        this.createContentfulEntry();
         console.log(result.user?.uid);
 
       })
@@ -63,6 +68,29 @@ export class AuthService {
         window.alert(error.message);
       });
   }
+
+
+  createContentfulEntry() {
+    const contentType = 'userData'; 
+    const entryData = {
+      userId: { 'en-US': 'uniqueUserId123' }, 
+      firstName: { 'en-US': 'John' },
+      surname: { 'en-US': 'Doe' },
+      username: { 'en-US': 'john_doe' },
+      email: { 'en-US': 'john.doe@example.com' },
+      cellphoneNumber: { 'en-US': '+1234567890' },
+    };
+
+    this.contentfulService.createEntry(contentType, entryData).subscribe(
+      (response) => {
+        console.log('Entry created successfully:', response);
+      },
+      (error) => {
+        console.error('Error creating entry:', error);
+      }
+    );
+  }
+
   // Send email verfificaiton when new user sign up
   SendVerificationMail() {
     return this.afAuth.currentUser
