@@ -31,6 +31,9 @@ h3{
     line-height: 24px;
     letter-spacing: -0.001em;
 }
+h4{
+    
+}
 
 h6{
     font-family: 'Barlow', sans-serif;
@@ -80,7 +83,6 @@ input[type=text], input[type=password], input[type=email], input[type=tel], inpu
 
 .btnPrimary{
     background: #FFF352;
-    width: 150px;
     border-radius: 6px;
     text-align: center;
     padding: 15px;
@@ -90,6 +92,7 @@ input[type=text], input[type=password], input[type=email], input[type=tel], inpu
     line-height: 14px;
     letter-spacing: -0.001em;
     border: none;
+    text-transform: uppercase;
     cursor: pointer;
 }
 
@@ -163,4 +166,15 @@ input[type=text], input[type=password], input[type=email], input[type=tel], inpu
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .small-icon{
+    font-size: 16px;
+  }
+
+  .icon-holder-label{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
   }

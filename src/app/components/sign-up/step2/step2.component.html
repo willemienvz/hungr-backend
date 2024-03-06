@@ -1,6 +1,184 @@
-<form [formGroup]="step2Form">
-    <!-- Form controls for step 2 -->
+<div class="form-container">
+    <img class="logo" src="../../../../assets/images/shared/logo.png" alt="" />
+    <div class="form-container-inner">
+        <h1>Sign Up</h1>
+        <h6>Select your Option</h6>
+        <form [formGroup]="step2Form">
+            <div class="tab-container">
+                <div class="tab" (click)="showAnnual = true" [class.active]="showAnnual">Annual</div>
+                <div class="tab" (click)="showAnnual = false" [class.active]="!showAnnual">Monthly</div>
+            </div>
 
-    <button (click)="onPrevious()">Previous</button>
-    <button (click)="onComplete()">Complete</button>
-</form>
+            <div *ngIf="showAnnual">
+                <div class="row1">
+                    <div class="col" (click)="selectBillingOption('annual1')"
+                        [class.active]="billingOption?.value === 'annual1'">
+                        <div class="section">
+                            <h6>Option 1 (Digital Menu)</h6>
+                            <p>Short description of this option Lorem ipsum dolor sit amet. Ut illo autem et totam esse
+                                et
+                                tenetur minima ut minima galisum? Sit magnam molestias et fugit quos ad quis expedita!
+                            </p>
+                            <div class="list">
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <h3>R 000.00</h3>
+                            <p>per month billed annually</p>
+                        </div>
+                    </div>
+                    <div class="col" (click)="selectBillingOption('annual2')"
+                        [class.active]="billingOption?.value === 'annual2'">
+                        <div class="section">
+                            <h6>Option 2 (Order & Pay)</h6>
+                            <p>Short description of this option Lorem ipsum dolor sit amet. Ut illo autem et totam esse
+                                et
+                                tenetur minima ut minima galisum? Sit magnam molestias et fugit quos ad quis expedita!
+                            </p>
+                            <div class="list">
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <h3>R 000.00</h3>
+                            <p>per month billed annually</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="!showAnnual">
+                <div class="row1">
+                    <div class="col" (click)="selectBillingOption('monthly1')"
+                        [class.active]="billingOption?.value === 'monthly1'">
+                        <div class="section">
+                            <h6>Option 1 (Digital Menu)</h6>
+                            <p>Short description of this option Lorem ipsum dolor sit amet. Ut illo autem et totam esse
+                                et
+                                tenetur minima ut minima galisum? Sit magnam molestias et fugit quos ad quis expedita!
+                            </p>
+                            <div class="list">
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <h3>R 000.00</h3>
+                            <p>per month billed monthly</p>
+                        </div>
+                    </div>
+                    <div class="col" (click)="selectBillingOption('monthly2')"
+                        [class.active]="billingOption?.value === 'monthly2'">
+                        <div class="section">
+                            <h6>Option 2 (Order & Pay)</h6>
+                            <p>Short description of this option Lorem ipsum dolor sit amet. Ut illo autem et totam esse
+                                et
+                                tenetur minima ut minima galisum? Sit magnam molestias et fugit quos ad quis expedita!
+                            </p>
+                            <div class="list">
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                                <div class="listitem">
+                                    <i class="material-icons">check_box</i>
+                                    <p>Feature included</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <h3>R 000.00</h3>
+                            <p>per month billed monthly</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="all-checkboxes">
+                <div class="checkbox-container">
+                    <label>
+                        <input type="checkbox" formControlName="agreeToTerms" required />
+                        By signing up you agree to our Terms & Conditions & Privacy Policy
+                    </label>
+                </div>
+
+                <div class="checkbox-container">
+                    <label>
+                        <input type="checkbox" formControlName="receiveMarketingInfo" />
+                        I'd like to receive awesome specials and marketing information
+                    </label>
+                </div>
+            </div>
+
+
+            <!--        <button (click)="onPrevious()">Previous</button> -->
+            <button (click)="onComplete()" class="btnPrimary" [disabled]="step2Form.invalid">Finish sign up</button>
+            <div class="redirectToLogin">
+                <span class="redirect mainLink" routerLink="/sign-in">
+                    Already have an account? Log In</span>
+            </div>
+        </form>
+    </div>
+</div>

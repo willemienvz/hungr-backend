@@ -7,30 +7,53 @@
                 <div class="col">
                     <h6>Your details</h6>
                     <div class="authBlock">
-                        <div class="formGroup">
+                        <div class="formGroup" [ngClass]="{
+                            'has-error': step1Form.get('firstName')?.invalid && (step1Form.get('firstName')?.touched || step1Form.get('firstName')?.dirty)
+                          }">
                             <div class="label-container">
                                 <label>First name</label>
+                                <div *ngIf="step1Form.get('firstName')?.hasError('required') && (step1Form.get('firstName')?.touched || step1Form.get('firstName')?.dirty)"
+                                    class="error-message">
+                                    First name is required.
+                                </div>
                             </div>
-                            <input type="text" class="formControl" placeholder="John" #firstName required />
+                            <input type="text" class="formControl" placeholder="John" formControlName="firstName" />
                         </div>
-                        <div class="formGroup">
+
+                        <div class="formGroup" [ngClass]="{
+                            'has-error': step1Form.get('lastName')?.invalid && (step1Form.get('lastName')?.touched || step1Form.get('lastName')?.dirty)
+                          }">
                             <div class="label-container">
                                 <label>Surname</label>
+                                <div *ngIf="step1Form.get('lastName')?.hasError('required') && (step1Form.get('lastName')?.touched || step1Form.get('lastName')?.dirty)"
+                                    class="error-message">
+                                    Surname is required.
+                                </div>
                             </div>
-                            <input type="text" class="formControl" placeholder="Smith" #surname required />
+                            <input type="text" class="formControl" placeholder="Smith" formControlName="lastName" />
                         </div>
-                        <div class="formGroup">
+                        <div class="formGroup" [ngClass]="{
+                            'has-error': step1Form.get('username')?.invalid && (step1Form.get('username')?.touched || step1Form.get('username')?.dirty)
+                          }">
                             <div class="label-container">
                                 <label>Username</label>
+                                <div *ngIf="step1Form.get('username')?.hasError('required') && (step1Form.get('username')?.touched || step1Form.get('username')?.dirty)"
+                                    class="error-message">
+                                    Username is required.
+                                </div>
                             </div>
-                            <input type="text" class="formControl" placeholder="John99" #username required />
+                            <input type="text" class="formControl" placeholder="John99" formControlName="username" />
                         </div>
                         <div class="formGroup" [ngClass]="{'green-text': isPasswordValid()}">
                             <div class="label-container">
                                 <label>Password</label>
                             </div>
-                            <input type="password" class="formControl" placeholder="Password"
-                                formControlName="password" />
+                            <div class="password-toggle">
+                                <input class="formControl" placeholder="Password" formControlName="password" required
+                                    type="{{ showPassword ? 'text' : 'password' }}" />
+                                <i class="material-icons" (click)="togglePasswordVisibility()">{{ showPassword ?
+                                    'visibility' : 'visibility_off' }}</i>
+                            </div>
                         </div>
 
                         <div class="formGroup">
@@ -40,8 +63,14 @@
                                     Passwords do not match.
                                 </div>
                             </div>
-                            <input type="password" class="formControl" placeholder="Password" #userPwdConfrim
-                                required />
+                            <div class="password-toggle">
+                                <input class="formControl" placeholder="Confirm Password"
+                                    formControlName="userPwdConfrim" required
+                                    type="{{ showPasswordConf ? 'text' : 'password' }}" />
+                                <i class="material-icons" (click)="togglePasswordConfirmVisibility()">{{
+                                    showPasswordConf ?
+                                    'visibility' : 'visibility_off' }}</i>
+                            </div>
                         </div>
                         <div class="infobox">
                             <p class="font-small-medium">Make sure your password has:</p>
@@ -57,48 +86,106 @@
                 </div>
                 <div class="col">
                     <h6>Contact Details</h6>
-                    <div class="formGroup">
+                    <div class="formGroup" [ngClass]="{
+                        'has-error': step1Form.get('userEmail')?.invalid && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)
+                      }">
                         <div class="label-container">
                             <label>Email</label>
+                            <div *ngIf="step1Form.get('userEmail')?.hasError('required') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)"
+                                class="error-message">
+                                Email is required.
+                            </div>
+                            <div *ngIf="step1Form.get('userEmail')?.hasError('email') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)"
+                                class="error-message">
+                                Enter a valid email address.
+                            </div>
                         </div>
-                        <input type="email" class="formControl" placeholder="email@address.co.za" #userEmail required />
+                        <input type="email" class="formControl" placeholder="email@address.co.za"
+                            formControlName="userEmail" />
                     </div>
-                    <div class="formGroup">
+                    <div class="formGroup" [ngClass]="{
+                        'has-error': step1Form.get('cellphone')?.invalid && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)
+                      }">
                         <div class="label-container">
                             <label>Cellphone number</label>
+                            <div *ngIf="step1Form.get('cellphone')?.hasError('required') && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)"
+                                class="error-message">
+                                Cellphone number is required.
+                            </div>
                         </div>
-                        <input type="tel" class="formControl" placeholder="+27 (0)12 345 6789" #cellphone required />
+                        <input type="tel" class="formControl" placeholder="+27 (0)12 345 6789"
+                            formControlName="cellphone" />
                     </div>
+
                     <h6>Billing Information</h6>
-                    <div class="formGroup">
+                    <div class="formGroup" [ngClass]="{
+  'has-error': step1Form.get('cardname')?.invalid && (step1Form.get('cardname')?.touched || step1Form.get('cardname')?.dirty)
+}">
                         <div class="label-container">
                             <label>Card holder name</label>
+                            <div *ngIf="step1Form.get('cardname')?.hasError('required') && (step1Form.get('cardname')?.touched || step1Form.get('cardname')?.dirty)"
+                                class="error-message">
+                                Card holder name is required.
+                            </div>
                         </div>
-                        <input type="text" class="formControl" placeholder="JS Smith" #cardname required />
+                        <input type="text" class="formControl" placeholder="JS Smith" formControlName="cardname" />
                     </div>
-                    <div class="formGroup">
+
+                    <div class="formGroup" [ngClass]="{
+    'has-error': step1Form.get('cardnumber')?.invalid && (step1Form.get('cardnumber')?.touched || step1Form.get('cardnumber')?.dirty)
+  }">
                         <div class="label-container">
                             <label>Card number</label>
-                        </div>
-                        <input type="text" class="formControl" placeholder="xxxx xxxx 1234" #cardnumber required />
-                    </div>
-                    <div class="inner-row-form-group">
-                        <div class="formGroup">
-                            <div class="label-container">
-                                <label>CVV</label>
+                            <div *ngIf="step1Form.get('cardnumber')?.hasError('required') && (step1Form.get('cardnumber')?.touched || step1Form.get('cardnumber')?.dirty)"
+                                class="error-message">
+                                Card number is required.
                             </div>
-                            <input type="number" class="formControl" placeholder="123" #cvv required />
                         </div>
-                        <div class="formGroup">
+                        <div class="icon-first">
+                            <input type="text" class="formControl" placeholder="xxxx xxxx 1234"
+                                formControlName="cardnumber" />
+                            <i class="material-icons">credit_card</i>
+                        </div>
+                    </div>
+
+                    <div class="inner-row-form-group">
+                        <div class="formGroup" [ngClass]="{
+                            'has-error': step1Form.get('cvv')?.invalid && (step1Form.get('cvv')?.touched || step1Form.get('cvv')?.dirty)
+                          }">
+                            <div class="label-container">
+                                <label class="icon-holder-label">CVV <i (mouseenter)="showCvvInfoPopup = true"
+                                        (mouseleave)="showCvvInfoPopup = false" class="material-icons small-icon">
+                                        info
+                                    </i></label>
+                                <div *ngIf="step1Form.get('cvv')?.hasError('required') && (step1Form.get('cvv')?.touched || step1Form.get('cvv')?.dirty)"
+                                    class="error-message">
+                                    CVV is required.
+                                </div>
+                                <app-tooltip
+                                    [text]="'This number is printed on your MasterCard & Visa cards in the signature area on the back of the card.'"
+                                    [isVisible]="showCvvInfoPopup"></app-tooltip>
+                            </div>
+                            <input type="number" class="formControl" placeholder="123" formControlName="cvv" />
+                        </div>
+
+                        <div class="formGroup" [ngClass]="{
+                            'has-error': step1Form.get('expirydate')?.invalid && (step1Form.get('expirydate')?.touched || step1Form.get('expirydate')?.dirty)
+                          }">
                             <div class="label-container">
                                 <label>Expiry Date</label>
+                                <div *ngIf="step1Form.get('expirydate')?.hasError('required') && (step1Form.get('expirydate')?.touched || step1Form.get('expirydate')?.dirty)"
+                                    class="error-message">
+                                    Expiry Date is required.
+                                </div>
                             </div>
-                            <input type="text" class="formControl" placeholder="mm/yy" #expirydate required />
+                            <input type="text" class="formControl" placeholder="mm/yy" formControlName="expirydate" />
                         </div>
                     </div>
+
                 </div>
             </div>
             <button (click)="onNext()" class="btnPrimary">Next</button>
+            <!-- <button (click)="onNext()" class="btnPrimary" [disabled]="step1Form.invalid">Next</button> -->
             <div class="redirectToLogin">
                 <span class="redirect mainLink" routerLink="/sign-in">
                     Already have an account? Log In</span>

@@ -9,16 +9,28 @@ import { FormDataService } from '../../../shared/services/signup/form-data.servi
 })
 export class Step2Component {
   step2Form: FormGroup;
-
+  showAnnual: boolean = true;
 
   @Output() previous: EventEmitter<void> = new EventEmitter<void>();
+  @Output() complete: EventEmitter<void> = new EventEmitter<void>();
 
 
   constructor(private fb: FormBuilder, private formDataService: FormDataService) {
     this.step2Form = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required]
+      billingOption: [null, Validators.required],
+      agreeToTerms: [false, Validators.requiredTrue],  
+      receiveMarketingInfo: [false]  
     });
+  }
+
+  get billingOption() {
+    return this.step2Form.get('billingOption');
+  }
+
+  selectBillingOption(option: string) {
+    if (this.billingOption) {
+      this.billingOption.setValue(option);
+    }
   }
 
   ngOnInit(): void {
@@ -28,5 +40,7 @@ export class Step2Component {
     this.previous.emit();
   }
   onComplete() {
+    const formData = this.step2Form.value;
+    this.complete.emit(formData);
   }
 }

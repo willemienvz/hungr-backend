@@ -127,3 +127,40 @@
         }
     }
 }
+
+
+.password-toggle{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    .material-icons{
+        position: absolute;
+        top: 11px;
+        right: 13px;
+        font-size: 19px;
+        cursor: pointer;
+        color: #EBEDEE;
+    }
+}
+
+.icon-first{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    .material-icons{
+        position: absolute;
+        top: 11px;
+        left: 13px;
+        font-size: 19px;
+        color: #000000;
+    }
+    input{
+        padding-left: 40px;
+    }
+}

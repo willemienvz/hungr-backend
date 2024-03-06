@@ -1,0 +1,35 @@
+.displayTable{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.24);
+
+    .displayTableCell{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 50%;
+        flex-direction: column;
+        background-color: white;
+        padding: 25px;
+        border: 1px solid #DEDEDE;
+        border-radius: 10px;
+
+        .authBlock{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap:25px;
+            margin-bottom: 25px;
+
+            p{
+                text-align: center;
+            }
+        }
+    }
+}

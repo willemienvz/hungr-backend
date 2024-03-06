@@ -15,6 +15,7 @@ import { Step1Component } from './components/sign-up/step1/step1.component';
 import { Step2Component } from './components/sign-up/step2/step2.component';
 import { FormDataService } from './shared/services/signup/form-data.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TooltipComponent } from './components/shared/tooltip/tooltip.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,7 +25,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ForgotPasswordComponent,
     VerifyEmailComponent,
     Step1Component,
-    Step2Component
+    Step2Component,
+    TooltipComponent
   ],
   imports: [
     BrowserModule,

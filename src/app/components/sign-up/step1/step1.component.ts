@@ -9,14 +9,24 @@ import { Subscription } from 'rxjs';
 })
 export class Step1Component  implements OnInit, OnDestroy{
   step1Form: FormGroup;
+  showPassword: boolean = false;
+  showPasswordConf: boolean = false;
+  showCvvInfoPopup: boolean = false;
   private confirmPwdSubscription!: Subscription;
-  @Output() next: EventEmitter<void> = new EventEmitter<void>();
+  @Output() next: EventEmitter<any> = new EventEmitter<any>();
   constructor(private fb: FormBuilder, private formDataService: FormDataService) {
     this.step1Form = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      password: ['', Validators.required],
+      username: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(10)]],
       userPwdConfrim: ['', Validators.required],
+      userEmail: ['', [Validators.required, Validators.email]],
+      cellphone: ['', Validators.required],
+      cardname: ['', Validators.required],
+      cardnumber: ['', Validators.required],
+      cvv: ['', Validators.required],
+      expirydate: ['', Validators.required],
   }, {
       validator: this.passwordMatchValidator 
   });
@@ -44,8 +54,6 @@ export class Step1Component  implements OnInit, OnDestroy{
   isPasswordMismatch(): boolean {
     const passwordControl = this.step1Form.get('password');
     const passwordConfirm = this.step1Form.get('userPwdConfrim');
-    console.log('passwordControl', passwordControl?.value);
-    console.log('passwordConfirm', passwordConfirm?.value);
     return passwordControl && passwordConfirm ? passwordControl.value !== passwordConfirm.value : false;
   }
 
@@ -88,13 +96,23 @@ isPasswordValid(): boolean {
     return this.isLengthValid() && this.isUppercaseValid() && this.isSpecialCharValid()
         && this.isLowercaseValid() && this.isNumberValid();
 }
+
+togglePasswordVisibility(): void {
+  this.showPassword = !this.showPassword;
+}
+
+togglePasswordConfirmVisibility(): void {
+  this.showPasswordConf = !this.showPasswordConf;
+}
   onNext() {
     if (this.isPasswordMismatch()) {
       // Handle the case where passwords don't match (e.g., display an error message)
       console.error('Passwords do not match');
       return;
   }
-    this.formDataService.updateFormData(this.step1Form.value);
-    this.next.emit();
+  const formData = this.step1Form.value;
+
+  this.next.emit(formData);
+
   }
 }

@@ -48,7 +48,7 @@ export class AuthService {
       });
   }
   // Sign up with email/password
-  SignUp(email: string, password: string) {
+  SignUp(email: string, password: string, formDataStep1:any, formDataStep2:any) {
     return this.afAuth
       .createUserWithEmailAndPassword(email, password)
       .then((result) => {
@@ -56,6 +56,8 @@ export class AuthService {
         up and returns promise */
         this.SendVerificationMail();
         this.SetUserData(result.user);
+        console.log(result.user?.uid);
+
       })
       .catch((error) => {
         window.alert(error.message);
