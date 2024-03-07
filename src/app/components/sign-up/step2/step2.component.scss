@@ -290,3 +290,11 @@
         border: 2px solid #181818;
     }
   }
+
+  .btn-holder{
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    display: flex;
+  }

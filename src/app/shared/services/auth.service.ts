@@ -60,33 +60,51 @@ export class AuthService {
         up and returns promise */
         this.SendVerificationMail();
         this.SetUserData(result.user);
-        this.createContentfulEntry();
+        this.createContentfulEntry(formDataStep1, formDataStep2,result.user?.uid);
         console.log(result.user?.uid);
-
       })
       .catch((error) => {
+        //add error message here
         window.alert(error.message);
       });
   }
 
 
-  createContentfulEntry() {
+  createContentfulEntry(formDataStep1:any, formDataStep2:any, userID:any) {
     const contentType = 'userData'; 
     const entryData = {
-      userId: { 'en-US': 'uniqueUserId123' }, 
-      firstName: { 'en-US': 'John' },
-      surname: { 'en-US': 'Doe' },
-      username: { 'en-US': 'john_doe' },
-      email: { 'en-US': 'john.doe@example.com' },
-      cellphoneNumber: { 'en-US': '+1234567890' },
+      userId: { 'en-US':  userID}, 
+      firstName: { 'en-US': formDataStep1.firstName },
+      surname: { 'en-US':  formDataStep1.lastName},
+      email: { 'en-US':  formDataStep1.userEmail },
+      cellphoneNumber: { 'en-US':  formDataStep1.cellphone },
+      cardHolderName: { 'en-US':  formDataStep1.cardname }, 
+      cardNumber: { 'en-US':  formDataStep1.cardnumber }, 
+      cvv: { 'en-US':  formDataStep1.cvv }, 
+      expiryDate: { 'en-US':  formDataStep1.expirydate }, 
+      accountMethod: { 'en-US': formDataStep2.billingOption}, 
+      tcAccept: { 'en-US':  formDataStep2.agreeToTerms }, 
+      marketingConsent: { 'en-US':  formDataStep2.receiveMarketingInfo }, 
     };
 
     this.contentfulService.createEntry(contentType, entryData).subscribe(
-      (response) => {
-        console.log('Entry created successfully:', response);
+      (entryId) => {
+        console.log('Entry drafted with ID:', entryId);
+        this.updateAndPublishContentfulEntry(entryId, contentType, entryData);
       },
       (error) => {
         console.error('Error creating entry:', error);
+      }
+    );
+  }
+
+  updateAndPublishContentfulEntry(entryId: string, contentType: string, updatedEntryData:any) {
+    this.contentfulService.updateAndPublishEntry(entryId, contentType, updatedEntryData).subscribe(
+      () => {
+        console.log('Entry updated and published successfully');
+      },
+      (error) => {
+        console.error('Error updating and publishing entry:', error);
       }
     );
   }

@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/cor
 import { FormBuilder, FormGroup, Validators, AbstractControl  } from '@angular/forms';
 import { FormDataService } from '../../../shared/services/signup/form-data.service';
 import { Subscription } from 'rxjs';
+import { dateInFutureValidator } from '../../../shared/validators/custom-validators'; //
 @Component({
   selector: 'app-step1',
   templateUrl: './step1.component.html',
@@ -18,15 +19,14 @@ export class Step1Component  implements OnInit, OnDestroy{
     this.step1Form = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(10)]],
       userPwdConfrim: ['', Validators.required],
       userEmail: ['', [Validators.required, Validators.email]],
       cellphone: ['', Validators.required],
       cardname: ['', Validators.required],
       cardnumber: ['', Validators.required],
-      cvv: ['', Validators.required],
-      expirydate: ['', Validators.required],
+      cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]], 
+      expirydate: ['', [Validators.required]],
   }, {
       validator: this.passwordMatchValidator 
   });

@@ -10,7 +10,7 @@ export class SignUpComponent implements OnInit {
   currentStep: number = 1;
   formDataStep1: any;
   formDataStep2: any;
-
+  errorMessage: string | null = null;
   constructor(
     public authService: AuthService,
     private formDataService: FormDataService
@@ -19,10 +19,12 @@ export class SignUpComponent implements OnInit {
 
   onNextStep(formData: any) {
     this.formDataStep1 = formData;
+    this.formDataService.updateFormData(formData);
     this.currentStep++;
   }
 
   onPreviousStep() {
+    this.formDataStep1 = this.formDataService.getFormData();
     this.currentStep--;
   }
 

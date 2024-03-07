@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormDataService } from '../../../shared/services/signup/form-data.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-step2',
@@ -10,12 +11,12 @@ import { FormDataService } from '../../../shared/services/signup/form-data.servi
 export class Step2Component {
   step2Form: FormGroup;
   showAnnual: boolean = true;
-
+  
   @Output() previous: EventEmitter<void> = new EventEmitter<void>();
   @Output() complete: EventEmitter<void> = new EventEmitter<void>();
 
 
-  constructor(private fb: FormBuilder, private formDataService: FormDataService) {
+  constructor(private fb: FormBuilder, private formDataService: FormDataService, private authService: AuthService) {
     this.step2Form = this.fb.group({
       billingOption: [null, Validators.required],
       agreeToTerms: [false, Validators.requiredTrue],  

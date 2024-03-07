@@ -1,70 +1,54 @@
 <div class="outer-container">
-    <div class="col formCol">
-      <img class="logo" src="../../../assets/images/shared/logo.png" alt=""/>
-      <h1>Log In</h1>
-      <div class="displayTableCell">
-        <div class="authBlock">
-          <div class="formGroup">
-            <label>Username</label>
-            <input 
-              type="text"
-              class="formControl"
-              placeholder="Username"
-              #userName
-              required
-            />
+  <div class="col formCol">
+    <img class="logo" src="../../../assets/images/shared/logo.png" alt="" />
+    <h1>Log In</h1>
+    <div class="displayTableCell">
+      <div class="authBlock">
+        <div class="formGroup">
+          <label>Email</label>
+          <input type="text" class="formControl" placeholder="Email" #userName required />
+        </div>
+        <div class="formGroup">
+          <label>Password</label>
+          <div class="password-toggle">
+            <input class="formControl" placeholder="Password" #userPassword required
+              type="{{ showPassword ? 'text' : 'password' }}"
+              (keyup.enter)="authService.SignIn(userName.value, userPassword.value)" />
+            <i class="material-icons" (click)="togglePasswordVisibility()">{{ showPassword ? 'visibility' :
+              'visibility_off' }}</i>
           </div>
-          <div class="formGroup">
-            <label>Password</label>
-            <div class="password-toggle">
-              <input
-                class="formControl"
-                placeholder="Password"
-                #userPassword
-                required
-                type="{{ showPassword ? 'text' : 'password' }}"
-              />
-                <i class="material-icons" (click)="togglePasswordVisibility()">{{ showPassword ? 'visibility' : 'visibility_off' }}</i>
-            </div>
-            <div class="forgotPassword">
-              <span  class="mainLink" (click)="forgotPassword.openPopup()">Forgot Password?</span>
-              <!--<span routerLink="/forgot-password" class="mainLink">Forgot Password?</span>-->
-            </div>
-          </div>
-          <!-- Calling SignIn Api from AuthService -->
-          <div class="formGroup btnHolder">
-            <input
-              type="button"
-              class="btn btnPrimary"
-              value="Log in"
-              (click)="authService.SignIn(userName.value, userPassword.value)"
-            />
+          <div class="forgotPassword">
+            <span class="mainLink" (click)="forgotPassword.openPopup()">Forgot Password?</span>
+            <!--<span routerLink="/forgot-password" class="mainLink">Forgot Password?</span>-->
           </div>
         </div>
-        <div class="redirectToLogin">
-          <span
-              class="redirect mainLink"
-              routerLink="/register-user"
-            >
-            Don't have an account? Sign Up</span>
+        <!-- Calling SignIn Api from AuthService -->
+        <div class="formGroup btnHolder">
+          <input type="button" class="btn btnPrimary" value="Log in"
+            (click)="authService.SignIn(userName.value, userPassword.value)" />
         </div>
       </div>
-    </div>
-    <div class="col downloadappcol">
-      <p class="extra-large-text">Your Go-To App for
-        Restaurant Discovery
-        and Menus</p>
-        <img class="phones" src="../../../assets/images/login/phones.png" alt=""/>
-        <div class="downloadappbox">
-          <div class="downloadappboxinner">
-            <h3>Download the app</h3>
-            <div class="row">
-              <a href="" target="_blank"><img src="../../../assets/images/shared/apps.svg" alt=""/></a>
-            </div>
-          </div>
-          
-        </div>
+      <div class="redirectToLogin">
+        <span class="redirect mainLink" routerLink="/register-user">
+          Don't have an account? Sign Up</span>
+      </div>
     </div>
   </div>
+  <div class="col downloadappcol">
+    <p class="extra-large-text">Your Go-To App for
+      Restaurant Discovery
+      and Menus</p>
+    <img class="phones" src="../../../assets/images/login/phones.png" alt="" />
+    <div class="downloadappbox">
+      <div class="downloadappboxinner">
+        <h3>Download the app</h3>
+        <div class="row">
+          <a href="" target="_blank"><img src="../../../assets/images/shared/apps.svg" alt="" /></a>
+        </div>
+      </div>
 
-  <app-forgot-password #forgotPassword></app-forgot-password>
+    </div>
+  </div>
+</div>
+
+<app-forgot-password #forgotPassword></app-forgot-password>

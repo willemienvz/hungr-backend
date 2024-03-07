@@ -11,4 +11,8 @@ export class FormDataService {
   updateFormData(data: any) {
     this.formData.next(data);
   }
+
+  getFormData(): any {
+    return this.formData.value;
+  }
 }

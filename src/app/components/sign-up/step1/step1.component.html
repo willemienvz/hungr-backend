@@ -32,18 +32,7 @@
                             </div>
                             <input type="text" class="formControl" placeholder="Smith" formControlName="lastName" />
                         </div>
-                        <div class="formGroup" [ngClass]="{
-                            'has-error': step1Form.get('username')?.invalid && (step1Form.get('username')?.touched || step1Form.get('username')?.dirty)
-                          }">
-                            <div class="label-container">
-                                <label>Username</label>
-                                <div *ngIf="step1Form.get('username')?.hasError('required') && (step1Form.get('username')?.touched || step1Form.get('username')?.dirty)"
-                                    class="error-message">
-                                    Username is required.
-                                </div>
-                            </div>
-                            <input type="text" class="formControl" placeholder="John99" formControlName="username" />
-                        </div>
+
                         <div class="formGroup" [ngClass]="{'green-text': isPasswordValid()}">
                             <div class="label-container">
                                 <label>Password</label>
@@ -154,12 +143,15 @@
                           }">
                             <div class="label-container">
                                 <label class="icon-holder-label">CVV <i (mouseenter)="showCvvInfoPopup = true"
-                                        (mouseleave)="showCvvInfoPopup = false" class="material-icons small-icon">
-                                        info
-                                    </i></label>
-                                <div *ngIf="step1Form.get('cvv')?.hasError('required') && (step1Form.get('cvv')?.touched || step1Form.get('cvv')?.dirty)"
-                                    class="error-message">
+                                        (mouseleave)="showCvvInfoPopup = false"
+                                        class="material-icons small-icon">info</i></label>
+                                <div class="error-message"
+                                    *ngIf="step1Form.get('cvv')?.hasError('required') && step1Form.get('cvv')?.touched">
                                     CVV is required.
+                                </div>
+                                <div class="error-message"
+                                    *ngIf="step1Form.get('cvv')?.hasError('pattern') && step1Form.get('cvv')?.touched">
+                                    Must be a 3/4 digit number.
                                 </div>
                                 <app-tooltip
                                     [text]="'This number is printed on your MasterCard & Visa cards in the signature area on the back of the card.'"
@@ -184,8 +176,7 @@
 
                 </div>
             </div>
-            <button (click)="onNext()" class="btnPrimary">Next</button>
-            <!-- <button (click)="onNext()" class="btnPrimary" [disabled]="step1Form.invalid">Next</button> -->
+            <button (click)="onNext()" class="btnPrimary" [disabled]="step1Form.invalid">Next</button>
             <div class="redirectToLogin">
                 <span class="redirect mainLink" routerLink="/sign-in">
                     Already have an account? Log In</span>
