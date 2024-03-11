@@ -81,6 +81,10 @@ input[type=text], input[type=password], input[type=email], input[type=tel], inpu
     color: #444444;
 }
 
+a{
+
+}
+
 .btnPrimary{
     background: #FFF352;
     border-radius: 6px;
@@ -177,4 +181,13 @@ input[type=text], input[type=password], input[type=email], input[type=tel], inpu
     justify-content: center;
     align-items: center;
     flex-direction: row;
+  }
+
+  a{
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    font-weight:500;
+    line-height: 1;
+    letter-spacing: -0.1%;
+    cursor: pointer;
   }
