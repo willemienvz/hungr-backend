@@ -8,20 +8,5 @@ import { AuthService } from '../../shared/services/auth.service';
 export class DashboardComponent implements OnInit {
   constructor(public authService: AuthService) {}
   ngOnInit(): void {}
-
-  isSearchBarExpanded = false;
-  isProfileExpanded = false;
-  isNotificationsExpanded = false;
-
-  toggleSearchBar() {
-    this.isSearchBarExpanded = !this.isSearchBarExpanded;
-  }
-
-  toggleProfile() {
-    this.isProfileExpanded = !this.isProfileExpanded;
-  }
-
-  toggleNotifications() {
-    this.isNotificationsExpanded = !this.isNotificationsExpanded;
-  }
+ 
 }

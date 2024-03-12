@@ -1,0 +1,39 @@
+<nav class="navbar">
+    <div class="inner">
+        <img src="../../../assets/images/shared/logo.png" alt="" style="width: 150px;" />
+        <h1>Overview Dashboard</h1>
+    </div>
+    <div class="inner">
+        <a href="">Download Full Report</a>
+        <div class="search-bar">
+            <input type="text" placeholder="Type your question or term here..." id="searchInput"
+                *ngIf="isSearchBarExpanded">
+            <div class="icon yellowIcon" (click)="toggleSearchBar()"><i class="material-icons">search</i></div>
+        </div>
+
+        <div class="icon yellowIcon"><i class="material-icons" (click)="toggleNotifications()">notifications</i></div>
+        <div class="icon" (click)="toggleProfile()"><i class="material-icons">person</i></div>
+    </div>
+</nav>
+<nav class="profiledd" *ngIf="isProfileExpanded">
+    <h6>John Smith (Admin)</h6>
+    <a>Edit profile</a>
+    <a>Add a user</a>
+    <a>Manage permissions</a>
+</nav>
+<nav class="profiledd" *ngIf="isNotificationsExpanded">
+    <h6>Notifications </h6>
+    <p class="notificationSubtext">Last 7 days</p>
+    <div class="row">
+        <p><span>Name</span>activated their profile</p>
+        <p class="smalltext">2h</p>
+    </div>
+    <div class="row">
+        <p><span>Name</span>activated their profile</p>
+        <p class="smalltext">2h</p>
+    </div>
+    <div class="row">
+        <p><span>Name</span>activated their profile</p>
+        <p class="smalltext">2h</p>
+    </div>
+</nav>

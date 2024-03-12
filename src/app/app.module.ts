@@ -16,6 +16,12 @@ import { Step2Component } from './components/sign-up/step2/step2.component';
 import { FormDataService } from './shared/services/signup/form-data.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TooltipComponent } from './components/shared/tooltip/tooltip.component';
+import { StatsOverviewBlockComponent } from './components/shared/stats-overview-block/stats-overview-block.component';
+import { TopMenuComponent } from './components/navigation/top-menu/top-menu.component';
+import { SidebarComponent } from './components/navigation/sidebar/sidebar.component';
+import { OverviewComponent } from './components/dashboard/overview/overview.component';
+import { AppLayoutComponent } from './app-layout/app-layout.component';
+import { StatsTableBlockComponent } from './components/shared/stats-table-block/stats-table-block.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -26,7 +32,13 @@ import { TooltipComponent } from './components/shared/tooltip/tooltip.component'
     VerifyEmailComponent,
     Step1Component,
     Step2Component,
-    TooltipComponent
+    TooltipComponent,
+    StatsOverviewBlockComponent,
+    TopMenuComponent,
+    SidebarComponent,
+    OverviewComponent,
+    AppLayoutComponent,
+    StatsTableBlockComponent
   ],
   imports: [
     BrowserModule,

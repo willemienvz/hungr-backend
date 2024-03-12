@@ -191,3 +191,15 @@ a{
     letter-spacing: -0.1%;
     cursor: pointer;
   }
+
+  .inner-page{
+    padding: 25px;
+  }
+
+  .block{
+    border: 1px solid #EBEDEE;
+    background-color: white;
+    padding: 25px;
+    box-shadow: 0 1px 8px rgba(68, 68, 68, 0.08);
+    border-radius: 10px;
+  }

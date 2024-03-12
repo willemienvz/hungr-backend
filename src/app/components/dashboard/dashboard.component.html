@@ -1,67 +1,15 @@
-<!-- Top navigation -->
-<nav class="navbar">
-  <div class="inner">
-    <img src="../../../assets/images/shared/logo.png" alt="" style="width: 150px;" />
-    <h1>Overview Dashboard</h1>
+<div class="inner-page">
+  <div class="row">
+    <app-stats-overview-block heading="Total menu views" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="800"
+      movement="+10% "></app-stats-overview-block>
+    <app-stats-overview-block heading="New views" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="200"
+      movement="+13% "></app-stats-overview-block>
+    <app-stats-table-block></app-stats-table-block>
+    <app-stats-overview-block heading="Total orders" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="700"
+      movement="+9% "></app-stats-overview-block>
   </div>
-  <div class="inner">
-    <a href="">Download Full Report</a>
-    <div class="search-bar">
-      <input type="text" placeholder="Type your question or term here..." id="searchInput" *ngIf="isSearchBarExpanded">
-      <div class="icon yellowIcon" (click)="toggleSearchBar()"><i class="material-icons">search</i></div>
-    </div>
+</div>
 
-    <div class="icon yellowIcon"><i class="material-icons">notifications</i></div>
-    <div class="icon" (click)="toggleNotifications()"><i class="material-icons">person</i></div>
-  </div>
-</nav>
-<nav class="profiledd" *ngIf="isProfileExpanded">
-  <h6>John Smith (Admin)</h6>
-  <a>Edit profile</a>
-  <a>Add a user</a>
-  <a>Manage permissions</a>
-</nav>
-<nav class="profiledd" *ngIf="isNotificationsExpanded">
-  <h6>Notifications </h6>
-  <p class="notificationSubtext">Last 7 days</p>
-  <div class="row">
-    <p><span>Name</span>activated their profile</p>
-    <p class="smalltext">2h</p>
-  </div>
-  <div class="row">
-    <p><span>Name</span>activated their profile</p>
-    <p class="smalltext">2h</p>
-  </div>
-  <div class="row">
-    <p><span>Name</span>activated their profile</p>
-    <p class="smalltext">2h</p>
-  </div>
-</nav>
-
-<nav class="sidebar">
-  <div class="subsidebarcontainer">
-    <p class="heading">Analytics</p>
-    <a class="activeMenu"><i class="material-icons">bar_chart</i>Overview</a>
-    <a><i class="material-icons">content_paste_search</i>Menu insights</a>
-    <a><i class="material-icons">group</i>Visitor Insights</a>
-    <a><i class="material-icons">query_stats</i>Sales Insights</a>
-  </div>
-  <div class="subsidebarcontainer">
-    <p class="heading">Menus</p>
-    <a><i class="material-icons">restaurant</i>My Menus</a>
-    <a><i class="material-icons">qr_code_scanner</i>QR codes</a>
-    <a><i class="material-icons">sell</i>Specials</a>
-  </div>
-  <div class="subsidebarcontainer">
-    <p class="heading">Settings</p>
-    <a><i class="material-icons">settings</i>General</a>
-    <a><i class="material-icons">brush</i>Branding</a>
-    <a><i class="material-icons">support_agent</i>Help</a>
-  </div>
-  <div class="subsidebarcontainer">
-    <a><i class="material-icons">manage_accounts</i>Manage users</a>
-  </div>
-</nav>
 <!-- Sidebar navigation -->
 <div class="container-fluid" style="display: none;">
   <div class="row">
