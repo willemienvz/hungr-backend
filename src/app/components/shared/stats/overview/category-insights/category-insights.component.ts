@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-stats-table-block',
-  templateUrl: './stats-table-block.component.html',
-  styleUrl: './stats-table-block.component.scss'
+  selector: 'app-category-insights',
+  templateUrl: './category-insights.component.html',
+  styleUrl: './category-insights.component.scss'
 })
-export class StatsTableBlockComponent {
+export class CategoryInsightsComponent {
   @Input() heading: string = '';
   @Input() tooltiptext: string = '';
   @Input() timeText: string = '';

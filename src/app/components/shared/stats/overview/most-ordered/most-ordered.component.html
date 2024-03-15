@@ -7,8 +7,9 @@
 
     </div>
     <label class="time">{{timeText}}</label>
-    <div class="row list" *ngFor="let object of data">
-        <p>{{object.name}}</p>
+    <div class="row list" *ngFor="let object of data; let i=index">
+       
+        <p> <span>{{i + 1}}</span>{{object.name}}</p>
         <p><b>{{object.description}}</b></p>
     </div>
 

@@ -7,6 +7,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
+import { GeneralComponent } from './components/settings/general/general.component';
+import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -21,6 +23,8 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
+      { path: 'settings/general', component: GeneralComponent },
+      { path: 'manage-users', component: ManageUsersComponent },
       { path: '', redirectTo: '/dashboard', pathMatch: 'full' } 
     ]
   }

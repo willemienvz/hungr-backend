@@ -22,6 +22,11 @@ import { SidebarComponent } from './components/navigation/sidebar/sidebar.compon
 import { OverviewComponent } from './components/dashboard/overview/overview.component';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { StatsTableBlockComponent } from './components/shared/stats-table-block/stats-table-block.component';
+import { CategoryInsightsComponent } from './components/shared/stats/overview/category-insights/category-insights.component';
+import { MostOrderedComponent } from './components/shared/stats/overview/most-ordered/most-ordered.component';
+import { AdditionalInsightsComponent } from './components/shared/stats/overview/additional-insights/additional-insights.component';
+import { GeneralComponent } from './components/settings/general/general.component';
+import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,7 +43,12 @@ import { StatsTableBlockComponent } from './components/shared/stats-table-block/
     SidebarComponent,
     OverviewComponent,
     AppLayoutComponent,
-    StatsTableBlockComponent
+    StatsTableBlockComponent,
+    CategoryInsightsComponent,
+    MostOrderedComponent,
+    AdditionalInsightsComponent,
+    GeneralComponent,
+    ManageUsersComponent
   ],
   imports: [
     BrowserModule,

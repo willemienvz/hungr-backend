@@ -1,14 +1,38 @@
 <div class="inner-page">
   <div class="row">
     <app-stats-overview-block heading="Total menu views" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="800"
-      movement="+10% "></app-stats-overview-block>
+      movement="+10%"></app-stats-overview-block>
     <app-stats-overview-block heading="New views" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="200"
-      movement="+13% "></app-stats-overview-block>
-    <app-stats-table-block></app-stats-table-block>
+      movement="+13%"></app-stats-overview-block>
+    <app-stats-table-block heading="Top categories" tooltiptext="Tooltip Text" timeText="Last 7 days" [data]="list"></app-stats-table-block>
     <app-stats-overview-block heading="Total orders" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="700"
-      movement="+9% "></app-stats-overview-block>
+      movement="+9%"></app-stats-overview-block>
+  </div>
+  <div class="row">
+    <div class="block">Stat 1 graph</div>
+    <div class="block">Stat 2 graph</div>
+  </div>
+  <div class="row">
+    <app-category-insights heading="Category insights" tooltiptext="Tooltip Text" [data]="listInsights"></app-category-insights>
+    <app-most-ordered heading="Most ordered items" tooltiptext="Tooltip Text"  [data]="listMost"></app-most-ordered>
+    <app-additional-insights heading="Additional insights" tooltiptext="Tooltip Text"  [data]="listAdditional"></app-additional-insights>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- Sidebar navigation -->
 <div class="container-fluid" style="display: none;">

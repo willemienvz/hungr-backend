@@ -3,6 +3,7 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
+    flex: 1;
     .row{
         width: 100%;
         display: flex;
@@ -14,13 +15,29 @@
 
     .list{
       margin-bottom: 10px;  
+      background-color: rgba(60,225,175,0.15);
+      padding: 20px 25px;
+      border-radius: 10px;
+      min-height: 65px;
+
     }
 
     .list:last-of-type{
         margin-bottom: 0px;  
+        background-color: #F3F4F5;
+      }
+      .list p{
+        font-weight: bold;
       }
 
-   
+      .list p:last-of-type{
+        color:  #1FCC96;
+        font-size: 24px;
+      }
+      .list:last-of-type p:last-of-type{
+        color:  #FF6767;
+        
+      }
 
     .heading{
         color: #444444;
