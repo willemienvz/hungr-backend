@@ -1,3 +1,32 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$hungr-backend-primary: mat.define-palette(mat.$indigo-palette);
+$hungr-backend-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$hungr-backend-warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$hungr-backend-theme: mat.define-light-theme((
+  color: (
+    primary: $hungr-backend-primary,
+    accent: $hungr-backend-accent,
+    warn: $hungr-backend-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0
+));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($hungr-backend-theme);
+
 @import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
 
@@ -6,6 +35,42 @@
     padding: 0;
     margin: 0;
     transition: 0.3s all;
+    
+--mdc-switch-selected-focus-state-layer-color: #3CE1AF;
+--mdc-switch-selected-handle-color: #3CE1AF;
+--mdc-switch-selected-hover-state-layer-color: #3CE1AF;
+--mdc-switch-selected-pressed-state-layer-color: #3CE1AF;
+--mdc-switch-selected-focus-handle-color: #3CE1AF;
+--mdc-switch-selected-hover-handle-color: #3CE1AF;
+--mdc-switch-selected-pressed-handle-color: #3CE1AF;
+--mdc-switch-selected-focus-track-color: #9A9A9A;
+--mdc-switch-selected-hover-track-color: #9A9A9A;
+--mdc-switch-selected-pressed-track-color: #9A9A9A;
+--mdc-switch-selected-track-color: #9A9A9A;
+--mdc-switch-disabled-selected-handle-color: #9A9A9A;
+--mdc-switch-disabled-selected-icon-color: #fff;
+--mdc-switch-disabled-selected-track-color: #9A9A9A;
+--mdc-switch-disabled-unselected-handle-color: #9A9A9A;
+--mdc-switch-disabled-unselected-icon-color: #fff;
+--mdc-switch-disabled-unselected-track-color: #9A9A9A;
+--mdc-switch-handle-surface-color: var(--mdc-theme-surface, #fff);
+--mdc-switch-handle-elevation-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+--mdc-switch-handle-shadow-color: black;
+--mdc-switch-disabled-handle-elevation-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12);
+--mdc-switch-selected-icon-color: #fff;
+--mdc-switch-unselected-focus-handle-color: #9A9A9A;
+--mdc-switch-unselected-focus-state-layer-color: #9A9A9A;
+--mdc-switch-unselected-focus-track-color: #fff;
+--mdc-switch-unselected-handle-color: #9A9A9A;
+--mdc-switch-unselected-hover-handle-color: #9A9A9A;
+--mdc-switch-unselected-hover-state-layer-color: #9A9A9A;
+--mdc-switch-unselected-hover-track-color: #fff;
+--mdc-switch-unselected-icon-color: #fff;
+--mdc-switch-unselected-pressed-handle-color: #9A9A9A;
+--mdc-switch-unselected-pressed-state-layer-color: #9A9A9A;
+--mdc-switch-unselected-pressed-track-color: #fff;
+--mdc-switch-unselected-track-color: #fff;
+--mdc-switch-disabled-label-text-color: rgba(0, 0, 0, 0.38);
 }
 .extra-large-text{
     font-family: 'Barlow', sans-serif;
@@ -203,3 +268,23 @@ a{
     box-shadow: 0 1px 8px rgba(68, 68, 68, 0.08);
     border-radius: 10px;
   }
+.toggle-container{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 12px;
+  border-bottom: 1px solid #DEDEDE;
+
+  label{
+    color: #444444;
+  }
+}
+.mat-slide-toggle-thumb {
+  background-color: #fff;
+}
+
+/* Change the track color */
+.mat-slide-toggle-bar {
+  background-color: #3CE1AF;
+}

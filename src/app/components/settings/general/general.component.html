@@ -1,1 +1,96 @@
-<p>general works!</p>
+<div class="settingspage inner-page">
+    <div class="block">
+        <h6>Account Details</h6>
+        <div class="formGroup">
+            <div class="label-container">
+                <label>Name</label>
+                <div class="error-message">
+                    First name is required.
+                </div>
+            </div>
+            <div class="input-holder">
+                <input type="text" class="formControl" placeholder="John"  />
+                <a class="editBtn">edit</a>
+            </div>
+        </div>
+        <div class="formGroup">
+            <div class="label-container">
+                <label>Surname</label>
+                <div class="error-message">
+                    Surname is required.
+                </div>
+            </div>
+            <div class="input-holder">
+                <input type="text" class="formControl" placeholder="John"  />
+                <a class="editBtn">edit</a>
+            </div>
+        </div>
+        <div class="formGroup">
+            <div class="label-container">
+                <label>Password</label>
+                <div class="error-message">
+                    Password is required.
+                </div>
+            </div>
+            <div class="input-holder">
+                <input type="text" class="formControl" placeholder="John"  />
+                <a class="editBtn">edit</a>
+            </div>
+        </div>
+
+
+        <h6>Contact Details</h6>
+
+        <div class="formGroup">
+            <div class="label-container">
+                <label>Email Address</label>
+            </div>
+            <div class="input-holder">
+                <input type="text" class="formControl" placeholder="John"/>
+                <a class="editBtn">edit</a>
+            </div>
+        </div>
+
+        <div class="formGroup">
+            <div class="label-container">
+                <label>Phone number</label>
+                <div class="error-message">
+                    Phone number is required.
+                </div>
+            </div>
+            <div class="input-holder">
+                <input type="text" class="formControl" placeholder="John"  />
+                <a class="editBtn">edit</a>
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="block">
+        <div class="row">
+            <h6 class="heading">Notifications</h6>
+            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
+                <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen"
+                    [isVisible]="isTooltipOpen"></app-tooltip></i>
+    
+        </div>
+        <div class="toggleHolder">
+            <div class="toggle-container">
+                <label>Email Notifications</label>
+                <mat-slide-toggle [(ngModel)]="emailNotificationsEnabled" color="#3CE1AF"></mat-slide-toggle>
+              </div>
+              
+              <div class="toggle-container">
+                <label>Tips & Tutorials</label>
+                <mat-slide-toggle [(ngModel)]="tipsAndTutorialsEnabled" color="#3CE1AF"></mat-slide-toggle>
+              </div>
+              
+              <div class="toggle-container">
+                <label>User Insights</label>
+                <mat-slide-toggle [(ngModel)]="userInsightsEnabled" color="#3CE1AF"></mat-slide-toggle>
+              </div>
+              <p>Collect user data to create statistics.</p>
+        </div>
+        
+    </div>
+</div>

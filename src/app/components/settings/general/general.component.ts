@@ -6,5 +6,13 @@ import { Component } from '@angular/core';
   styleUrl: './general.component.scss'
 })
 export class GeneralComponent {
+  isTooltipOpen:boolean = false;
 
+  emailNotificationsEnabled: boolean = false;
+  tipsAndTutorialsEnabled: boolean = false;
+  userInsightsEnabled: boolean = false;
+  
+  opentooltip(){
+    this.isTooltipOpen != this.isTooltipOpen;
+  }
 }

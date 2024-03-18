@@ -1,0 +1,80 @@
+.formGroup {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 25px;
+
+    label {
+        color: #9A9A9A;
+        margin-bottom: 12px;
+    }
+}
+.settingspage{
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    .block{
+        width: calc(33% - 10px);
+    }
+}
+
+
+.settingspage h6{
+    margin-bottom: 25px;
+}
+
+.error-message{
+    display: none;
+}
+
+.input-holder{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    .editBtn{
+        position: absolute;
+        right: 14px;
+        font-family: 'Barlow', sans-serif;
+        font-size: 10px;
+        font-weight:500;
+        line-height: 1;
+        letter-spacing: -0.1%;
+        cursor: pointer;
+        text-decoration: underline;
+        color: #9A9A9A;
+    }
+}
+
+.toggleHolder .toggle-container:last-of-type{
+    border-bottom: none;
+}
+
+.toggleHolder p{
+        font-size: 10px;
+        padding-left: 12px;
+        
+}
+
+.row{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.material-icons{
+    cursor: pointer;
+    width: 30px;
+    margin-bottom: 10px;
+    color: #9A9A9A;
+}
+

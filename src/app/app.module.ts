@@ -27,6 +27,7 @@ import { MostOrderedComponent } from './components/shared/stats/overview/most-or
 import { AdditionalInsightsComponent } from './components/shared/stats/overview/additional-insights/additional-insights.component';
 import { GeneralComponent } from './components/settings/general/general.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 @NgModule({
   declarations: [
     AppComponent,
@@ -48,7 +49,7 @@ import { ManageUsersComponent } from './components/manage-users/manage-users.com
     MostOrderedComponent,
     AdditionalInsightsComponent,
     GeneralComponent,
-    ManageUsersComponent
+    ManageUsersComponent,
   ],
   imports: [
     BrowserModule,
@@ -57,7 +58,8 @@ import { ManageUsersComponent } from './components/manage-users/manage-users.com
     AngularFireAuthModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    MatSlideToggleModule
   ],
   providers: [FormDataService],
   bootstrap: [AppComponent]
