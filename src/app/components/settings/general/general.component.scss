@@ -9,15 +9,20 @@
     label {
         color: #9A9A9A;
         margin-bottom: 12px;
+
     }
 }
 .settingspage{
     display: flex;
-    gap: 15px;
-    justify-content: flex-start;
-    align-items: flex-start;
+    flex-flow: column wrap;
+    width: 100%;
+    max-height: 110vh;
+    column-count: 3; 
+    column-gap: 10px; 
     .block{
-        width: calc(33% - 10px);
+        display: inline-block; /* Change from block to inline-block */
+    width: 32%; /* Ensure each block takes full width of its column */
+    margin-bottom: 8px;
     }
 }
 
@@ -71,6 +76,29 @@
     gap: 10px;
 }
 
+.rowToggle{
+    display: flex;
+
+    justify-content: flex-start;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 18px;
+    margin-top: 18px;
+    label{
+        color: #1FCC96;
+    }
+}
+
+.btnHolder{
+    justify-content: center !important;
+}
+
+.btnHolderRight{
+    justify-content: right !important;
+}
+
 .material-icons{
     cursor: pointer;
     width: 30px;
@@ -78,3 +106,100 @@
     color: #9A9A9A;
 }
 
+.btnBlock{
+    p{
+        font-size: 10px;
+        text-align: center;
+        color: #9A9A9A;
+        margin-bottom: 19px;
+    }
+
+    .row{
+        justify-content: center;
+        gap: 15px;
+    }
+
+    
+}
+
+.restaurantholder{
+    display: flex;
+    width: 100%;
+    padding: 12px 14px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    border-bottom: 1px solid #DEDEDE;
+    span{
+        font-family: 'Barlow', sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.001em;
+        color: #1FCC96;
+        text-align: left;
+    }
+}
+
+.material-icons{
+    margin-bottom: 0;
+}
+
+.popup-menu{
+    position: absolute;
+    right: 0;
+    transition: 0.3s all;
+    background-color: #F8F9FB;
+    border: 1px solid #DEDEDE;
+    display: flex;
+    flex-direction: column;
+    gap:13px;
+    padding: 13px;
+    border-radius: 10px;
+    width: 90px;
+    a{
+        font-family: 'Barlow', sans-serif;
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 10px;
+        letter-spacing: -2%;
+        color:#181818;
+        width: 100%;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .closeBtn{
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+}
+
+.posBlock{
+    p{
+        margin-bottom: 23px;
+    }
+}
+
+.longBlock{
+    width: calc((100% / 3) * 2 - 20px) !important;
+    column-span: 2; 
+}
+
+.smallCol{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    a{
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: baseline;
+        i{
+            font-size: 17px;
+        }
+    }
+}

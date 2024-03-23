@@ -162,7 +162,40 @@ a{
     letter-spacing: -0.001em;
     border: none;
     text-transform: uppercase;
+    color: #181818;
     cursor: pointer;
+}
+
+.btnSecondary{
+  color: #181818;
+  background: #3CE1AF;
+  border-radius: 6px;
+  text-align: center;
+  padding: 15px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 14px;
+  letter-spacing: -0.001em;
+  border: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btnTertiary{
+  color: #181818;
+  background: #E4E4E4;
+  border-radius: 6px;
+  text-align: center;
+  padding: 15px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 14px;
+  letter-spacing: -0.001em;
+  border: none;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 .mainLink{
@@ -182,6 +215,17 @@ a{
     text-decoration: underline;
 }
 
+
+.mainLinkLarge{
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.1%;
+  color:#444;
+  cursor: pointer;
+  text-decoration: underline;
+}
 
 .popup {
     position: fixed; 

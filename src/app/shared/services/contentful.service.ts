@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map, switchMap } from 'rxjs';
+import { Observable, map, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root',
@@ -39,16 +39,13 @@ export class ContentfulService {
   }
 
   updateAndPublishEntry(entryId: string, contentType: string, data: any): Observable<any> {
-    // Fetch the latest version of the entry to get the correct version number
     return this.getEntry(entryId, contentType).pipe(
       switchMap((entry) => {
         const latestVersion = entry.sys.version;
 
-        // Use the correct version in the update request
         const url = `${this.apiUrl}entries/${entryId}`;
         const headers = this.getHeaders(contentType, latestVersion);
 
-        // Include the "publish" parameter to publish the entry immediately
         const options = { headers, params: { publish: 'true' } };
 
         return this.http.put(url, { fields: data }, options);
@@ -57,10 +54,29 @@ export class ContentfulService {
   }
 
   // Example method to fetch the latest version of an entry
-  private getEntry(entryId: string, contentType:string): Observable<any> {
+  getEntry(entryId: string, contentType:string): Observable<any> {
     const url = `${this.apiUrl}entries/${entryId}`;
     const headers = this.getHeaders(contentType);
 
     return this.http.get(url, { headers });
+  }
+
+  getEntriesByField(contentType: string,field: string, value: any,): Observable<any[]> {
+    const url = `${this.apiUrl}entries`;
+    const headers = this.getHeaders(contentType);
+    
+    const queryParams = {
+      ['fields.' + field]: value,
+      'content_type': contentType 
+    };
+  
+    const options = { headers, params: queryParams };
+  
+    return this.http.get(url, options).pipe(
+      tap((response: any) => {
+        console.log('Response from getEntriesByField:', response);
+      }),
+      map((response: any) => response.items) 
+    );
   }
 }

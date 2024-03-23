@@ -1,5 +1,6 @@
 <div class="settingspage inner-page">
     <div class="block">
+        <form [formGroup]="accountForm" (ngSubmit)="saveAccountDetails()">
         <h6>Account Details</h6>
         <div class="formGroup">
             <div class="label-container">
@@ -9,7 +10,7 @@
                 </div>
             </div>
             <div class="input-holder">
-                <input type="text" class="formControl" placeholder="John"  />
+                <input type="text" class="formControl" placeholder="John" formControlName="name" />
                 <a class="editBtn">edit</a>
             </div>
         </div>
@@ -21,7 +22,7 @@
                 </div>
             </div>
             <div class="input-holder">
-                <input type="text" class="formControl" placeholder="John"  />
+                <input type="text" class="formControl" placeholder="Smith" formControlName="surname" />
                 <a class="editBtn">edit</a>
             </div>
         </div>
@@ -33,7 +34,7 @@
                 </div>
             </div>
             <div class="input-holder">
-                <input type="text" class="formControl" placeholder="John"  />
+                <input type="password" class="formControl" formControlName="password" />
                 <a class="editBtn">edit</a>
             </div>
         </div>
@@ -46,7 +47,7 @@
                 <label>Email Address</label>
             </div>
             <div class="input-holder">
-                <input type="text" class="formControl" placeholder="John"/>
+                <input type="email" class="formControl" placeholder="example@email.com" formControlName="email" />
                 <a class="editBtn">edit</a>
             </div>
         </div>
@@ -59,13 +60,13 @@
                 </div>
             </div>
             <div class="input-holder">
-                <input type="text" class="formControl" placeholder="John"  />
+                <input type="tel" class="formControl" placeholder="+278212345678" formControlName="phone" />
                 <a class="editBtn">edit</a>
             </div>
         </div>
-        
+    </form>
     </div>
-
+   
     <div class="block">
         <div class="row">
             <h6 class="heading">Notifications</h6>
@@ -77,20 +78,167 @@
         <div class="toggleHolder">
             <div class="toggle-container">
                 <label>Email Notifications</label>
-                <mat-slide-toggle [(ngModel)]="emailNotificationsEnabled" color="#3CE1AF"></mat-slide-toggle>
+                <mat-slide-toggle [(ngModel)]="currentUserData.marketingConsent['en-US']" color="#3CE1AF"></mat-slide-toggle>
               </div>
               
               <div class="toggle-container">
                 <label>Tips & Tutorials</label>
-                <mat-slide-toggle [(ngModel)]="tipsAndTutorialsEnabled" color="#3CE1AF"></mat-slide-toggle>
+                <mat-slide-toggle [(ngModel)]="currentUserData.tipsTutorials['en-US']" color="#3CE1AF"></mat-slide-toggle>
               </div>
               
               <div class="toggle-container">
                 <label>User Insights</label>
-                <mat-slide-toggle [(ngModel)]="userInsightsEnabled" color="#3CE1AF"></mat-slide-toggle>
+                <mat-slide-toggle [(ngModel)]="currentUserData.userInsights['en-US']" color="#3CE1AF"></mat-slide-toggle>
               </div>
               <p>Collect user data to create statistics.</p>
         </div>
         
     </div>
+
+    <div class="block btnBlock">
+        <p>Would you like to save or discard the changes you have made?</p>
+        <div class="row">
+            <a class="btnTertiary">Discard</a>
+            <a class="btnSecondary" (click)="saveAll()">Save Changes</a>
+        </div>
+    </div>
+
+    <div class="block">
+        <h6>Billing Information</h6>
+        <div class="formGroup">
+            <div class="label-container">
+                <label>Card Holder Name</label>
+                <div class="error-message">
+                    Card Holder Name is required.
+                </div>
+            </div>
+            <div class="input-holder">
+                <input type="text" class="formControl" placeholder="Name Surname"  />
+                <a class="editBtn">edit</a>
+            </div>
+        </div>
+        <div class="formGroup">
+            <div class="label-container">
+                <label>Card number</label>
+                <div class="error-message">
+                    Card number is required.
+                </div>
+            </div>
+            <div class="input-holder">
+                <input type="text" class="formControl" placeholder="xxxx xxxx 1234"  />
+                <a class="editBtn">edit</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="formGroup">
+                <div class="label-container">
+                    <label>CVV</label>
+                    <div class="error-message">
+                        CVV is required.
+                    </div>
+                </div>
+                <div class="input-holder">
+                    <input type="text" class="formControl" placeholder="John"  />
+                    <a class="editBtn">edit</a>
+                </div>
+            </div>
+            <div class="formGroup">
+                <div class="label-container">
+                    <label>Expiry Date</label>
+                    <div class="error-message">
+                        Expiry Date is required.
+                    </div>
+                </div>
+                <div class="input-holder">
+                    <input type="text" class="formControl" placeholder="mm/yy"  />
+                    <a class="editBtn">edit</a>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="row btnHolder">
+            <a class="btnSecondary">edit details</a>
+        </div>
+    </div>
+   
+    <div class="block">
+        <div class="row">
+            <h6 class="heading">Your Restaurants</h6>
+            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
+                <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen"
+                    [isVisible]="isTooltipOpen"></app-tooltip></i>
+        </div>
+        <div class="restaurantholder" *ngFor="let restaurant of restaurants; let i = index">
+            <p>{{ restaurant.name }}</p>
+            <span [style.color]="restaurant.status === 'active' ? '#1FCC96' : '#9A9A9A'">{{ restaurant.status }}</span>
+            <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
+            <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                <a href="#">View</a>
+                <a href="#">Edit</a>
+                <a href="#">Delete</a>
+                <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+            </div>
+        </div>
+    </div>
+    <div class="block">
+        <h6>About us</h6>
+        <p>The “About Us” page is an optional addition to your menu. You can activate / deactivate this page.</p>
+        <div class="row">
+            <div class="rowToggle">
+                <label>This page is visible  on your menu.</label>
+                <mat-slide-toggle [(ngModel)]="currentUserData.aboutUsDisplayed['en-US']" color="#3CE1AF"></mat-slide-toggle>
+            </div>
+            
+        </div>
+        <div class="row">
+            <a class="btnSecondary">edit details</a>
+        </div>
+    </div>
+    <div class="block">
+        <h6>Looking for something else?</h6>
+        <div class="smallCol">
+            <a class="mainLinkLarge">Edit Users<i class="material-icons">
+                arrow_outward
+            </i></a>
+            <a class="mainLinkLarge">Edit Menus<i class="material-icons">
+                arrow_outward
+            </i></a>
+        </div>
+        <div class="smallCol">
+            <a class="mainLinkLarge">Edit User Permissions<i class="material-icons">
+                arrow_outward
+            </i></a>
+            <a class="mainLinkLarge">Edit Branding<i class="material-icons">
+                arrow_outward
+            </i></a>
+        </div>
+        <div class="smallCol">
+            <a class="mainLinkLarge" (click)="authService.SignOut()">Log Out<i class="material-icons">
+                arrow_outward
+            </i></a>
+            <a class="mainLinkLarge">Terminate Account<i class="material-icons">
+                arrow_outward
+            </i></a>
+        </div>
+    </div>
+
+    <div class="block posBlock">
+        <h6>POS Integration</h6>
+        <p>This is the POS system that is currently linked to your HUNGR account.</p>
+        <div class="formGroup">
+            <div class="label-container">
+                <label>POS System</label>
+                <div class="error-message">
+                    POS System name is required.
+                </div>
+            </div>
+            <div class="input-holder">
+                <input type="text" class="formControl" placeholder="POS System name"  />
+                <a class="editBtn">edit</a>
+            </div>
+        </div>
+    </div>
+ 
 </div>
+

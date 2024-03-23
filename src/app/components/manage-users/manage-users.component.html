@@ -1,1 +1,94 @@
-<p>manage-users works!</p>
+<div class="inner-page">
+    <div class="block">
+        <div class="row">
+            <div class="formGroup">
+                <div class="label-container">
+                    <label>Name</label>
+                </div>
+                <div class="input-holder">
+                    <input type="text" class="formControl" placeholder="John"  />
+                    <a class="editBtn">edit</a>
+                </div>
+            </div>
+            <a class="btnSecondary">+ Add user</a>
+        </div>
+        <h6>Admins</h6>
+        <div class="userTable">
+            <table>
+              <thead>
+                <tr>
+                    <th></th>
+                    <th>User</th>
+                    <th>Email Address</th>
+                    <th>Status</th>
+                    <th>  
+                  
+                    </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of filteredAdmins; let i = index" [ngStyle]="{ background: !user.status ? '#F2F3F4' : 'none' }">
+                    <td>{{ i+1 }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <div class="toggle-container">
+                            <mat-slide-toggle [(ngModel)]="user.status" color="#3CE1AF"></mat-slide-toggle>
+                            <label [style.color]="user.status ? '#3CE1AF' : '#9A9A9A'">{{ user.status ? 'Active' : 'Deactivated' }}</label>
+                        </div>
+                    </td>
+                    <td style="text-align: right;">
+                        <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
+                        <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                            <a href="#">View</a>
+                            <a href="#">Edit</a>
+                            <a href="#">Delete</a>
+                            <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                        </div>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h6>Editors</h6>
+          <div class="userTable">
+              <table>
+                <thead>
+                  <tr>
+                      <th></th>
+                      <th>User</th>
+                      <th>Email Address</th>
+                      <th>Status</th>
+                      <th>  
+                    
+                      </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let user of filteredEditors; let i = index" [ngStyle]="{ background: !user.status ? '#F2F3F4' : 'none' }">
+                      <td>{{ i+1 }}</td>
+                      <td>{{ user.name }}</td>
+                      <td>{{ user.email }}</td>
+                      <td>
+                          <div class="toggle-container">
+                              <mat-slide-toggle [(ngModel)]="user.status" color="#3CE1AF"></mat-slide-toggle>
+                              <label [style.color]="user.status ? '#3CE1AF' : '#9A9A9A'">{{ user.status ? 'Active' : 'Deactivated' }}</label>
+                          </div>
+                      </td>
+                      <td style="text-align: right;">
+                          <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
+                          <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                              <a href="#">View</a>
+                              <a href="#">Edit</a>
+                              <a href="#">Delete</a>
+                              <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                          </div>
+                      </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+    </div>
+    
+</div>
