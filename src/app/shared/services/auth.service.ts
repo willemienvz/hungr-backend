@@ -9,6 +9,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { Component } from '@angular/core';
 import { ContentfulService } from './contentful.service';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class AuthService {
     public afAuth: AngularFireAuth, // Inject Firebase auth service
     public router: Router,
     public ngZone: NgZone,
+    public dataService: DataService,
     private contentfulService: ContentfulService
   ) {
     /* Saving user data in localstorage when 
@@ -60,6 +62,7 @@ export class AuthService {
         up and returns promise */
         this.SendVerificationMail();
         this.SetUserData(result.user);
+        this.dataService.createRobot(email, 'color', 'age');
         this.createContentfulEntry(formDataStep1, formDataStep2,result.user?.uid);
         console.log(result.user?.uid);
       })

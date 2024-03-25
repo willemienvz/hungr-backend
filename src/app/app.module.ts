@@ -28,6 +28,7 @@ import { AdditionalInsightsComponent } from './components/shared/stats/overview/
 import { GeneralComponent } from './components/settings/general/general.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -59,7 +60,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
   ],
   providers: [FormDataService],
   bootstrap: [AppComponent]
