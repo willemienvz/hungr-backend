@@ -1,0 +1,36 @@
+<div class="popup" *ngIf="showPopup">
+    <div class="popup-content">
+      <i class="material-icons popup-close" (click)="closePopup()">close</i>
+      <div class="authBlock">
+        <h3>Add a User</h3>
+        <p>Add the user's details</p>
+        <form #userForm="ngForm" (ngSubmit)="addUser(userForm)">
+          <div class="row">
+            <div class="formGroup">
+              <label>Name</label>
+              <input type="text" class="formControl" placeholder="John" name="name" ngModel required>
+            </div>
+            <div class="formGroup">
+              <label>Email address</label>
+              <input type="email" class="formControl" placeholder="email@address.co.za" name="email" ngModel required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="formGroup">
+              <label>Surname</label>
+              <input type="text" class="formControl" placeholder="Smith" name="lastname" ngModel required>
+            </div>
+            <div class="formGroup">
+              <label>Phone number</label>
+              <input type="text" class="formControl" placeholder="012 345 6789" name="phone" ngModel required>
+            </div>
+          </div>
+          <div class="formGroup btnHolder">
+            <input class="btn btnTertiary" type="button" value="Cancel" (click)="closePopup()">
+            <input type="submit" class="btn btnPrimary" value="Add User">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <app-loading [isLoading]="isSaving"></app-loading>

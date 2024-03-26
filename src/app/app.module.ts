@@ -30,6 +30,8 @@ import { ManageUsersComponent } from './components/manage-users/manage-users.com
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { LoadingComponent } from './components/shared/loading/loading.component';
+import { AddUserDialogComponent } from './components/manage-users/add-user-dialog/add-user-dialog.component';
+import { ConfirmUserComponent } from './components/manage-users/confirm-user/confirm-user.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +56,8 @@ import { LoadingComponent } from './components/shared/loading/loading.component'
     GeneralComponent,
     ManageUsersComponent,
     LoadingComponent,
+    AddUserDialogComponent,
+    ConfirmUserComponent,
   ],
   imports: [
     BrowserModule,

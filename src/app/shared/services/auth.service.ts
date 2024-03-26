@@ -59,51 +59,25 @@ export class AuthService {
       .then((result) => {
         this.SendVerificationMail();
         this.SetUserData(result.user, formDataStep1, formDataStep2);
-        //this.createContentfulEntry(formDataStep1, formDataStep2,result.user?.uid);
       })
       .catch((error) => {
         window.alert(error.message);
       });
   }
 
-
-  createContentfulEntry(formDataStep1:any, formDataStep2:any, userID:any) {
-    const contentType = 'userData'; 
-    const entryData = {
-      userId: { 'en-US':  userID}, 
-      firstName: { 'en-US': formDataStep1.firstName },
-      surname: { 'en-US':  formDataStep1.lastName},
-      email: { 'en-US':  formDataStep1.userEmail },
-      cellphoneNumber: { 'en-US':  formDataStep1.cellphone },
-      cardHolderName: { 'en-US':  formDataStep1.cardname }, 
-      cardNumber: { 'en-US':  formDataStep1.cardnumber }, 
-      cvv: { 'en-US':  formDataStep1.cvv }, 
-      expiryDate: { 'en-US':  formDataStep1.expirydate }, 
-      accountMethod: { 'en-US': formDataStep2.billingOption}, 
-      tcAccept: { 'en-US':  formDataStep2.agreeToTerms }, 
-      marketingConsent: { 'en-US':  formDataStep2.receiveMarketingInfo }, 
-    };
-
-    this.contentfulService.createEntry(contentType, entryData).subscribe(
-      (entryId) => {
-        console.log('Entry drafted with ID:', entryId);
-        this.updateAndPublishContentfulEntry(entryId, contentType, entryData);
-      },
-      (error) => {
-        console.error('Error creating entry:', error);
-      }
-    );
-  }
-
-  updateAndPublishContentfulEntry(entryId: string, contentType: string, updatedEntryData:any) {
-    this.contentfulService.updateAndPublishEntry(entryId, contentType, updatedEntryData).subscribe(
-      () => {
-        console.log('Entry updated and published successfully');
-      },
-      (error) => {
-        console.error('Error updating and publishing entry:', error);
-      }
-    );
+  SignUpEditor(email: string, data:any) {
+    const user = JSON.parse(localStorage.getItem('user')!);
+    const parentId = user.uid;
+    const password = 'th1s1s@t3mpP@ssw0rdPl3@s3Ch@ng3m3!123'
+    return this.afAuth
+      .createUserWithEmailAndPassword(email, password)
+      .then((result) => {
+        this.SendVerificationMailEditor();
+        this.SetUserDataEditor(result.user, data.email, data.lastname, data.name, data.phone, parentId);
+      })
+      .catch((error) => {
+        window.alert(error.message);
+      });  
   }
 
   // Send email verfificaiton when new user sign up
@@ -113,6 +87,24 @@ export class AuthService {
       .then(() => {
         this.router.navigate(['verify-email-address']);
       });
+  }
+
+   // Send email verfificaiton when new editor sign up
+   SendVerificationMailEditor() {
+    const currentUser = this.afAuth.currentUser;
+    if (currentUser) {
+      return currentUser.then((user: any) => {
+        return user.sendEmailVerification().then(() => {
+        }).catch((error: any) => {
+          console.log('Error sending verification email: ' + error.message);
+        });
+      }).catch((error: any) => {
+        console.log('Error getting current user: ' + error.message);
+      });
+    } else {
+      console.log('No user is currently signed in.');
+      return Promise.resolve();
+    }
   }
   // Reset Forggot password
   ForgotPassword(passwordResetEmail: string) {
@@ -154,11 +146,40 @@ export class AuthService {
       expiryDate: formDataStep1.expirydate,
       accountType:'admin',
       subscriptionType: formDataStep2.billingOption,
+      parentId:''
     };
     return userRef.set(userData, {
       merge: true,
     });
   }
+  SetUserDataEditor(user: any, email: string, lastName:string, firstName:string, phone:string, parentId:string) {
+      const userRef: AngularFirestoreDocument<any> = this.afs.doc(
+        `users/${user.uid}`
+      );
+      const userData: User = {
+        uid: user.uid,
+        firstName: firstName,
+        Surname: lastName,
+        email: email,
+        cellphoneNumber: phone,
+        emailVerified: user.emailVerified,
+        marketingConsent: false,
+        tipsTutorials: false,
+        userInsights: false,
+        aboutUsDisplayed: false,
+        cardHolderName: '',
+        cardNumber: '',
+        cvv: 0,
+        expiryDate: '',
+        accountType: 'editor',
+        subscriptionType: '',
+        parentId: parentId
+      };
+      return userRef.set(userData, {
+        merge: true,
+      });
+  }
+  
   // Sign out
   SignOut() {
     return this.afAuth.signOut().then(() => {
@@ -178,4 +199,20 @@ export class AuthService {
       });
     });
   }
+
+  sendEmailInvitation(email: string, docId: string) {
+    const actionCodeSettings = {
+      url: 'https://main.d9ek0iheftizq.amplifyapp.com/confirm-user?docId=' + docId,
+      handleCodeInApp: true // This must be true
+    };
+
+    return this.afAuth.sendSignInLinkToEmail(email, actionCodeSettings)
+      .then(() => {
+        console.log('success sent');        
+      })
+      .catch(error => {
+        console.error('Error sending email invitation: ', error);
+      });
+  }
+ 
 }

@@ -15,4 +15,5 @@ export interface User {
     tipsTutorials:boolean;
     userInsights:boolean;
     aboutUsDisplayed:boolean;
+    parentId:string;
  }

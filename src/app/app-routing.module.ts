@@ -9,6 +9,7 @@ import { VerifyEmailComponent } from './components/verify-email/verify-email.com
 import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { GeneralComponent } from './components/settings/general/general.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
+import { ConfirmUserComponent } from './components/manage-users/confirm-user/confirm-user.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'register-user', component: SignUpComponent },
  // { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]  },
   { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'confirm-user', component: ConfirmUserComponent },
   { path: 'verify-email-address', component: VerifyEmailComponent },
   {
     path: '',

@@ -1,39 +1,43 @@
-import { Component } from '@angular/core';
-
-interface User {
-  name: string;
-  email: string;
-  status: boolean;
-  role: 'admin' | 'editor'; // Define role property type
-}
+import { Component, OnInit } from '@angular/core';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
+import { User } from '../../shared/services/user';
 
 @Component({
   selector: 'app-manage-users',
   templateUrl: './manage-users.component.html',
   styleUrls: ['./manage-users.component.scss']
 })
-export class ManageUsersComponent {
-  users: User[] = [
-    { name: 'John Doe', email: 'john@example.com', status: true, role: 'admin' },
-    { name: 'Jane Smith', email: 'jane@example.com', status: false, role: 'admin' },
-    { name: 'Alice Johnson', email: 'alice@example.com', status: true, role: 'editor' },
-    { name: 'Bob Johnson', email: 'bob@example.com', status: true, role: 'editor' },
-  ];
-
-  filteredAdmins: User[] = [];
-  filteredEditors: User[] = [];
+export class ManageUsersComponent implements OnInit {
+  users: User[] = [];
+  isSaving: boolean = false;
   isPopupMenuOpen: boolean[] = [];
+  mainUserName:string='';
+  constructor(private firestore: AngularFirestore) {
+  }
 
-  constructor() {
-    this.filterUsers();
+  ngOnInit() {
+    this.isSaving = true;
+    this.fetchUsers();
+  }
+
+  private fetchUsers() {
+    const user = JSON.parse(localStorage.getItem('user')!);
+    const parentId = user.uid;
+    this.mainUserName = user.email;
+    this.firestore.collection<User>('users', ref => ref.where('parentId', '==', parentId))
+      .valueChanges()
+      .subscribe(users => {
+        this.users = users;
+        this.isSaving = false;
+      });
   }
 
   togglePopupMenu(index: number) {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
 
-  private filterUsers() {
-    this.filteredAdmins = this.users.filter(user => user.role === 'admin');
-    this.filteredEditors = this.users.filter(user => user.role === 'editor');
+  deleteUser(uid:string){
+    const userRef: AngularFirestoreDocument<any> = this.firestore.doc(`users/${uid}`);
+    userRef.delete();
   }
 }
