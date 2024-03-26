@@ -3,25 +3,10 @@ import { AuthService } from '../../../shared/services/auth.service';
 import { Observable, map } from 'rxjs';
 import { ContentfulService } from '../../../shared/services/contentful.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { createClient } from 'contentful';
-import { environment } from '../../../../environments/environment';
-interface UserData {
-  userId: string;
-  firstName: string;
-  surname: string;
-  email: string;
-  cellphoneNumber?: string;
-  cardHolderName?: string;
-  cardNumber?: string;
-  cvv?: number;
-  expiryDate?: string;
-  accountMethod?: string;
-  tcAccept?: boolean;
-  marketingConsent?: boolean;
-  tipsTutorials?: boolean;
-  userInsights?: boolean;
-  aboutUsDisplayed?: boolean;
-}
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { User } from '../../../shared/services/user';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-general',
   templateUrl: './general.component.html',
@@ -35,18 +20,33 @@ export class GeneralComponent {
   userInsightsEnabled: boolean = false;
   isPopupMenuOpen: boolean[] = [];
   currentUser:any;
-  currentUserData:any;
+  currentUserData!:User;
   userdateAll:any;
   accountForm!: FormGroup;
-  userToSave!:UserData;
   userDataID:string = '';
-  constructor(public authService: AuthService, public contentfulService: ContentfulService, private formBuilder: FormBuilder) {
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      this.currentUser = JSON.parse(userString);
-      this.getUserData(this.currentUser.uid, 'userData');
-      console.log(this.currentUser);
-    }
+  isSaving: boolean = false; 
+  userData$!: Observable<any>;
+  constructor( private router: Router,public authService: AuthService, private formBuilder: FormBuilder,private firestore: AngularFirestore) {
+    this.authService.getCurrentUserId().then((uid) => {
+      if (uid) {
+        console.log(uid);
+        this.userDataID = uid;
+        const userString = localStorage.getItem('user');
+        if (userString) {
+          this.currentUser = JSON.parse(userString);
+          console.log(this.currentUser);
+        }
+        this.userData$ = this.firestore.doc(`users/${this.userDataID}`).valueChanges();
+        this.userData$.subscribe(data => {
+          this.currentUserData = data;
+          this.updateFormWithUserData();
+        });
+      } else {
+        console.log("No authenticated user");
+        this.router.navigate(['/signin']);
+      }
+    });
+   
   }
 
   ngOnInit(): void {
@@ -59,31 +59,17 @@ export class GeneralComponent {
     });
   }
 
-  getUserData(fieldValue: string, contentType: string) {
-    const fieldName = "userId";
-    this.contentfulService.getEntriesByField(contentType, fieldName, fieldValue).subscribe(
-      (userData: any) => {
-        this.userDataID = userData[0].sys.id;
-        this.currentUserData = userData[0].fields;
-        this.updateFormWithUserData();
-        this.userdateAll = userData;
-        console.log('User Data:', userData);
-      },
-      (error: any) => {
-        console.error('Error fetching user data:', error);
-      }
-    );
+  getUserData() {
+   
   }
 
   updateFormWithUserData() {
     if (this.currentUserData && this.accountForm) {
       this.accountForm.patchValue({
-        name: this.currentUserData.firstName['en-US'],
-        surname: this.currentUserData.surname['en-US'],
-        password: 'test123',
-        email: this.currentUserData.email['en-US'],
-        phone: this.currentUserData.cellphoneNumber['en-US'],
-
+        name: this.currentUserData.firstName,
+        surname: this.currentUserData.Surname,
+        email: this.currentUserData.email,
+        phone: this.currentUserData.cellphoneNumber,
       });
     }
   }
@@ -107,20 +93,24 @@ export class GeneralComponent {
   }
 
   saveAll(){
-    const userToSave = {
-      firstName: { "en-US": this.accountForm.get('name')?.value },
-      surname: { "en-US": this.accountForm.get('surname')?.value },
-      cellphoneNumber: { "en-US": this.accountForm.get('phone')?.value },
+    this.isSaving = true; 
+    const userToSave: Partial<User> = {
+      firstName: this.accountForm.get('name')?.value,
+      Surname: this.accountForm.get('surname')?.value,
+      cellphoneNumber: this.accountForm.get('phone')?.value,
+      marketingConsent: this.currentUserData.marketingConsent, 
+      tipsTutorials: this.currentUserData.tipsTutorials, 
+      userInsights: this.currentUserData.userInsights,
+      aboutUsDisplayed: this.currentUserData.aboutUsDisplayed
     };
 
-  
-
-    this.contentfulService.getEntry(this.userdateAll[0].sys.id, 'userData')
-    .subscribe((entry) => {
-        entry.fields.firstName = {
-            'en-US': 'Arizona'
-        }
-        return entry.save()
-    });
+    this.firestore.doc(`users/${this.currentUserData.uid}`).update(userToSave)
+      .then(() => {
+        this.isSaving = false;
+      })
+      .catch((error) => {
+       this.isSaving = false;
+        console.error('Error updating user data:', error);
+      });
 }
 }

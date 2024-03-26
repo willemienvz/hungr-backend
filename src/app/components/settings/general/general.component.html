@@ -78,17 +78,17 @@
         <div class="toggleHolder">
             <div class="toggle-container">
                 <label>Email Notifications</label>
-                <mat-slide-toggle [(ngModel)]="currentUserData.marketingConsent['en-US']" color="#3CE1AF"></mat-slide-toggle>
+                <mat-slide-toggle [(ngModel)]="currentUserData.marketingConsent" color="#3CE1AF"></mat-slide-toggle>
               </div>
               
               <div class="toggle-container">
                 <label>Tips & Tutorials</label>
-                <mat-slide-toggle [(ngModel)]="currentUserData.tipsTutorials['en-US']" color="#3CE1AF"></mat-slide-toggle>
+                <mat-slide-toggle [(ngModel)]="currentUserData.tipsTutorials" color="#3CE1AF"></mat-slide-toggle>
               </div>
               
               <div class="toggle-container">
                 <label>User Insights</label>
-                <mat-slide-toggle [(ngModel)]="currentUserData.userInsights['en-US']" color="#3CE1AF"></mat-slide-toggle>
+                <mat-slide-toggle [(ngModel)]="currentUserData.userInsights" color="#3CE1AF"></mat-slide-toggle>
               </div>
               <p>Collect user data to create statistics.</p>
         </div>
@@ -187,7 +187,7 @@
         <div class="row">
             <div class="rowToggle">
                 <label>This page is visible  on your menu.</label>
-                <mat-slide-toggle [(ngModel)]="currentUserData.aboutUsDisplayed['en-US']" color="#3CE1AF"></mat-slide-toggle>
+                <mat-slide-toggle [(ngModel)]="currentUserData.aboutUsDisplayed" color="#3CE1AF"></mat-slide-toggle>
             </div>
             
         </div>
@@ -242,3 +242,4 @@
  
 </div>
 
+<app-loading [isLoading]="isSaving"></app-loading>

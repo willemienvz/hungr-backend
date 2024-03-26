@@ -28,6 +28,8 @@ import { AdditionalInsightsComponent } from './components/shared/stats/overview/
 import { GeneralComponent } from './components/settings/general/general.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { LoadingComponent } from './components/shared/loading/loading.component';
 
 @NgModule({
   declarations: [
@@ -51,11 +53,13 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     AdditionalInsightsComponent,
     GeneralComponent,
     ManageUsersComponent,
+    LoadingComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase, 'hungr-firebase-app'),
+    AngularFirestoreModule,
     AngularFireAuthModule,
     FormsModule,
     ReactiveFormsModule,

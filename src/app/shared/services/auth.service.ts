@@ -42,7 +42,6 @@ export class AuthService {
     return this.afAuth
       .signInWithEmailAndPassword(email, password)
       .then((result) => {
-        this.SetUserData(result.user);
         this.afAuth.authState.subscribe((user) => {
           if (user) {
             this.router.navigate(['dashboard']);
@@ -58,16 +57,11 @@ export class AuthService {
     return this.afAuth
       .createUserWithEmailAndPassword(email, password)
       .then((result) => {
-        /* Call the SendVerificaitonMail() function when new user sign 
-        up and returns promise */
         this.SendVerificationMail();
-        this.SetUserData(result.user);
-        this.dataService.createRobot(email, 'color', 'age');
-        this.createContentfulEntry(formDataStep1, formDataStep2,result.user?.uid);
-        console.log(result.user?.uid);
+        this.SetUserData(result.user, formDataStep1, formDataStep2);
+        //this.createContentfulEntry(formDataStep1, formDataStep2,result.user?.uid);
       })
       .catch((error) => {
-        //add error message here
         window.alert(error.message);
       });
   }
@@ -139,16 +133,27 @@ export class AuthService {
   /* Setting up user data when sign in with username/password, 
   sign up with username/password and sign in with social auth  
   provider in Firestore database using AngularFirestore + AngularFirestoreDocument service */
-  SetUserData(user: any) {
+  SetUserData(user: any, formDataStep1:any, formDataStep2:any) {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
       `users/${user.uid}`
     );
     const userData: User = {
       uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
+      firstName: formDataStep1.firstName,
+      Surname: formDataStep1.lastName,
+      email: formDataStep1.userEmail,
+      cellphoneNumber: formDataStep1.cellphone,
       emailVerified: user.emailVerified,
+      marketingConsent:formDataStep2.receiveMarketingInfo,
+      tipsTutorials:formDataStep2.receiveMarketingInfo,
+      userInsights:formDataStep2.receiveMarketingInfo,
+      aboutUsDisplayed:false,
+      cardHolderName: formDataStep1.cardname,
+      cardNumber:formDataStep1.cardnumber,
+      cvv: formDataStep1.cvv,
+      expiryDate: formDataStep1.expirydate,
+      accountType:'admin',
+      subscriptionType: formDataStep2.billingOption,
     };
     return userRef.set(userData, {
       merge: true,
@@ -159,6 +164,18 @@ export class AuthService {
     return this.afAuth.signOut().then(() => {
       localStorage.removeItem('user');
       this.router.navigate(['sign-in']);
+    });
+  }
+
+  getCurrentUserId(): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      this.afAuth.onAuthStateChanged((user) => {
+        if (user) {
+          resolve(user.uid);
+        } else {
+          resolve(null);
+        }
+      });
     });
   }
 }
