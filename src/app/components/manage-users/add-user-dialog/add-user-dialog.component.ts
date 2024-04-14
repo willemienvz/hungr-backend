@@ -13,8 +13,7 @@ export class AddUserDialogComponent {
   constructor(
     public authService: AuthService,
   ) { }
-  ngOnInit() {
-  }
+ 
 
   openPopup() {
     this.showPopup = true;

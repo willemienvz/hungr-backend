@@ -1,0 +1,38 @@
+<div class="popup" *ngIf="showPopup">
+    <div class="popup-content">
+      <i class="material-icons popup-close" (click)="closePopup()">close</i>
+      <div class="authBlock">
+        <h3>QR Code Name</h3>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="colInner" *ngIf="selectedMenu">
+            <qrcode [qrdata]="selectedMenu.menuID" (qrCodeURL)="onChangeURL($event)" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+              <div class="formGroup btnHolder">
+                <a class="btn btnTertiary" (click)="closePopup()">Cancel</a>
+                <a class="btn btnBlue" (click)="saveSettings()">Save</a>
+              </div>
+          </div>
+        </div>
+        <div class="col">
+          <div>
+            <p>Assign this code to...</p>
+            <p *ngIf="filteredMenus.length < 1">There are no unassigned menus</p>
+            <mat-form-field appearance="fill" *ngIf="filteredMenus.length > 0">
+              <mat-select [(ngModel)]="selectedMenu" (selectionChange)="selectMenu($event.value)">
+                <mat-option *ngFor="let menu of filteredMenus" [value]="menu">
+                  {{ menu.menuName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <p class="error-message" *ngIf="validationError">Please select a menu to assign</p>
+            <p class="success-message" *ngIf="saveSuccess">QR code assigned to {{selectedMenu?.menuName}}</p>
+          </div>
+          <div class="formGroup btnHolder">
+            <a class="btn btnSecondary" [href]="qrCodeDownloadLink" download="qrcode">SAVE & Download</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <app-loading [isLoading]="isSaving"></app-loading>

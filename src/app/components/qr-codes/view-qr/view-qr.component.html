@@ -1,0 +1,21 @@
+<div class="popup" *ngIf="showPopup">
+    <div class="popup-content">
+      <i class="material-icons popup-close" (click)="closePopup()">close</i>
+      <div class="authBlock">
+        <h3>QR Code Name</h3>
+      </div>
+      <div class="row">
+        <div class="col">
+          <qrcode [qrdata]="currentMenu.menuID" (qrCodeURL)="onChangeURL($event)" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+        </div>
+        <div class="col">
+          <div>
+            <p>This code is assigned to {{currentMenu.menuName}}</p>
+          </div>
+          <div class="formGroup btnHolder">
+            <a class="btn btnSecondary" [href]="qrCodeDownloadLink" download="qrcode">Download</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

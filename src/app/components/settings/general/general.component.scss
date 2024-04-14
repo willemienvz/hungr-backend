@@ -122,26 +122,6 @@
     
 }
 
-.restaurantholder{
-    display: flex;
-    width: 100%;
-    padding: 12px 14px;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    border-bottom: 1px solid #DEDEDE;
-    span{
-        font-family: 'Barlow', sans-serif;
-        font-size: 10px;
-        font-weight: 500;
-        line-height: 1;
-        letter-spacing: -0.001em;
-        color: #1FCC96;
-        text-align: left;
-    }
-}
-
 .material-icons{
     margin-bottom: 0;
 }

@@ -74,11 +74,7 @@ export class GeneralComponent {
     }
   }
 
-  restaurants = [
-    { name: 'Restaurant 1', status: 'active' },
-    { name: 'Restaurant 2', status: 'inactive' },
-    { name: 'Restaurant 3', status: 'active' }
-  ];
+
 
   togglePopupMenu(index: number) {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];

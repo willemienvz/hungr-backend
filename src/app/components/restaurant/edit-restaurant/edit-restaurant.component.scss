@@ -1,0 +1,87 @@
+.inner-page{
+    
+
+    form{
+        width: 100%;
+        flex-direction: row;
+        gap: 15px;
+        display: flex;
+    }
+}
+
+.col{
+    width: calc(33% - 15px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .block{
+        gap: 25px;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.selectedOption{
+    width: 100%;
+    padding: 12px;
+    background-color: #F3F4F5;
+    margin-bottom: 20px;
+}
+
+.contactBlock mat-form-field{
+    width: 100%;
+
+}
+
+.backLink{
+    width: 100%;
+    flex-direction: row;
+    display: flex;
+    justify-content: flex-start;
+    gap: 5px;
+    align-items: center;
+    text-decoration: none;
+}
+
+.row{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: center;
+    align-items: flex-start;
+
+    .formGroup{
+        width: 100%;
+    }
+}
+
+.tableNum{
+    color: #181818;
+    width: 84px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    height: 56px;
+    background-color: #F3F4F5;
+}
+
+.toggle-container{
+    border: 1px solid #DEDEDE;
+}
+
+.btnHolder{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-direction: row;
+}
+
+.success-message{
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+}

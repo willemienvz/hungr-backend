@@ -164,6 +164,7 @@ a{
     text-transform: uppercase;
     color: #181818;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .btnSecondary{
@@ -180,6 +181,7 @@ a{
   border: none;
   text-transform: uppercase;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .btnTertiary{
@@ -196,6 +198,24 @@ a{
   border: none;
   text-transform: uppercase;
   cursor: pointer;
+  text-decoration: none;
+}
+
+.btnBlue{
+  color: #181818;
+  background: #AFDCFF;
+  border-radius: 6px;
+  text-align: center;
+  padding: 15px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 14px;
+  letter-spacing: -0.001em;
+  border: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .mainLink{
@@ -245,7 +265,7 @@ a{
     padding: 20px;
     border: 1px solid #DEDEDE;
     width: 80%; 
-    max-width: 500px;
+    max-width: 600px;
     border-radius: 10px;
     padding: 25px;
     position: relative;
@@ -271,6 +291,16 @@ a{
     letter-spacing: -0.001em;
     text-align: left;
 
+  }
+
+  .success-message{
+    font-family: 'Barlow', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 10px;
+    letter-spacing: -0.001em;
+    text-align: left;
+    color: green;
   }
 
   .label-container{
@@ -331,4 +361,51 @@ a{
 /* Change the track color */
 .mat-slide-toggle-bar {
   background-color: #3CE1AF;
+}
+
+
+::ng-deep .mat-select-panel {
+  background-color: transparent !important;
+}
+
+/* Style the background color of the selected option */
+::ng-deep .mat-selected-option {
+  background-color: transparent !important;
+}
+
+/* Style the background color of the options in the dropdown */
+::ng-deep .mat-option {
+  background-color: white; /* Set to white to match default background */
+}
+
+/* Style the hover color of the options in the dropdown */
+::ng-deep .mat-option:hover:not(.mat-option-disabled) {
+  background-color: #e0e0e0; /* Change to the desired hover color */
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: white !important;
+}
+
+.mat-mdc-radio-button.mat-accent {
+  --mdc-radio-disabled-selected-icon-color: black;
+  --mdc-radio-disabled-unselected-icon-color: black;
+  --mdc-radio-unselected-hover-icon-color: #212121;
+  --mdc-radio-unselected-icon-color: rgba(0, 0, 0, 0.54);
+  --mdc-radio-unselected-pressed-icon-color: rgba(0, 0, 0, 0.54);
+  --mdc-radio-selected-focus-icon-color: black;
+  --mdc-radio-selected-hover-icon-color: #000;
+  --mdc-radio-selected-icon-color: #000;
+  --mdc-radio-selected-pressed-icon-color: #000;
+  --mat-radio-ripple-color: black;
+  --mat-radio-checked-ripple-color: #000;
+  --mat-radio-disabled-label-color: rgba(0, 0, 0, 0.38);
+}
+
+.mat-mdc-radio-touch-target{
+  display: none !important;
+}
+
+mat-label{
+  font-size: 14px !important;
 }

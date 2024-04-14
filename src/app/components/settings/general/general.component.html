@@ -163,23 +163,7 @@
     </div>
    
     <div class="block">
-        <div class="row">
-            <h6 class="heading">Your Restaurants</h6>
-            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-                <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen"
-                    [isVisible]="isTooltipOpen"></app-tooltip></i>
-        </div>
-        <div class="restaurantholder" *ngFor="let restaurant of restaurants; let i = index">
-            <p>{{ restaurant.name }}</p>
-            <span [style.color]="restaurant.status === 'active' ? '#1FCC96' : '#9A9A9A'">{{ restaurant.status }}</span>
-            <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
-            <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-                <a href="#">View</a>
-                <a href="#">Edit</a>
-                <a href="#">Delete</a>
-                <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
-            </div>
-        </div>
+        <app-summary></app-summary>
     </div>
     <div class="block">
         <h6>About us</h6>

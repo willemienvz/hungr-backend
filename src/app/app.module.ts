@@ -28,11 +28,24 @@ import { AdditionalInsightsComponent } from './components/shared/stats/overview/
 import { GeneralComponent } from './components/settings/general/general.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { LoadingComponent } from './components/shared/loading/loading.component';
 import { AddUserDialogComponent } from './components/manage-users/add-user-dialog/add-user-dialog.component';
 import { ConfirmUserComponent } from './components/manage-users/confirm-user/confirm-user.component';
-
+import { QrCodesComponent } from './components/qr-codes/qr-codes.component';
+import { EditQrComponent } from './components/qr-codes/edit-qr/edit-qr.component';
+import { ViewQrComponent } from './components/qr-codes/view-qr/view-qr.component';
+import { DeleteQrComponent } from './components/qr-codes/delete-qr/delete-qr.component';
+import { AddQrComponent } from './components/qr-codes/add-qr/add-qr.component';
+import { QRCodeModule } from 'angularx-qrcode';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SummaryComponent } from './components/restaurant/summary/summary.component';
+import { AddComponent } from './components/restaurant/add/add.component';
+import { EditRestaurantComponent } from './components/restaurant/edit-restaurant/edit-restaurant.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -58,6 +71,14 @@ import { ConfirmUserComponent } from './components/manage-users/confirm-user/con
     LoadingComponent,
     AddUserDialogComponent,
     ConfirmUserComponent,
+    QrCodesComponent,
+    EditQrComponent,
+    ViewQrComponent,
+    DeleteQrComponent,
+    AddQrComponent,
+    SummaryComponent,
+    AddComponent,
+    EditRestaurantComponent,
   ],
   imports: [
     BrowserModule,
@@ -69,6 +90,12 @@ import { ConfirmUserComponent } from './components/manage-users/confirm-user/con
     ReactiveFormsModule,
     HttpClientModule,
     MatSlideToggleModule,
+    QRCodeModule,
+    MatSelectModule,
+    MatInputModule,
+    MatFormFieldModule,
+    BrowserAnimationsModule,
+    MatRadioModule
   ],
   providers: [FormDataService],
   bootstrap: [AppComponent]
