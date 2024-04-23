@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { SignInComponent } from './components/sign-in/sign-in.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -46,6 +47,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SummaryComponent } from './components/restaurant/summary/summary.component';
 import { AddComponent } from './components/restaurant/add/add.component';
 import { EditRestaurantComponent } from './components/restaurant/edit-restaurant/edit-restaurant.component';
+import { BrandingComponent } from './components/settings/branding/branding.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -79,6 +81,7 @@ import { EditRestaurantComponent } from './components/restaurant/edit-restaurant
     SummaryComponent,
     AddComponent,
     EditRestaurantComponent,
+    BrandingComponent,
   ],
   imports: [
     BrowserModule,
@@ -95,7 +98,8 @@ import { EditRestaurantComponent } from './components/restaurant/edit-restaurant
     MatInputModule,
     MatFormFieldModule,
     BrowserAnimationsModule,
-    MatRadioModule
+    MatRadioModule,
+    AngularFireStorageModule
   ],
   providers: [FormDataService],
   bootstrap: [AppComponent]

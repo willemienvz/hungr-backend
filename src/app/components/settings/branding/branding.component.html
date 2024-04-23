@@ -1,0 +1,29 @@
+<div class="inner-page">
+    <div class="row">
+    <div class="block">
+        <h6>Logo</h6>
+        <p>Please upload your logo.</p>
+        <input type="file" (change)="onFileSelected($event)">
+        <button (click)="onUpload()">Upload</button>
+
+        <div *ngIf="imageUrl">
+        <img [src]="imageUrl" alt="Uploaded logo">
+        </div>
+    </div>
+   
+   
+
+    <div class="block btnBlock">
+        <p>Would you like to save or discard the changes you have made?</p>
+        <div class="row">
+            <a class="btnTertiary">Discard</a>
+            <a class="btnSecondary" (click)="saveAll()">Save Changes</a>
+        </div>
+    </div>
+
+</div>
+   
+ 
+</div>
+
+<app-loading [isLoading]="isSaving"></app-loading>

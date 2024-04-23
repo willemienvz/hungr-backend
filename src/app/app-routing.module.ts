@@ -13,6 +13,7 @@ import { ConfirmUserComponent } from './components/manage-users/confirm-user/con
 import { QrCodesComponent } from './components/qr-codes/qr-codes.component';
 import { AddComponent } from './components/restaurant/add/add.component';
 import { EditRestaurantComponent } from './components/restaurant/edit-restaurant/edit-restaurant.component';
+import { BrandingComponent } from './components/settings/branding/branding.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -33,6 +34,7 @@ const routes: Routes = [
       { path: 'menus/qr-codes', component: QrCodesComponent },
       { path: 'settings/add-new-restaurant', component: AddComponent },
       { path: 'settings/edit-restaurant', component: EditRestaurantComponent },
+      { path: 'settings/branding', component: BrandingComponent },
       { path: '', redirectTo: '/dashboard', pathMatch: 'full' } 
     ]
   }
