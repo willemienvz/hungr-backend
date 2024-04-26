@@ -11,6 +11,24 @@
         </div>
     </div>
    
+    <div class="block">
+        <div class="row">
+            <h6 class="heading">Background colour</h6>
+            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
+                <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen"
+                    [isVisible]="isTooltipOpen"></app-tooltip></i>
+        </div>
+        <div class="row inputRow">
+            <p>Background colour</p>
+            
+            <div class="colorPicker">
+                <ngx-colors ngx-colors-trigger [(ngModel)]="leftColor"></ngx-colors>
+                <mat-form-field>
+                    <input matInput [(ngModel)]="leftColor">
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
    
 
     <div class="block btnBlock">

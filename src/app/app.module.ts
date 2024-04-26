@@ -48,6 +48,7 @@ import { SummaryComponent } from './components/restaurant/summary/summary.compon
 import { AddComponent } from './components/restaurant/add/add.component';
 import { EditRestaurantComponent } from './components/restaurant/edit-restaurant/edit-restaurant.component';
 import { BrandingComponent } from './components/settings/branding/branding.component';
+import { NgxColorsModule } from 'ngx-colors';
 @NgModule({
   declarations: [
     AppComponent,
@@ -99,7 +100,8 @@ import { BrandingComponent } from './components/settings/branding/branding.compo
     MatFormFieldModule,
     BrowserAnimationsModule,
     MatRadioModule,
-    AngularFireStorageModule
+    AngularFireStorageModule,
+    NgxColorsModule
   ],
   providers: [FormDataService],
   bootstrap: [AppComponent]
