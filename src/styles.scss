@@ -118,7 +118,7 @@ h6{
 }
 
 p{
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'Barlow', sans-serif;
     font-size: 13px;
     font-weight: 400;
     line-height: 15px;
@@ -408,4 +408,34 @@ a{
 
 mat-label{
   font-size: 14px !important;
+}
+
+.colorPicker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  border: 1px solid #DEDEDE;
+  padding: 0 10px 10px 10px;
+    border-radius: 2px;
+    background-color: white;
+
+  .mat-mdc-form-field-subscript-wrapper{
+    display: none;
+  }
+
+  .mdc-text-field--filled:not(.mdc-text-field--disabled){
+    background-color: transparent !important;
+  }
+
+  .mat-mdc-form-field{
+    width: 100px;
+  }
+  .mat-mdc-form-field-focus-overlay{
+    opacity: 0 !important;
+  }
+
+  .mdc-text-field--no-label:not(.mdc-text-field--textarea){
+    font-size: 14px;
+  }
 }

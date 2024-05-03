@@ -73,6 +73,7 @@
     flex-direction: row;
     gap: 10px;
     justify-content: space-between;
+    align-items: flex-start;
 }
 
 .rowToggle{
@@ -88,6 +89,17 @@
     label{
         color: #1FCC96;
     }
+}
+
+.brandingRow{
+    margin-bottom: 10px;
+}
+
+.brandingRow:last-of-type{
+    margin-bottom: 0px;
+}
+.brandingRow > div{
+    width: 100%;
 }
 
 .btnHolder{
@@ -199,4 +211,127 @@
     gap: 20px;
     display: flex;
     flex-direction: column;
+}
+
+.mat-mdc-form-field-subscript-wrapper{
+    display: none;
+}
+
+.selectField{
+    border: 1px solid #DEDEDE;
+    padding: 0 10px;
+    background-color: white;
+    border-radius: 2px;
+    height: 68px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.headingTable{
+    color: #9A9A9A;
+    font-size: 13px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.headingTable:first-of-type{
+    text-align: left;
+}
+
+.block{
+    gap: 0;
+}
+
+.heading{
+    margin-bottom: 20px;
+}
+
+.inner-page{
+display: flex;
+gap: 20px;
+flex-direction: column;
+}
+
+.headingHold{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+
+    p{
+        color: #444444;
+    }
+}
+
+.outerLive{
+    width: 35%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.outerCol{
+    width: calc(65% - 15px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.outerRow{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    width: 100%;
+    align-items: stretch;
+}
+
+.preview{
+    background-image: url('../../../../assets/images/branding/phone.png');
+    background-position: center;
+    background-size: contain;
+    height: 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    max-width: 90%;
+    margin: auto;
+    gap: 20px;
+
+    p{
+        text-align: center;
+        width: 50%;
+    }
+
+    a{
+        padding: 12px 38px;
+        border-radius: 6px;
+        min-width: 120px;
+    }
+}
+
+.logoBlock{
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.imagePreview img{
+    width: 100%;
+}
+
+
+.imagePreviewSmall{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    img{
+        width: 50%;
+    }
 }
