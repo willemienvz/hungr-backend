@@ -1,0 +1,79 @@
+<div class="inner-page">
+    <div class="block">
+        <div class="row alignright">
+            <a class="btnSecondary" routerLink="/menus/add-menu" ><mat-icon>add</mat-icon> Add new menu</a>
+        </div>
+
+          <h6>Menus</h6>
+          <div class="userTable">
+              <table>
+                <thead>
+                  <tr>
+                      <th></th>
+                      <th>Menu Name</th>
+                      <th>Location</th>
+                      <th>Status</th>
+                      <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let menu of activeMenus; let i = index">
+                      <td>{{ i+1 }}</td>
+                      <td>{{ menu.menuName }}</td>
+                      <td>{{ menu.location }}</td>
+                      <td>   
+                          <div class="toggle-container">
+                          <label [style.color]="menu.Status ? '#3CE1AF' : '#444444'">{{ menu.Status ? 'Active' : 'Inactive' }}</label>
+                          <mat-slide-toggle [(ngModel)]="menu.Status" color="#3CE1AF" name="menuStatus"></mat-slide-toggle>
+                        </div>
+                      </td>
+                      <td style="text-align: right;">
+                          <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
+                          <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                            <a>Edit</a>
+                            <a>Delete</a>
+                              <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                          </div>
+                      </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            
+          <h6>Menu Drafts</h6>
+          <div class="userTable">
+              <table>
+                <thead>
+                  <tr>
+                      <th></th>
+                      <th>Menu Name</th>
+                      <th>Location</th>
+                      <th>Status</th>
+                      <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let menu of draftMenus; let i = index">
+                      <td>{{ i+1 }}</td>
+                      <td>{{ menu.menuName }}</td>
+                      <td>{{ menu.location }}</td>
+                      <td>Draft</td>
+                      <td style="text-align: right;">
+                          <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
+                          <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                              <a>Edit</a>
+                              <a>Delete</a>
+                              <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                          </div>
+                      </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+    </div>
+    
+</div>
+
+
+<app-loading [isLoading]="isSaving"></app-loading>

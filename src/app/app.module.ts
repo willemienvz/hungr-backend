@@ -49,6 +49,10 @@ import { AddComponent } from './components/restaurant/add/add.component';
 import { EditRestaurantComponent } from './components/restaurant/edit-restaurant/edit-restaurant.component';
 import { BrandingComponent } from './components/settings/branding/branding.component';
 import { NgxColorsModule } from 'ngx-colors';
+import { MenusComponent } from './components/menus/menus.component';
+import {MatIconModule} from '@angular/material/icon';
+import { AddMenuComponent } from './components/menus/add-menu/add-menu.component';
+import { ProgressBarComponent } from './components/shared/progress-bar/progress-bar.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -83,6 +87,9 @@ import { NgxColorsModule } from 'ngx-colors';
     AddComponent,
     EditRestaurantComponent,
     BrandingComponent,
+    MenusComponent,
+    AddMenuComponent,
+    ProgressBarComponent,
   ],
   imports: [
     BrowserModule,
@@ -101,7 +108,8 @@ import { NgxColorsModule } from 'ngx-colors';
     BrowserAnimationsModule,
     MatRadioModule,
     AngularFireStorageModule,
-    NgxColorsModule
+    NgxColorsModule,
+    MatIconModule
   ],
   providers: [FormDataService],
   bootstrap: [AppComponent]

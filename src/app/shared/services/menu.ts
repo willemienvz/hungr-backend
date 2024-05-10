@@ -7,4 +7,5 @@ export interface Menu {
     qrAssigned:boolean;
     qrUrl:string;
     menuID:string;
+    isDraft:boolean;
  }
