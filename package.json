@@ -25,6 +25,7 @@
     "contentful": "^10.7.0",
     "firebase": "^10.8.0",
     "ngx-colors": "^3.5.3",
+    "ngx-papaparse": "^8.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.2"

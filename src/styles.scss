@@ -73,6 +73,15 @@ $hungr-backend-theme: mat.define-light-theme((
 --mdc-switch-unselected-track-color: #fff;
 --mdc-switch-disabled-label-text-color: rgba(0, 0, 0, 0.38);
 }
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 0,
+  'GRAD' 0,
+  'opsz' 24
+}
+
 .extra-large-text{
     font-family: 'Barlow', sans-serif;
     font-size: 40px;
@@ -155,7 +164,7 @@ a{
     background: #FFF352;
     border-radius: 6px;
     text-align: center;
-    padding: 15px;
+    padding:  12px 15px;
     font-family: 'Barlow', sans-serif;
     font-size: 14px;
     font-weight: 900;
@@ -178,7 +187,7 @@ a{
   background: #3CE1AF;
   border-radius: 6px;
   text-align: center;
-  padding: 15px;
+  padding:  12px 15px;
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
   font-weight: 900;
@@ -200,7 +209,7 @@ a{
   background: #E4E4E4;
   border-radius: 6px;
   text-align: center;
-  padding: 15px;
+  padding:  12px 15px;
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
   font-weight: 900;
@@ -222,7 +231,7 @@ a{
   background: #AFDCFF;
   border-radius: 6px;
   text-align: center;
-  padding: 15px;
+  padding:  12px 15px;
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
   font-weight: 900;
@@ -344,6 +353,12 @@ a{
     font-weight:500;
     line-height: 1;
     letter-spacing: -0.1%;
+    cursor: pointer;
+  }
+
+  .link{
+    text-decoration: underline;
+    color: #9A9A9A;
     cursor: pointer;
   }
 

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Menu } from '../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Restaurant } from '../../shared/services/restaurant';
 
 @Component({
   selector: 'app-qr-codes',
@@ -12,6 +13,7 @@ export class QrCodesComponent implements OnInit {
   isSaving: boolean = false;
   isPopupMenuOpen: boolean[] = [];
   selectedMenuId: string = ''; 
+  tempRestaurant:Restaurant = {} as Restaurant;
   constructor(private firestore: AngularFirestore) {
   }
 
@@ -50,4 +52,6 @@ export class QrCodesComponent implements OnInit {
   togglePopupMenu(index: number) {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
+
+
 }

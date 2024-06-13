@@ -1,3 +1,355 @@
 <div class="menu-add">
-    <app-progress-bar [progress]="30"></app-progress-bar>
+    <app-progress-bar [progress]="(currentStep - 1) * 50"></app-progress-bar>
+
+    <form class="container" #menuForm="ngForm" (ngSubmit)="addMenu(menuForm)">
+        <div *ngIf="currentStep === 1" class="step1">
+            <div class="block">
+                <div class="row headerRow">
+                    <p class="labelStep">Step 1</p>
+                    <h6>General Details</h6>
+                </div>
+                <div class="col2row">
+                    <div class="col">
+                        <div class="formGroup" [ngClass]="{'error': validationError}">
+                            <label>Menu Name</label>
+                            <input (change)="checkValidation()" type="text" class="formControl" placeholder="Name your menu" name="menuname"
+                                [(ngModel)]="menuName" required>
+                                <div *ngIf="validationError" class="error-message">Menu name is required.</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="formGroup" [ngClass]="{'error': validationError}">
+                            <label>Assign Restaurant</label>
+                            <mat-form-field>
+                                <mat-select (change)="checkValidation()" name="selectedNumberTable" [(ngModel)]="selectedRestaurant">
+                                    <mat-option *ngFor="let restaurant of restuarants"
+                                        [value]="restaurant.restaurantID">
+                                        {{ restaurant.restaurantName }}
+                                    </mat-option>
+                                </mat-select>
+                                <div *ngIf="validationError" class="error-message">Restaurant selection is required.</div>
+                            </mat-form-field>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="block">
+                <div class="col2row">
+                    <div class="col headerRow">
+                        <p class="labelStep">Step 2</p>
+                        <div class="headerContainer">
+                            <h6>Create your menu categories</h6>
+                            <p>For example: Starters, Mains, and Desserts.</p>
+                        </div>
+                    </div>
+                    <div class="col outerBlock">
+                        <input type="text" class="formControl" placeholder="Name your category..."
+                            [(ngModel)]="newCategoryName" name="categoryName">
+                        <a class="btnSecondary" (click)="addCategory()">+ Add category</a>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div *ngFor="let category of categories; let i = index" class="category">
+                        <div class="title">
+                            <h6>{{ category.name }}</h6>
+                            <div class="addBox">
+                                <i class="material-symbols-outlined" (click)="toggleAddInput(i)">add_box</i>
+                            </div>
+                            <div class="menuSub">
+                                <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
+                                <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                                    <a href="#">View</a>
+                                    <a href="#">Edit</a>
+                                    <a (click)="deleteCategory(i)">Delete</a>
+                                    <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="isAddInputVisible[i]" class="inputHolder">
+                            <input type="text" [(ngModel)]="newSubcategoryName[i]" (keyup.enter)="addSubCategory(i)"
+                                placeholder="Enter subcategory name" [ngModelOptions]="{standalone: true}">
+                            <p>press enter to add</p>
+                        </div>
+
+                        <div *ngIf="category.subcategories && category.subcategories.length > 0">
+                            <div *ngFor="let sub of category.subcategories; let j = index" class="subcategory">
+                                <p>{{ sub.name }}</p>
+                                <a (click)="deleteSubCategory(i, j)" class="deleteIcon"><i
+                                        class="material-icons">close</i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="block">
+                <div class="row headerRow">
+                    <p class="labelStep">Step 3</p>
+                    <div class="headerContainer">
+                        <h6>Add menu items</h6>
+                        <p>Please select how you would like to add your menu items.</p>
+                    </div>
+                </div>
+                <div class="col2row">
+                    <div class="col uploadBlock" (click)="openPopupuploadFile()">
+                        <i class="material-symbols-outlined">upload</i>
+                        <h6>Bulk Upload</h6>
+                        <p>Upload your spreadsheet to add menu items.</p>
+                    </div>
+                    <div class="col uploadBlock" (click)="nextStep()">
+                        <i class="material-symbols-outlined">upload</i>
+                        <h6>Manually Add Items</h6>
+                        <p>Manually add items individually.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <a class="btnPrimary" routerLink="/menus">Cancel</a>
+                <a class="btnBlue" (click)="openProgressPopup()">SAVE for later</a>
+            </div>
+        </div>
+
+        <div id="stepDiv" *ngIf="currentStep === 2" class="step2">
+            <div class="block row3col">
+                <div class="col3row backBtn" (click)="previousStep()">
+                    <i class="material-symbols-outlined">arrow_back_ios</i>
+                    <p class="">Back</p>
+                </div>
+                <div class="col3row headerRow">
+                    <p class="labelStep">Step 3 <span>(Continued)</span></p>
+                    <div class="headerContainer">
+                        <h6>Manually Add menu items</h6>
+                        <p>Please add the menu items and their details below.</p>
+                    </div>
+                </div>
+                <div class="col3row btnCol">
+                    <a class="btnBlue" (click)="openProgressPopup()">SAVE for later</a>
+                    <a class="btnSecondary" (click)="saveMenu()">SAVE</a>
+                    <a class="btnTertiary" (click)="showPopupDialog()">cancel</a>
+                </div>
+            </div>
+            <div *ngFor="let menuItem of menuItems; let itemIndex = index" class="menuItemBlock block">
+                <div class="row3col">
+                    <div class="itemCol">
+                        <p>Select Category</p>
+                        <mat-select [(value)]="menuItem.categoryId">
+                            <mat-option *ngFor="let category of categories" [value]="category.id">
+                                {{ category.name }}
+                            </mat-option>
+                        </mat-select>
+                        <div class="row labelRow">
+                            <div class="label-input" *ngIf="menuItem.showLabelInput">
+                                <input type="text" [(ngModel)]="newLabel" [ngModelOptions]="{standalone: true}"
+                                    placeholder="Enter label name" (keyup.enter)="addLabel(itemIndex)">
+                            </div>
+                            <h6 class="labelContainer" *ngIf="!menuItem.showLabelInput"><i
+                                    *ngIf="!menuItem.showLabelInput" class="material-symbols-outlined">label</i>
+                                {{menuItem.labels}}</h6>
+                            <p class="labelAdd" (click)="toggleLabelInput(itemIndex)">
+                                <i class="material-symbols-outlined">new_label</i><span>Add Label</span>
+                            </p>
+
+                        </div>
+                    </div>
+                    <div class="itemCol">
+                        <p>Item Name</p>
+                        <input type="text" [(ngModel)]="menuItem.name" placeholder="Item Name"
+                            [ngModelOptions]="{standalone: true}">
+                        <input type="text" [(ngModel)]="menuItem.description" placeholder="Description..."
+                            [ngModelOptions]="{standalone: true}">
+                        <div class="row">
+                            <a class="btnTertiary" (click)="toggleDetail('preparation', itemIndex)">+ Add
+                                Preparation</a>
+                            <a class="btnTertiary" (click)="toggleDetail('variation', itemIndex)">+ Add Variation</a>
+                            <a class="btnTertiary" (click)="toggleDetail('pairing', itemIndex)">+ Add Pairing</a>
+                            <a class="btnTertiary" (click)="toggleDetail('side', itemIndex)">+ Add Side</a>
+                        </div>
+                    </div>
+                    <div class="itemCol priceContainer">
+                        <div class="col">
+                            <p>Price</p>
+                            <input type="text" [(ngModel)]="menuItem.price" placeholder="R 00.00" class="smallerInput"
+                                [ngModelOptions]="{standalone: true}">
+                        </div>
+                        <div class="image">
+                            <div *ngIf="menuItems[itemIndex].imageUrl" class="imagePreview">
+                                <img [src]="menuItems[itemIndex].imageUrl" alt="Uploaded logo">
+                              </div>
+                            <div id="yourBtn" (click)="getFile(itemIndex)">
+                              <p><i class="material-symbols-outlined">upload</i>Add Image</p>
+                            </div>
+                            <div style='height: 0px; width: 0px; overflow:hidden;'>
+                              <input id="upfile" type="file" #fileInput (change)="onFileSelected($event, itemIndex)" />
+                            </div>
+                           
+                          </div>
+                    </div>
+                </div>
+                <div *ngIf="menuItem.displayDetails.preparation" class="additionalItems">
+                    <div class="col">
+                        <h6>Preparation</h6>
+                        <div class="inputHolder">
+                            <input placeholder="Add a preparation" type="text" [(ngModel)]="newPreparation"
+                                [ngModelOptions]="{standalone: true}">
+                            <a class="btnSecondary" (click)="addPreparation(itemIndex)">+ Add</a>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="item" *ngFor="let preparation of menuItem.preparations; let i = index">
+                            <p>{{ preparation }}</p>
+                            <i class="material-icons" (click)="removePreparation(itemIndex, i)">close</i>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="menuItem.displayDetails.variation" class="additionalItems">
+                    <div class="col">
+                        <h6>Variations</h6>
+                        <div class="inputHolder">
+                            <input placeholder="Add a variation" type="text" [(ngModel)]="newVariation"
+                                [ngModelOptions]="{standalone: true}">
+                            <a class="btnSecondary" (click)="addVariation(itemIndex)">+ Add</a>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="item" *ngFor="let variation of menuItem.variations; let i = index">
+                            <p>{{ variation }}</p>
+                            <i class="material-icons" (click)="removeVariation(itemIndex, i)">close</i>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="menuItem.displayDetails.pairing" class="additionalItems">
+                    <div class="col">
+                        <h6>Pairings</h6>
+                        <div class="inputHolder">
+                            <input placeholder="Add a pairing" type="text" [(ngModel)]="newPairing"
+                                [ngModelOptions]="{standalone: true}">
+                            <a class="btnSecondary" (click)="addPairing(itemIndex)">+ Add</a>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="item" *ngFor="let pairing of menuItem.pairings; let i = index">
+                            <p>{{ pairing }}</p>
+                            <i class="material-icons" (click)="removePairing(itemIndex, i)">close</i>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="menuItem.displayDetails.side" class="additionalItems">
+                    <div class="col">
+                        <h6>Sides</h6>
+                        <div class="inputHolder">
+                            <input placeholder="Add a side" type="text" [(ngModel)]="newSide"
+                                [ngModelOptions]="{standalone: true}">
+                            <a class="btnSecondary" (click)="addSide(itemIndex)">+ Add</a>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="item" *ngFor="let side of menuItem.sides; let i = index">
+                            <p>{{ side }}</p>
+                            <i class="material-icons" (click)="removeSide(itemIndex, i)">close</i>
+                        </div>
+                    </div>
+                </div>
+                <i class="material-icons closeIconItem" (click)="removeMenuItem(itemIndex)">close</i>
+            </div>
+            <a class="btnSecondary" (click)="addMenuItem()">+ Add item</a>
+        </div>
+        <div class="step3"  *ngIf="currentStep === 3">
+            <div class="col">
+                <div class="block row3col">
+                    <div class="col3row backBtn" routerLink="/menus">
+                        <i class="material-symbols-outlined">arrow_back_ios</i>
+                        <p class="">Back</p>
+                    </div>
+                    <div class="colrow headerRow">
+                        <p class="labelStep"><span>Your menu has been saved</span></p>
+                    </div>
+                </div>
+                <div class="block nextSteps">
+                  <h6>Next Steps</h6>
+                  <p>Now that your menu has been set up, you can generate a QR code that will enable your patrons to access your menu. </p>
+                  <div class="innerRow">
+                    <h6>Generate a QR code for this menu</h6>
+                    <a routerLink="/menus/qr-codes" class="btnSecondary">Generate QR code</a>
+                  </div>
+                  <div class="innerRow">
+                    <p>If you want to edit the menu or the appearance of the menu, select one of these options.</p>
+                    <div class="btnHold">
+                        <a routerLink="/settings/branding" class="btnBlue">edit appearance</a>
+                        <a routerLink="/menus" class="btnBlue">edit menu</a>
+                    </div>
+                  </div>
+                  <div class="innerRow">
+                    <p>If you do not want to publish you menu right now, you can save and continue at a later stage.</p>
+                    <div class="btnHold">
+                        <a class="btnBlue" (click)="setAsDraft()">save for later</a>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="col">
+                    <div class="block">
+                        <div class="row">
+                            <h6 class="heading">Real-time Preview</h6>
+                        </div>
+                        <div class="preview" >
+                           
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </form>
 </div>
+
+        <div class="popup" *ngIf="showPopup">
+            <div class="popup-content">
+                <i class="material-icons popup-close" (click)="closePopup()">close</i>
+                <h6>Cancel</h6>
+                <p class="text-center">Are you sure you want to cancel? All changes will be discarded.</p>
+                <div class="row">
+                    <a class="btnTertiary">Back</a>
+                    <a class="btnPrimary">yes, cancel</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup" *ngIf="showPopupProgress">
+            <div class="popup-content">
+                <i class="material-icons popup-close" (click)="closePopupProgress()">close</i>
+                <h6>Progress saved</h6>
+                <p class="text-center">Your changes have been saved. You can continue editing anytime.</p>
+                <div class="row">
+                    <a class="btnTertiary" (click)="closePopupProgress()">back to editing</a>
+                    <a class="btnPrimary" routerLink="/menus">dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup" *ngIf="uploadFilePopUp">
+            <div class="popup-content">
+                <i class="material-icons popup-close" (click)="closePopupuploadFile()">close</i>
+                <h6>Upload a file</h6>
+                <p class="text-center">Please upload a CSV file to automatically add your menu items.</p>
+                <div class="row uploadItems">
+                    <div class="col">
+                        <i class="material-icons">upload</i>
+                        <h6>Select a file</h6>
+                        <input type="file" (change)="onFileSelectedBulk($event)" accept=".csv">
+                    </div>
+                    <div class="col">
+                        <i class="material-icons">download</i>
+                        <h6>Download Template</h6>
+                        <p><a (click)="downloadTemplate()">Click here</a> to download the CSV template.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <a class="btnTertiary" (click)="closePopupuploadFile()">Cancel</a>
+                    <a class="btnBlue" (click)="processFile()">Upload</a>
+                </div>
+            </div>
+        </div>
+        <app-loading [isLoading]="isSaving"></app-loading>

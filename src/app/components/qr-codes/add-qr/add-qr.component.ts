@@ -41,7 +41,6 @@ export class AddQrComponent {
   saveSettings(){
     if (this.selectedMenu) {
       this.validationError = false;
-      console.log('Selected Menu:', this.selectedMenu);
       this.updateMenuQrData(this.selectedMenu.menuID, this.qrCodeDownloadLink);
     } else {
       this.validationError = true;

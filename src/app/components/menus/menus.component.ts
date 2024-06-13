@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Menu } from '../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Restaurant } from '../../shared/services/restaurant';
 
 @Component({
   selector: 'app-menus',
@@ -11,8 +12,10 @@ export class MenusComponent implements OnInit{
   activeMenus: Menu[] = [];
   draftMenus: Menu[] = [];
   isSaving: boolean = false;
-  isPopupMenuOpen: boolean[] = [];
+  isPopupMenuOpenActive: boolean[] = [];
+  isPopupMenuOpenDraft: boolean[] = [];
   selectedMenuId: string = ''; 
+  tempRestaurant:Restaurant = {} as Restaurant;
   constructor(private firestore: AngularFirestore) {
   }
 
@@ -30,7 +33,8 @@ export class MenusComponent implements OnInit{
 
     this.firestore.doc(`menus/${id}`).update(dataToUpdate)
       .then(() => {
-        this.togglePopupMenu(index);
+        this.isPopupMenuOpenActive[index] = false;
+        this.isPopupMenuOpenDraft[index] = false;
       })
       .catch((error) => {
         console.log(error);
@@ -49,7 +53,41 @@ export class MenusComponent implements OnInit{
       });
   }
 
-  togglePopupMenu(index: number) {
-    this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
+  togglePopupMenuActive(index: number) {
+    this.isPopupMenuOpenActive[index] = !this.isPopupMenuOpenActive[index];
+  }
+
+  togglePopupMenuDraft(index: number) {
+    this.isPopupMenuOpenDraft[index] = !this.isPopupMenuOpenDraft[index];
+  }
+
+  closeAllPopups() {
+    this.isPopupMenuOpenActive = new Array(this.activeMenus.length).fill(false);
+    this.isPopupMenuOpenDraft = new Array(this.draftMenus.length).fill(false);
+  }
+
+  deleteMenu(id: string) {
+    this.firestore.doc(`menus/${id}`).delete()
+      .then(() => {
+        this.fetchMenus();
+        this.closeAllPopups();
+      })
+      .catch((error) => {
+        console.log(error);
+        this.isSaving = false;
+      });
+  }
+
+  updateMenuStatus(menu: Menu) {
+    this.isSaving = true;
+    
+    this.firestore.doc(`menus/${menu.menuID}`).update({ Status: menu.Status })
+      .then(() => {
+        this.isSaving = false;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.isSaving = false;
+      });
   }
 }

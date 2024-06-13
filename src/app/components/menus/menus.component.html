@@ -24,15 +24,15 @@
                       <td>   
                           <div class="toggle-container">
                           <label [style.color]="menu.Status ? '#3CE1AF' : '#444444'">{{ menu.Status ? 'Active' : 'Inactive' }}</label>
-                          <mat-slide-toggle [(ngModel)]="menu.Status" color="#3CE1AF" name="menuStatus"></mat-slide-toggle>
+                          <mat-slide-toggle (change)="updateMenuStatus(menu)" [(ngModel)]="menu.Status" color="#3CE1AF" name="menuStatus"></mat-slide-toggle>
                         </div>
                       </td>
                       <td style="text-align: right;">
-                          <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
-                          <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-                            <a>Edit</a>
-                            <a>Delete</a>
-                              <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                          <i class="material-icons" (click)="togglePopupMenuActive(i)">more_vert</i>
+                          <div class="popup-menu" *ngIf="isPopupMenuOpenActive[i]">
+                            <a [routerLink]="['/menus/edit-menu', menu.menuID]">Edit</a>
+                            <a (click)="deleteMenu(menu.menuID)">Delete</a>
+                              <i class="material-icons closeBtn" (click)="togglePopupMenuActive(i)">close</i>
                           </div>
                       </td>
                   </tr>
@@ -60,11 +60,11 @@
                       <td>{{ menu.location }}</td>
                       <td>Draft</td>
                       <td style="text-align: right;">
-                          <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
-                          <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-                              <a>Edit</a>
-                              <a>Delete</a>
-                              <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                          <i class="material-icons" (click)="togglePopupMenuDraft(i)">more_vert</i>
+                          <div class="popup-menu" *ngIf="isPopupMenuOpenDraft[i]">
+                              <a [routerLink]="['/menus/edit-menu', menu.menuID]">Edit</a>
+                              <a (click)="deleteMenu(menu.menuID)">Delete</a>
+                              <i class="material-icons closeBtn" (click)="togglePopupMenuDraft(i)">close</i>
                           </div>
                       </td>
                   </tr>

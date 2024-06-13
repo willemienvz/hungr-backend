@@ -21,7 +21,9 @@
         margin-bottom: 20px;
     }
 }
-
+.linerow{
+    justify-content: center;
+}
 .labelStep{
     color: rgba(60, 225, 175, 1);
     font-weight: 700;
@@ -121,6 +123,7 @@ mat-form-field{
         display: flex;
         flex-direction: column;
         gap: 5px;
+        cursor: pointer;
 
         .title{
             width: 100%;
@@ -537,43 +540,13 @@ mat-form-field{
     color: red;
 }
 
-.uploadItems {
-    border: 2px dashed #ccc;
-    padding: 20px;
-    text-align: center;
-    position: relative;
-    transition: background-color 0.3s;
-}
-
-.uploadItems.dragging {
-    background-color: #f0f8ff;
-}
-
-.uploadItems i {
-    font-size: 48px;
-    margin-bottom: 10px;
-}
-
-.uploadItems h6, .uploadItems p {
-    margin: 0;
-}
-
-.btn {
-    background-color: #007bff;
-    color: #fff;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.btn:hover {
-    background-color: #0056b3;
-}
-
 .imagePreview{
     width: 110px;
     img{
         width: 100%;
     }
+} 
+
+.centerBtn{
+    justify-content: center;
 }

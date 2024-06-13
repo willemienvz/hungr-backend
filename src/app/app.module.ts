@@ -53,6 +53,7 @@ import { MenusComponent } from './components/menus/menus.component';
 import {MatIconModule} from '@angular/material/icon';
 import { AddMenuComponent } from './components/menus/add-menu/add-menu.component';
 import { ProgressBarComponent } from './components/shared/progress-bar/progress-bar.component';
+import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -90,6 +91,7 @@ import { ProgressBarComponent } from './components/shared/progress-bar/progress-
     MenusComponent,
     AddMenuComponent,
     ProgressBarComponent,
+    EditMenuComponent,
   ],
   imports: [
     BrowserModule,

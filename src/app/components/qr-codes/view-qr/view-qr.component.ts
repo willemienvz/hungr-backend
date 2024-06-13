@@ -39,7 +39,6 @@ export class ViewQrComponent implements OnInit {
     this.firestore.collection<Menu>('menus', ref => ref.where('menuID', '==', this.selectedID))
       .valueChanges()
       .subscribe(menus => {
-        console.log(menus);
         this.currentMenu = menus[0];
       });
   }

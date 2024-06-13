@@ -1,0 +1,242 @@
+<div class="container">
+    <div class="block" *ngIf="selectedCategoryIndex === null">
+        <div class="row headerRow">
+            <h6>General Details</h6>
+        </div>
+        <div class="col2row">
+            <div class="col">
+                <div class="formGroup" >
+                    <label>Menu Name</label>
+                    <input  type="text" class="formControl" placeholder="Name your menu" name="menuname"
+                        [(ngModel)]="menuName" required>
+                </div>
+            </div>
+            <div class="col">
+                <div class="formGroup" >
+                    <label>Assign Restaurant</label>
+                    <mat-form-field>
+                        <mat-select  name="selectedNumberTable" [(ngModel)]="selectedRestaurant">
+                            <mat-option *ngFor="let restaurant of restuarants"
+                                [value]="restaurant.restaurantID">
+                                {{ restaurant.restaurantName }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="block" *ngIf="selectedCategoryIndex === null">
+        <div class="col2row">
+            <div class="col headerRow">
+                <div class="headerContainer">
+                    <h6>Menu categories</h6>
+                    <p>Select a category to view the items under that category.</p>
+                </div>
+            </div>
+            <div class="col outerBlock">
+                <input type="text" class="formControl" placeholder="Name your category..."
+                    [(ngModel)]="newCategoryName" name="categoryName">
+                <a class="btnSecondary" (click)="addCategory()">+ Add category</a>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 20px;">
+            <div *ngFor="let category of categories; let i = index" class="category">
+                <div class="title" (click)="selectCategory(i)">
+                    <div class="row linerow">
+                        <h6>{{ category.name }}</h6>
+                        <p>({{ itemCounts[category.id] || 0 }}) items</p>
+                    </div>
+                    <div class="menuSub">
+                        <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
+                        <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                            <a href="#">View</a>
+                            <a href="#">Edit</a>
+                            <a (click)="deleteCategory(i)">Delete</a>
+                            <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="isAddInputVisible[i]" class="inputHolder">
+                    <input type="text" [(ngModel)]="newSubcategoryName[i]" (keyup.enter)="addSubCategory(i)"
+                        placeholder="Enter subcategory name" [ngModelOptions]="{standalone: true}">
+                    <p>press enter to add</p>
+                </div>
+
+                <div *ngIf="category.subcategories && category.subcategories.length > 0">
+                    <div *ngFor="let sub of category.subcategories; let j = index" class="subcategory">
+                        <p>{{ sub.name }}</p>
+                        <a (click)="deleteSubCategory(i, j)" class="deleteIcon"><i
+                                class="material-icons">close</i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row centerBtn" *ngIf="selectedCategoryIndex === null">
+        <a class="btnSecondary" (click)="saveMenu()">SAVE</a>
+    </div>
+
+
+    
+    <div id="stepDiv" *ngIf="selectedCategoryIndex !== null"  class="step2">
+        <div class="block row3col">
+            <div class="col3row backBtn" (click)="resetFilter()">
+                <i class="material-symbols-outlined">arrow_back_ios</i>
+                <p class="">Back</p>
+            </div>
+            <div class="col3row headerRow">
+                <p class="labelStep">Step 3 <span>(Continued)</span></p>
+                <div class="headerContainer">
+                    <h6>Manually Add menu items</h6>
+                    <p>Please add the menu items and their details below.</p>
+                </div>
+            </div>
+            <div class="col3row btnCol">
+                <a class="btnBlue" (click)="openProgressPopup()">SAVE for later</a>
+                <a class="btnSecondary" (click)="saveMenu()">SAVE</a>
+                <a class="btnTertiary" (click)="showPopupDialog()">cancel</a>
+            </div>
+        </div>
+        <div *ngFor="let menuItem of filteredItems; let itemIndex = index" class="menuItemBlock block">
+            <div class="row3col">
+                <div class="itemCol">
+                    <p>Select Category</p>
+                    <mat-select [(value)]="menuItem.categoryId">
+                        <mat-option *ngFor="let category of categories" [value]="category.id">
+                            {{ category.name }}
+                        </mat-option>
+                    </mat-select>
+                    <div class="row labelRow">
+                        <div class="label-input" *ngIf="menuItem.showLabelInput">
+                            <input type="text" [(ngModel)]="newLabel" [ngModelOptions]="{standalone: true}"
+                                placeholder="Enter label name" (keyup.enter)="addLabel(itemIndex)">
+                        </div>
+                        <h6 class="labelContainer" *ngIf="!menuItem.showLabelInput"><i
+                                *ngIf="!menuItem.showLabelInput" class="material-symbols-outlined">label</i>
+                            {{menuItem.labels}}</h6>
+                        <p class="labelAdd" (click)="toggleLabelInput(itemIndex)">
+                            <i class="material-symbols-outlined">new_label</i><span>Add Label</span>
+                        </p>
+
+                    </div>
+                </div>
+                <div class="itemCol">
+                    <p>Item Name</p>
+                    <input type="text" [(ngModel)]="menuItem.name" placeholder="Item Name"
+                        [ngModelOptions]="{standalone: true}">
+                    <input type="text" [(ngModel)]="menuItem.description" placeholder="Description..."
+                        [ngModelOptions]="{standalone: true}">
+                    <div class="row">
+                        <a class="btnTertiary" (click)="toggleDetail('preparation', itemIndex)">+ Add
+                            Preparation</a>
+                        <a class="btnTertiary" (click)="toggleDetail('variation', itemIndex)">+ Add Variation</a>
+                        <a class="btnTertiary" (click)="toggleDetail('pairing', itemIndex)">+ Add Pairing</a>
+                        <a class="btnTertiary" (click)="toggleDetail('side', itemIndex)">+ Add Side</a>
+                    </div>
+                </div>
+                <div class="itemCol priceContainer">
+                    <div class="col">
+                        <p>Price</p>
+                        <input type="text" [(ngModel)]="menuItem.price" placeholder="R 00.00" class="smallerInput"
+                            [ngModelOptions]="{standalone: true}">
+                    </div>
+                    <div class="image">
+                        <div *ngIf="menuItem.imageUrl" class="imagePreview">
+                            <img [src]="menuItem.imageUrl" alt="Uploaded logo">
+                          </div>
+                        <div id="yourBtn" (click)="getFile(itemIndex)">
+                          <p><i class="material-symbols-outlined">upload</i>Add Image</p>
+                        </div>
+                        <div style='height: 0px; width: 0px; overflow:hidden;'>
+                          <input id="upfile" type="file" #fileInput (change)="onFileSelected($event, itemIndex)" />
+                        </div>
+                       
+                      </div>
+                </div>
+            </div>
+            <div *ngIf="menuItem.displayDetails.preparation" class="additionalItems">
+                <div class="col">
+                    <h6>Preparation</h6>
+                    <div class="inputHolder">
+                        <input placeholder="Add a preparation" type="text" [(ngModel)]="newPreparation"
+                            [ngModelOptions]="{standalone: true}">
+                        <a class="btnSecondary" (click)="addPreparation(itemIndex)">+ Add</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="item" *ngFor="let preparation of menuItem.preparations; let i = index">
+                        <p>{{ preparation }}</p>
+                        <i class="material-icons" (click)="removePreparation(itemIndex, i)">close</i>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="menuItem.displayDetails.variation" class="additionalItems">
+                <div class="col">
+                    <h6>Variations</h6>
+                    <div class="inputHolder">
+                        <input placeholder="Add a variation" type="text" [(ngModel)]="newVariation"
+                            [ngModelOptions]="{standalone: true}">
+                        <a class="btnSecondary" (click)="addVariation(itemIndex)">+ Add</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="item" *ngFor="let variation of menuItem.variations; let i = index">
+                        <p>{{ variation }}</p>
+                        <i class="material-icons" (click)="removeVariation(itemIndex, i)">close</i>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="menuItem.displayDetails.pairing" class="additionalItems">
+                <div class="col">
+                    <h6>Pairings</h6>
+                    <div class="inputHolder">
+                        <input placeholder="Add a pairing" type="text" [(ngModel)]="newPairing"
+                            [ngModelOptions]="{standalone: true}">
+                        <a class="btnSecondary" (click)="addPairing(itemIndex)">+ Add</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="item" *ngFor="let pairing of menuItem.pairings; let i = index">
+                        <p>{{ pairing }}</p>
+                        <i class="material-icons" (click)="removePairing(itemIndex, i)">close</i>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="menuItem.displayDetails.side" class="additionalItems">
+                <div class="col">
+                    <h6>Sides</h6>
+                    <div class="inputHolder">
+                        <input placeholder="Add a side" type="text" [(ngModel)]="newSide"
+                            [ngModelOptions]="{standalone: true}">
+                        <a class="btnSecondary" (click)="addSide(itemIndex)">+ Add</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="item" *ngFor="let side of menuItem.sides; let i = index">
+                        <p>{{ side }}</p>
+                        <i class="material-icons" (click)="removeSide(itemIndex, i)">close</i>
+                    </div>
+                </div>
+            </div>
+            <i class="material-icons closeIconItem" (click)="removeMenuItem(itemIndex)">close</i>
+        </div>
+        <a class="btnSecondary" (click)="addMenuItem()">+ Add item</a>
+    </div>
+</div>
+<app-loading [isLoading]="isSaving"></app-loading>
+<div class="popup" *ngIf="showPopupProgress">
+    <div class="popup-content">
+        <i class="material-icons popup-close" (click)="closePopupProgress()">close</i>
+        <h6>Progress saved</h6>
+        <p class="text-center">Your changes have been saved. You can continue editing anytime.</p>
+        <div class="row">
+            <a class="btnTertiary" (click)="closePopupProgress()">back to editing</a>
+            <a class="btnPrimary" routerLink="/menus">dashboard</a>
+        </div>
+    </div>
+</div>

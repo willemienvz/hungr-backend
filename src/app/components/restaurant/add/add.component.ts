@@ -88,7 +88,6 @@ export class AddComponent implements OnInit{
     };
     this.firestore.collection('restuarants').add(this.newRestaurant)
       .then((data) => {
-        console.log('Restaurant added successfully!', data);
         this.newRestaurant= {
           restaurantID: data.id,
           city: this.restaurant.city,

@@ -16,6 +16,7 @@ import { EditRestaurantComponent } from './components/restaurant/edit-restaurant
 import { BrandingComponent } from './components/settings/branding/branding.component';
 import { MenusComponent } from './components/menus/menus.component';
 import { AddMenuComponent } from './components/menus/add-menu/add-menu.component';
+import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.component';
 
 
 const routes: Routes = [
@@ -36,6 +37,7 @@ const routes: Routes = [
       { path: 'manage-users', component: ManageUsersComponent },
       { path: 'menus', component: MenusComponent },
       { path: 'menus/add-menu', component: AddMenuComponent },
+      { path: 'menus/edit-menu/:menuID', component: EditMenuComponent },
       { path: 'menus/qr-codes', component: QrCodesComponent },
       { path: 'settings/add-new-restaurant', component: AddComponent },
       { path: 'settings/edit-restaurant', component: EditRestaurantComponent },
