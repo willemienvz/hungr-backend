@@ -1,0 +1,110 @@
+.container{
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+   gap: 20px;
+    width: 100%;
+
+    .row{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: stretch;
+        justify-content: space-between;
+        
+        .col{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+
+            mat-select{
+                width: 200px;
+            }
+        }
+
+    }
+    app-stats-overview-block{
+        flex: 1;
+    }
+
+    .block{
+        width: 100%;
+        position: relative;
+        
+    }
+}
+.imageSpecial{
+    width: calc(50% - 15px);
+    object-fit: cover;
+    border-radius: 10px 0 0 10px;
+}
+.rowSpecials{
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+
+    .special{
+        width: calc(50% - 15px);
+        position: relative;
+        border: 1px solid rgba(230, 233, 236, 1);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: row;
+
+        .content{
+            width: 50%;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}
+
+.additionalItems{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.smallText{
+    font-size: 13px;
+    color: rgba(154, 154, 154, 1);
+    font-weight: 500;
+    line-height: normal;
+    margin: 15px 0 0 0;
+}
+
+
+.popup-menu{
+    position: absolute;
+    right: -79px;
+    transition: 0.3s all;
+    background-color: #F8F9FB;
+    border: 1px solid #DEDEDE;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    padding: 13px;
+    border-radius: 10px;
+    width: 90px;
+    z-index: 50;
+    a{
+        font-family: 'Barlow', sans-serif;
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 10px;
+        letter-spacing: -2%;
+        color:#181818;
+        width: 100%;
+        cursor: pointer;
+        text-align: left;
+        text-decoration: none;
+    }
+    .closeBtn{
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+}

@@ -17,6 +17,10 @@ import { BrandingComponent } from './components/settings/branding/branding.compo
 import { MenusComponent } from './components/menus/menus.component';
 import { AddMenuComponent } from './components/menus/add-menu/add-menu.component';
 import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.component';
+import { AboutComponent } from './components/settings/about/about.component';
+import { AddSpecialComponent } from './components/specials/add-special/add-special.component';
+import { SpecialsLandingComponent } from './components/specials/specials-landing/specials-landing.component';
+import { EditSpecialComponent } from './components/specials/edit-special/edit-special.component';
 
 
 const routes: Routes = [
@@ -34,6 +38,7 @@ const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'settings/general', component: GeneralComponent },
+      { path: 'settings/about-us', component: AboutComponent },
       { path: 'manage-users', component: ManageUsersComponent },
       { path: 'menus', component: MenusComponent },
       { path: 'menus/add-menu', component: AddMenuComponent },
@@ -42,6 +47,9 @@ const routes: Routes = [
       { path: 'settings/add-new-restaurant', component: AddComponent },
       { path: 'settings/edit-restaurant', component: EditRestaurantComponent },
       { path: 'settings/branding', component: BrandingComponent },
+      { path: 'specials/add-new-special', component: AddSpecialComponent },
+      { path: 'specials/edit-special/:id', component: EditSpecialComponent },
+      { path: 'specials', component: SpecialsLandingComponent },
       { path: '', redirectTo: '/dashboard', pathMatch: 'full' } 
     ]
   }

@@ -1,0 +1,94 @@
+<div class="container">
+    <div class="outerCol">
+      <div class="block aboutBlock">
+        <div class="backBtn row" routerLink="/general/settings">
+          <i class="material-symbols-outlined">arrow_back_ios</i>
+          <p>Back</p>
+        </div>
+        <div class="headerRow">
+          <h6>About Us</h6>
+          <mat-form-field class="example-full-width">
+            <textarea matInput [(ngModel)]="aboutText"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="block imgBlock">
+        <h6>Images</h6>
+        <section class="image-container">
+          <div class="additional-images">
+            <i class="material-symbols-outlined">info</i>
+            <p class="text">Main Image</p>
+          </div>
+          <button class="add-image-button">
+            <i class="material-symbols-outlined">upload</i>
+            <input type="file" (change)="onFileSelected($event)" />
+          </button>
+        </section>
+        <section class="image-container">
+          <div class="additional-images">
+            <i class="material-symbols-outlined">info</i>
+            <p class="text">Additional Images</p>
+          </div>
+          <button class="add-image-button">
+            <i class="material-symbols-outlined">upload</i>
+            <input type="file" (change)="onFileSelected1($event)" />
+          </button>
+        </section>
+      </div>
+      <div class="block">
+        <div class="row rowspace">
+          <h6>Business Hours</h6>
+          <div class="rowToggle">
+            <label>This section is visible on your menu.</label>
+            <mat-slide-toggle [(ngModel)]="isBusinessHoursVisible" color="primary"></mat-slide-toggle>
+          </div>
+        </div>
+        <div class="row">
+          <div class="formGroup">
+            <input type="text" class="formControl" placeholder="Add description" [(ngModel)]="businessHours">
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="row rowspace">
+          <h6>Contact Details</h6>
+          <div class="rowToggle">
+            <label>This section is visible on your menu.</label>
+            <mat-slide-toggle [(ngModel)]="isContactDetailsVisible" color="primary"></mat-slide-toggle>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="formGroup">
+              <label>Email address</label>
+              <input type="email" class="formControl" placeholder="email@address.co.za" [(ngModel)]="email">
+            </div>
+          </div>
+          <div class="col">
+            <div class="formGroup">
+              <label>Cellphone number</label>
+              <input type="tel" class="formControl" placeholder="+27 (0)12 345 6789" [(ngModel)]="cellphone">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="outerColSmall">
+      <div class="block btnBlock">
+        <p>Would you like to save or discard the changes you have made?</p>
+        <div class="row">
+          <a class="btnTertiary">Discard</a>
+          <a class="btnSecondary" (click)="update()">Save Changes</a>
+        </div>
+      </div>
+      <div class="block" style="min-height: 800px;">
+        <div class="row">
+          <h6 class="heading">Real-time Preview</h6>
+        </div>
+        <div class="preview">
+          <!-- Add content for real-time preview here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <app-loading [isLoading]="isSaving"></app-loading>

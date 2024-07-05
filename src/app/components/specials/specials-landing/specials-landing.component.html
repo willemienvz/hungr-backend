@@ -1,0 +1,47 @@
+<div class="container">
+    <div class="row">
+        <app-stats-overview-block heading="Sales" tooltiptext="Tooltip Text" timeText="from current specials" stat="R 10 000,00"
+      movement=""></app-stats-overview-block>
+      <app-stats-overview-block heading="Special Views" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="1000"
+      movement="+3%"></app-stats-overview-block>
+      <app-stats-overview-block heading="Top Performing Special" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="Special Name"
+      movement=""></app-stats-overview-block>
+      <app-stats-overview-block heading="Specials Ordered" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="2 345"
+      movement=""></app-stats-overview-block>
+    </div>
+
+    <div class="row">
+      <div class="block">
+        <div class="row">
+          <div class="col">
+            <h6>Specials</h6>
+            <mat-select formControlName="menu" (selectionChange)="onFilterChange()">
+              <mat-option value="filterOptionActice">Active</mat-option>
+              <mat-option value="filterOptionDraft">Draft</mat-option>
+          </mat-select>
+          </div>
+          <div class="col">
+            <a class="btnSecondary" routerLink="/specials/add-new-special">+ Add special</a>
+          </div>
+            
+        </div>
+        <div class="row rowSpecials">
+          <div class="special" *ngFor="let special of specials; let i = index">
+            <img [src]="special.imageUrl" alt="" class="imageSpecial"/>
+            <span class="material-icons additionalItems" (click)="togglePopupMenu(i)">more_vert</span>
+            <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+              <a [routerLink]="['/specials/edit-special', special.specialID]">Edit</a>
+              <a (click)="deleteSpecial(special.specialID, i)">Delete</a>
+              <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+            </div>
+            <div class="content">
+              <h3>{{special.specialTitle}}</h3>
+              <p class="smallText">{{special.dateFrom}} - {{special.dateTo}}</p>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+    </div>
+    
+</div>

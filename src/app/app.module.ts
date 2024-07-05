@@ -54,6 +54,12 @@ import {MatIconModule} from '@angular/material/icon';
 import { AddMenuComponent } from './components/menus/add-menu/add-menu.component';
 import { ProgressBarComponent } from './components/shared/progress-bar/progress-bar.component';
 import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.component';
+import { AboutComponent } from './components/settings/about/about.component';
+import { AddSpecialComponent } from './components/specials/add-special/add-special.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { SpecialsLandingComponent } from './components/specials/specials-landing/specials-landing.component';
+import { EditSpecialComponent } from './components/specials/edit-special/edit-special.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -92,6 +98,10 @@ import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.compon
     AddMenuComponent,
     ProgressBarComponent,
     EditMenuComponent,
+    AboutComponent,
+    AddSpecialComponent,
+    SpecialsLandingComponent,
+    EditSpecialComponent,
   ],
   imports: [
     BrowserModule,
@@ -111,7 +121,9 @@ import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.compon
     MatRadioModule,
     AngularFireStorageModule,
     NgxColorsModule,
-    MatIconModule
+    MatIconModule,
+    MatChipsModule
+
   ],
   providers: [FormDataService],
   bootstrap: [AppComponent]

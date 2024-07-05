@@ -394,7 +394,17 @@ a{
   background-color: #3CE1AF;
 }
 
-
+mat-select{
+  border: 1px solid #DEDEDE;
+  height: 38px;
+  padding: 6px 12px 0 6px;
+  line-height: 38px;
+  border-radius: 5px;
+}
+.mat-mdc-select-panel {
+  margin-left: -6px;
+  margin-top: 6px;
+}
 ::ng-deep .mat-select-panel {
   background-color: transparent !important;
 }
@@ -469,4 +479,9 @@ mat-label{
   .mdc-text-field--no-label:not(.mdc-text-field--textarea){
     font-size: 14px;
   }
+}
+
+mat-chip {
+  margin: 0 5px;
+  cursor: pointer;
 }

@@ -1,0 +1,235 @@
+.container{
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+   gap: 20px;
+    width: 100%;
+
+    .mainTitle{
+        margin-bottom: 20px;
+    }
+    .row{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 50px;
+        align-items: flex-start;
+        .col{
+            width: calc(50% - 10px);
+            display: flex;
+            flex-direction: column;
+            gap: 30px
+        }
+    }
+
+    .block{
+        width: 100%;
+        position: relative;
+        
+    }
+}
+a.btnSecondary.disabled {
+    pointer-events: none;
+    color: grey;
+    cursor: not-allowed;
+  }
+.formGroup{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 15px;
+
+}
+.weekday-selector {
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+    border: 1px solid rgba(222, 222, 222, 1);
+    padding: 15px 50px;
+    border-radius: 2px;
+  }
+  
+  .weekday {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s, border-color 0.3s;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    line-height: normal;
+  }
+  
+  .weekday.selected {
+   font-weight: 800;
+  }
+
+.mediaBlock{
+    background-color:rgba(243, 244, 245, 1);
+    border: 1px solid rgba(222, 222, 222, 1);
+    padding: 25px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    .colmediaBlock{
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        p{
+            margin: 0 0 25px 0;
+        }
+        a{
+            margin: 0 0 15px 0;
+            text-decoration: none;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            color: rgba(68, 68, 68, 1);
+        }
+    }
+}
+
+.container .timeRow {
+    gap:0;
+    justify-content: space-between;
+    align-items: center;
+    input{
+        width: 47%;
+        border: 1px solid #DEDEDE;
+        height: 38px;
+        padding:12px;
+        border-radius: 5px;
+        line-height: 38px;
+    }
+}
+.error-message{
+    color: red;
+}
+.listMenuItems{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 40px;
+    a{
+        text-decoration: underline;
+    }
+}
+.dateRow{
+    .row{
+        gap:0;
+        justify-content: space-between;
+        align-items: center;
+    }
+    input{
+        width: 47%;
+        border: 1px solid #DEDEDE;
+        height: 38px;
+        border-radius: 5px;
+        padding:12px;
+        line-height: 38px;
+        font-family: 'Barlow', sans-serif;
+    }
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 46%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 20px;
+align-items: flex-start;
+
+.row{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+  }
+  
+  .close {
+    color: #aaa;
+    position: absolute;
+    font-size: 28px;
+    font-weight: bold;
+    right: 15px;
+    top:15px;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .open {
+    display: block; /* Show when open */
+  }
+
+
+.popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #00000018;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    
+  
+    &.popup-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+     
+    }
+    h1{
+        color: black;
+      }
+      .row{
+        justify-content: center;
+        align-items: center;
+      }
+      .col{
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        flex: 1;
+      }
+      img{
+        width: 50%;
+        object-fit: cover;
+        height: 100%;
+      }
+  }
+  
+  .popup-close{
+    color: black;
+    top:10px;
+    right: 10px;
+  }
