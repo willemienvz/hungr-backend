@@ -65,6 +65,10 @@
         width: 100%;
         cursor: pointer;
         text-decoration: none;
+        transition: 0.3s all;
+    }
+    a:hover{
+        font-weight: 600;
     }
     .closeBtn{
         position: absolute;

@@ -1,4 +1,7 @@
 <div class="outer-container">
+  <div class="col downloadappcol">
+    <img src="../../../assets/images/login/dashboard.png" alt="" />
+  </div>
   <div class="col formCol">
     <img class="logo" src="../../../assets/images/shared/logo.png" alt="" />
     <h1>Log In</h1>
@@ -19,10 +22,8 @@
           </div>
           <div class="forgotPassword">
             <span class="mainLink" (click)="forgotPassword.openPopup()">Forgot Password?</span>
-            <!--<span routerLink="/forgot-password" class="mainLink">Forgot Password?</span>-->
           </div>
         </div>
-        <!-- Calling SignIn Api from AuthService -->
         <div class="formGroup btnHolder">
           <input type="button" class="btn btnPrimary" value="Log in"
             (click)="authService.SignIn(userName.value, userPassword.value)" />
@@ -34,21 +35,7 @@
       </div>
     </div>
   </div>
-  <div class="col downloadappcol">
-    <p class="extra-large-text">Your Go-To App for
-      Restaurant Discovery
-      and Menus</p>
-    <img class="phones" src="../../../assets/images/login/phones.png" alt="" />
-    <div class="downloadappbox">
-      <div class="downloadappboxinner">
-        <h3>Download the app</h3>
-        <div class="row">
-          <a href="" target="_blank"><img src="../../../assets/images/shared/apps.svg" alt="" /></a>
-        </div>
-      </div>
 
-    </div>
-  </div>
 </div>
 
 <app-forgot-password #forgotPassword></app-forgot-password>

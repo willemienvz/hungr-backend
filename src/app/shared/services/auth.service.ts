@@ -10,7 +10,6 @@ import { Router } from '@angular/router';
 import { Component } from '@angular/core';
 import { ContentfulService } from './contentful.service';
 import { DataService } from './data.service';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -22,7 +21,8 @@ export class AuthService {
     public router: Router,
     public ngZone: NgZone,
     public dataService: DataService,
-    private contentfulService: ContentfulService
+    private contentfulService: ContentfulService,
+   
   ) {
     /* Saving user data in localstorage when 
     logged in and setting up null when logged out */
@@ -65,19 +65,22 @@ export class AuthService {
       });
   }
 
-  SignUpEditor(email: string, data:any) {
+  SignUpEditor(email: string, data: any): Promise<void> {
     const user = JSON.parse(localStorage.getItem('user')!);
     const parentId = user.uid;
-    const password = 'th1s1s@t3mpP@ssw0rdPl3@s3Ch@ng3m3!123'
-    return this.afAuth
-      .createUserWithEmailAndPassword(email, password)
-      .then((result) => {
-        this.SendVerificationMailEditor();
-        this.SetUserDataEditor(result.user, data.email, data.lastname, data.name, data.phone, parentId);
-      })
-      .catch((error) => {
-        window.alert(error.message);
-      });  
+    const password = 'th1s1s@t3mpP@ssw0rdPl3@s3Ch@ng3m3!123';
+  
+    return new Promise<void>((resolve, reject) => {
+      this.afAuth.createUserWithEmailAndPassword(email, password)
+        .then((result) => {
+          this.SendVerificationMailEditor();
+          this.SetUserDataEditor(result.user, data.email, data.lastname, data.name, data.phone, parentId);
+          resolve(); 
+        })
+        .catch((error) => {
+          reject(error); 
+        });
+    });
   }
 
   // Send email verfificaiton when new user sign up

@@ -27,7 +27,7 @@
           </div>
           <div class="formGroup btnHolder">
             <input class="btn btnTertiary" type="button" value="Cancel" (click)="closePopup()">
-            <input type="submit" class="btn btnPrimary" value="Add User">
+            <input type="submit" class="btn btnPrimary" [disabled]="!userForm.valid" value="Add User">
           </div>
         </form>
       </div>

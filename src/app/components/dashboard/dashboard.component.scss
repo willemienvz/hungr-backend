@@ -16,4 +16,9 @@
         flex-direction: column;
     } 
     
+    
+    .biggerBlock{
+        width: calc(66%);
+        flex: none !important;
+    }
 }

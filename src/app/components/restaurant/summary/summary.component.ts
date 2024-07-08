@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../../shared/services/restaurant';
 
@@ -12,11 +12,17 @@ export class SummaryComponent  implements OnInit{
   isPopupMenuOpen: boolean[] = [];
   isSaving: boolean = false;
   restuarants: Restaurant[] = [];
-  constructor(private firestore: AngularFirestore) {
+  constructor(private firestore: AngularFirestore,  private elementRef: ElementRef) {
   }
   ngOnInit() {
     this.isSaving = true;
     this.fetchRestaurant();
+  }
+  @HostListener('document:click', ['$event'])
+  onClick(event: Event) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.closeAllPopupMenu();
+    }
   }
   
   togglePopupMenu(index: number) {
@@ -43,6 +49,10 @@ export class SummaryComponent  implements OnInit{
         .catch((error) => {
             console.error("Error removing restaurant: ", error);
         });
+  }
+
+  private closeAllPopupMenu() {
+    this.isPopupMenuOpen.fill(false);
   }
 
 }

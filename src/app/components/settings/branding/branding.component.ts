@@ -18,7 +18,7 @@ export class BrandingComponent {
   brand: Branding[] = [];
   isTooltipOpen: boolean = false;
   lastSavedDocId: string | null = null;
-
+  tooltipOpen: { [key: string]: boolean } = {};
   // Color settings
   backgroundColor: string = '';
   mainHeadingColor: string = '';
@@ -73,7 +73,17 @@ export class BrandingComponent {
         this.brand = brand;
       });
   }
+  openTooltip(tooltip: string) {
+    this.tooltipOpen[tooltip] = true;
+  }
 
+  removeImg(){
+    this.imageUrl ='';
+  }
+
+  closeTooltip(tooltip: string) {
+    this.tooltipOpen[tooltip] = false;
+  }
   applyChanges(type: string, value: any): void {
     console.log(`${type} settings updated.`, value);
     switch(type) {

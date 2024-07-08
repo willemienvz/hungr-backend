@@ -4,11 +4,10 @@
     padding: 50px;
     flex-direction: row;
     justify-content: center;
-    min-height: 100vh;
     align-items: stretch;
 
     .col{
-        width: 50%;
+        width: calc(50% - 20px);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -105,33 +104,23 @@
             .redirect{
                 text-align: center;
                 width: 100%;
+                text-decoration: underline;
             }
         }
         
     } 
 
     .downloadappcol{
-        background: #FFF56E;
-        padding: 55px 75px;
-        border-radius: 10px;
         display: flex;
         flex-direction: column;
-        position: relative;
-        justify-content: space-between;
-        align-items: flex-start;
-        max-width: 640px;
+        width: calc(50% - 20px);
 
-        .extra-large-text{
-            text-align: left;
-            width: 380px;
-        }
-
-        .phones{
-            position: absolute;
-            left: -50px;
-            top: 220px;
-            transform: rotate(-4.25deg);
-            height:60%;
+        img { 
+            width: 100%;
+            object-fit: cover;
+            height: 100%;
+            border-radius: 10px;
+            object-position: top left;
         }
     }
 

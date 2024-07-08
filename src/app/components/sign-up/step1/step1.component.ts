@@ -2,7 +2,8 @@ import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/cor
 import { FormBuilder, FormGroup, Validators, AbstractControl  } from '@angular/forms';
 import { FormDataService } from '../../../shared/services/signup/form-data.service';
 import { Subscription } from 'rxjs';
-import { dateInFutureValidator } from '../../../shared/validators/custom-validators'; //
+import { dateInFutureValidator } from '../../../shared/validators/custom-validators'; 
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-step1',
   templateUrl: './step1.component.html',
@@ -12,21 +13,16 @@ export class Step1Component  implements OnInit, OnDestroy{
   step1Form: FormGroup;
   showPassword: boolean = false;
   showPasswordConf: boolean = false;
-  showCvvInfoPopup: boolean = false;
   private confirmPwdSubscription!: Subscription;
   @Output() next: EventEmitter<any> = new EventEmitter<any>();
-  constructor(private fb: FormBuilder, private formDataService: FormDataService) {
+  constructor(private fb: FormBuilder, private formDataService: FormDataService,  private toastr: ToastrService) {
     this.step1Form = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(10)]],
       userPwdConfrim: ['', Validators.required],
       userEmail: ['', [Validators.required, Validators.email]],
-      cellphone: ['', Validators.required],
-      cardname: ['', Validators.required],
-      cardnumber: ['', Validators.required],
-      cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]], 
-      expirydate: ['', [Validators.required]],
+      cellphone: ['', Validators.required]
   }, {
       validator: this.passwordMatchValidator 
   });
@@ -106,8 +102,7 @@ togglePasswordConfirmVisibility(): void {
 }
   onNext() {
     if (this.isPasswordMismatch()) {
-      // Handle the case where passwords don't match (e.g., display an error message)
-      console.error('Passwords do not match');
+      this.toastr.error('Passwords do not match');
       return;
   }
   const formData = this.step1Form.value;

@@ -3,10 +3,11 @@
         <div class="block logoBlock">
             <h6>Logo</h6>
             <p>Please upload your logo.</p>
-            <input class="btnTertiary" type="file" (change)="onFileSelected($event)">
+            <input class="btnTertiary" type="file" (change)="onFileSelected($event)" style="font-weight: 500; text-transform: capitalize;">
             <button (click)="onUpload()" class="btnSecondary">Upload</button>
 
             <div *ngIf="imageUrl" class="imagePreview">
+                <i *ngIf="imageUrl" class="material-icons closeBtn" (click)="removeImg()">close</i>
                 <img [src]="imageUrl" alt="Uploaded logo">
             </div>
         </div>
@@ -14,9 +15,9 @@
         <div class="block">
             <div class="row">
                 <h6 class="heading">Background Colour</h6>
-                <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-                    <app-tooltip [text]="'This sets the general background color for branding.'" *ngIf="isTooltipOpen"
-                        [isVisible]="isTooltipOpen"></app-tooltip></i>
+                <i class="material-icons" (mouseenter)="tooltipOpen['bgColor'] = true" (mouseleave)="tooltipOpen['bgColor'] = false">information
+                    <app-tooltip [text]="'This sets the general background color for branding.'" *ngIf="tooltipOpen['bgColor']"
+                        [isVisible]="tooltipOpen['bgColor']"></app-tooltip></i>
             </div>
             <div class="row inputRow">
                 <p>Background colour</p>
@@ -32,7 +33,7 @@
         <div class="block btnBlock">
             <p>Would you like to save or discard the changes you have made?</p>
             <div class="row">
-                <a class="btnTertiary">Discard</a>
+                <a class="btnTertiary" style="width: 130px;">Discard</a>
                 <a class="btnSecondary" (click)="updateBrandingDetails()">Save Changes</a>
             </div>
         </div>
@@ -55,9 +56,9 @@
                     <!-- Main Headings Settings -->
                     <div class="row inputRow brandingRow">
                         <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-                                <app-tooltip [text]="'Settings for main headings.'" *ngIf="isTooltipOpen"
-                                    [isVisible]="isTooltipOpen"></app-tooltip></i>
+                            <i class="material-icons" (mouseenter)="tooltipOpen['mainHeading'] = true" (mouseleave)="tooltipOpen['mainHeading'] = false">information
+                                <app-tooltip [text]="'Settings for main headings.'" *ngIf="tooltipOpen['mainHeading']"
+                                    [isVisible]="tooltipOpen['mainHeading']"></app-tooltip></i>
                             <p>Main Headings</p>
                         </div>
                         <div class="colorPicker">
@@ -91,9 +92,9 @@
                     <!-- Sub Headings Settings -->
                     <div class="row inputRow brandingRow">
                         <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-                                <app-tooltip [text]="'Settings for sub headings.'" *ngIf="isTooltipOpen"
-                                    [isVisible]="isTooltipOpen"></app-tooltip></i>
+                            <i class="material-icons" (mouseenter)="tooltipOpen['subHeading'] = true" (mouseleave)="tooltipOpen['subHeading'] = false">information
+                                <app-tooltip [text]="'Settings for sub headings.'" *ngIf="tooltipOpen['subHeading']"
+                                    [isVisible]="tooltipOpen['subHeading']"></app-tooltip></i>
                             <p>Sub Headings</p>
                         </div>
                         <div class="colorPicker">
@@ -127,9 +128,9 @@
                     <!-- Body Text Settings -->
                     <div class="row inputRow brandingRow">
                         <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-                                <app-tooltip [text]="'Settings for body text.'" *ngIf="isTooltipOpen"
-                                    [isVisible]="isTooltipOpen"></app-tooltip></i>
+                            <i class="material-icons" (mouseenter)="tooltipOpen['bodyText'] = true" (mouseleave)="tooltipOpen['bodyText'] = false">information
+                                <app-tooltip [text]="'Settings for body text.'" *ngIf="tooltipOpen['bodyText']"
+                                    [isVisible]="tooltipOpen['bodyText']"></app-tooltip></i>
                             <p>Body Text</p>
                         </div>
                         <div class="colorPicker">
@@ -178,9 +179,9 @@
                     <!-- Primary Settings -->
                     <div class="row inputRow brandingRow">
                         <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-                                <app-tooltip [text]="'Settings for buttons.'" *ngIf="isTooltipOpen"
-                                    [isVisible]="isTooltipOpen"></app-tooltip></i>
+                            <i class="material-icons" (mouseenter)="tooltipOpen['btnPrimary'] = true" (mouseleave)="tooltipOpen['btnPrimary'] = false">information
+                                <app-tooltip [text]="'Settings for buttons.'" *ngIf="tooltipOpen['btnPrimary']"
+                                    [isVisible]="tooltipOpen['btnPrimary']"></app-tooltip></i>
                             <p>Primary</p>
                         </div>
                         <div class="colorPicker">
@@ -214,9 +215,9 @@
                      <!-- Secondary Settings -->
                      <div class="row inputRow brandingRow">
                         <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-                                <app-tooltip [text]="'Settings for buttons.'" *ngIf="isTooltipOpen"
-                                    [isVisible]="isTooltipOpen"></app-tooltip></i>
+                            <i class="material-icons" (mouseenter)="tooltipOpen['btnSecondary'] = true" (mouseleave)="tooltipOpen['btnSecondary'] = false">information
+                                <app-tooltip [text]="'Settings for buttons.'" *ngIf="tooltipOpen['btnSecondary']"
+                                    [isVisible]="tooltipOpen['btnSecondary']"></app-tooltip></i>
                             <p>Secondary</p>
                         </div>
                         <div class="colorPicker">
@@ -256,6 +257,7 @@
                 </div>
                 <div class="preview" [ngStyle]="{'background-color': backgroundColor}">
                     <div *ngIf="imageUrl" class="imagePreviewSmall">
+                        
                         <img [src]="imageUrl" alt="Uploaded logo">
                     </div>
                     <h1 [ngStyle]="{

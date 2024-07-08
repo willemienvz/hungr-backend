@@ -7,5 +7,7 @@ import { Component, Input } from '@angular/core';
 })
 export class TooltipComponent {
   @Input() text: string = '';
+  @Input() showToTheLeft: boolean = false;
   @Input() isVisible: boolean = false;
+
 }

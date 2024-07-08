@@ -22,12 +22,10 @@ import { AddSpecialComponent } from './components/specials/add-special/add-speci
 import { SpecialsLandingComponent } from './components/specials/specials-landing/specials-landing.component';
 import { EditSpecialComponent } from './components/specials/edit-special/edit-special.component';
 
-
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
   { path: 'sign-in', component: SignInComponent },
   { path: 'register-user', component: SignUpComponent },
- // { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]  },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'confirm-user', component: ConfirmUserComponent },
   { path: 'verify-email-address', component: VerifyEmailComponent },
@@ -40,7 +38,7 @@ const routes: Routes = [
       { path: 'settings/general', component: GeneralComponent },
       { path: 'settings/about-us', component: AboutComponent },
       { path: 'manage-users', component: ManageUsersComponent },
-      { path: 'menus', component: MenusComponent },
+      { path: 'menus/dashboard', component: MenusComponent },
       { path: 'menus/add-menu', component: AddMenuComponent },
       { path: 'menus/edit-menu/:menuID', component: EditMenuComponent },
       { path: 'menus/qr-codes', component: QrCodesComponent },
@@ -54,6 +52,7 @@ const routes: Routes = [
     ]
   }
 ];
+
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],

@@ -2,7 +2,7 @@
     <div class="row">
         <h6 class="heading">{{heading}}</h6>
         <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-            <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen"
+            <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen" [showToTheLeft]="showLeft"
                 [isVisible]="isTooltipOpen"></app-tooltip></i>
 
     </div>

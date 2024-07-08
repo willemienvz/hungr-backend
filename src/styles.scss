@@ -37,41 +37,41 @@ $hungr-backend-theme: mat.define-light-theme((
     margin: 0;
     transition: 0.3s all;
     
---mdc-switch-selected-focus-state-layer-color: #3CE1AF;
---mdc-switch-selected-handle-color: #3CE1AF;
---mdc-switch-selected-hover-state-layer-color: #3CE1AF;
---mdc-switch-selected-pressed-state-layer-color: #3CE1AF;
---mdc-switch-selected-focus-handle-color: #3CE1AF;
---mdc-switch-selected-hover-handle-color: #3CE1AF;
---mdc-switch-selected-pressed-handle-color: #3CE1AF;
---mdc-switch-selected-focus-track-color: #9A9A9A;
---mdc-switch-selected-hover-track-color: #9A9A9A;
---mdc-switch-selected-pressed-track-color: #9A9A9A;
---mdc-switch-selected-track-color: #9A9A9A;
---mdc-switch-disabled-selected-handle-color: #9A9A9A;
---mdc-switch-disabled-selected-icon-color: #fff;
---mdc-switch-disabled-selected-track-color: #9A9A9A;
---mdc-switch-disabled-unselected-handle-color: #9A9A9A;
---mdc-switch-disabled-unselected-icon-color: #fff;
---mdc-switch-disabled-unselected-track-color: #9A9A9A;
---mdc-switch-handle-surface-color: var(--mdc-theme-surface, #fff);
---mdc-switch-handle-elevation-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
---mdc-switch-handle-shadow-color: black;
---mdc-switch-disabled-handle-elevation-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12);
---mdc-switch-selected-icon-color: #fff;
---mdc-switch-unselected-focus-handle-color: #9A9A9A;
---mdc-switch-unselected-focus-state-layer-color: #9A9A9A;
---mdc-switch-unselected-focus-track-color: #fff;
---mdc-switch-unselected-handle-color: #9A9A9A;
---mdc-switch-unselected-hover-handle-color: #9A9A9A;
---mdc-switch-unselected-hover-state-layer-color: #9A9A9A;
---mdc-switch-unselected-hover-track-color: #fff;
---mdc-switch-unselected-icon-color: #fff;
---mdc-switch-unselected-pressed-handle-color: #9A9A9A;
---mdc-switch-unselected-pressed-state-layer-color: #9A9A9A;
---mdc-switch-unselected-pressed-track-color: #fff;
---mdc-switch-unselected-track-color: #fff;
---mdc-switch-disabled-label-text-color: rgba(0, 0, 0, 0.38);
+    --mdc-switch-selected-focus-state-layer-color: #fff;
+    --mdc-switch-selected-handle-color: #fff;
+    --mdc-switch-selected-hover-state-layer-color: #fff;
+    --mdc-switch-selected-pressed-state-layer-color: #fff;
+    --mdc-switch-selected-focus-handle-color: #fff;
+    --mdc-switch-selected-hover-handle-color: #fff;
+    --mdc-switch-selected-pressed-handle-color: #fff;
+    --mdc-switch-selected-focus-track-color: #3CE1AF;
+    --mdc-switch-selected-hover-track-color: #3CE1AF;
+    --mdc-switch-selected-pressed-track-color: #3CE1AF;
+    --mdc-switch-selected-track-color: #3CE1AF;
+    --mdc-switch-disabled-selected-handle-color: #424242;
+    --mdc-switch-disabled-selected-icon-color: #fff;
+    --mdc-switch-disabled-selected-track-color: #424242;
+    --mdc-switch-disabled-unselected-handle-color: #424242;
+    --mdc-switch-disabled-unselected-icon-color: #fff;
+    --mdc-switch-disabled-unselected-track-color: #424242;
+    --mdc-switch-handle-surface-color: var(--mdc-theme-surface, #fff);
+    --mdc-switch-handle-elevation-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+    --mdc-switch-handle-shadow-color: black;
+    --mdc-switch-disabled-handle-elevation-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12);
+    --mdc-switch-selected-icon-color: #fff;
+    --mdc-switch-unselected-focus-handle-color: #212121;
+    --mdc-switch-unselected-focus-state-layer-color: #424242;
+    --mdc-switch-unselected-focus-track-color: #e0e0e0;
+    --mdc-switch-unselected-handle-color: #616161;
+    --mdc-switch-unselected-hover-handle-color: #212121;
+    --mdc-switch-unselected-hover-state-layer-color: #424242;
+    --mdc-switch-unselected-hover-track-color: #e0e0e0;
+    --mdc-switch-unselected-icon-color: #fff;
+    --mdc-switch-unselected-pressed-handle-color: #212121;
+    --mdc-switch-unselected-pressed-state-layer-color: #424242;
+    --mdc-switch-unselected-pressed-track-color: #e0e0e0;
+    --mdc-switch-unselected-track-color: #e0e0e0;
+    --mdc-switch-disabled-label-text-color: rgba(0, 0, 0, 0.38);
 }
 
 .material-symbols-outlined {
@@ -89,7 +89,9 @@ $hungr-backend-theme: mat.define-light-theme((
     line-height: 48px;
     letter-spacing: -0.001em;
 }
-
+.colorPicker .mat-mdc-form-field{
+  height: 40px;
+}
 h1{
     font-family: 'Barlow', sans-serif;
     font-size: 24px;
@@ -167,7 +169,7 @@ a{
     padding:  12px 15px;
     font-family: 'Barlow', sans-serif;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: 800;
     line-height: 14px;
     letter-spacing: -0.001em;
     border: none;
@@ -180,17 +182,21 @@ a{
     justify-content: center;
     align-items: center;
     gap: 10px;
+    transition: 0.3s all;
 }
 
+.btnPrimary:hover{
+  background: #fff463;
+}
 .btnSecondary{
   color: #181818;
-  background: #3CE1AF;
+  background: #3ce1af;
   border-radius: 6px;
   text-align: center;
   padding:  12px 15px;
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 14px;
   letter-spacing: -0.001em;
   border: none;
@@ -198,10 +204,16 @@ a{
   cursor: pointer;
   text-decoration: none;
   display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  transition: 0.3s all;
+}
+
+.btnSecondary:hover{
+  background: #3fefba;
 }
 
 .btnTertiary{
@@ -212,7 +224,7 @@ a{
   padding:  12px 15px;
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 14px;
   letter-spacing: -0.001em;
   border: none;
@@ -224,8 +236,12 @@ a{
     justify-content: center;
     align-items: center;
     gap: 10px;
+    transition: 0.3s all;
 }
 
+.btnTertiary:hover{
+  background: #ededed;
+}
 .btnBlue{
   color: #181818;
   background: #AFDCFF;
@@ -234,18 +250,23 @@ a{
   padding:  12px 15px;
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 14px;
   letter-spacing: -0.001em;
   border: none;
   text-transform: uppercase;
   cursor: pointer;
   text-decoration: none;
+  transition: 0.3s all;
+}
+
+.btnBlue:hover{
+  background: #bbe2ff;
 }
 
 .mainLink{
     font-family: 'Barlow', sans-serif;
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 10px;
     letter-spacing: -0.001em;
@@ -253,6 +274,7 @@ a{
     color:#9A9A9A;
     width: 100%;
     cursor: pointer;
+    transition: 0.3s all;
 }
 
 .mainLink:hover{
@@ -484,4 +506,10 @@ mat-label{
 mat-chip {
   margin: 0 5px;
   cursor: pointer;
+}
+
+input[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f2f2f2;
 }

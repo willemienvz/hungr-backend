@@ -59,6 +59,7 @@ import { AddSpecialComponent } from './components/specials/add-special/add-speci
 import { MatChipsModule } from '@angular/material/chips';
 import { SpecialsLandingComponent } from './components/specials/specials-landing/specials-landing.component';
 import { EditSpecialComponent } from './components/specials/edit-special/edit-special.component';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -122,7 +123,8 @@ import { EditSpecialComponent } from './components/specials/edit-special/edit-sp
     AngularFireStorageModule,
     NgxColorsModule,
     MatIconModule,
-    MatChipsModule
+    MatChipsModule,
+    ToastrModule.forRoot(),
 
   ],
   providers: [FormDataService],

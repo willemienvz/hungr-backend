@@ -39,5 +39,10 @@ export class ManageUsersComponent implements OnInit {
   deleteUser(uid:string){
     const userRef: AngularFirestoreDocument<any> = this.firestore.doc(`users/${uid}`);
     userRef.delete();
+    this.closeAllPopupMenu();
+  }
+
+  private closeAllPopupMenu() {
+    this.isPopupMenuOpen.fill(false);
   }
 }

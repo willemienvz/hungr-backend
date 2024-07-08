@@ -14,16 +14,11 @@
 }
 .settingspage{
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: row;
     width: 100%;
     max-height: 110vh;
     column-count: 3; 
     column-gap: 10px; 
-    .block{
-        display: inline-block; /* Change from block to inline-block */
-    width: 32%; /* Ensure each block takes full width of its column */
-    margin-bottom: 8px;
-    }
 }
 
 
@@ -148,6 +143,10 @@
         width: 100%;
         cursor: pointer;
         text-decoration: none;
+        transition: 0.3s all;
+    }
+    a:hover{
+        font-weight: 600;
     }
     .closeBtn{
         position: absolute;
@@ -181,5 +180,16 @@
         i{
             font-size: 17px;
         }
+    }
+}
+
+.colthird{
+    width: calc(33% - 15px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .formGroup:last-of-type{
+        margin-bottom: 0;
     }
 }

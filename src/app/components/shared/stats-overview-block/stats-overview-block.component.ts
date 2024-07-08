@@ -11,6 +11,7 @@ export class StatsOverviewBlockComponent {
   @Input() timeText: string = '';
   @Input() stat: string = '';
   @Input() movement: string = '';
+  @Input() showLeft: boolean = false;
 
   isTooltipOpen:boolean = false;
 

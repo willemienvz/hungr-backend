@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { AuthService } from '../../../shared/services/auth.service';
+
 @Component({
   selector: 'app-top-menu',
   templateUrl: './top-menu.component.html',
-  styleUrl: './top-menu.component.scss'
+  styleUrls: ['./top-menu.component.scss']
 })
 export class TopMenuComponent {
   constructor(public authService: AuthService) {}
@@ -12,15 +13,24 @@ export class TopMenuComponent {
   isProfileExpanded = false;
   isNotificationsExpanded = false;
 
+  @HostListener('document:click', ['$event'])
+  onClick(event: Event) {
+    if (!(event.target as HTMLElement).closest('.search-bar')) {
+      this.isSearchBarExpanded = false; 
+    }
+  }
+
   toggleSearchBar() {
     this.isSearchBarExpanded = !this.isSearchBarExpanded;
   }
 
   toggleProfile() {
+    this.isNotificationsExpanded = false;
     this.isProfileExpanded = !this.isProfileExpanded;
   }
 
   toggleNotifications() {
+    this.isProfileExpanded = false;
     this.isNotificationsExpanded = !this.isNotificationsExpanded;
   }
 }

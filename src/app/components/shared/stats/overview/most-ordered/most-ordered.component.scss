@@ -51,6 +51,11 @@
         flex-direction: row;
         gap: 13px;
       }
+
+      .list p:last-of-type{
+        text-align: left;
+       width: 30%;
+      }
     .heading{
         color: #444444;
         margin-bottom: 10px;
