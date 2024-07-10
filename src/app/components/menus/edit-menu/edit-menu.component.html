@@ -120,7 +120,7 @@
                                 *ngIf="!menuItem.showLabelInput" class="material-symbols-outlined">label</i>
                             {{menuItem.labels}}</h6>
                         <p class="labelAdd" (click)="toggleLabelInput(itemIndex)">
-                            <i class="material-symbols-outlined">new_label</i><span>Add Label</span>
+                            <i class="material-symbols-outlined">new_label</i><span>Select sub category</span>
                         </p>
 
                     </div>
@@ -143,8 +143,8 @@
                     <div class="col">
                         <p>Price</p>
                         <input type="text" [(ngModel)]="menuItem.price" placeholder="R 00.00" class="smallerInput"
-                            [ngModelOptions]="{standalone: true}">
-                    </div>
+                               [ngModelOptions]="{standalone: true}" (input)="onPriceInput($event, menuItem)">
+                      </div>
                     <div class="image">
                         <div *ngIf="menuItem.imageUrl" class="imagePreview">
                             <img [src]="menuItem.imageUrl" alt="Uploaded logo">

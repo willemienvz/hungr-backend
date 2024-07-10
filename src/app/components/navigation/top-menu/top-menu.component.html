@@ -16,10 +16,11 @@
     </div>
 </nav>
 <nav class="profiledd" *ngIf="isProfileExpanded">
-    <h6>John Smith (Admin)</h6>
+    <h6>{{userProfile.firstName}} {{userProfile.Surname }} {{ !userProfile.ParentID ? ' - Admin' : '' }}</h6>
     <a>Edit profile</a>
     <a>Add a user</a>
     <a>Manage permissions</a>
+    <a (click)="authService.SignOut()">Log out</a>
 </nav>
 <nav class="profiledd" *ngIf="isNotificationsExpanded">
     <h6>Notifications </h6>

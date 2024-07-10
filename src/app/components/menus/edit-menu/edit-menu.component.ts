@@ -111,6 +111,15 @@ export class EditMenuComponent implements OnInit {
       this.newCategoryName = '';
     }
   }
+
+  onPriceInput(event: any, menuItem: any): void {
+    let inputValue = event.target.value;
+    if (!inputValue.startsWith('R ')) {
+      inputValue = 'R ' + inputValue.replace(/^R\s*/, '');
+    }
+    menuItem.price = inputValue;
+    event.target.value = inputValue;
+  }
   onFileSelected(event: Event, itemIndex: number): void {
     const fileInput = event.target as HTMLInputElement;
     if (fileInput.files && fileInput.files[0]) {

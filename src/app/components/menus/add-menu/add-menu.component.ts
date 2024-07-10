@@ -75,6 +75,8 @@ export class AddMenuComponent implements OnInit {
   OwnerID:string='';
   menuName:string='';
   validationError:boolean = false;
+  menuNameError:boolean = false;
+  restaurantError:boolean = false;
   selectedFileBulk: File | null = null;
   constructor(private storage: AngularFireStorage, private firestore: AngularFirestore, private papa: Papa ) {}
 
@@ -182,20 +184,28 @@ export class AddMenuComponent implements OnInit {
     return this.validationError;
   }
 
-  checkValidation() {
-    this.validationError = !this.menuName || !this.selectedRestaurant;
+  validateMenuName() {
+    this.menuNameError = !this.menuName.trim();
   }
+
+  validateRestaurant() {
+    this.restaurantError = !this.selectedRestaurant.trim();
+  }
+  onPriceInput(event: any, menuItem: any): void {
+    let inputValue = event.target.value;
+    if (!inputValue.startsWith('R ')) {
+      inputValue = 'R ' + inputValue.replace(/^R\s*/, '');
+    }
+    menuItem.price = inputValue;
+    event.target.value = inputValue;
+  }
+
   nextStep() {
-   
-    if (this.selectedRestaurant.length < 1 || this.menuName.length < 1 ){
-      this.validationError = true;
-    }else{
+    if (!this.menuNameError && !this.restaurantError) {
       if (this.currentStep < 3) {
         this.currentStep++;
       }
-      this.validationError = false;
     }
-    
   }
 
   previousStep() {
@@ -218,12 +228,13 @@ export class AddMenuComponent implements OnInit {
     this.showPopupProgress = false;
   }
 
-  openProgressPopup(){
-    if (this.isValid()){
+  openProgressPopup() {
+    if (this.isValid()) {
       this.showPopupProgress = true;
       this.saveMenu();
-    }else{
-      this.checkValidation();
+    } else {
+      this.validateMenuName();
+      this.validateRestaurant();
     }
   }
 
@@ -380,6 +391,7 @@ export class AddMenuComponent implements OnInit {
     }
   
     onFileSelected(event: Event, itemIndex: number): void {
+      this.isSaving = true;
       const fileInput = event.target as HTMLInputElement;
       if (fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
@@ -391,6 +403,7 @@ export class AddMenuComponent implements OnInit {
           finalize(() => {
             fileRef.getDownloadURL().subscribe((url) => {
               this.menuItems[itemIndex].imageUrl = url;
+              this.isSaving = false;
             });
           })
         ).subscribe();
@@ -412,6 +425,7 @@ export class AddMenuComponent implements OnInit {
           qrAssigned: false,
           qrUrl: ''
         };
+        console.log(this.newMenu);
         this.firestore.collection('menus').add(this.newMenu)
         .then((data) => {
           this.currentMenuID = data.id;
@@ -429,6 +443,7 @@ export class AddMenuComponent implements OnInit {
             location: this.findCityAndProvince(this.selectedRestaurant)
           };
           this.firestore.collection('menus').doc(data.id).update(this.newMenu);
+          this.isSaving = false;
           this.nextStep();
         })
         .catch(error => {

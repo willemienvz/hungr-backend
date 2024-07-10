@@ -10,26 +10,26 @@
                 </div>
                 <div class="col2row">
                     <div class="col">
-                        <div class="formGroup" [ngClass]="{'error': validationError}">
+                        <div class="formGroup" [ngClass]="{'error': menuNameError}">
                             <label>Menu Name</label>
-                            <input (change)="checkValidation()" type="text" class="formControl" placeholder="Name your menu" name="menuname"
+                            <input (change)="validateMenuName()" type="text" class="formControl" placeholder="Name your menu" name="menuname"
                                 [(ngModel)]="menuName" required>
-                                <div *ngIf="validationError" class="error-message">Menu name is required.</div>
+                                <div *ngIf="menuNameError" class="error-message">Menu name is required.</div>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="formGroup" [ngClass]="{'error': validationError}">
+                        <div class="formGroup" [ngClass]="{'error': restaurantError}">
                             <label>Assign Restaurant</label>
                             <mat-form-field>
-                                <mat-select (change)="checkValidation()" name="selectedNumberTable" [(ngModel)]="selectedRestaurant">
+                                <mat-select (change)="validateRestaurant()" name="selectedNumberTable" [(ngModel)]="selectedRestaurant">
                                     <mat-option *ngFor="let restaurant of restuarants"
                                         [value]="restaurant.restaurantID">
                                         {{ restaurant.restaurantName }}
                                     </mat-option>
                                 </mat-select>
-                                <div *ngIf="validationError" class="error-message">Restaurant selection is required.</div>
+                                <div *ngIf="restaurantError" class="error-message">Restaurant selection is required.</div>
                             </mat-form-field>
-                            
+                            <a class="mainLink" style="text-align: right; width: 100%;" routerLink="/settings/add-new-restaurant">Add restaurant</a>
                         </div>
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                                     *ngIf="!menuItem.showLabelInput" class="material-symbols-outlined">label</i>
                                 {{menuItem.labels}}</h6>
                             <p class="labelAdd" (click)="toggleLabelInput(itemIndex)">
-                                <i class="material-symbols-outlined">new_label</i><span>Add Label</span>
+                                <i class="material-symbols-outlined">new_label</i><span>Select sub category</span>
                             </p>
 
                         </div>
@@ -174,8 +174,8 @@
                         <div class="col">
                             <p>Price</p>
                             <input type="text" [(ngModel)]="menuItem.price" placeholder="R 00.00" class="smallerInput"
-                                [ngModelOptions]="{standalone: true}">
-                        </div>
+                                   [ngModelOptions]="{standalone: true}" (input)="onPriceInput($event, menuItem)">
+                          </div>
                         <div class="image">
                             <div *ngIf="menuItems[itemIndex].imageUrl" class="imagePreview">
                                 <img [src]="menuItems[itemIndex].imageUrl" alt="Uploaded logo">
@@ -279,7 +279,7 @@
                   <div class="innerRow">
                     <p>If you want to edit the menu or the appearance of the menu, select one of these options.</p>
                     <div class="btnHold">
-                        <a routerLink="/settings/branding" class="btnBlue">edit appearance</a>
+                        <a routerLink="/settings/branding" class="btnBlue" style="width: 157px;">edit appearance</a>
                         <a routerLink="/menus" class="btnBlue">edit menu</a>
                     </div>
                   </div>
