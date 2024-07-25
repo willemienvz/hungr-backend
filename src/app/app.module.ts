@@ -60,6 +60,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { SpecialsLandingComponent } from './components/specials/specials-landing/specials-landing.component';
 import { EditSpecialComponent } from './components/specials/edit-special/edit-special.component';
 import { ToastrModule } from 'ngx-toastr';
+import { HelpComponent } from './components/help/help/help.component';
+import { TutorialsComponent } from './components/help/tutorials/tutorials.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import { RestaurantComponent } from './components/restaurant/restaurant.component';
 
 @NgModule({
   declarations: [
@@ -103,6 +107,9 @@ import { ToastrModule } from 'ngx-toastr';
     AddSpecialComponent,
     SpecialsLandingComponent,
     EditSpecialComponent,
+    HelpComponent,
+    TutorialsComponent,
+    RestaurantComponent,
   ],
   imports: [
     BrowserModule,
@@ -124,6 +131,7 @@ import { ToastrModule } from 'ngx-toastr';
     NgxColorsModule,
     MatIconModule,
     MatChipsModule,
+    MatCheckboxModule,
     ToastrModule.forRoot(),
 
   ],

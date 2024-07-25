@@ -149,7 +149,17 @@ export class AuthService {
       expiryDate: formDataStep1.expirydate,
       accountType:'admin',
       subscriptionType: formDataStep2.billingOption,
-      parentId:''
+      parentId:'',
+      about: {
+        aboutText: '',
+        businessHours: '',
+        email: '',
+        cellphone: '',
+        isBusinessHoursVisible: false,
+        isContactDetailsVisible: false,
+        mainImageUrl: '',
+        additionalImageUrl: ''
+    }
     };
     return userRef.set(userData, {
       merge: true,
@@ -176,7 +186,18 @@ export class AuthService {
         expiryDate: '',
         accountType: 'editor',
         subscriptionType: '',
-        parentId: parentId
+        parentId: parentId,
+        about: {
+          aboutText: '',
+          businessHours: '',
+          email: '',
+          cellphone: '',
+          isBusinessHoursVisible: false,
+          isContactDetailsVisible: false,
+          mainImageUrl: '',
+          additionalImageUrl: ''
+      }
+
       };
       return userRef.set(userData, {
         merge: true,

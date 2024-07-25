@@ -6,6 +6,7 @@ import { finalize } from 'rxjs/operators';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-special',
@@ -39,7 +40,8 @@ export class AddSpecialComponent implements OnInit {
   constructor(
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private toastr: ToastrService
   ) {
     this.specialForm = this.fb.group({
       menu: [null, Validators.required],
@@ -59,6 +61,24 @@ export class AddSpecialComponent implements OnInit {
 
   ngOnInit() {
     this.fetchMenus();
+    this.addPrefixIfNeeded();
+  }
+
+  addPrefixIfNeeded() {
+    const amountControl = this.specialForm.get('amount');
+    if (amountControl && !amountControl.value.startsWith('R')) {
+      amountControl.setValue('R' + amountControl.value);
+    }
+  }
+
+  preventDeletion(event: any) {
+    const inputElement = event.target;
+    const currentValue = inputElement.value;
+
+    if (!currentValue.startsWith('R')) {
+      inputElement.value = 'R' + currentValue.replace(/R/g, '');
+      this.specialForm.get('amount')?.setValue(inputElement.value);
+    }
   }
 
   private fetchMenus() {
@@ -183,6 +203,9 @@ export class AddSpecialComponent implements OnInit {
           console.error('Error saving to Firestore:', error);
           this.isSaving = false;
         });
+    }else{
+      this.isSaving = false;
+      this.toastr.error('Some fields have not been completed. ');
     }
   }
 
@@ -218,6 +241,9 @@ export class AddSpecialComponent implements OnInit {
           console.error('Error saving draft to Firestore:', error);
           this.isSaving = false;
         });
+    }else{
+      this.isSaving = false;
+      this.toastr.error('Some fields have not been completed. ');
     }
   }
 

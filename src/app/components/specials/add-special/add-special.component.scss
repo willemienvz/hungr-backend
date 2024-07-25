@@ -89,6 +89,18 @@ a.btnSecondary.disabled {
             color: rgba(68, 68, 68, 1);
         }
     }
+
+    .innerBlock{
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+
+      img{
+        max-height: 220px;
+      }
+    }
 }
 
 .container .timeRow {
@@ -220,9 +232,13 @@ align-items: flex-start;
         align-items: center;
         padding: 20px;
         flex: 1;
+
+        .row .col{
+          gap: 20px;
+        }
       }
       img{
-        width: 50%;
+        width: 30%;
         object-fit: cover;
         height: 100%;
       }

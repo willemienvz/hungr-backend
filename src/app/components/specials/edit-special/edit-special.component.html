@@ -133,6 +133,7 @@
         <span class="close" (click)="closeImageUploadModal()">&times;</span>
         <h6>Upload Image</h6>
         <input type="file" (change)="onFileSelected($event)" accept="image/*">
+        <p>Acceptable file formats: PNG, JPG<br/>File sizes: Files that are less than 5 MB.</p>
         <div class="row">
           <a class="btnSecondary" [class.disabled]="!uploadDone" (click)="uploadDone && closeImageUploadModal()"> Done</a>
           <a class="btnTertiary" (click)="cancelUpload()">Cancel</a>

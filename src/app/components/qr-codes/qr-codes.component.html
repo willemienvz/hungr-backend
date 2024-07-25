@@ -11,7 +11,9 @@
                   <tr>
                       <th></th>
                       <th>Menu Name</th>
+                      <th></th>
                       <th>Location</th>
+                      <th></th>
                       <th></th>
                   </tr>
                 </thead>
@@ -19,14 +21,11 @@
                     <tr *ngFor="let menu of menus; let i = index">
                       <td>{{ i+1 }}</td>
                       <td>{{ menu.menuName }}</td>
+                      <td></td>
                       <td>{{ menu.location }}</td>
+                      <td></td>
                       <td style="text-align: right;">
-                          <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
-                          <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-                              <a  (click)="viewQR.openPopup(menu.menuID)">View</a>
-                              <a (click)="deleteQR(menu.menuID, i)">Unassign</a>
-                              <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
-                          </div>
+                        <a  (click)="viewQR.openPopup(menu.menuID)"><i class="material-symbols-outlined">visibility</i></a>
                       </td>
                   </tr>
                 </tbody>

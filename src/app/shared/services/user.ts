@@ -1,3 +1,5 @@
+import { About } from "./about";
+
 export interface User {
     uid: string;
     firstName:string;
@@ -16,4 +18,5 @@ export interface User {
     userInsights:boolean;
     aboutUsDisplayed:boolean;
     parentId:string;
+    about: About;
  }

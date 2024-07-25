@@ -1,0 +1,27 @@
+<div class="inner-page">
+    <div class="block">
+
+        <div class="container">
+            <div class="row">
+                <h6 class="heading">Your Restaurants</h6>
+                <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
+                    <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen"
+                        [isVisible]="isTooltipOpen"></app-tooltip></i>
+            </div>
+            <div class="restaurantholder" *ngFor="let restaurant of restuarants; let i = index">
+                <p>{{ restaurant.restaurantName }}</p>
+                <span [style.color]="restaurant.status ? '#1FCC96' : '#9A9A9A'">{{ restaurant.status ? 'active' : 'inactive' }}</span>
+                <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
+                <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                    <a routerLink="/settings/edit-restaurant" [queryParams]="{ id: restaurant.restaurantID}">Edit</a>
+                    <a (click)="deleteRestaurant(restaurant.restaurantID , i)">Delete</a>
+                    <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 30px;">
+                <a class="btnSecondary" routerLink="/settings/add-new-restaurant">Add restaurant</a>
+            </div>
+        </div>
+    </div>
+</div>
+

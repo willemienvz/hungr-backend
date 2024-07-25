@@ -1,0 +1,35 @@
+<div class="inner-page">
+    <div class="block">
+        <div class="row">
+            <a routerLink="/help" class="link">Back</a>
+        </div>
+
+        <div class="list">
+            <div class="tut" (click)="openvideoModal()">
+                <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt="" />
+                <p>Tutorial name</p>
+                <i class="material-icons">play_circle</i>
+            </div>
+            <div class="tut" (click)="openvideoModal()">
+                <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt="" />
+                <p>Tutorial name</p>
+                <i class="material-icons">play_circle</i>
+            </div>
+            <div class="tut" (click)="openvideoModal()">
+                <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt="" />
+                <p>Tutorial name</p>
+                <i class="material-icons">play_circle</i>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" [class.open]="showvideoModal">
+    <div class="modal-content">
+        <span class="close" (click)="closevideoModal()">&times;</span>
+        <h6>Tutorial name</h6>
+        <iframe width="1236" height="695" [src]="videoUrl" title="Sample Videos / Dummy Videos For Demo Use"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+</div>

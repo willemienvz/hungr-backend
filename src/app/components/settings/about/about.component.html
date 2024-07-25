@@ -1,7 +1,7 @@
 <div class="container">
     <div class="outerCol">
       <div class="block aboutBlock">
-        <div class="backBtn row" routerLink="/general/settings">
+        <div class="backBtn row" routerLink="/settings/general">
           <i class="material-symbols-outlined">arrow_back_ios</i>
           <p>Back</p>
         </div>
@@ -18,21 +18,28 @@
           <div class="additional-images">
             <i class="material-symbols-outlined">info</i>
             <p class="text">Main Image</p>
+            
           </div>
-          <button class="add-image-button">
-            <i class="material-symbols-outlined">upload</i>
-            <input type="file" (change)="onFileSelected($event)" />
-          </button>
+          <div class="hold">
+            <button class="add-image-button">
+              <i class="material-symbols-outlined">upload</i>
+              <input type="file" (change)="onFileSelected($event)" />
+            </button>
+            <i class="material-symbols-outlined deleteIcon" (click)="removeMainImg()">Delete</i>
+          </div>
         </section>
         <section class="image-container">
           <div class="additional-images">
             <i class="material-symbols-outlined">info</i>
             <p class="text">Additional Images</p>
           </div>
-          <button class="add-image-button">
-            <i class="material-symbols-outlined">upload</i>
-            <input type="file" (change)="onFileSelected1($event)" />
-          </button>
+          <div class="hold">
+            <button class="add-image-button">
+              <i class="material-symbols-outlined">upload</i>
+              <input type="file" (change)="onFileSelected1($event)" />
+            </button>
+            <i class="material-symbols-outlined deleteIcon" (click)="removeSecImg()">Delete</i>
+          </div>
         </section>
       </div>
       <div class="block">
@@ -45,7 +52,7 @@
         </div>
         <div class="row">
           <div class="formGroup">
-            <input type="text" class="formControl" placeholder="Add description" [(ngModel)]="businessHours">
+              <textarea matInput [(ngModel)]="businessHours"></textarea>
           </div>
         </div>
       </div>
@@ -86,7 +93,27 @@
           <h6 class="heading">Real-time Preview</h6>
         </div>
         <div class="preview">
-          <!-- Add content for real-time preview here -->
+          <div class="innerPart">
+            <img [src]="mainImageUrl" alt="" class="mainImg"/>
+            <div class="about">
+              <h6>ABOUT US</h6>
+              <p class="about-text" [innerHTML]="aboutText"></p>
+            </div>
+            
+            <img [src]="additionalImageUrl" alt="" class="mainImg"/>
+            <div class="hours" *ngIf="isContactDetailsVisible && isBusinessHoursVisible">
+              <h6 >DETAILS</h6>
+              <p *ngIf="isBusinessHoursVisible"><strong>Opening Hours</strong></p>
+              <p *ngIf="isBusinessHoursVisible" class="about-text">{{businessHours}}</p>
+              <br/>
+              <div *ngIf="isContactDetailsVisible" class="contactDetails">
+                <p><strong>Contact Details</strong></p>
+                <a *ngIf="cellphone" href="tel:{{cellphone}}">{{cellphone}}</a>
+                <a *ngIf="email" href="mailto:{{email}}">{{email}}</a>
+              </div>
+            </div>
+          </div>
+            
         </div>
       </div>
     </div>

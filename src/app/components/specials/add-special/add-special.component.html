@@ -57,7 +57,7 @@
                   {{ special.name }}
                 </mat-option>
               </mat-select>
-              <input type="text" formControlName="amount">
+              <input type="text" formControlName="amount" (input)="preventDeletion($event)" (focus)="addPrefixIfNeeded()">
             </div>
             <div class="row" style="justify-content: flex-end; margin-top: 10px;">
               <button type="button" class="btnSecondary" (click)="addItem()">+ Add item</button>
@@ -80,7 +80,11 @@
               <p>Short description of why media is needed and where these will be displayed.</p>
               <a href="" target="_blank"><mat-icon>download</mat-icon>Download Media Guidelines and Templates</a>
             </div>
-            <a class="btnSecondary" (click)="openImageUploadModal()"><mat-icon>upload</mat-icon> Add Image</a>
+            <div class="innerBlock">
+              <a class="btnSecondary" (click)="openImageUploadModal()"><mat-icon>upload</mat-icon> Add Image</a>
+              <img [src]="uploadedImageUrl" alt=""/>
+            </div>
+            
           </div>
 
           <div class="formGroup">
@@ -137,6 +141,7 @@
       <span class="close" (click)="closeImageUploadModal()">&times;</span>
       <h6>Upload Image</h6>
       <input type="file" (change)="onFileSelected($event)" accept="image/*">
+      <p>Acceptable file formats: PNG, JPG<br/>File sizes: Files that are less than 5 MB.</p>
       <div class="row">
         <a class="btnSecondary" [class.disabled]="!uploadDone" (click)="uploadDone && closeImageUploadModal()"> Done</a>
         <a class="btnTertiary" (click)="cancelUpload()">Cancel</a>

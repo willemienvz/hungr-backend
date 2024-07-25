@@ -37,7 +37,6 @@ export class TopMenuComponent {
       .valueChanges()
       .subscribe(result => {
         this.userProfile = result[0];
-        console.log( this.userProfile)
       });
   }
 

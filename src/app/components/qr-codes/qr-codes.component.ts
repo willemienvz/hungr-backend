@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Menu } from '../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
+import { SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-qr-codes',
@@ -14,6 +15,7 @@ export class QrCodesComponent implements OnInit {
   isPopupMenuOpen: boolean[] = [];
   selectedMenuId: string = ''; 
   tempRestaurant:Restaurant = {} as Restaurant;
+  public qrCodeDownloadLink: SafeUrl = "";
   constructor(private firestore: AngularFirestore) {
   }
 
@@ -45,8 +47,13 @@ export class QrCodesComponent implements OnInit {
       .valueChanges()
       .subscribe(menus => {
         this.menus = menus;
+        console.log(menus);
         this.isSaving = false;
       });
+  }
+
+  download(url:string){
+    console.log(url);
   }
 
   togglePopupMenu(index: number) {
