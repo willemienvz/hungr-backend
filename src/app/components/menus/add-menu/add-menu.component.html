@@ -12,24 +12,27 @@
                     <div class="col">
                         <div class="formGroup" [ngClass]="{'error': menuNameError}">
                             <label>Menu Name</label>
-                            <input (change)="validateMenuName()" type="text" class="formControl" placeholder="Name your menu" name="menuname"
-                                [(ngModel)]="menuName" required>
-                                <div *ngIf="menuNameError" class="error-message">Menu name is required.</div>
+                            <input (change)="validateMenuName()" type="text" class="formControl"
+                                placeholder="Name your menu" name="menuname" [(ngModel)]="menuName" required>
+                            <div *ngIf="menuNameError" class="error-message">Menu name is required.</div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="formGroup" [ngClass]="{'error': restaurantError}">
                             <label>Assign Restaurant</label>
                             <mat-form-field>
-                                <mat-select (change)="validateRestaurant()" name="selectedNumberTable" [(ngModel)]="selectedRestaurant">
+                                <mat-select (change)="validateRestaurant()" name="selectedNumberTable"
+                                    [(ngModel)]="selectedRestaurant">
                                     <mat-option *ngFor="let restaurant of restuarants"
                                         [value]="restaurant.restaurantID">
                                         {{ restaurant.restaurantName }}
                                     </mat-option>
                                 </mat-select>
-                                <div *ngIf="restaurantError" class="error-message">Restaurant selection is required.</div>
+                                <div *ngIf="restaurantError" class="error-message">Restaurant selection is required.
+                                </div>
                             </mat-form-field>
-                            <a class="mainLink" style="text-align: right; width: 100%;" routerLink="/settings/add-new-restaurant">Add restaurant</a>
+                            <a class="mainLink" style="text-align: right; width: 100%;"
+                                routerLink="/settings/add-new-restaurant">Add restaurant</a>
                         </div>
                     </div>
                 </div>
@@ -137,24 +140,27 @@
                 <div class="row3col">
                     <div class="itemCol">
                         <p>Select Category</p>
-                        <mat-select [(value)]="menuItem.categoryId">
-                            <mat-option *ngFor="let category of categories" [value]="category.id">
-                                {{ category.name }}
-                            </mat-option>
+                        <mat-select [(value)]="menuItem.categoryId" placeholder="Select Category">
+                            <mat-optgroup *ngFor="let category of categories" [label]="category.name">
+                                <mat-option [value]="category.id">{{ category.name }}</mat-option>
+                                <mat-option *ngFor="let subcategory of category.subcategories" [value]="subcategory.id">
+                                    &nbsp;&nbsp;{{ subcategory.name }}
+                                </mat-option>
+                            </mat-optgroup>
                         </mat-select>
-                        <div class="row labelRow">
+                        <!--  <div class="row labelRow">
                             <div class="label-input" *ngIf="menuItem.showLabelInput">
                                 <input type="text" [(ngModel)]="newLabel" [ngModelOptions]="{standalone: true}"
                                     placeholder="Enter label name" (keyup.enter)="addLabel(itemIndex)">
                             </div>
-                            <h6 class="labelContainer" *ngIf="!menuItem.showLabelInput"><i
+                               <h6 class="labelContainer" *ngIf="!menuItem.showLabelInput"><i
                                     *ngIf="!menuItem.showLabelInput" class="material-symbols-outlined">label</i>
                                 {{menuItem.labels}}</h6>
-                            <p class="labelAdd" (click)="toggleLabelInput(itemIndex)">
+                         <p class="labelAdd" (click)="toggleLabelInput(itemIndex)">
                                 <i class="material-symbols-outlined">new_label</i><span>Select sub category</span>
-                            </p>
+                            </p> 
 
-                        </div>
+                        </div>-->
                     </div>
                     <div class="itemCol">
                         <p>Item Name</p>
@@ -174,20 +180,21 @@
                         <div class="col">
                             <p>Price</p>
                             <input type="text" [(ngModel)]="menuItem.price" placeholder="R 00.00" class="smallerInput"
-                                   [ngModelOptions]="{standalone: true}" (input)="onPriceInput($event, menuItem)">
-                          </div>
+                                [ngModelOptions]="{standalone: true}" (input)="onPriceInput($event, menuItem)">
+                        </div>
                         <div class="image">
-                            <div *ngIf="menuItems[itemIndex].imageUrl" class="imagePreview">
-                                <img [src]="menuItems[itemIndex].imageUrl" alt="Uploaded logo">
-                              </div>
+                            <div *ngIf="menuItem.imageUrl" class="imagePreview">
+                                <img [src]="menuItem.imageUrl" alt="Uploaded logo">
+                            </div>
                             <div id="yourBtn" (click)="getFile(itemIndex)">
-                              <p><i class="material-symbols-outlined">upload</i>Add Image</p>
+                                <p><i class="material-symbols-outlined">upload</i>Add Image</p>
                             </div>
                             <div style='height: 0px; width: 0px; overflow:hidden;'>
-                              <input id="upfile" type="file" #fileInput (change)="onFileSelected($event, itemIndex)" />
+                                <input id="upfile" type="file" #fileInput
+                                    (change)="onFileSelected($event, itemIndex)" />
                             </div>
-                           
-                          </div>
+
+                        </div>
                     </div>
                 </div>
                 <div *ngIf="menuItem.displayDetails.preparation" class="additionalItems">
@@ -258,7 +265,7 @@
             </div>
             <a class="btnSecondary" (click)="addMenuItem()">+ Add item</a>
         </div>
-        <div class="step3"  *ngIf="currentStep === 3">
+        <div class="step3" *ngIf="currentStep === 3">
             <div class="col">
                 <div class="block row3col">
                     <div class="col3row backBtn" routerLink="/menus">
@@ -270,86 +277,88 @@
                     </div>
                 </div>
                 <div class="block nextSteps">
-                  <h6>Next Steps</h6>
-                  <p>Now that your menu has been set up, you can generate a QR code that will enable your patrons to access your menu. </p>
-                  <div class="innerRow">
-                    <h6>Generate a QR code for this menu</h6>
-                    <a routerLink="/menus/qr-codes" class="btnSecondary">Generate QR code</a>
-                  </div>
-                  <div class="innerRow">
-                    <p>If you want to edit the menu or the appearance of the menu, select one of these options.</p>
-                    <div class="btnHold">
-                        <a routerLink="/settings/branding" class="btnBlue" style="width: 157px;">edit appearance</a>
-                        <a routerLink="/menus" class="btnBlue">edit menu</a>
+                    <h6>Next Steps</h6>
+                    <p>Now that your menu has been set up, you can generate a QR code that will enable your patrons to
+                        access your menu. </p>
+                    <div class="innerRow">
+                        <h6>Generate a QR code for this menu</h6>
+                        <a routerLink="/menus/qr-codes" class="btnSecondary">Generate QR code</a>
                     </div>
-                  </div>
-                  <div class="innerRow">
-                    <p>If you do not want to publish you menu right now, you can save and continue at a later stage.</p>
-                    <div class="btnHold">
-                        <a class="btnBlue" (click)="setAsDraft()">save for later</a>
+                    <div class="innerRow">
+                        <p>If you want to edit the menu or the appearance of the menu, select one of these options.</p>
+                        <div class="btnHold">
+                            <a routerLink="/settings/branding" class="btnBlue" style="width: 157px;">edit appearance</a>
+                            <a routerLink="/menus" class="btnBlue">edit menu</a>
+                        </div>
                     </div>
-                  </div>
+                    <div class="innerRow">
+                        <p>If you do not want to publish you menu right now, you can save and continue at a later stage.
+                        </p>
+                        <div class="btnHold">
+                            <a class="btnBlue" (click)="setAsDraft()">save for later</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col">
-                    <div class="block">
-                        <div class="row">
-                            <h6 class="heading">Real-time Preview</h6>
-                        </div>
-                        <div class="preview" >
-                           
-                        </div>
+                <div class="block">
+                    <div class="row">
+                        <h6 class="heading">Real-time Preview</h6>
                     </div>
+                    <div class="preview">
+
+                    </div>
+                </div>
             </div>
         </div>
     </form>
 </div>
 
-        <div class="popup" *ngIf="showPopup">
-            <div class="popup-content">
-                <i class="material-icons popup-close" (click)="closePopup()">close</i>
-                <h6>Cancel</h6>
-                <p class="text-center">Are you sure you want to cancel? All changes will be discarded.</p>
-                <div class="row">
-                    <a class="btnTertiary">Back</a>
-                    <a class="btnPrimary">yes, cancel</a>
-                </div>
-            </div>
+<div class="popup" *ngIf="showPopup">
+    <div class="popup-content">
+        <i class="material-icons popup-close" (click)="closePopup()">close</i>
+        <h6>Cancel</h6>
+        <p class="text-center">Are you sure you want to cancel? All changes will be discarded.</p>
+        <div class="row">
+            <a class="btnTertiary" (click)="closePopup()">Back</a>
+            <a class="btnPrimary" routerLink="/menus/dashboard">yes, cancel</a>
         </div>
+    </div>
+</div>
 
-        <div class="popup" *ngIf="showPopupProgress">
-            <div class="popup-content">
-                <i class="material-icons popup-close" (click)="closePopupProgress()">close</i>
-                <h6>Progress saved</h6>
-                <p class="text-center">Your changes have been saved. You can continue editing anytime.</p>
-                <div class="row">
-                    <a class="btnTertiary" (click)="closePopupProgress()">back to editing</a>
-                    <a class="btnPrimary" routerLink="/menus">dashboard</a>
-                </div>
-            </div>
+<div class="popup" *ngIf="showPopupProgress">
+    <div class="popup-content">
+        <i class="material-icons popup-close" (click)="closePopupProgress()">close</i>
+        <h6>Progress saved</h6>
+        <p class="text-center">Your changes have been saved. You can continue editing anytime.</p>
+        <div class="row">
+            <a class="btnTertiary" (click)="closePopupProgress()">back to editing</a>
+            <a class="btnPrimary" routerLink="/menus">dashboard</a>
         </div>
+    </div>
+</div>
 
-        <div class="popup" *ngIf="uploadFilePopUp">
-            <div class="popup-content">
-                <i class="material-icons popup-close" (click)="closePopupuploadFile()">close</i>
-                <h6>Upload a file</h6>
-                <p class="text-center">Please upload a CSV file to automatically add your menu items.</p>
-                <div class="row uploadItems">
-                    <div class="col">
-                        <i class="material-icons">upload</i>
-                        <h6>Select a file</h6>
-                        <input type="file" (change)="onFileSelectedBulk($event)" accept=".csv">
-                    </div>
-                    <div class="col">
-                        <i class="material-icons">download</i>
-                        <h6>Download Template</h6>
-                        <p><a (click)="downloadTemplate()">Click here</a> to download the CSV template.</p>
-                    </div>
-                </div>
-                <div class="row">
-                    <a class="btnTertiary" (click)="closePopupuploadFile()">Cancel</a>
-                    <a class="btnBlue" (click)="processFile()">Upload</a>
-                </div>
+<div class="popup" *ngIf="uploadFilePopUp">
+    <div class="popup-content">
+        <i class="material-icons popup-close" (click)="closePopupuploadFile()">close</i>
+        <h6>Upload a file</h6>
+        <p class="text-center">Please upload a CSV file to automatically add your menu items.</p>
+        <div class="row uploadItems">
+            <div class="col">
+                <i class="material-icons">upload</i>
+                <h6>Select a file</h6>
+                <input type="file" (change)="onFileSelectedBulk($event)" accept=".csv">
+            </div>
+            <div class="col">
+                <i class="material-icons">download</i>
+                <h6>Download Template</h6>
+                <p><a (click)="downloadTemplate()">Click here</a> to download the CSV template.</p>
             </div>
         </div>
-        <app-loading [isLoading]="isSaving"></app-loading>
+        <div class="row">
+            <a class="btnTertiary" (click)="closePopupuploadFile()">Cancel</a>
+            <a class="btnBlue" (click)="processFile()">Upload</a>
+        </div>
+    </div>
+</div>
+<app-loading [isLoading]="isSaving"></app-loading>

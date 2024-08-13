@@ -81,7 +81,11 @@ $hungr-backend-theme: mat.define-light-theme((
   'GRAD' 0,
   'opsz' 24
 }
-
+.mat-mdc-optgroup-label{
+  font-size: 12px;
+  font-weight: bold;
+  min-height: 25px !important;
+}
 .extra-large-text{
     font-family: 'Barlow', sans-serif;
     font-size: 40px;
@@ -216,6 +220,12 @@ a{
 
 .btnSecondary:hover{
   background: #3fefba;
+}
+
+.btnSecondary:disabled {
+  pointer-events: none;
+  color: grey;
+  cursor: not-allowed !important;
 }
 
 .btnTertiary{

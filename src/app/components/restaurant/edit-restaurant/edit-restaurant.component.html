@@ -7,32 +7,37 @@
                 <div class="row">
                     <div class="formGroup">
                         <label>Restaurant Name</label>
-                        <input type="text" class="formControl" placeholder="Name your restaurant..." name="name" [(ngModel)]="restaurant.name" required>
+                        <input type="text" class="formControl" placeholder="Name your restaurant..." name="name"
+                            [(ngModel)]="restaurant.name" required>
                     </div>
                 </div>
                 <h6>Restaurant Address</h6>
                 <div class="row">
                     <div class="formGroup">
                         <label>Street Address</label>
-                        <input type="text" class="formControl" placeholder="1882 Bodenstein St" name="street" [(ngModel)]="restaurant.street" required>
+                        <input type="text" class="formControl" placeholder="1882 Bodenstein St" name="street"
+                            [(ngModel)]="restaurant.street" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="formGroup">
                         <label>City</label>
-                        <input type="text" class="formControl" placeholder="Boksburg" name="city" [(ngModel)]="restaurant.city" required>
+                        <input type="text" class="formControl" placeholder="Boksburg" name="city"
+                            [(ngModel)]="restaurant.city" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="formGroup">
                         <label>Province</label>
-                        <input type="text" class="formControl" placeholder="Gauteng" name="province" [(ngModel)]="restaurant.province" required>
+                        <input type="text" class="formControl" placeholder="Gauteng" name="province"
+                            [(ngModel)]="restaurant.province" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="formGroup">
                         <label>Zip Code</label>
-                        <input type="text" class="formControl" placeholder="1213" name="zip" [(ngModel)]="restaurant.zip" required>
+                        <input type="text" class="formControl" placeholder="1213" name="zip"
+                            [(ngModel)]="restaurant.zip" required>
                     </div>
                 </div>
             </div>
@@ -42,7 +47,8 @@
                 <h6>Assign menu</h6>
                 <p>Please assign a menu to this restaurant.</p>
                 <mat-form-field appearance="fill">
-                    <mat-select [(ngModel)]="selectedMenu" (selectionChange)="selectMenu($event.value)" name="selectedMenu">
+                    <mat-select [(ngModel)]="selectedMenu" (selectionChange)="selectMenu($event.value)"
+                        name="selectedMenu">
                         <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
                             {{ menu.menuName }}
                         </mat-option>
@@ -50,7 +56,7 @@
                 </mat-form-field>
                 <a routerLink="/menus/add-menu" class="mainLink" style="width: 100%;text-align: right;">Add menu</a>
             </div>
-  
+
             <div class="block contactBlock">
                 <h6>Main Contact Person</h6>
                 <mat-radio-group name="selectedContact" [(ngModel)]="selectedContact">
@@ -60,40 +66,44 @@
                     <mat-form-field *ngIf="selectedContact === 'assign'">
                         <mat-label>Select user...</mat-label>
                         <mat-select name="selectedUser" [(ngModel)]="selectedUser">
-                            <mat-option [value]="currentUser">{{ currentUser.firstName }} {{ currentUser.Surname }}</mat-option>
-                            <mat-option *ngFor="let user of users" [value]="user">{{ user.firstName }} {{ user.Surname }}</mat-option>
+                            <mat-option [value]="currentUser">{{ currentUser.firstName }} {{ currentUser.Surname
+                                }}</mat-option>
+                            <mat-option *ngFor="let user of users" [value]="user">{{ user.firstName }} {{ user.Surname
+                                }}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </mat-radio-group>
             </div>
-  
-  
+
+
             <div class="block contactBlock">
                 <h6>Number of tables in the restaurant</h6>
                 <div class="row">
                     <p class="tableNum">{{selectedNumberTable}}</p>
-                  <mat-form-field >
-                    <mat-label>Select number of tables</mat-label>
-                    <mat-select name="selectedNumberTable" [(ngModel)]="selectedNumberTable">
-                      <mat-option *ngFor="let num of tableNums" [value]="num">{{ num }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Select number of tables</mat-label>
+                        <mat-select name="selectedNumberTable" [(ngModel)]="selectedNumberTable">
+                            <mat-option *ngFor="let num of tableNums" [value]="num">{{ num }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
             </div>
             <div class="formGroup btnHolder">
                 <a routerLink="/settings/general" class="btn btnTertiary">Cancel</a>
-                <button type="submit" class="btn btnSecondary" [disabled]="userForm.invalid">Save</button>
+                <button type="submit" class="btn btnSecondary">Save</button>
             </div>
         </div>
         <div class="col">
-          <div class="block">
-            <h6>Restaurant Status</h6>
-            <div class="toggle-container">
-              <label [style.color]="restaurantStatus ? '#3CE1AF' : '#444444'">{{ restaurantStatus ? 'Active' : 'Inactive' }}</label>
-              <mat-slide-toggle [(ngModel)]="restaurantStatus" color="#3CE1AF" name="restaurantStatus"></mat-slide-toggle>
+            <div class="block">
+                <h6>Restaurant Status</h6>
+                <div class="toggle-container">
+                    <label [style.color]="restaurantStatus ? '#3CE1AF' : '#444444'">{{ restaurantStatus ? 'Active' :
+                        'Inactive' }}</label>
+                    <mat-slide-toggle [(ngModel)]="restaurantStatus" color="#3CE1AF"
+                        name="restaurantStatus"></mat-slide-toggle>
+                </div>
             </div>
-          </div>
         </div>
     </form>
-  </div>
-  <p class="success-message" *ngIf="isSaving">Saved</p>
+</div>
+<p class="success-message" *ngIf="isSaving">Saved</p>

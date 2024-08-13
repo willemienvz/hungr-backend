@@ -5,24 +5,23 @@
         </div>
         <div class="col2row">
             <div class="col">
-                <div class="formGroup" >
+                <div class="formGroup">
                     <label>Menu Name</label>
-                    <input  type="text" class="formControl" placeholder="Name your menu" name="menuname"
+                    <input type="text" class="formControl" placeholder="Name your menu" name="menuname"
                         [(ngModel)]="menuName" required>
                 </div>
             </div>
             <div class="col">
-                <div class="formGroup" >
+                <div class="formGroup">
                     <label>Assign Restaurant</label>
                     <mat-form-field>
-                        <mat-select  name="selectedNumberTable" [(ngModel)]="selectedRestaurant">
-                            <mat-option *ngFor="let restaurant of restuarants"
-                                [value]="restaurant.restaurantID">
+                        <mat-select name="selectedNumberTable" [(ngModel)]="selectedRestaurant">
+                            <mat-option *ngFor="let restaurant of restuarants" [value]="restaurant.restaurantID">
                                 {{ restaurant.restaurantName }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    
+
                 </div>
             </div>
         </div>
@@ -36,8 +35,8 @@
                 </div>
             </div>
             <div class="col outerBlock">
-                <input type="text" class="formControl" placeholder="Name your category..."
-                    [(ngModel)]="newCategoryName" name="categoryName">
+                <input type="text" class="formControl" placeholder="Name your category..." [(ngModel)]="newCategoryName"
+                    name="categoryName">
                 <a class="btnSecondary" (click)="addCategory()">+ Add category</a>
             </div>
         </div>
@@ -69,8 +68,7 @@
                 <div *ngIf="category.subcategories && category.subcategories.length > 0">
                     <div *ngFor="let sub of category.subcategories; let j = index" class="subcategory">
                         <p>{{ sub.name }}</p>
-                        <a (click)="deleteSubCategory(i, j)" class="deleteIcon"><i
-                                class="material-icons">close</i></a>
+                        <a (click)="deleteSubCategory(i, j)" class="deleteIcon"><i class="material-icons">close</i></a>
                     </div>
                 </div>
             </div>
@@ -82,8 +80,8 @@
     </div>
 
 
-    
-    <div id="stepDiv" *ngIf="selectedCategoryIndex !== null"  class="step2">
+
+    <div id="stepDiv" *ngIf="selectedCategoryIndex !== null" class="step2">
         <div class="block row3col">
             <div class="col3row backBtn" (click)="resetFilter()">
                 <i class="material-symbols-outlined">arrow_back_ios</i>
@@ -106,18 +104,21 @@
             <div class="row3col">
                 <div class="itemCol">
                     <p>Select Category</p>
-                    <mat-select [(value)]="menuItem.categoryId">
-                        <mat-option *ngFor="let category of categories" [value]="category.id">
-                            {{ category.name }}
-                        </mat-option>
+                    <mat-select [(value)]="menuItem.categoryId" placeholder="Select Category">
+                        <mat-optgroup *ngFor="let category of categories" [label]="category.name">
+                            <mat-option [value]="category.id">{{ category.name }}</mat-option>
+                            <mat-option *ngFor="let subcategory of category.subcategories" [value]="subcategory.id">
+                                &nbsp;&nbsp;{{ subcategory.name }}
+                            </mat-option>
+                        </mat-optgroup>
                     </mat-select>
                     <div class="row labelRow">
                         <div class="label-input" *ngIf="menuItem.showLabelInput">
                             <input type="text" [(ngModel)]="newLabel" [ngModelOptions]="{standalone: true}"
                                 placeholder="Enter label name" (keyup.enter)="addLabel(itemIndex)">
                         </div>
-                        <h6 class="labelContainer" *ngIf="!menuItem.showLabelInput"><i
-                                *ngIf="!menuItem.showLabelInput" class="material-symbols-outlined">label</i>
+                        <h6 class="labelContainer" *ngIf="!menuItem.showLabelInput"><i *ngIf="!menuItem.showLabelInput"
+                                class="material-symbols-outlined">label</i>
                             {{menuItem.labels}}</h6>
                         <p class="labelAdd" (click)="toggleLabelInput(itemIndex)">
                             <i class="material-symbols-outlined">new_label</i><span>Select sub category</span>
@@ -143,20 +144,20 @@
                     <div class="col">
                         <p>Price</p>
                         <input type="text" [(ngModel)]="menuItem.price" placeholder="R 00.00" class="smallerInput"
-                               [ngModelOptions]="{standalone: true}" (input)="onPriceInput($event, menuItem)">
-                      </div>
+                            [ngModelOptions]="{standalone: true}" (input)="onPriceInput($event, menuItem)">
+                    </div>
                     <div class="image">
                         <div *ngIf="menuItem.imageUrl" class="imagePreview">
                             <img [src]="menuItem.imageUrl" alt="Uploaded logo">
-                          </div>
+                        </div>
                         <div id="yourBtn" (click)="getFile(itemIndex)">
-                          <p><i class="material-symbols-outlined">upload</i>Add Image</p>
+                            <p><i class="material-symbols-outlined">upload</i>Add Image</p>
                         </div>
                         <div style='height: 0px; width: 0px; overflow:hidden;'>
-                          <input id="upfile" type="file" #fileInput (change)="onFileSelected($event, itemIndex)" />
+                            <input id="upfile" type="file" #fileInput (change)="onFileSelected($event, itemIndex)" />
                         </div>
-                       
-                      </div>
+
+                    </div>
                 </div>
             </div>
             <div *ngIf="menuItem.displayDetails.preparation" class="additionalItems">

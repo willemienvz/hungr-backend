@@ -24,6 +24,7 @@ export class EditMenuComponent implements OnInit {
   itemCounts:any;
   newMenu:any;
   showPopupProgress: boolean = false;
+  tempNum:number =0;
   selectedRestaurant: string = '';
   menuName:string='';
   newLabel: string = '';
@@ -131,7 +132,7 @@ export class EditMenuComponent implements OnInit {
       task.snapshotChanges().pipe(
         finalize(() => {
           fileRef.getDownloadURL().subscribe((url) => {
-            this.currentMenu.items[itemIndex].imageUrl = url;
+            this.currentMenu.items[this.tempNum].imageUrl = url;
           });
         })
       ).subscribe();
@@ -163,7 +164,7 @@ export class EditMenuComponent implements OnInit {
     if (this.newSubcategoryName[index].trim()) {
       const newId = subcategories.length ? Math.max(...subcategories.map(sub => sub.id)) + 1 : 1;
       subcategories.push({
-        id: newId,
+        id: newId*10000,
         name: this.newSubcategoryName[index]
       });
       this.isAddInputVisible[index] = false;
@@ -190,6 +191,7 @@ export class EditMenuComponent implements OnInit {
     this.validationError = !this.menuName || !this.selectedRestaurant;
   }
   getFile(itemIndex: number): void {
+    this.tempNum = itemIndex;
     this.fileInput.nativeElement.click();
   }
 

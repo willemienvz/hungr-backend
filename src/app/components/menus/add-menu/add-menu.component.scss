@@ -186,6 +186,7 @@ mat-form-field{
     padding: 10px;
     position: relative;
     border: 1px solid #C8AFEB;
+    margin-bottom: 8px;
     p{
         font-weight: bold;
     }
@@ -198,6 +199,10 @@ mat-form-field{
         }
     }
 
+}
+
+.subcategory:last-of-type{
+    margin-bottom: 0px;
 }
 
 .inputHolder{

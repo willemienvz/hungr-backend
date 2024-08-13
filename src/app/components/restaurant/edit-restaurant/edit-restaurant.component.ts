@@ -121,6 +121,8 @@ export class EditRestaurantComponent {
       streetAdress: this.restaurant.street,
       zip: this.restaurant.zip
     };
+
+    console.log(tempRestaurant);
     this.firestore.collection('restuarants').doc(this.currentRestaurantID).update(tempRestaurant);
     
     setTimeout(() => {

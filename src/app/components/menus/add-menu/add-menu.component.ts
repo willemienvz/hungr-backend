@@ -66,6 +66,7 @@ export class AddMenuComponent implements OnInit {
     pairing: false,
     side: false
   };
+  tempNum:number =0;
   preparations: string[] = [];
   variations: string[] = [];
   pairings: string[] = [];
@@ -98,6 +99,7 @@ export class AddMenuComponent implements OnInit {
   toggleAddInput(index: number): void {
     this.isAddInputVisible[index] = !this.isAddInputVisible[index];
     this.newSubcategoryName[index] = ''; 
+
   }
 
   onFileSelectedBulk(event: any) {
@@ -260,17 +262,17 @@ export class AddMenuComponent implements OnInit {
 
   addSubCategory(index: number): void {
     const subcategories = this.categories[index].subcategories ?? (this.categories[index].subcategories = []);
+    
     if (this.newSubcategoryName[index].trim()) {
       const newId = subcategories.length ? Math.max(...subcategories.map(sub => sub.id)) + 1 : 1;
       subcategories.push({
-        id: newId,
+        id: newId*10000,
         name: this.newSubcategoryName[index]
       });
       this.isAddInputVisible[index] = false;
       this.newSubcategoryName[index] = '';
     }
   }
-
   togglePopupMenu(index: number) {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
@@ -290,6 +292,7 @@ export class AddMenuComponent implements OnInit {
   }
 
   getFile(itemIndex: number): void {
+    this.tempNum = itemIndex;
     this.fileInput.nativeElement.click();
   }
 
@@ -402,7 +405,7 @@ export class AddMenuComponent implements OnInit {
         task.snapshotChanges().pipe(
           finalize(() => {
             fileRef.getDownloadURL().subscribe((url) => {
-              this.menuItems[itemIndex].imageUrl = url;
+              this.menuItems[this.tempNum].imageUrl = url;
               this.isSaving = false;
             });
           })
@@ -470,6 +473,7 @@ export class AddMenuComponent implements OnInit {
     }
   
     toggleLabelInput(itemIndex: number): void {
+      console.log(this.categories);
       this.menuItems[itemIndex].showLabelInput = !this.menuItems[itemIndex].showLabelInput;
     }
   
