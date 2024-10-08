@@ -64,6 +64,15 @@ import { HelpComponent } from './components/help/help/help.component';
 import { TutorialsComponent } from './components/help/tutorials/tutorials.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { RestaurantComponent } from './components/restaurant/restaurant.component';
+import { ViewingtimegraphComponent } from './components/graphs/viewingtimegraph/viewingtimegraph.component';
+import { VisitorDashboardComponent } from './components/dashboard/visitor-dashboard/visitor-dashboard.component';
+
+import { FusionChartsModule } from "angular-fusioncharts";
+
+// Import FusionCharts library and chart modules
+import * as FusionCharts from "fusioncharts";
+import * as charts from "fusioncharts/fusioncharts.charts";
+import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
 
 @NgModule({
   declarations: [
@@ -110,9 +119,12 @@ import { RestaurantComponent } from './components/restaurant/restaurant.componen
     HelpComponent,
     TutorialsComponent,
     RestaurantComponent,
+    ViewingtimegraphComponent,
+    VisitorDashboardComponent,
   ],
   imports: [
     BrowserModule,
+    FusionChartsModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase, 'hungr-firebase-app'),
     AngularFirestoreModule,

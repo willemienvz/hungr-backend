@@ -24,6 +24,7 @@ import { EditSpecialComponent } from './components/specials/edit-special/edit-sp
 import { HelpComponent } from './components/help/help/help.component';
 import { TutorialsComponent } from './components/help/tutorials/tutorials.component';
 import { RestaurantComponent } from './components/restaurant/restaurant.component';
+import { VisitorDashboardComponent } from './components/dashboard/visitor-dashboard/visitor-dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -38,6 +39,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
+      { path: 'visitor-insights', component: VisitorDashboardComponent },
       { path: 'settings/general', component: GeneralComponent },
       { path: 'settings/about-us', component: AboutComponent },
       { path: 'manage-users', component: ManageUsersComponent },
