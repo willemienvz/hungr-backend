@@ -6,6 +6,7 @@ import { Category } from '../../../shared/services/category';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { finalize } from 'rxjs';
 import { Papa } from 'ngx-papaparse'; 
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-add-menu',
@@ -22,6 +23,7 @@ export class AddMenuComponent implements OnInit {
   restaurantDescription: string = '';
   newLabel: string = '';
   menuItems: {
+    itemId: string;
     categoryId?: number;
     name: string;
     description: string;
@@ -132,6 +134,7 @@ export class AddMenuComponent implements OnInit {
   addMenuItemsFromCSV(data: any[]) {
     data.forEach((item) => {
       const newItem = {
+        itemId: uuidv4(),
         categoryId: this.getCategoryIdByName(item.category),
         name: item.name,
         description: item.description,
@@ -321,6 +324,7 @@ export class AddMenuComponent implements OnInit {
 
     addMenuItem(): void {
       this.menuItems.push({
+        itemId: uuidv4(),
         categoryId: undefined,
         name: '',
         description: '',
@@ -415,6 +419,7 @@ export class AddMenuComponent implements OnInit {
     
     saveMenu(): void {
       this.isSaving = true;
+      console.log("Menu Items with IDs:", this.menuItems);
       if (this.currentMenuID.length < 1){
         this.newMenu= {
           menuID: '1',
@@ -446,6 +451,18 @@ export class AddMenuComponent implements OnInit {
             location: this.findCityAndProvince(this.selectedRestaurant)
           };
           this.firestore.collection('menus').doc(data.id).update(this.newMenu);
+          
+          this.firestore.collection<Restaurant>('restuarants', ref => ref.where('restaurantID', '==', this.selectedRestaurant))
+            .valueChanges()
+            .subscribe(restuarant => {
+              let temp = restuarant[0];
+              temp.menuID = this.currentMenuID;
+              this.firestore.collection('restuarants').doc(this.selectedRestaurant).update(temp)
+              .then(() => console.log('Restaurant ID edited'))
+              .catch(err => console.error('Error updating Restaurant ID ', err));
+          });
+         
+
           this.isSaving = false;
           this.nextStep();
         })

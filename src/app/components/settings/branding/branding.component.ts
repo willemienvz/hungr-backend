@@ -308,24 +308,20 @@ export class BrandingComponent {
     const brandingDetails = this.getBrandingSettings();
   
     if (this.lastSavedDocId) {
-      // If we have a document ID, use it to update the document
       this.firestore.collection('branding').doc(this.lastSavedDocId).update(brandingDetails)
         .then(() => console.log('Branding details updated successfully with document ID'))
         .catch(err => console.error('Error updating branding details:', err));
     } else {
-      // No document ID, look for an existing document or create a new one
       const brandingRef = this.firestore.collection('branding', ref => ref.where('parentID', '==', this.OwnerID));
       brandingRef.get().toPromise().then(querySnapshot => {
         if (!querySnapshot || querySnapshot.empty) {
-          // Create a new document if none exists
           this.firestore.collection('branding').add(brandingDetails)
             .then(docRef => {
               console.log('New branding document created with ID:', docRef.id);
-              this.lastSavedDocId = docRef.id; // Store the new document ID
+              this.lastSavedDocId = docRef.id; 
             })
             .catch(err => console.error('Error creating new branding document:', err));
         } else {
-          // Update the existing document
           this.lastSavedDocId = querySnapshot.docs[0].id;
           this.firestore.collection('branding').doc(this.lastSavedDocId).update(brandingDetails)
             .then(() => console.log('Branding details updated in existing Firestore document'))

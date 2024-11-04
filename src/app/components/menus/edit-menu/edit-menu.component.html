@@ -51,8 +51,6 @@
                     <div class="menuSub">
                         <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
                         <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-                            <a href="#">View</a>
-                            <a href="#">Edit</a>
                             <a (click)="deleteCategory(i)">Delete</a>
                             <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
                         </div>

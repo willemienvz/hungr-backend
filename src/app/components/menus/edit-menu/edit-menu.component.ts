@@ -7,6 +7,7 @@ import { Menu } from '../../../shared/services/menu';
 import { Category } from '../../../shared/services/category';
 import { finalize } from 'rxjs';
 import { MenuItem } from '../../../shared/services/menu-item';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-edit-menu',
@@ -122,6 +123,7 @@ export class EditMenuComponent implements OnInit {
     event.target.value = inputValue;
   }
   onFileSelected(event: Event, itemIndex: number): void {
+    this.isSaving = true;
     const fileInput = event.target as HTMLInputElement;
     if (fileInput.files && fileInput.files[0]) {
       const file = fileInput.files[0];
@@ -132,12 +134,14 @@ export class EditMenuComponent implements OnInit {
       task.snapshotChanges().pipe(
         finalize(() => {
           fileRef.getDownloadURL().subscribe((url) => {
-            this.currentMenu.items[this.tempNum].imageUrl = url;
+            this.filteredItems[this.tempNum].imageUrl = url;
+            this.isSaving = false;
           });
         })
       ).subscribe();
     }
   }
+  
   toggleLabelInput(itemIndex: number): void {
     this.currentMenu.items[itemIndex].showLabelInput = !this.currentMenu.items[itemIndex].showLabelInput;
   }
@@ -221,6 +225,16 @@ export class EditMenuComponent implements OnInit {
         this.loading();
         this.resetFilter();
     });
+
+    this.firestore.collection<Restaurant>('restuarants', ref => ref.where('restaurantID', '==', this.selectedRestaurant))
+    .valueChanges()
+    .subscribe(restuarant => {
+      let temp = restuarant[0];
+      temp.menuID = this.menuID;
+      this.firestore.collection('restuarants').doc(this.selectedRestaurant).update(temp)
+      .then(() => console.log('Restaurant ID edited'))
+      .catch(err => console.error('Error updating Restaurant ID ', err));
+  });
     this.loading();
     
   }
@@ -300,6 +314,7 @@ removeMenuItem(itemIndex: number): void {
 
 addMenuItem(): void {
   this.currentMenu.items.push({
+    itemId: uuidv4(),
     categoryId:  this.selectedCategoryId,
     name: '',
     description: '',
