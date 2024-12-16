@@ -42,3 +42,99 @@
     font-weight: 600;
     position: absolute;
   }
+
+
+  
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  position: relative;
+  z-index: 2;
+  transition: background-color 0.3s;
+}
+
+.step.active .circle {
+  background-color: #4caf50; /* Green for active step */
+}
+
+.step.completed .circle {
+  background-color: #4caf50;
+}
+
+.step .line {
+  height: 2px;
+  width: 50px
+}
+
+.progress-container {
+  display: flex;
+  gap: 26px;
+}
+.step-indicator {
+  border-radius: 50%;
+  display: flex;
+  width: 25px;
+  height: 25px;
+  border: 1px solid rgba(154, 154, 154, 1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #fff;
+  position: relative;
+  z-index: 5;
+}
+.step-indicator:focus {
+  outline: 2px solid #4A90E2;
+  outline-offset: 2px;
+}
+.step-indicator.active {
+  background-color: rgba(255, 255, 255, 1);
+  border: 2px solid rgba(60, 225, 175, 1);
+  width: 26px;
+  height: 26px;
+}
+
+.row{
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+ 
+  width: 100%;
+
+  .inner{
+    justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+  position: relative;
+  }
+
+  .line{
+    width: 100%;
+    height: 1px;
+    background-color: #9A9A9A;
+    position: absolute;
+    z-index: 1;
+  }
+}

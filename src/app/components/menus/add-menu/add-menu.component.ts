@@ -81,6 +81,7 @@ export class AddMenuComponent implements OnInit {
   menuNameError:boolean = false;
   restaurantError:boolean = false;
   selectedFileBulk: File | null = null;
+  steps: string[] = ['Menu Details', 'Categories', 'Add Items', 'Done'];
   constructor(private storage: AngularFireStorage, private firestore: AngularFirestore, private papa: Papa ) {}
 
 
@@ -205,19 +206,7 @@ export class AddMenuComponent implements OnInit {
     event.target.value = inputValue;
   }
 
-  nextStep() {
-    if (!this.menuNameError && !this.restaurantError) {
-      if (this.currentStep < 3) {
-        this.currentStep++;
-      }
-    }
-  }
-
-  previousStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
-  }
+  
 
   addMenu(userForm: NgForm) {
 
@@ -323,6 +312,7 @@ export class AddMenuComponent implements OnInit {
   }
 
     addMenuItem(): void {
+      this.nextStep();
       this.menuItems.push({
         itemId: uuidv4(),
         categoryId: undefined,
@@ -523,5 +513,29 @@ export class AddMenuComponent implements OnInit {
     setTimeout(() => {
       this.isSaving =false;
     }, 800);
+  }
+
+  nextStep() {
+    if (this.currentStep === 1) {
+      this.validateMenuName();
+      this.validateRestaurant();
+      if (this.menuNameError || this.restaurantError) {
+        return;
+      }
+    }
+    if (this.currentStep < 5) {
+      this.currentStep++;
+    }
+  }
+  
+  previousStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+  
+  completeSetup() {
+    // Handle the final step logic
+    console.log("Setup completed!");
   }
 }

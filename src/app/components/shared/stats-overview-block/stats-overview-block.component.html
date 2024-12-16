@@ -8,8 +8,11 @@
     </div>
     <label class="time">{{timeText}}</label>
     <div class="row bottom-align">
-        <p class="stat">{{stat}}</p>
-        <p class="movement">{{movement}}</p>
+        <p class="stat" [ngStyle]="{ 'font-size': textSize === 'S' ? '30px' : textSize === 'M' ? '40px' : '64px' }">{{
+            stat }}</p>
+        <p class="movement" [ngStyle]="{ color: getMovementColor() }">
+            {{ movement }}
+        </p>
     </div>
 
 </div>

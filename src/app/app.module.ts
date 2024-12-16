@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
@@ -66,13 +67,17 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { RestaurantComponent } from './components/restaurant/restaurant.component';
 import { ViewingtimegraphComponent } from './components/graphs/viewingtimegraph/viewingtimegraph.component';
 import { VisitorDashboardComponent } from './components/dashboard/visitor-dashboard/visitor-dashboard.component';
-
 import { FusionChartsModule } from "angular-fusioncharts";
+import { NgxEchartsModule } from 'ngx-echarts';
 
 // Import FusionCharts library and chart modules
 import * as FusionCharts from "fusioncharts";
 import * as charts from "fusioncharts/fusioncharts.charts";
 import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
+import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
+import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
+import { ConfirmDeleteDialogComponent } from './components/restaurant/confirm-delete-dialog/confirm-delete-dialog.component';
+import { SuccessAddRestaurantDialogComponent } from './components/restaurant/add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
 
 @NgModule({
   declarations: [
@@ -121,6 +126,10 @@ import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
     RestaurantComponent,
     ViewingtimegraphComponent,
     VisitorDashboardComponent,
+    MenuInsightsComponent,
+    SalesInsightsComponent,
+    ConfirmDeleteDialogComponent,
+    SuccessAddRestaurantDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -134,6 +143,7 @@ import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
     HttpClientModule,
     MatSlideToggleModule,
     QRCodeModule,
+    CommonModule,
     MatSelectModule,
     MatInputModule,
     MatFormFieldModule,
@@ -145,6 +155,9 @@ import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
     MatChipsModule,
     MatCheckboxModule,
     ToastrModule.forRoot(),
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts'),
+    }),
 
   ],
   providers: [FormDataService],

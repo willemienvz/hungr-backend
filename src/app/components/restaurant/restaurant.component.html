@@ -1,27 +1,54 @@
 <div class="inner-page">
     <div class="block">
-
         <div class="container">
             <div class="row">
-                <h6 class="heading">Your Restaurants</h6>
-                <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-                    <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen"
-                        [isVisible]="isTooltipOpen"></app-tooltip></i>
-            </div>
-            <div class="restaurantholder" *ngFor="let restaurant of restuarants; let i = index">
-                <p>{{ restaurant.restaurantName }}</p>
-                <span [style.color]="restaurant.status ? '#1FCC96' : '#9A9A9A'">{{ restaurant.status ? 'active' : 'inactive' }}</span>
-                <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
-                <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-                    <a routerLink="/settings/edit-restaurant" [queryParams]="{ id: restaurant.restaurantID}">Edit</a>
-                    <a (click)="deleteRestaurant(restaurant.restaurantID , i)">Delete</a>
-                    <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
-                </div>
-            </div>
-            <div class="row" style="margin-top: 30px;">
-                <a class="btnSecondary" routerLink="/settings/add-new-restaurant">Add restaurant</a>
+                <h6 class="heading">Add a new restaurant</h6>
+                <a class="btnSecondary" routerLink="/settings/add-new-restaurant">+ Add restaurant</a>
             </div>
         </div>
     </div>
-</div>
 
+    <div class="block">
+        <div class="container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 10%;"></th>
+                        <th style="width: 30%;">Restaurant Name</th>
+                        <th style="width: 30%;">Location</th>
+                        <th style="width: 10%;">Status</th>
+                        <th style="width: 20%;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let restaurant of restuarants; let i = index">
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ restaurant.restaurantName }}</td>
+                        <td>{{ restaurant.city }}</td>
+                        <td [style.color]="restaurant.status ? '#1FCC96' : '#9A9A9A'">
+                            {{ restaurant.status ? 'Active' : 'Inactive' }}
+                        </td>
+                        <td style="text-align: right;">
+                            <a (click)="viewRestaurant(restaurant.restaurantID, i)">
+                                <i class="material-icons">visibility</i>
+                            </a>
+                            <a routerLink="/settings/edit-restaurant" [queryParams]="{ id: restaurant.restaurantID}">
+                                <i class="material-icons">edit</i>
+                            </a>
+                            <a (click)="openDialog(restaurant.restaurantID, i, restaurant.restaurantName)">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

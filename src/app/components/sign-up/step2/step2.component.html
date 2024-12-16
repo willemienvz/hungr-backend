@@ -3,7 +3,9 @@
     <div class="form-container-inner">
         <h1>Sign Up</h1>
         <h6>Select your Option</h6>
-
+        <a class="backLink" routerLink="/sign-up"><span class="material-symbols-outlined">
+                arrow_back
+            </span>Back</a>
         <form [formGroup]="step2Form">
             <div class="tab-container">
                 <div class="tab" (click)="showAnnual = true" [class.active]="showAnnual">Annual</div>

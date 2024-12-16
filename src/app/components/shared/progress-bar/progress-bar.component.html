@@ -1,7 +1,14 @@
-<main class="progress-main-container">
-    <section class="progress-bar-container">
-      <div class="progress-bar" role="progressbar" [style.width.%]="progress"></div>
-      <p class="progress-info">{{progress}}% completed</p>
-    </section>
-  </main>
-  
+<div class="row">
+  <div class="inner">
+    <div class="step-indicator" tabindex="0" [class.completed]="progress > 1" [class.active]="progress === 1"
+      role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" aria-label="Step 1 of 4"></div>
+    <div class="step-indicator" tabindex="0" [class.completed]="progress > 2" [class.active]="progress === 2"
+      role="progressbar" aria-valuenow="2" aria-valuemin="1" aria-valuemax="4" aria-label="Step 2 of 4"></div>
+    <div class="step-indicator" tabindex="0" [class.completed]="progress > 3" [class.active]="progress === 3"
+      role="progressbar" aria-valuenow="3" aria-valuemin="1" aria-valuemax="4" aria-label="Step 3 of 4"></div>
+    <div class="step-indicator" tabindex="0" [class.completed]="progress > 4" [class.active]="progress === 4"
+      role="progressbar" aria-valuenow="4" aria-valuemin="1" aria-valuemax="4" aria-label="Step 4 of 4"></div>
+    <div class="line"></div>
+  </div>
+
+</div>

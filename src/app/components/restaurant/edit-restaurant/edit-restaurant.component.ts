@@ -5,6 +5,9 @@ import { User } from '../../../shared/services/user';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ConfigService } from '../../../config.service';
 import { ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { SuccessAddRestaurantDialogComponent } from '../add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-edit-restaurant',
@@ -45,7 +48,7 @@ export class EditRestaurantComponent {
     this.fetchRestaurant(this.currentRestaurantID);
   }
 
-  constructor(private firestore: AngularFirestore, private configService: ConfigService,private route: ActivatedRoute) {
+  constructor(private dialog: MatDialog,private snackBar: MatSnackBar,private firestore: AngularFirestore, private configService: ConfigService,private route: ActivatedRoute) {
     for (let i = 1; i <= this.configService.numberOfTables; i++) {
       this.tableNums.push(i);
     }
@@ -99,7 +102,7 @@ export class EditRestaurantComponent {
   }
 
   editRestaurant(){
-    this.isSaving = true;
+    this.isSaving = false;
     const menuID = this.selectedMenu ? this.selectedMenu : '';
     var holdID = '';
    
@@ -123,11 +126,21 @@ export class EditRestaurantComponent {
     };
 
     console.log(tempRestaurant);
-    this.firestore.collection('restuarants').doc(this.currentRestaurantID).update(tempRestaurant);
-    
-    setTimeout(() => {
-      this.isSaving = false;
-    }, 3000);
+    this.firestore.collection('restuarants').doc(this.currentRestaurantID).update(tempRestaurant)
+      .then(() => {
+        this.dialog.open(SuccessAddRestaurantDialogComponent, {
+          width: '400px',
+          data: { message: 'Your restaurant has been updated.',
+            title:'Restaurant Edited'
+           }
+        });
+      })
+      .catch(error => {
+        console.error('Error updating restaurant:', error);
+        this.snackBar.open('Failed to update restaurant. Please try again.', 'Close', {
+          duration: 3000,
+        });
+      });
   }
 
   selectMenu(menuID: string) {

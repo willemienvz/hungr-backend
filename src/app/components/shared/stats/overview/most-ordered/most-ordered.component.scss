@@ -11,6 +11,16 @@
         justify-content: space-between;
         align-items: center;
         gap: 10px;
+        margin-bottom: 20px;
+
+        .heading{
+          margin-bottom: 0;
+        }
+  
+        .time{
+          text-align: right;
+          margin-bottom: 0;
+        }
     }
 
     .list{
@@ -27,7 +37,7 @@
       width: 25px;
       height: 25px;
       border-radius: 50%;
-      font-family: 'Barlow', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-size: 15px;
       line-height: 1;
       display: flex;

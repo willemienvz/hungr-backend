@@ -1,6 +1,9 @@
 <div class="form-container">
     <img class="logo" src="../../../../assets/images/shared/logo.png" alt="" />
     <div class="form-container-inner">
+        <a class="backLink" routerLink="/sign-in"><span class="material-symbols-outlined">
+                arrow_back
+            </span>Back</a>
         <h1>Sign Up</h1>
         <form [formGroup]="step1Form">
             <div class="row">
@@ -33,78 +36,80 @@
                             <input type="text" class="formControl" placeholder="Smith" formControlName="lastName" />
                         </div>
 
-                        <div class="formGroup" [ngClass]="{'green-text': isPasswordValid()}">
+                        <h6>Contact Details</h6>
+                        <div class="formGroup" [ngClass]="{
+                            'has-error': step1Form.get('userEmail')?.invalid && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)
+                          }">
                             <div class="label-container">
-                                <label>Password</label>
-                            </div>
-                            <div class="password-toggle">
-                                <input class="formControl" placeholder="Password" formControlName="password" required
-                                    type="{{ showPassword ? 'text' : 'password' }}" />
-                                <i class="material-icons" (click)="togglePasswordVisibility()">{{ showPassword ?
-                                    'visibility' : 'visibility_off' }}</i>
-                            </div>
-                        </div>
-
-                        <div class="formGroup">
-                            <div class="label-container">
-                                <label>Confirm Password</label>
-                                <div *ngIf="isPasswordMismatch()" class="error-message">
-                                    Passwords do not match.
+                                <label>Email</label>
+                                <div *ngIf="step1Form.get('userEmail')?.hasError('required') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)"
+                                    class="error-message">
+                                    Email is required.
+                                </div>
+                                <div *ngIf="step1Form.get('userEmail')?.hasError('email') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)"
+                                    class="error-message">
+                                    Enter a valid email address.
                                 </div>
                             </div>
-                            <div class="password-toggle">
-                                <input class="formControl" placeholder="Confirm Password"
-                                    formControlName="userPwdConfrim" required
-                                    type="{{ showPasswordConf ? 'text' : 'password' }}" />
-                                <i class="material-icons" (click)="togglePasswordConfirmVisibility()">{{
-                                    showPasswordConf ?
-                                    'visibility' : 'visibility_off' }}</i>
-                            </div>
+                            <input type="email" class="formControl" placeholder="email@address.co.za"
+                                formControlName="userEmail" />
                         </div>
-                        <div class="infobox">
-                            <p class="font-small-medium">Make sure your password has:</p>
-                            <div class="inner-row">
-                                <p [ngClass]="{'vaild': isLengthValid()}">10 characters</p>
-                                <p [ngClass]="{'vaild': isUppercaseValid()}">an uppercase letter</p>
-                                <p [ngClass]="{'vaild': isSpecialCharValid()}">a special character</p>
-                                <p [ngClass]="{'vaild': isLowercaseValid()}">a lowercase letter</p>
-                                <p [ngClass]="{'vaild': isNumberValid()}">a number</p>
+                        <div class="formGroup" [ngClass]="{
+                            'has-error': step1Form.get('cellphone')?.invalid && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)
+                          }">
+                            <div class="label-container">
+                                <label>Cellphone number</label>
+                                <div *ngIf="step1Form.get('cellphone')?.hasError('required') && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)"
+                                    class="error-message">
+                                    Cellphone number is required.
+                                </div>
                             </div>
+                            <input type="tel" class="formControl" placeholder="+27 (0)12 345 6789"
+                                formControlName="cellphone" />
                         </div>
+
                     </div>
                 </div>
                 <div class="col">
-                    <h6>Contact Details</h6>
-                    <div class="formGroup" [ngClass]="{
-                        'has-error': step1Form.get('userEmail')?.invalid && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)
-                      }">
+                    <h6>Login details</h6>
+                    <div class="formGroup" [ngClass]="{'green-text': isPasswordValid()}">
                         <div class="label-container">
-                            <label>Email</label>
-                            <div *ngIf="step1Form.get('userEmail')?.hasError('required') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)"
-                                class="error-message">
-                                Email is required.
-                            </div>
-                            <div *ngIf="step1Form.get('userEmail')?.hasError('email') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)"
-                                class="error-message">
-                                Enter a valid email address.
+                            <label>Password</label>
+                        </div>
+                        <div class="password-toggle">
+                            <input class="formControl" placeholder="Password" formControlName="password" required
+                                type="{{ showPassword ? 'text' : 'password' }}" />
+                            <i class="material-icons" (click)="togglePasswordVisibility()">{{ showPassword ?
+                                'visibility' : 'visibility_off' }}</i>
+                        </div>
+                    </div>
+
+                    <div class="formGroup">
+                        <div class="label-container">
+                            <label>Confirm Password</label>
+                            <div *ngIf="isPasswordMismatch()" class="error-message">
+                                Passwords do not match.
                             </div>
                         </div>
-                        <input type="email" class="formControl" placeholder="email@address.co.za"
-                            formControlName="userEmail" />
-                    </div>
-                    <div class="formGroup" [ngClass]="{
-                        'has-error': step1Form.get('cellphone')?.invalid && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)
-                      }">
-                        <div class="label-container">
-                            <label>Cellphone number</label>
-                            <div *ngIf="step1Form.get('cellphone')?.hasError('required') && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)"
-                                class="error-message">
-                                Cellphone number is required.
-                            </div>
+                        <div class="password-toggle">
+                            <input class="formControl" placeholder="Confirm Password" formControlName="userPwdConfrim"
+                                required type="{{ showPasswordConf ? 'text' : 'password' }}" />
+                            <i class="material-icons" (click)="togglePasswordConfirmVisibility()">{{
+                                showPasswordConf ?
+                                'visibility' : 'visibility_off' }}</i>
                         </div>
-                        <input type="tel" class="formControl" placeholder="+27 (0)12 345 6789"
-                            formControlName="cellphone" />
                     </div>
+                    <div class="infobox">
+                        <p class="font-small-medium">Make sure your password has:</p>
+                        <div class="inner-row">
+                            <p [ngClass]="{'valid': isLengthValid()}">10 characters</p>
+                            <p [ngClass]="{'valid': isUppercaseValid()}">an uppercase letter</p>
+                            <p [ngClass]="{'valid': isSpecialCharValid()}">a special character</p>
+                            <p [ngClass]="{'valid': isLowercaseValid()}">a lowercase letter</p>
+                            <p [ngClass]="{'valid': isNumberValid()}">a number</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <button (click)="onNext()" class="btnPrimary" [disabled]="step1Form.invalid">Next</button>

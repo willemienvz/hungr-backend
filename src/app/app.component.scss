@@ -1,13 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;700&display=swap');
-
-
 *{
     box-sizing: border-box;
     padding: 0;
     margin: 0;
 }
 h1{
-    font-family: 'Barlow', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 24px;
     font-weight: 900;
     line-height: 22px;
@@ -15,7 +12,7 @@ h1{
 }
 
 label{
-    font-family: 'Barlow', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 13px;
     font-weight: 500;
     line-height: 13px;
@@ -26,7 +23,7 @@ input[type=text]{
     width: 100%;
     height: 38px;
     border-radius: 5px;
-    font-family: 'Barlow', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 13px;
     font-weight: 500;
     line-height: 13px;

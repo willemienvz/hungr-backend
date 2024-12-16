@@ -45,4 +45,13 @@ export class SpecialsLandingComponent implements OnInit{
     });
     
   }
+
+  getSpecialTypeLabel(type: number): string {
+    switch (type) {
+      case 1: return 'Weekly Special';
+      case 2: return 'Category Special';
+      case 3: return 'Combo Special';
+      default: return 'Special Type';
+    }
+  }
 }

@@ -15,20 +15,20 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class AddSpecialComponent implements OnInit {
   isSaving: boolean = false;
+  currentStep = 1;
+selectedSpecialType: number = 1;
   uploadDone: boolean = false;
   specialForm: FormGroup;
   specialTypes = [
     { id: 1, name: 'Weekly Special' },
     { id: 2, name: 'Category special' },
-    { id: 3, name: 'Discount special' },
-    { id: 4, name: 'Combo special' },
-    { id: 5, name: 'Item promotion (e.g. new items'}
+    { id: 3, name: 'Combo special' },
   ];
   weekdays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   selectedDays: string[] = [];
   menus: Menu[] = [];
   selectedMenu: Menu | null = null;
-  addedItems: { name: string; amount: number }[] = [];
+  addedItems: { name: string; amount: string }[] = []; 
   imageUploadProgress: number = 0;
   showImageUploadModal: boolean = false;
   uploadedImageUrl: string | null = null;
@@ -45,14 +45,16 @@ export class AddSpecialComponent implements OnInit {
   ) {
     this.specialForm = this.fb.group({
       menu: [null, Validators.required],
-      specialTitle: [{ value: '', disabled: true }, Validators.required],
-      dateFrom: [{ value: '', disabled: true }, Validators.required],
-      dateTo: [{ value: '', disabled: true }, Validators.required],
-      typeSpecial: [{ value: '', disabled: true }, Validators.required],
-      typeSpecialDetails: [{ value: '', disabled: true }],
-      amount: [{ value: '', disabled: true }],
-      featureSpecialUnder: [{ value: '', disabled: true }],
-      timeFrom: [{ value: '', disabled: true }, Validators.required],
+      specialTitle: ['', Validators.required],
+      dateFrom: [{ value: ''  }, Validators.required],
+      dateTo: [{ value: '' }, Validators.required],
+      typeSpecial: [{ value: ''}, Validators.required],
+      typeSpecialDetails: [[]],
+      comboPrice: [''], 
+      percentage: [''], 
+      amount: ['', Validators.required],
+      featureSpecialUnder: [{ value: '',}],
+      timeFrom: [{ value: '', }, Validators.required],
       timeTo: [{ value: '', disabled: true }, Validators.required],
     }, {
       validators: [dateRangeValidator(), timeRangeValidator()]
@@ -61,9 +63,53 @@ export class AddSpecialComponent implements OnInit {
 
   ngOnInit() {
     this.fetchMenus();
-    this.addPrefixIfNeeded();
   }
-
+  addItem(): void {
+    const selectedType = this.selectedSpecialType;
+  
+    if (selectedType === 1) { // Weekly Special
+      const selectedItemName = this.specialForm.get('typeSpecialDetails')?.value;
+      const amount = this.specialForm.get('amount')?.value;
+  
+      if (selectedItemName && amount) {
+        this.addedItems.push({ name: selectedItemName, amount });
+        this.specialForm.get('typeSpecialDetails')?.reset();
+        this.specialForm.get('amount')?.reset();
+      }
+    } 
+    else if (selectedType === 2) { // Category Special
+      const categoryName = this.specialForm.get('featureSpecialUnder')?.value;
+      const percentage = this.specialForm.get('percentage')?.value;
+  
+      if (categoryName && percentage) {
+        this.addedItems.push({ name: `Category: ${categoryName}`, amount: `${percentage}%` });
+        this.specialForm.get('featureSpecialUnder')?.reset();
+        this.specialForm.get('percentage')?.reset();
+      }
+    } 
+    else  if (selectedType === 3) { // Combo Special
+      const comboItems = this.specialForm.get('typeSpecialDetails')?.value; // Array of items
+      const comboPrice = this.specialForm.get('comboPrice')?.value;
+  
+      if (Array.isArray(comboItems) && comboItems.length > 0 && comboPrice) {
+        const comboItemNames = comboItems.join(', ');
+        this.addedItems.push({ name: `Combo: ${comboItemNames}`, amount: comboPrice });
+        this.specialForm.get('typeSpecialDetails')?.reset();
+        this.specialForm.get('comboPrice')?.reset();
+      }
+    }
+  }
+  getSpecialTypeLabel(type: number): string {
+    switch (type) {
+      case 1: return 'Weekly Special';
+      case 2: return 'Category Special';
+      case 3: return 'Combo Special';
+      default: return 'Special Type';
+    }
+  }
+  removeItem(index: number): void {
+    this.addedItems.splice(index, 1); // Remove the item at the specified index
+  }
   addPrefixIfNeeded() {
     const amountControl = this.specialForm.get('amount');
     if (amountControl && !amountControl.value.startsWith('R')) {
@@ -105,26 +151,7 @@ export class AddSpecialComponent implements OnInit {
     }
   }
 
-  addItem() {
-    const typeSpecialDetailsControl = this.specialForm.get('typeSpecialDetails');
-    const amountControl = this.specialForm.get('amount');
-
-    if (typeSpecialDetailsControl?.value && amountControl?.value) {
-      const item = {
-        name: typeSpecialDetailsControl.value,
-        amount: parseFloat(amountControl.value)
-      };
-
-      if (!this.addedItems.find(i => i.name === item.name)) {
-        this.addedItems.push(item);
-        console.log('Added Items:', this.addedItems);
-      }
-
-      typeSpecialDetailsControl.reset();
-      amountControl.reset();
-    }
-  }
-
+ 
   toggleSelection(day: string) {
     const index = this.selectedDays.indexOf(day);
     if (index >= 0) {
@@ -138,10 +165,6 @@ export class AddSpecialComponent implements OnInit {
     return this.selectedDays.includes(day);
   }
 
-  removeItem(index: number) {
-    this.addedItems.splice(index, 1);
-    console.log('Updated Items:', this.addedItems);
-  }
 
   openImageUploadModal() {
     this.showImageUploadModal = true;
@@ -178,7 +201,6 @@ export class AddSpecialComponent implements OnInit {
 
   onSubmit() {
     this.isSaving = true;
-    if (this.specialForm.valid) {
       const formValue = this.specialForm.getRawValue();
       const data = {
         ...formValue,
@@ -189,6 +211,7 @@ export class AddSpecialComponent implements OnInit {
         specialID: '1',
         active: true
       };
+
       this.firestore.collection('specials').add(data)
         .then((results) => {
           const newData = {
@@ -203,10 +226,6 @@ export class AddSpecialComponent implements OnInit {
           console.error('Error saving to Firestore:', error);
           this.isSaving = false;
         });
-    }else{
-      this.isSaving = false;
-      this.toastr.error('Some fields have not been completed. ');
-    }
   }
 
   cancelUpload() {
@@ -235,7 +254,7 @@ export class AddSpecialComponent implements OnInit {
           };
           this.firestore.collection('specials').doc(results.id).update(newData);
           this.isSaving = false;
-          this.showSuccess('Draft saved successfully!'); 
+          this.toastr.success('Your changes have been saved');
         })
         .catch(error => {
           console.error('Error saving draft to Firestore:', error);
@@ -251,5 +270,16 @@ export class AddSpecialComponent implements OnInit {
     this.successPopupMessage = message;
     this.showSuccessPopup = true;
     
+  }
+  nextStep() {
+    if (this.currentStep < 5) this.currentStep++;
+  }
+  
+  previousStep() {
+    if (this.currentStep > 1) this.currentStep--;
+  }
+  
+  onSpecialTypeChange() {
+    this.selectedSpecialType = this.specialForm.get('typeSpecial')?.value;
   }
 }

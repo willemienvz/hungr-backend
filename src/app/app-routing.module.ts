@@ -25,6 +25,8 @@ import { HelpComponent } from './components/help/help/help.component';
 import { TutorialsComponent } from './components/help/tutorials/tutorials.component';
 import { RestaurantComponent } from './components/restaurant/restaurant.component';
 import { VisitorDashboardComponent } from './components/dashboard/visitor-dashboard/visitor-dashboard.component';
+import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
+import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -38,24 +40,26 @@ const routes: Routes = [
     component: AppLayoutComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'visitor-insights', component: VisitorDashboardComponent },
-      { path: 'settings/general', component: GeneralComponent },
-      { path: 'settings/about-us', component: AboutComponent },
-      { path: 'manage-users', component: ManageUsersComponent },
-      { path: 'menus/dashboard', component: MenusComponent },
-      { path: 'menus/add-menu', component: AddMenuComponent },
-      { path: 'restaurants', component: RestaurantComponent },
-      { path: 'menus/edit-menu/:menuID', component: EditMenuComponent },
-      { path: 'menus/qr-codes', component: QrCodesComponent },
-      { path: 'settings/add-new-restaurant', component: AddComponent },
-      { path: 'settings/edit-restaurant', component: EditRestaurantComponent },
-      { path: 'settings/branding', component: BrandingComponent },
-      { path: 'specials/add-new-special', component: AddSpecialComponent },
-      { path: 'specials/edit-special/:id', component: EditSpecialComponent },
-      { path: 'specials', component: SpecialsLandingComponent },
-      { path: 'help', component: HelpComponent },
-      { path: 'help/all-tutorials', component: TutorialsComponent },
+      { path: 'dashboard', component: DashboardComponent, data: { title: 'Overview Dashboard' }},
+      { path: 'menu-insights', component: MenuInsightsComponent, data: { title: 'Menu Insights' } },
+      { path: 'visitor-insights', component: VisitorDashboardComponent, data: { title: 'Visistor Insights' } },
+      { path: 'sales-insights', component: SalesInsightsComponent, data: { title: 'Sales Insights' } },
+      { path: 'settings/general', component: GeneralComponent, data: { title: 'Settings' } },
+      { path: 'settings/about-us', component: AboutComponent, data: { title: 'About us' } },
+      { path: 'manage-users', component: ManageUsersComponent, data: { title: 'Manage Users' } },
+      { path: 'menus/dashboard', component: MenusComponent, data: { title: 'Menu' } },
+      { path: 'menus/add-menu', component: AddMenuComponent, data: { title: 'Add Menu' } },
+      { path: 'restaurants', component: RestaurantComponent, data: { title: 'Restaurant' } },
+      { path: 'menus/edit-menu/:menuID', component: EditMenuComponent, data: { title: 'Edit Menu' } },
+      { path: 'menus/qr-codes', component: QrCodesComponent, data: { title: 'QR codes' } },
+      { path: 'settings/add-new-restaurant', component: AddComponent, data: { title: 'New Restaurant' } },
+      { path: 'settings/edit-restaurant', component: EditRestaurantComponent, data: { title: 'Edit Restaurant' } },
+      { path: 'settings/branding', component: BrandingComponent, data: { title: 'Branding' } },
+      { path: 'specials/add-new-special', component: AddSpecialComponent, data: { title: 'Add Specials' } },
+      { path: 'specials/edit-special/:id', component: EditSpecialComponent, data: { title: 'Edit Specials' } },
+      { path: 'specials', component: SpecialsLandingComponent, data: { title: 'Visistor Insights' } },
+      { path: 'help', component: HelpComponent, data: { title: 'Help' } },
+      { path: 'help/all-tutorials', component: TutorialsComponent, data: { title: 'All Tutorials' } },
       { path: '', redirectTo: '/dashboard', pathMatch: 'full' } 
     ]
   }

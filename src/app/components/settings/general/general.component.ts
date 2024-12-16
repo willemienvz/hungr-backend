@@ -109,4 +109,16 @@ export class GeneralComponent {
         console.error('Error updating user data:', error);
       });
 }
+
+saveProfile(){
+  //TODO
+}
+
+cancelSubscribtion(){
+//TODO
+}
+
+upgrade(){
+  //TODO
+}
 }

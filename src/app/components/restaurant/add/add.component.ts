@@ -4,7 +4,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { User } from '../../../shared/services/user';
 import { ConfigService } from '../../../config.service';
 import { Restaurant } from '../../../shared/services/restaurant';
-
+import { MatDialog } from '@angular/material/dialog';
+import { SuccessAddRestaurantDialogComponent } from './success-add-restaurant-dialog/success-add-restaurant-dialog.component';
 @Component({
   selector: 'app-add',
   templateUrl: './add.component.html',
@@ -24,7 +25,7 @@ export class AddComponent implements OnInit{
   user: any;
   OwnerID:string='';
   tableNums: number[] = [];
-  constructor(private firestore: AngularFirestore, private configService: ConfigService) {
+  constructor(private firestore: AngularFirestore, private configService: ConfigService, private dialog: MatDialog) {
     for (let i = 1; i <= this.configService.numberOfTables; i++) {
       this.tableNums.push(i);
     }
@@ -86,6 +87,8 @@ export class AddComponent implements OnInit{
       streetAdress: this.restaurant.street,
       zip: this.restaurant.zip
     };
+
+    console.log(this.newRestaurant);
     this.firestore.collection('restuarants').add(this.newRestaurant)
       .then((data) => {
         this.newRestaurant= {
@@ -102,6 +105,15 @@ export class AddComponent implements OnInit{
           zip: this.restaurant.zip
         };
         this.firestore.collection('restuarants').doc(data.id).update(this.newRestaurant);
+        
+      })
+      .then(() => {
+        this.dialog.open(SuccessAddRestaurantDialogComponent, {
+          width: '400px',
+          data: { message: 'Your new restaurant has been successfully created.',
+            title:'Restaurant Added'
+           }
+        });
       })
       .catch(error => {
         console.error('Error adding restaurant: ', error);

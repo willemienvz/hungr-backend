@@ -1,0 +1,43 @@
+<div class="inner-page">
+    <div class="row">
+        <app-stats-overview-block heading="Total Menu Views" tooltiptext="Tooltip Text" timeText="Last 7 days"
+            [stat]="viewingTotalCurrentWeek.toString()"
+            [movement]="getWeeklyDifferenceMessage()"></app-stats-overview-block>
+        <app-stats-overview-block heading="New views" tooltiptext="Tooltip Text" timeText="Last 7 days"
+            [stat]="viewingTotalLast24Hours.toString()"
+            [movement]="getDailyDifferenceMessage()"></app-stats-overview-block>
+
+        <app-stats-overview-block heading="Most Viewed Category" tooltiptext="Tooltip Text" timeText="Last 7 days"
+            [stat]="mostOrderedCategory" [movement]="" textSize="S"></app-stats-overview-block>
+
+        <app-stats-overview-block heading="Most Ordered Item" tooltiptext="Tooltip Text" timeText="Last 7 days"
+            [stat]="topOrderedItems[0]?.name" [movement]="" textSize="S"></app-stats-overview-block>
+
+    </div>
+    <div class="row">
+        <div class="block biggerBlock">
+            <h6 class="heading">Daily Menu Visits</h6>
+            <div echarts [options]="chartOptions" class="echart"></div>
+        </div>
+        <div class="block">
+            <h6 class="heading">Sales Overview</h6>
+            <div echarts [options]="chartOptionsCategoryPercentages" class="echart"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="block biggerBlock">
+            <h6 class="heading">Most Ordered Items</h6>
+            <div echarts [options]="chartOptionsMostOrderedItems" class="echart"></div>
+        </div>
+        <div class="block">
+            <h6 class="heading">Frequently ordered together</h6>
+            <div *ngFor="let pair of frequentItemPairs | slice:0:3" class="pariholder">
+                <div class="pair-card">
+                    <div class="side">{{ pair.itemA }}</div>
+                    <div class="center">&</div>
+                    <div class="side">{{ pair.itemB }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

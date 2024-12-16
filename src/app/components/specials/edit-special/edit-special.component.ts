@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { finalize } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
-import { Special } from '../../../shared/services/special';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-special',
@@ -16,43 +16,46 @@ import { Special } from '../../../shared/services/special';
 })
 export class EditSpecialComponent implements OnInit {
   isSaving: boolean = false;
+  currentStep = 1;
+  selectedSpecialType: number = 1;
   uploadDone: boolean = false;
   specialForm: FormGroup;
   specialTypes = [
     { id: 1, name: 'Weekly Special' },
     { id: 2, name: 'Category special' },
-    { id: 3, name: 'Discount special' },
-    { id: 4, name: 'Combo special' },
-    { id: 5, name: 'Item promotion (e.g. new items'}
+    { id: 3, name: 'Combo special' },
   ];
   weekdays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   selectedDays: string[] = [];
   menus: Menu[] = [];
   selectedMenu: Menu | null = null;
-  addedItems: { name: string; amount: number }[] = [];
+  addedItems: { name: string; amount: string }[] = [];
   imageUploadProgress: number = 0;
   showImageUploadModal: boolean = false;
   uploadedImageUrl: string | null = null;
   owner: string = '';
-  specialID: string = '';
+  specialId: string = '';
   showSuccessPopup: boolean = false;
   successPopupMessage: string = '';
 
   constructor(
+    private route: ActivatedRoute,
+    private router: Router,
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router
+    private toastr: ToastrService
   ) {
     this.specialForm = this.fb.group({
-      menu: [{ value: '', disabled: true }, Validators.required],
+      menu: [null, Validators.required],
       specialTitle: ['', Validators.required],
       dateFrom: ['', Validators.required],
       dateTo: ['', Validators.required],
       typeSpecial: ['', Validators.required],
-      typeSpecialDetails: [''],
-      amount: [''],
+      typeSpecialDetails: [[]],
+      comboPrice: [''],
+      percentage: [''],
+      amount: ['', Validators.required],
       featureSpecialUnder: [''],
       timeFrom: ['', Validators.required],
       timeTo: ['', Validators.required],
@@ -62,89 +65,65 @@ export class EditSpecialComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.specialId = this.route.snapshot.paramMap.get('id') || '';
+    this.fetchSpecialData();
     this.fetchMenus();
-    this.loadSpecial();
   }
 
-  private fetchMenus() {
+  fetchSpecialData() {
+    this.firestore.collection('specials').doc(this.specialId).valueChanges()
+      .subscribe((data: any) => {
+        if (data) {
+          this.specialForm.patchValue(data);
+          this.addedItems = data.addedItems || [];
+          this.selectedDays = data.selectedDays || [];
+          this.uploadedImageUrl = data.imageUrl || null;
+          this.selectedSpecialType = data.typeSpecial || 1;
+        }
+      });
+  }
+
+  fetchMenus() {
     const user = JSON.parse(localStorage.getItem('user')!);
     const OwnerID = user.uid;
     this.owner = user.uid;
     this.firestore.collection<Menu>('menus', ref => ref.where('OwnerID', '==', OwnerID))
       .valueChanges()
-      .subscribe(menus => {
-        this.menus = menus;
-        console.log(menus);
-      });
+      .subscribe(menus => this.menus = menus);
   }
 
-  private loadSpecial() {
-    this.specialID = this.route.snapshot.paramMap.get('id')!;
-    console.log(this.route.snapshot.paramMap);
-    this.firestore.collection('specials').doc(this.specialID).valueChanges().subscribe((special) => {
-      if (special) {
-        // Type assertion to help TypeScript understand `special`'s shape
-        const data = special as Special;
+  updateSpecial() {
+    this.isSaving = true;
+    const formValue = this.specialForm.getRawValue();
+    const data = {
+      ...formValue,
+      addedItems: this.addedItems,
+      selectedDays: this.selectedDays,
+      imageUrl: this.uploadedImageUrl,
+      OwnerID: this.owner,
+    };
 
-        // Enable form controls to allow setting values
-        this.specialForm.enable();
-
-        // Remove any existing added items and days to avoid duplicates
-        this.addedItems = [];
-        this.selectedDays = [];
-
-        // Patch form values
-        this.specialForm.patchValue({
-          menu: data.menu,
-          specialTitle: data.specialTitle,
-          dateFrom: data.dateFrom,
-          dateTo: data.dateTo,
-          typeSpecial: data.typeSpecial,
-          typeSpecialDetails: data.typeSpecialDetails,
-          featureSpecialUnder: data.featureSpecialUnder,
-          timeFrom: data.timeFrom,
-          timeTo: data.timeTo
-        });
-
-        // Set additional properties
-        this.selectedMenu = this.menus.find(menu => menu.menuID === data.menu) || null;
-        this.addedItems = data.addedItems || [];
-        this.selectedDays = data.selectedDays || [];
-        this.uploadedImageUrl = data.imageUrl || '';
-      }
-    });
+    this.firestore.collection('specials').doc(this.specialId).update(data)
+      .then(() => {
+        this.isSaving = false;
+        this.showSuccess('Special updated successfully!');
+        this.router.navigate(['/specials']);
+      })
+      .catch(error => {
+        console.error('Error updating Firestore:', error);
+        this.isSaving = false;
+      });
   }
 
   onMenuChange() {
     const menuControl = this.specialForm.get('menu');
     if (menuControl?.value) {
       this.specialForm.enable();
-      menuControl.disable();
       this.selectedMenu = this.menus.find(menu => menu.menuID === menuControl.value) || null;
     } else {
       this.specialForm.disable();
       menuControl?.enable();
       this.specialForm.reset({ menu: null });
-    }
-  }
-
-  addItem() {
-    const typeSpecialDetailsControl = this.specialForm.get('typeSpecialDetails');
-    const amountControl = this.specialForm.get('amount');
-
-    if (typeSpecialDetailsControl?.value && amountControl?.value) {
-      const item = {
-        name: typeSpecialDetailsControl.value,
-        amount: parseFloat(amountControl.value)
-      };
-
-      if (!this.addedItems.find(i => i.name === item.name)) {
-        this.addedItems.push(item);
-        console.log('Added Items:', this.addedItems);
-      }
-
-      typeSpecialDetailsControl.reset();
-      amountControl.reset();
     }
   }
 
@@ -156,14 +135,49 @@ export class EditSpecialComponent implements OnInit {
       this.selectedDays.push(day);
     }
   }
+  addItem(): void {
+    const selectedType = this.selectedSpecialType;
+  
+    if (selectedType === 1) { // Weekly Special
+      const selectedItemName = this.specialForm.get('typeSpecialDetails')?.value;
+      const amount = this.specialForm.get('amount')?.value;
+  
+      if (selectedItemName && amount) {
+        this.addedItems.push({ name: selectedItemName, amount });
+        this.specialForm.get('typeSpecialDetails')?.reset();
+        this.specialForm.get('amount')?.reset();
+      }
+    } 
+    else if (selectedType === 2) { // Category Special
+      const categoryName = this.specialForm.get('featureSpecialUnder')?.value;
+      const percentage = this.specialForm.get('percentage')?.value;
+  
+      if (categoryName && percentage) {
+        this.addedItems.push({ name: `Category: ${categoryName}`, amount: `${percentage}%` });
+        this.specialForm.get('featureSpecialUnder')?.reset();
+        this.specialForm.get('percentage')?.reset();
+      }
+    } 
+    else  if (selectedType === 3) { // Combo Special
+      const comboItems = this.specialForm.get('typeSpecialDetails')?.value; // Array of items
+      const comboPrice = this.specialForm.get('comboPrice')?.value;
+  
+      if (Array.isArray(comboItems) && comboItems.length > 0 && comboPrice) {
+        const comboItemNames = comboItems.join(', ');
+        this.addedItems.push({ name: `Combo: ${comboItemNames}`, amount: comboPrice });
+        this.specialForm.get('typeSpecialDetails')?.reset();
+        this.specialForm.get('comboPrice')?.reset();
+      }
+    }
+  }
 
   isSelected(day: string): boolean {
     return this.selectedDays.includes(day);
   }
 
-  removeItem(index: number) {
+
+  removeItem(index: number): void {
     this.addedItems.splice(index, 1);
-    console.log('Updated Items:', this.addedItems);
   }
 
   openImageUploadModal() {
@@ -192,47 +206,35 @@ export class EditSpecialComponent implements OnInit {
       finalize(() => {
         fileRef.getDownloadURL().subscribe(url => {
           this.uploadedImageUrl = url;
-          this.showImageUploadModal = false;
+          this.uploadDone = true;
         });
       })
     ).subscribe();
   }
 
-  submitForm() {
-    if (this.specialForm.valid) {
-      this.isSaving = true;
-      const data: Special = {
-        ...this.specialForm.value,
-        addedItems: this.addedItems,
-        selectedDays: this.selectedDays,
-        imageUrl: this.uploadedImageUrl,
-        owner: this.owner
-      };
+  showSuccess(message: string) {
+    this.successPopupMessage = message;
+    this.showSuccessPopup = true;
+  }
 
-      this.firestore.collection('specials').doc(this.specialID).update(data)
-        .then(() => {
-          console.log('Special updated successfully');
-          this.isSaving = false;
-          this.showSuccessPopup = true;
-          this.successPopupMessage = 'Special updated successfully!';
-          setTimeout(() => {
-            this.showSuccessPopup = false;
-            this.router.navigate(['/specials']);
-          }, 2000);
-        })
-        .catch(error => {
-          console.error('Error updating special:', error);
-          this.isSaving = false;
-        });
+  nextStep() {
+    if (this.currentStep < 5) this.currentStep++;
+  }
+
+  previousStep() {
+    if (this.currentStep > 1) this.currentStep--;
+  }
+
+  onSpecialTypeChange() {
+    this.selectedSpecialType = this.specialForm.get('typeSpecial')?.value;
+  }
+
+  getSpecialTypeLabel(type: number): string {
+    switch (type) {
+      case 1: return 'Weekly Special';
+      case 2: return 'Category Special';
+      case 3: return 'Combo Special';
+      default: return 'Special Type';
     }
-  }
-
-  cancel() {
-    this.router.navigate(['/specials']);
-  }
-
-  cancelUpload() {
-    this.uploadedImageUrl = '';
-    this.closeImageUploadModal();
   }
 }

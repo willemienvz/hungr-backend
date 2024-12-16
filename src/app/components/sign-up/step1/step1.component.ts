@@ -31,6 +31,10 @@ export class Step1Component  implements OnInit, OnDestroy{
     this.confirmPwdSubscription = this.step1Form.get('userPwdConfrim')!.valueChanges.subscribe(() => {
       this.passwordMatchValidator(this.step1Form);
     });
+  
+    this.step1Form.get('password')!.valueChanges.subscribe(() => {
+      this.isPasswordValid();
+    });
   }
 
 

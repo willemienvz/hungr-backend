@@ -1,7 +1,8 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
-
+import {MatDialog} from '@angular/material/dialog';
+import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 @Component({
   selector: 'app-restaurant',
   templateUrl: './restaurant.component.html',
@@ -12,7 +13,7 @@ export class RestaurantComponent {
   isPopupMenuOpen: boolean[] = [];
   isSaving: boolean = false;
   restuarants: Restaurant[] = [];
-  constructor(private firestore: AngularFirestore,  private elementRef: ElementRef) {
+  constructor(private firestore: AngularFirestore,  private elementRef: ElementRef, public dialog: MatDialog) {
   }
   ngOnInit() {
     this.isSaving = true;
@@ -29,6 +30,20 @@ export class RestaurantComponent {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
 
+  openDialog(id:string, index: number, name:string): void {
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      width: '400px',
+      data: {name: name}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteRestaurant(id, index);
+      } else {
+      }
+    });
+  }
+
   private fetchRestaurant() {
     const user = JSON.parse(localStorage.getItem('user')!);
     const OwnerID = user.uid;
@@ -36,12 +51,12 @@ export class RestaurantComponent {
       .valueChanges()
       .subscribe(restuarants => {
         this.restuarants = restuarants;
+        console.log(this.restuarants)
         this.isSaving = false;
       });
   }
 
   deleteRestaurant(id:string, index: number){
-    this.togglePopupMenu(index);
     this.firestore.collection('restuarants').doc(id).delete()
         .then(() => {
             console.log("Restaurant successfully deleted!");
@@ -53,5 +68,10 @@ export class RestaurantComponent {
 
   private closeAllPopupMenu() {
     this.isPopupMenuOpen.fill(false);
+  }
+
+  
+  viewRestaurant(id:string, index: number){
+    //TODO View and edit and test delete + popup
   }
 }

@@ -1,38 +1,35 @@
 <div class="inner-page">
-    <div class="block">
-        <div class="row alignright">
-            <a class="btnSecondary" (click)="newQR.openPopup()">Generate QR code</a>
-        </div>
+  <div class="block">
 
-          <h6>Menus</h6>
-          <div class="userTable">
-              <table>
-                <thead>
-                  <tr>
-                      <th></th>
-                      <th>Menu Name</th>
-                      <th></th>
-                      <th>Location</th>
-                      <th></th>
-                      <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let menu of menus; let i = index">
-                      <td>{{ i+1 }}</td>
-                      <td>{{ menu.menuName }}</td>
-                      <td></td>
-                      <td>{{ menu.location }}</td>
-                      <td></td>
-                      <td style="text-align: right;">
-                        <a  (click)="viewQR.openPopup(menu.menuID)"><i class="material-symbols-outlined">visibility</i></a>
-                      </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+    <h6>QR Codes</h6>
+    <div class="userTable">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Menu Name</th>
+            <th></th>
+            <th>Location</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let menu of menus; let i = index">
+            <td>{{ i+1 }}</td>
+            <td>{{ menu.menuName }}</td>
+            <td></td>
+            <td>{{ menu.location }}</td>
+            <td></td>
+            <td style="text-align: right;">
+              <a (click)="viewQR.openPopup(menu.menuID)"><i class="material-symbols-outlined">visibility</i></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    
+  </div>
+
 </div>
 <app-add-qr #newQR [menus]="menus"></app-add-qr>
 <app-view-qr #viewQR></app-view-qr>

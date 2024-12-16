@@ -1,255 +1,314 @@
 <div class="inner-page">
-    <div class="row">
-        <div class="block logoBlock">
-            <h6>Logo</h6>
-            <p>Please upload your logo.</p>
-            <input class="btnTertiary" type="file" (change)="onFileSelected($event)" style="font-weight: 500; text-transform: capitalize;">
-            <button (click)="onUpload()" class="btnSecondary">Upload</button>
+    <div class="all-other">
+        <div class="row">
+            <div class="block logoBlock">
+                <h6>Logo</h6>
+                <p>Please upload your logo.</p>
+                <input class="btnTertiary" type="file" (change)="onFileSelected($event)"
+                    style="font-weight: 500; text-transform: capitalize;">
+                <button (click)="onUpload()" class="btnSecondary">Upload</button>
 
-            <div *ngIf="imageUrl" class="imagePreview">
-                <i *ngIf="imageUrl" class="material-icons closeBtn" (click)="removeImg()">close</i>
-                <img [src]="imageUrl" alt="Uploaded logo">
-            </div>
-        </div>
-
-        <div class="block">
-            <div class="row">
-                <h6 class="heading">Background Colour</h6>
-                <i class="material-icons" (mouseenter)="tooltipOpen['bgColor'] = true" (mouseleave)="tooltipOpen['bgColor'] = false">information
-                    <app-tooltip [text]="'This sets the general background color for branding.'" *ngIf="tooltipOpen['bgColor']"
-                        [isVisible]="tooltipOpen['bgColor']"></app-tooltip></i>
-            </div>
-            <div class="row inputRow">
-                <p>Background colour</p>
-                <div class="colorPicker">
-                    <ngx-colors ngx-colors-trigger [(ngModel)]="backgroundColor" (ngModelChange)="applyChanges('Background Color',$event)"></ngx-colors>
-                    <mat-form-field>
-                        <input matInput [(ngModel)]="backgroundColor">
-                    </mat-form-field>
+                <div *ngIf="imageUrl" class="imagePreview">
+                    <i *ngIf="imageUrl" class="material-icons closeBtn" (click)="removeImg()">close</i>
+                    <img [src]="imageUrl" alt="Uploaded logo">
                 </div>
             </div>
+
+            <div class="block">
+                <div class="row">
+                    <h6 class="heading">Background Colour</h6>
+                    <i class="material-icons" (mouseenter)="tooltipOpen['bgColor'] = true"
+                        (mouseleave)="tooltipOpen['bgColor'] = false">information
+                        <app-tooltip [text]="'This sets the general background color for branding.'"
+                            *ngIf="tooltipOpen['bgColor']" [isVisible]="tooltipOpen['bgColor']"></app-tooltip></i>
+                </div>
+                <div class="row inputRow">
+                    <p>Background colour</p>
+                    <div class="colorPicker">
+                        <ngx-colors ngx-colors-trigger [(ngModel)]="backgroundColor"
+                            (ngModelChange)="applyChanges('Background Color',$event)"></ngx-colors>
+                        <mat-form-field>
+                            <input matInput [(ngModel)]="backgroundColor">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
 
-        <div class="block btnBlock">
-            <p>Would you like to save or discard the changes you have made?</p>
-            <div class="row">
-                <a class="btnTertiary" style="width: 130px;">Discard</a>
-                <a class="btnSecondary" (click)="updateBrandingDetails()">Save Changes</a>
+        <div class="outerRow">
+            <div class="outerCol">
+
+                <div class="row">
+                    <div class="block">
+                        <div class="row">
+                            <h6 class="heading">Button Styles</h6>
+                        </div>
+                        <div class="row">
+                            <p style="font-weight: 600;">Primary Button</p>
+                        </div>
+
+                        <!-- Primary Settings -->
+                        <div class="row buttonRos">
+                            <div class="col">
+                                <label>Typeface</label>
+                                <div class="selectField">
+                                    <mat-select [(value)]="buttonTypeface"
+                                        (selectionChange)="applyChanges('Button Typeface',$event.value)">
+                                        <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
+                                            {{ typeface }}
+                                        </mat-option>
+                                    </mat-select>
+                                </div>
+                                <label>Letter Case</label>
+                                <div class="selectField">
+                                    <mat-select [(value)]="buttonCase"
+                                        (selectionChange)="applyChanges('Button Case',$event.value)">
+                                        <mat-option *ngFor="let caseOption of letterCases" [value]="caseOption.value">
+                                            {{ caseOption.display }}
+                                        </mat-option>
+                                    </mat-select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <label>Colours</label>
+                                <div class="blockInnerColours">
+                                    <div class="col">
+                                        <label>Main Colour</label>
+                                        <div class="colorPicker">
+                                            <ngx-colors ngx-colors-trigger [(ngModel)]="buttonColor"
+                                                (ngModelChange)="applyChanges('Button Color',$event)"></ngx-colors>
+                                            <mat-form-field>
+                                                <input matInput [(ngModel)]="buttonColor">
+                                            </mat-form-field>
+                                        </div>
+                                        <label>Text Colour</label>
+                                        <div class="colorPicker">
+                                            <ngx-colors ngx-colors-trigger [(ngModel)]="buttonTextColor"
+                                                (ngModelChange)="applyChanges('Button Text Color',$event)"></ngx-colors>
+                                            <mat-form-field>
+                                                <input matInput [(ngModel)]="buttonTextColor">
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="col buttonExample">
+                                        <label>Example</label>
+                                        <a [ngStyle]="{
+                                            'background-color': buttonColor,
+                                            'color': buttonTextColor,
+                                            'font-family': buttonTypeface,
+                                            'text-transform': buttonCase
+                                        }">save</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <p style="font-weight: 600;">Secondary Button</p>
+                        </div>
+                        <div class="row buttonRos">
+                            <div class="col">
+                                <label>Typeface</label>
+                                <div class="selectField">
+                                    <mat-select [(value)]="buttonSecondaryTypeface"
+                                        (selectionChange)="applyChanges('Button Secondary Typeface',$event.value)">
+                                        <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
+                                            {{ typeface }}
+                                        </mat-option>
+                                    </mat-select>
+                                </div>
+                                <label>Letter Case</label>
+                                <div class="selectField">
+                                    <mat-select [(value)]="buttonSecondaryCase"
+                                        (selectionChange)="applyChanges('Button Secondary Case',$event.value)">
+                                        <mat-option *ngFor="let caseOption of letterCases" [value]="caseOption.value">
+                                            {{ caseOption.display }}
+                                        </mat-option>
+                                    </mat-select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <label>Colours</label>
+                                <div class="blockInnerColours">
+                                    <div class="col">
+                                        <label>Main Colour</label>
+                                        <div class="colorPicker">
+                                            <ngx-colors ngx-colors-trigger [(ngModel)]="buttonSecondaryColor"
+                                                (ngModelChange)="applyChanges('Button Secondary Color',$event)"></ngx-colors>
+                                            <mat-form-field>
+                                                <input matInput [(ngModel)]="buttonSecondaryColor">
+                                            </mat-form-field>
+                                        </div>
+                                        <label>Text Colour</label>
+                                        <div class="colorPicker">
+                                            <ngx-colors ngx-colors-trigger [(ngModel)]="buttonSecondaryTextColor"
+                                                (ngModelChange)="applyChanges('Button Secondary Text Color',$event)"></ngx-colors>
+                                            <mat-form-field>
+                                                <input matInput [(ngModel)]="buttonSecondaryTextColor">
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="col buttonExample">
+                                        <label>Example</label>
+                                        <a [ngStyle]="{
+                                            'background-color': buttonSecondaryColor,
+                                            'color': buttonSecondaryTextColor,
+                                            'font-family': buttonSecondaryTypeface,
+                                            'text-transform': buttonSecondaryCase
+                                        }">save</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="block">
+                        <div class="row">
+                            <h6 class="heading">Text Styles</h6>
+                        </div>
+                        <div class="conTextHold">
+                            <div class="colText">
+                                <div class="row">
+                                    <p style="font-weight: 600;">Main Headings</p>
+                                </div>
+                                <div class="row">
+                                    <label>Typeface</label>
+                                    <div class="selectField">
+                                        <mat-select [(value)]="mainHeadingTypeface"
+                                            (selectionChange)="applyChanges('Main Heading Typeface',$event.value)">
+                                            <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
+                                                {{ typeface }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label>Letter Case</label>
+                                    <div class="selectField">
+                                        <mat-select [(value)]="mainHeadingCase"
+                                            (selectionChange)="applyChanges('Main Heading Case',$event.value)">
+                                            <mat-option *ngFor="let caseOption of letterCases"
+                                                [value]="caseOption.value">
+                                                {{ caseOption.display }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label>Colour</label>
+                                    <div class="colorPicker">
+                                        <ngx-colors ngx-colors-trigger [(ngModel)]="mainHeadingColor"
+                                            (ngModelChange)="applyChanges('Main Heading Color',$event)"></ngx-colors>
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="mainHeadingColor">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p style="font-weight: 600;">Sub-Headings Style</p>
+                                </div>
+                                <div class="row">
+                                    <label>Typeface</label>
+                                    <div class="selectField">
+                                        <mat-select [(value)]="subHeadingTypeface"
+                                            (selectionChange)="applyChanges('Sub Heading Typeface',$event.value)">
+                                            <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
+                                                {{ typeface }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label>Letter Case</label>
+                                    <div class="selectField">
+                                        <mat-select [(value)]="subHeadingCase"
+                                            (selectionChange)="applyChanges('Sub Heading Case',$event.value)">
+                                            <mat-option *ngFor="let caseOption of letterCases"
+                                                [value]="caseOption.value">
+                                                {{ caseOption.display }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label>Colour</label>
+                                    <div class="colorPicker">
+                                        <ngx-colors ngx-colors-trigger [(ngModel)]="subHeadingColor"
+                                            (ngModelChange)="applyChanges('Main Heading Color',$event)"></ngx-colors>
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="subHeadingColor">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p style="font-weight: 600;">Body</p>
+                                </div>
+                                <div class="row">
+                                    <label>Typeface</label>
+                                    <div class="selectField">
+                                        <mat-select [(value)]="bodyTypeface"
+                                            (selectionChange)="applyChanges('Body Typeface',$event.value)">
+                                            <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
+                                                {{ typeface }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label>Letter Case</label>
+                                    <div class="selectField">
+                                        <mat-select [(value)]="bodyCase"
+                                            (selectionChange)="applyChanges('Body Case',$event.value)">
+                                            <mat-option *ngFor="let caseOption of letterCases"
+                                                [value]="caseOption.value">
+                                                {{ caseOption.display }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label>Colour</label>
+                                    <div class="colorPicker">
+                                        <ngx-colors ngx-colors-trigger [(ngModel)]="bodyColor"
+                                            (ngModelChange)="applyChanges('Body Color',$event)"></ngx-colors>
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="bodyColor">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="colText previewTexrt">
+                                <h1 [ngStyle]="{
+                                    'color': mainHeadingColor,
+                                    'font-family': mainHeadingTypeface,
+                                    'font-size': mainHeadingSize,
+                                    'text-transform': mainHeadingCase
+                                }">Main Heading</h1>
+                                <h2 [ngStyle]="{
+                                    'color': subHeadingColor,
+                                    'font-family': subHeadingTypeface,
+                                    'font-size': subHeadingSize,
+                                    'text-transform': subHeadingCase
+                                }">Sub Heading</h2>
+                                <p [ngStyle]="{
+                                    'color': bodyColor,
+                                    'font-family': bodyTypeface,
+                                    'font-size': bodySize,
+                                    'text-transform': bodyCase
+                                }">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 
-    <div class="outerRow">
-        <div class="outerCol">
-            <div class="row">
-                <div class="block">
-                    <div class="row">
-                        <h6 class="heading">Text Settings</h6>
-                    </div>
-                    <div class="row">
-                        <p class="headingTable">Element</p>
-                        <p class="headingTable">Colour</p>
-                        <p class="headingTable">Typeface</p>
-                        <p class="headingTable">Size</p>
-                        <p class="headingTable">Letter Case</p>
-                    </div>
-                    <!-- Main Headings Settings -->
-                    <div class="row inputRow brandingRow">
-                        <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="tooltipOpen['mainHeading'] = true" (mouseleave)="tooltipOpen['mainHeading'] = false">information
-                                <app-tooltip [text]="'Settings for main headings.'" *ngIf="tooltipOpen['mainHeading']"
-                                    [isVisible]="tooltipOpen['mainHeading']"></app-tooltip></i>
-                            <p>Main Headings</p>
-                        </div>
-                        <div class="colorPicker">
-                            <ngx-colors ngx-colors-trigger [(ngModel)]="mainHeadingColor" (ngModelChange)="applyChanges('Main Heading Color',$event)"></ngx-colors>
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="mainHeadingColor">
-                            </mat-form-field>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="mainHeadingTypeface" (selectionChange)="applyChanges('Main Heading Typeface',$event.value)">
-                                <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
-                                    {{ typeface }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="mainHeadingSize" (selectionChange)="applyChanges('Main Heading Size',$event.value)">
-                                <mat-option *ngFor="let size of fontSizes" [value]="size">
-                                    {{ size }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="mainHeadingCase" (selectionChange)="applyChanges('Main Heading Case',$event.value)">
-                                <mat-option *ngFor="let caseOption of letterCases" [value]="caseOption.value">
-                                    {{ caseOption.display }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                    </div>
-                    <!-- Sub Headings Settings -->
-                    <div class="row inputRow brandingRow">
-                        <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="tooltipOpen['subHeading'] = true" (mouseleave)="tooltipOpen['subHeading'] = false">information
-                                <app-tooltip [text]="'Settings for sub headings.'" *ngIf="tooltipOpen['subHeading']"
-                                    [isVisible]="tooltipOpen['subHeading']"></app-tooltip></i>
-                            <p>Sub Headings</p>
-                        </div>
-                        <div class="colorPicker">
-                            <ngx-colors ngx-colors-trigger [(ngModel)]="subHeadingColor" (ngModelChange)="applyChanges('Sub Heading Color',$event)"></ngx-colors>
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="subHeadingColor">
-                            </mat-form-field>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="subHeadingTypeface" (selectionChange)="applyChanges('Sub Heading Typeface',$event.value)">
-                                <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
-                                    {{ typeface }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="subHeadingSize" (selectionChange)="applyChanges('Sub Heading Size',$event.value)">
-                                <mat-option *ngFor="let size of fontSizes" [value]="size">
-                                    {{ size }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="subHeadingCase" (selectionChange)="applyChanges('Sub Heading Case',$event.value)">
-                                <mat-option *ngFor="let caseOption of letterCases" [value]="caseOption.value">
-                                    {{ caseOption.display }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                    </div>
-                    <!-- Body Text Settings -->
-                    <div class="row inputRow brandingRow">
-                        <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="tooltipOpen['bodyText'] = true" (mouseleave)="tooltipOpen['bodyText'] = false">information
-                                <app-tooltip [text]="'Settings for body text.'" *ngIf="tooltipOpen['bodyText']"
-                                    [isVisible]="tooltipOpen['bodyText']"></app-tooltip></i>
-                            <p>Body Text</p>
-                        </div>
-                        <div class="colorPicker">
-                            <ngx-colors ngx-colors-trigger [(ngModel)]="bodyColor" (ngModelChange)="applyChanges('Body Color',$event)"></ngx-colors>
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="bodyColor">
-                            </mat-form-field>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="bodyTypeface" (selectionChange)="applyChanges('Body Typeface',$event.value)">
-                                <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
-                                    {{ typeface }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="bodySize" (selectionChange)="applyChanges('Body Size',$event.value)">
-                                <mat-option *ngFor="let size of fontSizes" [value]="size">
-                                    {{ size }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="bodyCase" (selectionChange)="applyChanges('Body Case',$event.value)">
-                                <mat-option *ngFor="let caseOption of letterCases" [value]="caseOption.value">
-                                    {{ caseOption.display }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="block">
-                    <div class="row">
-                        <h6 class="heading">Button Settings</h6>
-                    </div>
-                    <div class="row">
-                        <p class="headingTable">Element</p>
-                        <p class="headingTable">Colour</p>
-                        <p class="headingTable">Typeface</p>
-                        <p class="headingTable">Text Colour</p>
-                        <p class="headingTable">Letter Case</p>
-                    </div>
-                   
-                    <!-- Primary Settings -->
-                    <div class="row inputRow brandingRow">
-                        <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="tooltipOpen['btnPrimary'] = true" (mouseleave)="tooltipOpen['btnPrimary'] = false">information
-                                <app-tooltip [text]="'Settings for buttons.'" *ngIf="tooltipOpen['btnPrimary']"
-                                    [isVisible]="tooltipOpen['btnPrimary']"></app-tooltip></i>
-                            <p>Primary</p>
-                        </div>
-                        <div class="colorPicker">
-                            <ngx-colors ngx-colors-trigger [(ngModel)]="buttonColor" (ngModelChange)="applyChanges('Button Color',$event)"></ngx-colors>
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="buttonColor">
-                            </mat-form-field>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="buttonTypeface" (selectionChange)="applyChanges('Button Typeface',$event.value)">
-                                <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
-                                    {{ typeface }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                        <div class="colorPicker">
-                            <ngx-colors ngx-colors-trigger [(ngModel)]="buttonTextColor" (ngModelChange)="applyChanges('Button Text Color',$event)"></ngx-colors>
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="buttonTextColor">
-                            </mat-form-field>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="buttonCase" (selectionChange)="applyChanges('Button Case',$event.value)">
-                                <mat-option *ngFor="let caseOption of letterCases" [value]="caseOption.value">
-                                    {{ caseOption.display }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                    </div>
-
-                     <!-- Secondary Settings -->
-                     <div class="row inputRow brandingRow">
-                        <div class="headingHold">
-                            <i class="material-icons" (mouseenter)="tooltipOpen['btnSecondary'] = true" (mouseleave)="tooltipOpen['btnSecondary'] = false">information
-                                <app-tooltip [text]="'Settings for buttons.'" *ngIf="tooltipOpen['btnSecondary']"
-                                    [isVisible]="tooltipOpen['btnSecondary']"></app-tooltip></i>
-                            <p>Secondary</p>
-                        </div>
-                        <div class="colorPicker">
-                            <ngx-colors ngx-colors-trigger [(ngModel)]="buttonSecondaryColor" (ngModelChange)="applyChanges('Button Secondary Color',$event)"></ngx-colors>
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="buttonSecondaryColor">
-                            </mat-form-field>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="buttonSecondaryTypeface" (selectionChange)="applyChanges('Button Secondary Typeface',$event.value)">
-                                <mat-option *ngFor="let typeface of typefaces" [value]="typeface">
-                                    {{ typeface }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                        <div class="colorPicker">
-                            <ngx-colors ngx-colors-trigger [(ngModel)]="buttonSecondaryTextColor" (ngModelChange)="applyChanges('Button Secondary Text Color',$event)"></ngx-colors>
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="buttonSecondaryTextColor">
-                            </mat-form-field>
-                        </div>
-                        <div class="selectField">
-                            <mat-select [(value)]="buttonSecondaryCase" (selectionChange)="applyChanges('Button Secondary Case',$event.value)">
-                                <mat-option *ngFor="let caseOption of letterCases" [value]="caseOption.value">
-                                    {{ caseOption.display }}
-                                </mat-option>
-                            </mat-select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="sidebar block">
         <div class="outerLive">
             <div class="block" style="height: 100%;">
                 <div class="row">
@@ -257,7 +316,7 @@
                 </div>
                 <div class="preview" [ngStyle]="{'background-color': backgroundColor}">
                     <div *ngIf="imageUrl" class="imagePreviewSmall">
-                        
+
                         <img [src]="imageUrl" alt="Uploaded logo">
                     </div>
                     <h1 [ngStyle]="{
@@ -291,6 +350,12 @@
                         'text-transform': buttonSecondaryCase
                     }">Secondary Button</a>
                 </div>
+            </div>
+        </div>
+        <div class=" btnBlock">
+            <div class="row">
+                <a class="btnTertiary" style="width: 130px;">Discard</a>
+                <a class="btnSecondary" (click)="updateBrandingDetails()">Save Changes</a>
             </div>
         </div>
     </div>

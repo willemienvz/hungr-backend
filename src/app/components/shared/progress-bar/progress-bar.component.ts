@@ -7,4 +7,5 @@ import { Component, Input } from '@angular/core';
 })
 export class ProgressBarComponent {
   @Input() progress: number = 0;
+  steps:number =5;
 }

@@ -1,16 +1,14 @@
 <div class="block stat">
     <div class="row">
         <h6 class="heading">{{heading}}</h6>
-        <i class="material-icons" (mouseenter)="isTooltipOpen = true" (mouseleave)="isTooltipOpen = false">information
-            <app-tooltip [text]="'Lorem ipsum about this block'" *ngIf="isTooltipOpen"
-                [isVisible]="isTooltipOpen"></app-tooltip></i>
+        <label class="time">Last 30 days</label>
 
     </div>
-    <label class="time">{{timeText}}</label>
+
     <div class="row list" *ngFor="let object of data; let i=index">
-       
+
         <p> <span>{{i + 1}}</span>{{object.name}}</p>
-        <p><b>{{object.description}}</b></p>
+        <p><b>{{ object.count }} {{ object.count === 1 ? 'order' : 'orders' }}</b></p>
     </div>
 
 </div>

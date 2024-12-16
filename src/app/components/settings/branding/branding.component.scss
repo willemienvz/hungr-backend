@@ -46,7 +46,7 @@
     .editBtn{
         position: absolute;
         right: 14px;
-        font-family: 'Barlow', sans-serif;
+        font-family: 'Poppins', sans-serif;
         font-size: 10px;
         font-weight:500;
         line-height: 1;
@@ -117,6 +117,7 @@
 }
 
 .btnBlock{
+    margin-top: 30px;
     p{
         font-size: 10px;
         text-align: center;
@@ -149,7 +150,7 @@
     border-radius: 10px;
     width: 90px;
     a{
-        font-family: 'Barlow', sans-serif;
+        font-family: 'Poppins', sans-serif;
         font-size: 11px;
         font-weight: 400;
         line-height: 10px;
@@ -254,7 +255,9 @@
 .inner-page{
 display: flex;
 gap: 20px;
-flex-direction: column;
+flex-direction: row;
+width: 100%;
+
 }
 
 .headingHold{
@@ -269,21 +272,80 @@ flex-direction: column;
 }
 
 .outerLive{
-    width: 35%;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+.buttonRos{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap:15px;
+    margin-top: 15px;
+    .col{
+        width: calc(50% - 15px);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        label{
+            margin-top: 15px;
+            margin-bottom: 8px;
+font-family: 'Poppins';
+font-size: 15px;
+font-weight: 400;
+line-height: 20.25px;
+letter-spacing: -0.001em;
+text-align: left;
 
+        }
+
+        .blockInnerColours{
+            display: flex;
+            width: 100%;
+            flex-direction: row;
+            background-color: #F5F5F7;
+            align-items: center;
+            border-radius: 5px;
+            padding: 25px 20px;
+            justify-content: center;
+            label{
+                margin: 0;
+            }
+            .col{
+            }
+        }
+    }
+}
 .outerCol{
-    width: calc(65% - 15px);
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     gap: 15px;
 }
+.colorPicker{
+    padding: 0;
+    gap: 5px;
+    border: none;
+    margin-bottom: 8px;
+    background-color: transparent;
+}
+::ng-deep .colorPicker .mdc-text-field--filled{
+    border: none !important;
+}
+.colorPicker .mdc-text-field--no-label:not(.mdc-text-field--textarea){
+    border: none !important;
+}
 
+::ng-deep  .mat-mdc-text-field-wrapper{
+    border: none !important;
+}
+.colorPicker .mat-mdc-form-field{
+    width: 100%;
+}
 .outerRow{
     display: flex;
     flex-direction: row;
@@ -349,4 +411,66 @@ flex-direction: column;
     img{
         width: 50%;
     }
+}
+.all-other{
+    width: 70%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.sidebar{
+    width: 25%;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.buttonExample{
+    padding: 25px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    a{
+        padding: 12px 12px;
+        border-radius: 6px;
+        min-width: 120px;
+        text-align: center;
+    }
+}
+
+.colText{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 12px;
+    label{
+        width: 90px;
+    }
+    .selectField{
+        flex: 1;
+    }
+    .colorPicker{
+        flex: 1;
+    }
+}
+
+.conTextHold{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.previewTexrt{
+    background-color: #F5F5F7;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
 }

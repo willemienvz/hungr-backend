@@ -21,12 +21,22 @@
         flex-direction: column;
     }
 }
+.radiogroup{
+    flex-direction: row;
+    gap: 20px;
+    display: flex;
+    width: 100%;
+}
 
+::ng-deep mat-mdc-text-field-wrapper{
+    height: 50px !important;
+}
 .selectedOption{
     width: 100%;
-    padding: 12px;
+    padding: 20px 12px;
     background-color: #F3F4F5;
     margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 .contactBlock mat-form-field{
@@ -42,19 +52,46 @@
     gap: 5px;
     align-items: center;
     text-decoration: none;
+    color: #2E3646;
+    font-size: 16px;
+    font-weight: 600;
+}
+.block{
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.block-row{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+label{
+    color: #9A9A9A;
+}
+
+.font-small{
     color: #9A9A9A;
 }
 
 .row{
     display: flex;
     width: 100%;
-    flex-direction: row;
+    flex-direction: column;
     gap: 8px;
     justify-content: center;
     align-items: flex-start;
 
     .formGroup{
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
 }
 
@@ -78,4 +115,11 @@
     justify-content: center;
     gap: 20px;
     flex-direction: row;
+}
+
+.rowBottom{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    
 }

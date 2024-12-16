@@ -19,13 +19,17 @@
     .headerRow{
         gap: 14px;
         margin-bottom: 20px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 25px;
     }
 }
 
 .labelStep{
     color: rgba(60, 225, 175, 1);
     font-weight: 700;
-
+    text-transform: uppercase;
+  
 }
 .row3col{
     display: flex;
@@ -64,12 +68,13 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    flex: 1;
     flex-direction: row;
     gap: 15px;
 
     .col{
-        width: calc(50% - 8px);
+       flex: 1;
         display: flex;
     }
 }
@@ -159,7 +164,7 @@ mat-form-field{
     width: 90px;
     z-index: 50;
     a{
-        font-family: 'Barlow', sans-serif;
+        font-family: 'Poppins', sans-serif;
         font-size: 11px;
         font-weight: 400;
         line-height: 10px;
@@ -204,7 +209,10 @@ mat-form-field{
 .subcategory:last-of-type{
     margin-bottom: 0px;
 }
-
+.mainLink{
+    width: unset;
+    margin-top: 50px;
+}
 .inputHolder{
     position: relative;
     display: flex;
@@ -229,8 +237,24 @@ mat-form-field{
     background-color: #F3F4F5;
     border-radius: 5px;
     cursor: pointer;
-}
+    min-width: 50%;
 
+    i{
+        width: 40px;
+        height: 40px;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+    }
+}
+.innerHold{
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+}
 .backBtn{
     cursor: pointer;
     
@@ -345,16 +369,29 @@ mat-form-field{
 .additionalItems{
     width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 40px;
-    background-color: #F3F4F5;
-    border: 1px solid #DEDEDE;
+    border-top: 1px solid #9A9A9A;
     border-radius: 2px;
-    padding: 15px 10px;
+    padding: 33px 0px;
     margin-top: 30px;
     .col{
-        width: calc(50% - 20px);
+        width: 100%;
         display: flex;
+        flex-direction: row !important;
+    }
+    .inputHolder{
+        flex-direction: column !important;
+        justify-content: flex-start;
+            align-items: flex-start;
+        p{
+            position: relative;
+            right: 0;
+            
+        }
+    }
+    h6{
+        min-width: 30%;
     }
 
     .col:first-of-type{
@@ -410,6 +447,11 @@ mat-form-field{
     color: #000;
 }
 
+input{
+    height: 58px;
+    border-color: #000;
+}
+
 .colrow{
    width: 100%;
     justify-content: center;
@@ -422,7 +464,18 @@ mat-form-field{
         }
     }
 }
-
+.topRow{
+    flex-direction: column !important;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+    .row{
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+    }
+}
 .step3 .row3col{
     position: relative;
     .col3row{
@@ -583,4 +636,168 @@ mat-form-field{
     img{
         width: 100%;
     }
+}
+
+
+h6{
+    color:#444;
+}
+label{
+    color:#444;
+}
+
+.step-buttons {
+    display: flex;
+   justify-content: flex-start;
+   align-items: center;
+    width: 100%;
+    margin-top: 25px;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper{
+    display: none !important;
+}
+
+.addCol{
+    flex-wrap: nowrap;
+    margin-top: 25px;
+    input{
+        width: 350px;
+    }
+}
+
+.catRow{
+    gap: 20px;
+    justify-content: space-between;
+    margin-top: 25px;
+    .block{
+        width: calc(50% - 30px);
+        position: relative;
+    }
+.delete{
+    position: absolute;
+    top: 10px;
+    right: 5px;
+}
+
+
+
+    h6{
+        margin-bottom: 25px;
+    }
+}
+
+.dltIcon{
+    position: absolute;
+    top: 10px;right: 5px;
+}
+
+.subcat{
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 10px;
+    justify-content: space-between;
+}
+
+.blockInner{
+    display: flex
+;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+}
+
+.menuItemBlock{
+    margin-top: 25px;
+}
+
+.addittionalRow{
+    justify-content: center;
+    align-items: center;
+    background-color: #F2F3F4;
+    width: unset;
+    flex-direction: row;
+    display: flex;
+    a{
+       color: #181818;
+    border-radius: 6px;
+    text-align: center;
+    padding: 12px 15px;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+
+    line-height: 14px;
+    letter-spacing: -0.001em;
+    border: none;
+    cursor: pointer;
+    min-width: 140px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s all;
+    }
+}
+
+.addRowOuter{
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.inputBox{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+
+    label{
+        position: absolute;
+        right: 10px;
+    }
+
+    input{
+        width: 100% !important;
+    }
+}
+
+.qrblock{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #F3F4F5;
+    margin: 30px 0;
+}
+
+.lastStep p a{
+       font-family: "Poppins", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 130%;
+    letter-spacing: -0.02em;
+    text-decoration: underline;
+    color: #181818;
+}
+
+.lastStep label{
+    color: #9A9A9A;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+font-weight: 400;
+line-height: 18.2px;
+letter-spacing: -0.001em;
+display: flex;
+text-align: left;
+margin-top: 30px;
 }

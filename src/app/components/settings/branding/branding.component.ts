@@ -136,7 +136,6 @@ export class BrandingComponent {
             this.bodySize = value;
             break;
         case 'Main Heading Case':
-            
             this.mainHeadingCase = this.getCase(value);
             break;
         case 'Sub Heading Case':

@@ -1,0 +1,14 @@
+<section class="delete-confirmation">
+    <header class="confirmation-header">
+        <h2 class="confirmation-title">Are you sure you want to delete {{ data.name }}?</h2>
+        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/6ba640d2a6941ec44313343a8bfdb5af3293affd248dbb14ff74fc9ffa217969?placeholderIfAbsent=true&apiKey=e267c502494249909854f49fe1d37e24"
+            alt="" class="close-icon" />
+    </header>
+    <p class="confirmation-message">
+        If you select confirm, this restaurant will be permanently deleted.
+    </p>
+    <footer class="confirmation-actions">
+        <button class="action-button cancel" (click)="onCancel()">Cancel</button>
+        <button class="action-button confirm" (click)="onConfirm()">Yes, delete</button>
+    </footer>
+</section>
