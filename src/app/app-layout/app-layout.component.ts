@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { User } from '../shared/services/user';
 
 @Component({
   selector: 'app-app-layout',
@@ -6,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './app-layout.component.scss'
 })
 export class AppLayoutComponent {
-
+  
 }

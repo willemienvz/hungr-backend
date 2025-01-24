@@ -3,7 +3,7 @@
         <div class="container">
             <div class="row">
                 <h6 class="heading">Add a new restaurant</h6>
-                <a class="btnSecondary" routerLink="/settings/add-new-restaurant">+ Add restaurant</a>
+                <a class="btnSecondary" routerLink="/restaurants/add-new-restaurant">+ Add restaurant</a>
             </div>
         </div>
     </div>
@@ -32,7 +32,7 @@
                             <a (click)="viewRestaurant(restaurant.restaurantID, i)">
                                 <i class="material-icons">visibility</i>
                             </a>
-                            <a routerLink="/settings/edit-restaurant" [queryParams]="{ id: restaurant.restaurantID}">
+                            <a routerLink="/restaurants/edit-restaurant" [queryParams]="{ id: restaurant.restaurantID}">
                                 <i class="material-icons">edit</i>
                             </a>
                             <a (click)="openDialog(restaurant.restaurantID, i, restaurant.restaurantName)">

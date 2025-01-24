@@ -3,6 +3,8 @@ import { AuthService } from '../../shared/services/auth.service';
 import { Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
+import { Menu } from '../../shared/services/menu';
+import { ViewingTime } from '../../shared/services/viewingTime';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,6 +12,11 @@ import { Observable } from 'rxjs';
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
+  averageTime:number = 0;
+  popularTime: string = '';
+
+
+
   userDataID: string = '';
   menus$: Observable<any[]> | undefined;
   restaurant$: Observable<any[]> | undefined;
@@ -32,6 +39,8 @@ export class DashboardComponent implements OnInit {
   mostOrderedCategory: string = '';
   leastOrderedCategory: string = '';
   drinksCategoryOrderChange: number = 0;
+  accountType = localStorage.getItem('accountType');
+  layoutMinimised: boolean = false;
 
   list: any[] = [
     { id: 1, name: 'Restaurant Name', description: 'Mains' },
@@ -48,6 +57,9 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     private firestore: AngularFirestore
   ) {
+    if (this.accountType === 'true'){
+      this.layoutMinimised = true;
+    }
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
         this.userDataID = uid;
@@ -78,6 +90,8 @@ export class DashboardComponent implements OnInit {
         this.viewingTotalPreviousWeek = this.calculateTotalViews(menuData, 14, 7);
         this.viewingTotalLast24Hours = this.calculateTotalViews(menuData, 1);
         this.viewingTotalPrevious24Hours = this.calculateTotalViews(menuData, 2, 1);
+        this.calculateAverageViewingTime(menuData);
+        this.getMostPopularViewingTime(menuData);
       },
       error: (error) => console.error("Error fetching menus:", error),
     });
@@ -442,4 +456,61 @@ export class DashboardComponent implements OnInit {
       ],
     };
   }
+
+  
+  
+  
+  
+    calculateAverageViewingTime(menus: Menu[]):void {
+          let totalViewingTime = 0;
+          let totalEntries = 0;
+  
+          menus.forEach((menu) => {
+            if (menu.viewingTime && Array.isArray(menu.viewingTime)) {
+              menu.viewingTime.forEach((entry: { time: number }) => {
+                totalViewingTime += entry.time;
+                totalEntries++;
+              });
+            }
+          });
+          console.log(totalViewingTime/60000);
+          console.log(totalEntries);
+          this.averageTime = Math.round((totalViewingTime/totalEntries)/ 60000);
+  }
+  
+  getMostPopularViewingTime(menus: Menu[]):void {
+    
+        const viewingTimeMap: { [key: string]: number } = {};
+  
+        menus.forEach((menu) => {
+          if (menu.viewingTime && Array.isArray(menu.viewingTime)) {
+            menu.viewingTime.forEach((view: ViewingTime) => {
+              const key = `${view.day}-${view.hour}`;
+              viewingTimeMap[key] = (viewingTimeMap[key] || 0) + view.time;
+            });
+          }
+        });
+  
+        // Find the most popular day-hour
+        let mostPopularKey = '';
+        let maxTime = 0;
+  
+        for (const key in viewingTimeMap) {
+          if (viewingTimeMap[key] > maxTime) {
+            mostPopularKey = key;
+            maxTime = viewingTimeMap[key];
+          }
+        }
+  
+  
+        // Extract day and hour from the key
+        const [day, hour] = mostPopularKey.split('-').map(Number);
+  
+        // Convert day and hour into a readable format
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const period = hour < 12 ? 'AM' : 'PM';
+        const formattedHour = hour % 12 || 12;
+        this.popularTime = `${daysOfWeek[day]}s, ${formattedHour} ${period}`;
+  }
+  
 }

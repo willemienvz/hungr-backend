@@ -2,41 +2,58 @@
     <div class="coltwothird">
         <div class="block" style=" justify-content: center; align-items: center;display: flex;">
             <div class="innerBlock">
-            <h6 style="text-align: center;">Looking for something specific?</h6>
-            <input type="text" placeholder="Search FAQs" [(ngModel)]="searchTerm" (input)="filterFaqs()">
-            <div class="row">
-                <p class="linkIcon" (click)="showFaqContent(1)">How to upload my logo <i class="material-icons">north_east</i></p>
-                <p class="linkIcon" (click)="showFaqContent(1)">How to add a new menu <i class="material-icons">north_east</i></p>
-                <p class="linkIcon" (click)="showFaqContent(1)">How to create a QR code <i class="material-icons">north_east</i></p>
+                <h6 style="text-align: center;">Looking for something specific?</h6>
+                <div class="rowinput">
+                    <input type="text" placeholder="type your question here" [(ngModel)]="searchTerm"
+                        (input)="filterFaqs()">
+                    <i class="material-icons " (click)="clearSearch()">close</i>
+                </div>
+
+                <div class="row">
+                    <p class="linkIcon" (click)="showFaqContent('How to upload my logo')">How to upload my logo</p>
+                    <p class="linkIcon" (click)="showFaqContent('How to add a new menu')">How to add a new menu </p>
+                    <p class="linkIcon" (click)="showFaqContent('How to create a QR code')">How to create a QR code </p>
+                </div>
             </div>
-        </div>
         </div>
         <div class="block" *ngIf="!selectedFaq">
             <h6>Frequently Asked Questions</h6>
             <div class="faqList">
-                <div class="faq" *ngFor="let faq of filteredFaqs; let i = index" (click)="showFaqContent(i)">
-                    <p>{{ faq.question }}</p>
-                    <i class="material-icons">keyboard_arrow_down</i>
+                <div class="faq" *ngFor="let faq of filteredFaqs; let i = index" (click)="toggleFaq(i)">
+                    <div class="faq-row">
+                        <p>{{ faq.question }}</p>
+                        <i class="material-icons rotate-icon" [class.open]="faq.isOpen">keyboard_arrow_down</i>
+                    </div>
+                    <div class="faq-ans" *ngIf="faq.isOpen">
+                        <p>{{faq.answer}}
+                        </p>
+                    </div>
+
                 </div>
             </div>
         </div>
 
         <div class="block" *ngIf="selectedFaq">
-            <p class="linkIcon" (click)="closeFaqContent()"> <i class="material-symbols-outlined">arrow_back_ios</i>Back</p>
+            <p class="linkIcon" (click)="closeFaqContent()"> <i class="material-symbols-outlined">arrow_back_ios</i>Back
+            </p>
             <div class="content">
                 <h6>How to edit a special</h6>
                 <div class="step">
-                    <img src="../../../../assets/images/faqs/howto.png" alt=""/>
+                    <img src="../../../../assets/images/faqs/howto.png" alt="" />
                     <div class="inner">
                         <p class="headline">Instruction Headline</p>
-                        <p>A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi est incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.</p>
+                        <p>A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi
+                            est incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.
+                        </p>
                     </div>
                 </div>
                 <div class="step">
-                    <img src="../../../../assets/images/faqs/howto.png" alt=""/>
+                    <img src="../../../../assets/images/faqs/howto.png" alt="" />
                     <div class="inner">
                         <p class="headline">Instruction Headline</p>
-                        <p>A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi est incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.</p>
+                        <p>A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi
+                            est incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -51,8 +68,10 @@
                     <p>Need additional assistance? Feel free to contact us directly.</p>
                 </div>
                 <div class="col">
-                    <a href="https://www.hungr.com/help" target="_blank"><i class="material-icons">language</i>www.hungr.com/help</a>
-                    <a href="mailto:email@address.co.za" target="_blank"><i class="material-icons">alternate_email</i>email&#64;address.co.za</a>
+                    <a href="https://www.hungr.com/help" target="_blank"><i
+                            class="material-icons">language</i>www.hungr.com/help</a>
+                    <a href="mailto:email@address.co.za" target="_blank"><i
+                            class="material-icons">alternate_email</i>email&#64;address.co.za</a>
                     <a href="tel:+27123456789" target="_blank"><i class="material-icons">call</i>012 345 6789</a>
                 </div>
             </div>
@@ -60,23 +79,23 @@
 
         <div class="block">
             <div class="row">
-                <h6>Contact Details</h6>
+                <h6>Featured Tutorials</h6>
                 <a routerLink="/help/all-tutorials" class="link">View All tutorials</a>
             </div>
 
             <div class="list">
                 <div class="tut" (click)="openvideoModal()">
-                    <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt=""/>
+                    <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt="" />
                     <p>Tutorial name</p>
                     <i class="material-icons">play_circle</i>
                 </div>
                 <div class="tut" (click)="openvideoModal()">
-                    <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt=""/>
+                    <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt="" />
                     <p>Tutorial name</p>
                     <i class="material-icons">play_circle</i>
                 </div>
                 <div class="tut" (click)="openvideoModal()">
-                    <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt=""/>
+                    <img src="../../../../assets/images/faqs/tutorialthumbnail.png" alt="" />
                     <p>Tutorial name</p>
                     <i class="material-icons">play_circle</i>
                 </div>
@@ -87,8 +106,11 @@
 
 <div class="modal" [class.open]="showvideoModal">
     <div class="modal-content">
-      <span class="close" (click)="closevideoModal()">&times;</span>
-      <h6>Tutorial name</h6>
-      <iframe width="1236" height="695" [src]="videoUrl" title="Sample Videos / Dummy Videos For Demo Use" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <span class="close" (click)="closevideoModal()">&times;</span>
+        <h6>Tutorial name</h6>
+        <iframe width="1236" height="395" [src]="videoUrl" title="Sample Videos / Dummy Videos For Demo Use"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
-  </div>
+</div>

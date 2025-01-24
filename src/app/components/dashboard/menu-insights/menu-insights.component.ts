@@ -31,11 +31,17 @@ export class MenuInsightsComponent {
   chartOptionsMostOrderedItems: any;
   categoryOrderCounts: { [category: string]: number } = {};
 
+  accountType = localStorage.getItem('accountType');
+  layoutMinimised: boolean = false;
+
   constructor(
     public authService: AuthService,
     private router: Router,
     private firestore: AngularFirestore
   ) {
+    if (this.accountType === 'true'){
+      this.layoutMinimised = true;
+    }
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
         this.userDataID = uid;

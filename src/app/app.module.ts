@@ -78,6 +78,9 @@ import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
 import { ConfirmDeleteDialogComponent } from './components/restaurant/confirm-delete-dialog/confirm-delete-dialog.component';
 import { SuccessAddRestaurantDialogComponent } from './components/restaurant/add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
+import { Step3Component } from './components/sign-up/step3/step3.component';
+import {MatTabsModule} from '@angular/material/tabs';
+import { ViewComponent } from './components/restaurant/view/view.component';
 
 @NgModule({
   declarations: [
@@ -130,6 +133,8 @@ import { SuccessAddRestaurantDialogComponent } from './components/restaurant/add
     SalesInsightsComponent,
     ConfirmDeleteDialogComponent,
     SuccessAddRestaurantDialogComponent,
+    Step3Component,
+    ViewComponent,
   ],
   imports: [
     BrowserModule,
@@ -153,6 +158,7 @@ import { SuccessAddRestaurantDialogComponent } from './components/restaurant/add
     NgxColorsModule,
     MatIconModule,
     MatChipsModule,
+    MatTabsModule,
     MatCheckboxModule,
     ToastrModule.forRoot(),
     NgxEchartsModule.forRoot({

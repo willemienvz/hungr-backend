@@ -13,7 +13,7 @@ export class Step2Component {
   showAnnual: boolean = true;
   
   @Output() previous: EventEmitter<void> = new EventEmitter<void>();
-  @Output() complete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() next: EventEmitter<void> = new EventEmitter<void>();
 
 
   constructor(private fb: FormBuilder, private formDataService: FormDataService, private authService: AuthService) {
@@ -42,6 +42,6 @@ export class Step2Component {
   }
   onComplete() {
     const formData = this.step2Form.value;
-    this.complete.emit(formData);
+    this.next.emit(formData);
   }
 }

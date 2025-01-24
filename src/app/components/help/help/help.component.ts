@@ -14,14 +14,13 @@ export class HelpComponent {
   searchTerm: string = '';
 
   faqs = [
-    { question: 'How do I edit a menu?' },
-    { question: 'How do I edit a icon?' },
-    { question: 'How do I edit a list?' },
-    { question: 'How do I edit a list?' },
-    { question: 'How do I edit a icon?' },
-    { question: 'How do I edit a book?' },
-    { question: 'How do I edit a menu?' },
+    { question: 'How to upload my logo?', isOpen: false, answer: 'A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi st incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.' },
+    { question: 'How do I edit an icon?', isOpen: false, answer: 'A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi st incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.' },
+    { question: 'How do I edit a list?', isOpen: false, answer: 'A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi st incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.' },
+    { question: 'How do I edit a book?', isOpen: false, answer: 'A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi st incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.' },
+    { question: 'How do I upload a logo?', isOpen: false, answer: 'A step-by-step explanation. Lorem ipsum dolor sit amet. Non quaerat quod ex numquam commodi st incidunt quia nam maiores ratione ut fuga sint vel iste modi cum molestiae excepturi.' },
   ];
+
   filteredFaqs = this.faqs;
   constructor(private sanitizer: DomSanitizer) {
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('');
@@ -36,10 +35,19 @@ export class HelpComponent {
       this.filteredFaqs = this.faqs;
     }
   }
+toggleFaq(index: number) {
+    this.filteredFaqs.forEach((faq, i) => {
+      if (i === index) {
+        faq.isOpen = !faq.isOpen; 
+      } else {
+        faq.isOpen = false; 
+      }
+    });
+  }
 
-
-  showFaqContent(index:number){
-    this.selectedFaq = true;
+  showFaqContent(stringName:string){
+    this.searchTerm = stringName;
+    this.filterFaqs();
   }
 
   closeFaqContent(){
@@ -54,5 +62,8 @@ export class HelpComponent {
     this.showvideoModal = false;
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('');
   }
-
+  clearSearch(){
+    this.searchTerm = '';
+    this.filterFaqs();
+  }
 }

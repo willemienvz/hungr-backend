@@ -1,5 +1,6 @@
 import { Category } from "./category";
 import { MenuItem } from "./menu-item";
+import { ViewingTime } from "./viewingTime";
 
 export interface Menu {
     id: string;
@@ -13,4 +14,5 @@ export interface Menu {
     categories: Category[];
     items: MenuItem[];
     location:string;
+    viewingTime: ViewingTime[];
  }

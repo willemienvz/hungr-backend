@@ -8,8 +8,9 @@ import * as auth from 'firebase/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { Component } from '@angular/core';
-import { ContentfulService } from './contentful.service';
 import { DataService } from './data.service';
+import { ToastrService } from 'ngx-toastr';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -21,7 +22,7 @@ export class AuthService {
     public router: Router,
     public ngZone: NgZone,
     public dataService: DataService,
-    private contentfulService: ContentfulService,
+     private toastr: ToastrService,
    
   ) {
     /* Saving user data in localstorage when 
@@ -37,6 +38,22 @@ export class AuthService {
       }
     });
   }
+
+   /**
+   * Checks if an email is already registered with Firebase.
+   * @param email The email to check.
+   * @returns A Promise<boolean> indicating whether the email is in use.
+   */
+   async isEmailInUse(email: string): Promise<boolean> {
+    try {
+      const signInMethods = await this.afAuth.fetchSignInMethodsForEmail(email);
+      console.log('a', signInMethods)
+      return signInMethods.length > 0;
+    } catch (error) {
+      console.error('Error checking email:', error);
+      throw new Error('Unable to check email availability at this time.');
+    }
+  }
   // Sign in with email/password
   SignIn(email: string, password: string) {
     return this.afAuth
@@ -49,19 +66,22 @@ export class AuthService {
         });
       })
       .catch((error) => {
-        window.alert(error.message);
+        this.toastr.error('Invalid email and/or password combination.');
       });
   }
   // Sign up with email/password
-  SignUp(email: string, password: string, formDataStep1:any, formDataStep2:any) {
+  SignUp(email: string, password: string, formDataStep1:any, formDataStep2:any,  formDataStep3:any) {
     return this.afAuth
       .createUserWithEmailAndPassword(email, password)
       .then((result) => {
         this.SendVerificationMail();
-        this.SetUserData(result.user, formDataStep1, formDataStep2);
+        result.user.updateProfile({
+          displayName: formDataStep1.firstName
+        });
+        this.SetUserData(result.user, formDataStep1, formDataStep2, formDataStep3);
       })
       .catch((error) => {
-        window.alert(error.message);
+        this.toastr.error(error.message)
       });
   }
 
@@ -114,10 +134,10 @@ export class AuthService {
     return this.afAuth
       .sendPasswordResetEmail(passwordResetEmail)
       .then(() => {
-        window.alert('Password reset email sent, check your inbox.');
+        this.toastr.success('Password reset email sent, check your inbox.')
       })
       .catch((error) => {
-        window.alert(error);
+        this.toastr.error(error)
       });
   }
   // Returns true when user is looged in and email is verified
@@ -128,10 +148,12 @@ export class AuthService {
   /* Setting up user data when sign in with username/password, 
   sign up with username/password and sign in with social auth  
   provider in Firestore database using AngularFirestore + AngularFirestoreDocument service */
-  SetUserData(user: any, formDataStep1:any, formDataStep2:any) {
+  SetUserData(user: any, formDataStep1:any, formDataStep2:any, formDataStep3:any) {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
       `users/${user.uid}`
     );
+    console.log(formDataStep3);
+    
     const userData: User = {
       uid: user.uid,
       firstName: formDataStep1.firstName,
@@ -143,10 +165,10 @@ export class AuthService {
       tipsTutorials:formDataStep2.receiveMarketingInfo,
       userInsights:formDataStep2.receiveMarketingInfo,
       aboutUsDisplayed:false,
-      cardHolderName: formDataStep1.cardname,
-      cardNumber:formDataStep1.cardnumber,
-      cvv: formDataStep1.cvv,
-      expiryDate: formDataStep1.expirydate,
+      cardHolderName: '',
+      cardNumber:'',
+      cvv: 0,
+      expiryDate: '',
       accountType:'admin',
       subscriptionType: formDataStep2.billingOption,
       parentId:'',

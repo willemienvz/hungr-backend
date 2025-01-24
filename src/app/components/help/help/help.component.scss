@@ -24,16 +24,26 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             flex-direction: column;
+
+            h6{
+                color: #444444;
+            }
+
+            .row{
+                margin-top: 5px;
+                justify-content: center;
+                gap: 35px;
+            }
         }
 
         .linkIcon{
             color: #444444;
             text-decoration: underline;
             align-items: flex-start;
-            font-weight: 600;
-            font-size: 13px;
+            font-weight: 400;
+            font-size: 11px;
         }
     }
 
@@ -90,16 +100,43 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        margin-top: 25px;
+        margin-top: 20px;
         .faq{
             display: flex;
             justify-content: space-between;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
             border: 1px solid #E4E4EA;
             padding: 13px 25px;
+            border-radius: 5px;
+            gap: 15px;
             cursor: pointer;
+
+            .faq-row{
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-direction: row;
+            }
+
+            .faq-ans{
+                width: 100%;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                flex-direction: row;
+                p{
+font-size: 13px;
+font-weight: 400;
+line-height: 18.2px;
+color: #444444;
+letter-spacing: -0.001em;
+
+                }
+            }
             p{
+                color: #444444;
                 font-weight: 600;
             }
         }
@@ -246,5 +283,33 @@ iframe{
     display: flex; 
     justify-content: center;
     align-items: center;
-    margin-top: 50px;
+  }
+
+
+  .block{
+    h6{
+        color: #444444;
+    }
+  }
+
+  .rotate-icon {
+    transition: transform 0.3s ease;
+  
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+
+  .rowinput{
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    i{
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
+    }
   }

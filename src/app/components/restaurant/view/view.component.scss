@@ -1,0 +1,122 @@
+.delete-confirmation {
+    border-radius: 10px;
+    background-color: #fff;
+    display: flex;
+    max-width: 700px;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: Poppins, sans-serif;
+    text-align: center;
+    padding: 23px 25px;
+    border: 1px solid #dedede;
+
+    h5{
+font-family: 'Poppins';
+font-size: 18px;
+font-weight: 700;
+line-height: 22.5px;
+letter-spacing: -0.001em;
+text-align: left;
+    
+    }
+    .row{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .col{
+        width: calc(50% - 15px);
+        
+        .label{
+            font-family: 'Poppins';
+font-size: 16px;
+font-weight: 700;
+line-height: 19.2px;
+letter-spacing: -0.001em;
+text-align: left;
+color: #2E3646;
+margin: 19px  0 8px 0;
+flex: 1;
+        }
+
+        .answer{
+            background-color: #F3F4F5;
+            width: 100%;
+            border-radius: 5px;
+            padding: 17px  30px;
+            flex: 0;
+font-family: 'Poppins';
+font-size: 15px;
+font-weight: 400;
+line-height: 20.25px;
+letter-spacing: -0.001em;
+text-align: left;
+
+        }
+    }
+  }
+
+  .confirmation-header {
+    display: flex;
+    gap: 41px;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .confirmation-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2e3646;
+    line-height: 1;
+    letter-spacing: -0.02px;
+    margin: 0;
+  }
+
+  .close-icon {
+    width: 15px;
+    height: 15px;
+    object-fit: contain;
+  }
+
+  .confirmation-message {
+    color: #2e3646;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 20px;
+    margin: 20px auto 0;
+    max-width: 283px;
+  }
+
+  .confirmation-actions {
+    display: flex;
+    margin-top: 28px;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+  .action-button {
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 10px 30px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .cancel {
+    background-color: #e4e4e4;
+    color: #181818;
+  }
+
+  .confirm {
+    background-color: #3ce1af;
+    color: #181818;
+  }

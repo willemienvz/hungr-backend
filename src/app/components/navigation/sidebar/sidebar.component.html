@@ -6,14 +6,18 @@
                 class="material-icons">content_paste_search</i>Menu insights</a>
         <a routerLink="/visitor-insights" routerLinkActive="activeMenu"><i class="material-icons">group</i>Visitor
             Insights</a>
+        @if (!accountType1) {
         <a routerLink="/sales-insights" routerLinkActive="activeMenu"><i class="material-icons">query_stats</i>Sales
             Insights</a>
+        }
+
     </div>
     <div class="subsidebarcontainer">
         <p class="heading">My Restaurants</p>
-        <a routerLink="/restaurants" routerLinkActive="activeMenu"><i
-                class="material-icons">storefront</i>Restaurants</a>
-        <a routerLink="/menus/dashboard" routerLinkActive="activeMenu"><i class="material-icons">restaurant</i>My
+        <a routerLink="/restaurants" routerLinkActive="activeMenu" [routerLinkActiveOptions]="{ exact: false }"
+            [class.activeMenu]="isRestaurantRouteActive()"><i class="material-icons">storefront</i>Restaurants</a>
+        <a routerLink="/menus" routerLinkActive="activeMenu" [routerLinkActiveOptions]="{ exact: false }"
+            [class.activeMenu]="isMenusRouteActive()"><i class="material-icons">restaurant</i>My
             Menus</a>
         <a routerLink="/menus/qr-codes" routerLinkActive="activeMenu"><i class="material-icons">qr_code_scanner</i>QR
             codes</a>

@@ -1,0 +1,71 @@
+<div class="form-container">
+    <h1>Sign Up</h1>
+    <h6>Billing Information</h6>
+    <form [formGroup]="step3Form">
+        <div class="formGroup"
+            [ngClass]="{'has-error': step3Form.get('cardHolderName')?.invalid && (step3Form.get('cardHolderName')?.touched || step3Form.get('cardHolderName')?.dirty)}">
+            <label>Card holder name</label>
+            <div *ngIf="step3Form.get('cardHolderName')?.hasError('required') && (step3Form.get('cardHolderName')?.touched || step3Form.get('cardHolderName')?.dirty)"
+                class="error-message">
+                Card holder name is required.
+            </div>
+            <input type="text" class="formControl" placeholder="JS Smith" formControlName="cardHolderName" />
+        </div>
+
+        <div class="formGroup"
+            [ngClass]="{'has-error': step3Form.get('cardNumber')?.invalid && (step3Form.get('cardNumber')?.touched || step3Form.get('cardNumber')?.dirty)}">
+            <label>Card number</label>
+            <div *ngIf="step3Form.get('cardNumber')?.hasError('required') && (step3Form.get('cardNumber')?.touched || step3Form.get('cardNumber')?.dirty)"
+                class="error-message">
+                Card number is required.
+            </div>
+            <div *ngIf="step3Form.get('cardNumber')?.hasError('pattern') && (step3Form.get('cardNumber')?.touched || step3Form.get('cardNumber')?.dirty)"
+                class="error-message">
+                Enter a valid card number.
+            </div>
+            <input type="text" class="formControl" placeholder="xxxx xxxx xxxx xxxx" formControlName="cardNumber" />
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="formGroup"
+                    [ngClass]="{'has-error': step3Form.get('cvv')?.invalid && (step3Form.get('cvv')?.touched || step3Form.get('cvv')?.dirty)}">
+                    <label>CVV</label>
+                    <div *ngIf="step3Form.get('cvv')?.hasError('required') && (step3Form.get('cvv')?.touched || step3Form.get('cvv')?.dirty)"
+                        class="error-message">
+                        CVV is required.
+                    </div>
+                    <div *ngIf="step3Form.get('cvv')?.hasError('pattern') && (step3Form.get('cvv')?.touched || step3Form.get('cvv')?.dirty)"
+                        class="error-message">
+                        Enter a valid CVV.
+                    </div>
+                    <input type="text" class="formControl" placeholder="xxx" formControlName="cvv" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="formGroup"
+                    [ngClass]="{'has-error': step3Form.get('expiryDate')?.invalid && (step3Form.get('expiryDate')?.touched || step3Form.get('expiryDate')?.dirty)}">
+                    <label>Expiry Date</label>
+                    <div *ngIf="step3Form.get('expiryDate')?.hasError('required') && (step3Form.get('expiryDate')?.touched || step3Form.get('expiryDate')?.dirty)"
+                        class="error-message">
+                        Expiry date is required.
+                    </div>
+                    <div *ngIf="step3Form.get('expiryDate')?.hasError('pattern') && (step3Form.get('expiryDate')?.touched || step3Form.get('expiryDate')?.dirty)"
+                        class="error-message">
+                        Enter a valid expiry date (mm/yy).
+                    </div>
+                    <input type="text" class="formControl" placeholder="mm/yy" formControlName="expiryDate" />
+                </div>
+            </div>
+        </div>
+
+        <button (click)="onFinish()" class="btnPrimary" [disabled]="step3Form.invalid">Finish Sign Up</button>
+        <button (click)="onSkip()" class="btnSecondary">Skip for Now</button>
+
+        <div class="redirectToLogin">
+            <span class="redirect mainLink" routerLink="/sign-in">
+                Already have an account? Log in
+            </span>
+        </div>
+    </form>
+</div>

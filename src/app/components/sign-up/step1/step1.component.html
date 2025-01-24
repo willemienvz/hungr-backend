@@ -50,6 +50,9 @@
                                     class="error-message">
                                     Enter a valid email address.
                                 </div>
+                                <div *ngIf="emailInUse" class="error-message">
+                                    This email is already in use.
+                                </div>
                             </div>
                             <input type="email" class="formControl" placeholder="email@address.co.za"
                                 formControlName="userEmail" />
@@ -63,11 +66,14 @@
                                     class="error-message">
                                     Cellphone number is required.
                                 </div>
+                                <div *ngIf="step1Form.get('cellphone')?.hasError('invalidCellphone') && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)"
+                                    class="error-message">
+                                    Enter a valid cellphone number (e.g., +27 12 345 6789).
+                                </div>
                             </div>
                             <input type="tel" class="formControl" placeholder="+27 (0)12 345 6789"
                                 formControlName="cellphone" />
                         </div>
-
                     </div>
                 </div>
                 <div class="col">

@@ -26,7 +26,7 @@
     }
 
     h1{
-        color: #444444;
+        color: #2E3646;
     }
 
     form {
@@ -42,9 +42,9 @@
             flex-direction: row;
             justify-content: center;
             align-items: flex-start;
-            gap: 56px;
+            gap: 15px;
             .col {
-                width: calc(50% - 28px);
+                width: calc(50% - 15px);
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
@@ -75,41 +75,7 @@
                     flex-direction: column;
                    
 
-                    .infobox {
-                        width: 100%;
-                        border-radius: 5px;
-                        background: #F8F9FB;
-                        padding: 13px 36px;
-                        display: flex;
-                        flex-direction: column;
-                        gap: 10px;
-
-                        
-                        .font-small-medium{
-                            text-align: left;
-                            color: #5F6D7E;
-
-                        }
-                        
-                        .inner-row {
-                            width: 100%;
-                            display: flex;
-                            flex-wrap: wrap;
-                            flex-direction: row;
-                            p {
-                                width: 50%;
-                                font-family: 'Poppins', sans-serif;
-                                font-size: 9px;
-                                font-weight: 500;
-                                line-height: 14px;
-                                letter-spacing: -0.001em;
-                                text-align: left;
-                            }
-                           
-                            
-    
-                        }
-                    }
+                   
 
                  
                 }
@@ -181,4 +147,39 @@
 
   .valid  {
     color: #3CE1AF;
+}
+
+.infobox {
+    width: 100%;
+    border-radius: 5px;
+    padding: 13px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    
+    .font-small-medium{
+        text-align: left;
+        color: #5F6D7E;
+
+    }
+    
+    .inner-row {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        p {
+            width: 50%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 9px;
+            font-weight: 500;
+            line-height: 14px;
+            letter-spacing: -0.001em;
+            text-align: left;
+        }
+       
+        
+
+    }
 }

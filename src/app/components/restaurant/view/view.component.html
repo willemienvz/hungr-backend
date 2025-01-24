@@ -1,0 +1,25 @@
+<section class="delete-confirmation">
+    <div class="row">
+        <div class="col">
+            <h5>{{restuarant.restaurantName}}</h5>
+            <p class="label">Address</p>
+            <p class="answer">{{restuarant.streetAdress}}</p>
+            <p class="label">Assigned Users</p>
+            <p class="answer">{{owner}}</p>
+        </div>
+        <div class="col">
+            <div class="row">
+                <p class="label">Number of tables</p>
+                <p class="answer">{{restuarant.numberTables}}</p>
+            </div>
+            <p class="label">Assigned Menu</p>
+            <p class="answer">{{menuName}}</p>
+        </div>
+    </div>
+
+    <footer class="confirmation-actions">
+        <button class="action-button cancel" (click)="onCancel()">Close</button>
+        <button class="action-button confirm" routerLink="/restaurants/edit-restaurant"
+            [queryParams]="{ id: restuarant.restaurantID}" (click)="onCancel()">Edit</button>
+    </footer>
+</section>

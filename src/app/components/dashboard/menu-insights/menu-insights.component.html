@@ -1,3 +1,26 @@
+@if (layoutMinimised) {
+<div class="inner-page">
+    <div class="row">
+        <app-stats-overview-block heading="Total Menu Views" tooltiptext="Tooltip Text" timeText="Last 7 days"
+            [stat]="viewingTotalCurrentWeek.toString()"
+            [movement]="getWeeklyDifferenceMessage()"></app-stats-overview-block>
+        <app-stats-overview-block heading="New views" tooltiptext="Tooltip Text" timeText="Last 7 days"
+            [stat]="viewingTotalLast24Hours.toString()"
+            [movement]="getDailyDifferenceMessage()"></app-stats-overview-block>
+
+        <app-stats-overview-block heading="Top categories" tooltiptext="Tooltip Text" timeText="Last 7 days"
+            [stat]="mostOrderedCategory" [movement]="" textSize="S"></app-stats-overview-block>
+
+    </div>
+    <div class="row">
+        <div class="block">
+            <h6 class="heading">Daily Menu Visits</h6>
+            <div echarts [options]="chartOptions" class="echart"></div>
+        </div>
+    </div>
+</div>
+}@else {
+
 <div class="inner-page">
     <div class="row">
         <app-stats-overview-block heading="Total Menu Views" tooltiptext="Tooltip Text" timeText="Last 7 days"
@@ -41,3 +64,4 @@
         </div>
     </div>
 </div>
+}

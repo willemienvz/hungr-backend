@@ -3,6 +3,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
 import {MatDialog} from '@angular/material/dialog';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
+import { ViewComponent } from './view/view.component';
 @Component({
   selector: 'app-restaurant',
   templateUrl: './restaurant.component.html',
@@ -72,6 +73,16 @@ export class RestaurantComponent {
 
   
   viewRestaurant(id:string, index: number){
-    //TODO View and edit and test delete + popup
+    const dialogRef = this.dialog.open(ViewComponent, {
+      width: '700px',
+      data: {id: id}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        
+      } else {
+      }
+    });
   }
 }
