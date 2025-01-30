@@ -3,6 +3,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { finalize } from 'rxjs';
 import { Branding } from '../../../shared/services/branding';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-branding',
@@ -57,7 +58,7 @@ export class BrandingComponent {
   buttonCase: string = 'uppercase';
   buttonSecondaryCase: string = 'uppercase';
 
-  constructor(private storage: AngularFireStorage, private firestore: AngularFirestore) {}
+  constructor(private storage: AngularFireStorage, private firestore: AngularFirestore, private toastr: ToastrService) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user')!);
@@ -156,9 +157,12 @@ export class BrandingComponent {
   }
 
   getCase(value:string){
+    if (value === 'uppercase') return 'uppercase';
     if (value === 'ABC') return 'uppercase';
+    if (value === 'lowercase') return 'lowercase';
     if (value === 'abc') return 'lowercase';
     if (value === 'Abc') return 'capitalize';
+    if (value === 'capitalize') return 'capitalize';
     return '';
   }
 
@@ -280,6 +284,7 @@ export class BrandingComponent {
     };
   }
   loadBrandingSettings(brandingData: any): void {
+    console.log(brandingData);
     this.backgroundColor = brandingData?.backgroundColor ?? '';
     this.mainHeadingColor = brandingData?.mainHeadingColor ?? '';
     this.subHeadingColor = brandingData?.subHeadingColor ?? '';
@@ -304,30 +309,48 @@ export class BrandingComponent {
     this.imageUrl = brandingData?.imageUrl ?? null;
   }
   updateBrandingDetails(): void {
+    this.isSaving = true;
     const brandingDetails = this.getBrandingSettings();
-  
+  console.log(brandingDetails);
     if (this.lastSavedDocId) {
       this.firestore.collection('branding').doc(this.lastSavedDocId).update(brandingDetails)
-        .then(() => console.log('Branding details updated successfully with document ID'))
-        .catch(err => console.error('Error updating branding details:', err));
+        .then(() => {
+          this.isSaving = false;
+          this.toastr.success("Branding successfully updated");
+        })
+        .catch(err =>  {
+          this.toastr.error('An error occurred, please try again later or contact admin');
+          this.isSaving = false;
+        });
     } else {
       const brandingRef = this.firestore.collection('branding', ref => ref.where('parentID', '==', this.OwnerID));
       brandingRef.get().toPromise().then(querySnapshot => {
         if (!querySnapshot || querySnapshot.empty) {
           this.firestore.collection('branding').add(brandingDetails)
             .then(docRef => {
-              console.log('New branding document created with ID:', docRef.id);
+              this.toastr.success("Branding successfully updated");
+              this.isSaving = false;
               this.lastSavedDocId = docRef.id; 
             })
-            .catch(err => console.error('Error creating new branding document:', err));
+            .catch(err => {
+              this.toastr.error('An error occurred, please try again later or contact admin');
+              this.isSaving = false;
+            });
         } else {
           this.lastSavedDocId = querySnapshot.docs[0].id;
           this.firestore.collection('branding').doc(this.lastSavedDocId).update(brandingDetails)
-            .then(() => console.log('Branding details updated in existing Firestore document'))
-            .catch(err => console.error('Error updating existing branding document:', err));
+            .then(() =>{
+              this.toastr.success("Branding successfully updated");
+              this.isSaving = false;
+            }
+            )
+            .catch(err => {
+              this.toastr.error('An error occurred, please try again later or contact admin');
+              this.isSaving = false;
+            });
         }
       }).catch(err => {
-        console.error('Error fetching existing branding data:', err);
+        this.toastr.error('Error fetching existing branding data');
       });
     }
   }

@@ -27,8 +27,26 @@
 }
 
 
-.settingspage h6{
-    margin-bottom: 25px;
+h6{
+font-family: 'Poppins';
+font-size: 18px;
+font-weight: 700;
+line-height: 22.5px;
+letter-spacing: -0.001em;
+text-align: left;
+color: #444444;
+
+}
+
+.subheading{
+font-family: 'Poppins';
+font-size: 15px;
+font-weight: 600;
+line-height: 20.25px;
+letter-spacing: -0.001em;
+text-align: left;
+color: #444444;
+margin: 0 0 11px 0;
 }
 
 .error-message{
@@ -74,7 +92,12 @@
     gap: 10px;
     justify-content: space-between;
 }
-
+.label{
+    display: flex;
+    flex-direction: row;
+    font-weight: 400;
+    align-items: center;
+}
 .rowToggle{
     display: flex;
 
@@ -222,7 +245,7 @@
 }
 
 .selectField{
-    border: 1px solid #DEDEDE;
+    border: 1px solid #9A9A9A;
     padding: 0 10px;
     background-color: white;
     border-radius: 2px;
@@ -276,6 +299,13 @@ width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+
+    .blockPreview{
+    gap: 20px;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    }
 }
 .buttonRos{
     display: flex;
@@ -283,7 +313,6 @@ width: 100%;
     justify-content: space-between;
     align-items: flex-start;
     gap:15px;
-    margin-top: 15px;
     .col{
         width: calc(50% - 15px);
         display: flex;
@@ -298,6 +327,7 @@ font-weight: 400;
 line-height: 20.25px;
 letter-spacing: -0.001em;
 text-align: left;
+color: #9A9A9A;
 
         }
 
@@ -355,11 +385,6 @@ text-align: left;
 }
 
 .preview{
-    background-image: url('../../../../assets/images/branding/phone.png');
-    background-position: center;
-    background-size: contain;
-    height: 100%;
-    background-repeat: no-repeat;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -368,6 +393,17 @@ text-align: left;
     max-width: 90%;
     margin: auto;
     gap: 20px;
+    position: relative;
+    width: 250px;
+    height: 512px;
+    border-radius: 50px;
+
+    .previewImg{
+        width: 250px;
+        height: 512px;
+        position: absolute;
+        top: 0px;
+    }
 
     p{
         text-align: center;
@@ -378,6 +414,8 @@ text-align: left;
         padding: 12px 38px;
         border-radius: 6px;
         min-width: 120px;
+        width: 80%;
+        text-align: center;
     }
 }
 
@@ -422,8 +460,8 @@ text-align: left;
 .sidebar{
     width: 25%;
     position: fixed;
-    height: 100%;
-    top: 0;
+    height: calc(100% - 130px);
+    top: 110px;
     bottom: 0;
     right: 0;
 }
@@ -471,6 +509,33 @@ text-align: left;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    width: 265px;
+    border-radius: 5px;
+    padding: 30px;
+    h1{
+        text-align: left;
+    }
+    h2{
+        text-align: left;
+    }
+    p{
+        text-align: left;
+    }
+}
+
+::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-line-ripple::before{
+    border: none !important;
+}
+
+::ng-deep .colorPicker .mat-mdc-form-field{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+::ng-deep .mat-mdc-form-field-infix{
+    width: auto !important;
 }

@@ -6,12 +6,15 @@
                 <p>Please upload your logo.</p>
                 <input class="btnTertiary" type="file" (change)="onFileSelected($event)"
                     style="font-weight: 500; text-transform: capitalize;">
-                <button (click)="onUpload()" class="btnSecondary">Upload</button>
 
-                <div *ngIf="imageUrl" class="imagePreview">
-                    <i *ngIf="imageUrl" class="material-icons closeBtn" (click)="removeImg()">close</i>
-                    <img [src]="imageUrl" alt="Uploaded logo">
+                <div class="row" style="margin-top: 20px;">
+                    <button (click)="onUpload()" class="btnSecondary">Upload</button>
+                    <div *ngIf="imageUrl" class="imagePreview">
+                        <i *ngIf="imageUrl" class="material-icons closeBtn" (click)="removeImg()">close</i>
+                        <img [src]="imageUrl" alt="Uploaded logo">
+                    </div>
                 </div>
+
             </div>
 
             <div class="block">
@@ -46,7 +49,7 @@
                             <h6 class="heading">Button Styles</h6>
                         </div>
                         <div class="row">
-                            <p style="font-weight: 600;">Primary Button</p>
+                            <p class="subheading">Primary Button</p>
                         </div>
 
                         <!-- Primary Settings -->
@@ -61,7 +64,7 @@
                                         </mat-option>
                                     </mat-select>
                                 </div>
-                                <label>Letter Case</label>
+                                <label>Letter Case <p>Debug: {{ buttonCase }}</p></label>
                                 <div class="selectField">
                                     <mat-select [(value)]="buttonCase"
                                         (selectionChange)="applyChanges('Button Case',$event.value)">
@@ -170,12 +173,12 @@
                             <h6 class="heading">Text Styles</h6>
                         </div>
                         <div class="conTextHold">
-                            <div class="colText">
+                            <div class="colText" style="flex: 1;">
                                 <div class="row">
                                     <p style="font-weight: 600;">Main Headings</p>
                                 </div>
                                 <div class="row">
-                                    <label>Typeface</label>
+                                    <label class="label">Typeface</label>
                                     <div class="selectField">
                                         <mat-select [(value)]="mainHeadingTypeface"
                                             (selectionChange)="applyChanges('Main Heading Typeface',$event.value)">
@@ -186,7 +189,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <label>Letter Case</label>
+                                    <label class="label">Letter Case</label>
                                     <div class="selectField">
                                         <mat-select [(value)]="mainHeadingCase"
                                             (selectionChange)="applyChanges('Main Heading Case',$event.value)">
@@ -198,7 +201,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <label>Colour</label>
+                                    <label class="label">Colour</label>
                                     <div class="colorPicker">
                                         <ngx-colors ngx-colors-trigger [(ngModel)]="mainHeadingColor"
                                             (ngModelChange)="applyChanges('Main Heading Color',$event)"></ngx-colors>
@@ -211,7 +214,7 @@
                                     <p style="font-weight: 600;">Sub-Headings Style</p>
                                 </div>
                                 <div class="row">
-                                    <label>Typeface</label>
+                                    <label class="label">Typeface</label>
                                     <div class="selectField">
                                         <mat-select [(value)]="subHeadingTypeface"
                                             (selectionChange)="applyChanges('Sub Heading Typeface',$event.value)">
@@ -222,7 +225,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <label>Letter Case</label>
+                                    <label class="label">Letter Case</label>
                                     <div class="selectField">
                                         <mat-select [(value)]="subHeadingCase"
                                             (selectionChange)="applyChanges('Sub Heading Case',$event.value)">
@@ -234,7 +237,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <label>Colour</label>
+                                    <label class="label">Colour</label>
                                     <div class="colorPicker">
                                         <ngx-colors ngx-colors-trigger [(ngModel)]="subHeadingColor"
                                             (ngModelChange)="applyChanges('Main Heading Color',$event)"></ngx-colors>
@@ -247,7 +250,7 @@
                                     <p style="font-weight: 600;">Body</p>
                                 </div>
                                 <div class="row">
-                                    <label>Typeface</label>
+                                    <label class="label">Typeface</label>
                                     <div class="selectField">
                                         <mat-select [(value)]="bodyTypeface"
                                             (selectionChange)="applyChanges('Body Typeface',$event.value)">
@@ -258,7 +261,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <label>Letter Case</label>
+                                    <label class="label">Letter Case</label>
                                     <div class="selectField">
                                         <mat-select [(value)]="bodyCase"
                                             (selectionChange)="applyChanges('Body Case',$event.value)">
@@ -270,7 +273,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <label>Colour</label>
+                                    <label class="label">Colour</label>
                                     <div class="colorPicker">
                                         <ngx-colors ngx-colors-trigger [(ngModel)]="bodyColor"
                                             (ngModelChange)="applyChanges('Body Color',$event)"></ngx-colors>
@@ -310,11 +313,12 @@
 
     <div class="sidebar block">
         <div class="outerLive">
-            <div class="block" style="height: 100%;">
+            <div class="blockPreview" style="height: 100%;">
                 <div class="row">
-                    <h6 class="heading">Real-time Preview</h6>
+                    <h6 class="heading" style="margin-bottom: 0;">Real-time Preview</h6>
                 </div>
                 <div class="preview" [ngStyle]="{'background-color': backgroundColor}">
+                    <img class="previewImg" src="../../../../assets/images/branding/phone1.png" />
                     <div *ngIf="imageUrl" class="imagePreviewSmall">
 
                         <img [src]="imageUrl" alt="Uploaded logo">

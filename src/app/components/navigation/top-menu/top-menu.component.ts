@@ -4,6 +4,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { User } from '../../../shared/services/user';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
+import { Notification } from '../../../shared/services/notification';
+import { NotificationsService } from '../../../shared/services/notifications.service';
 
 @Component({
   selector: 'app-top-menu',
@@ -13,9 +15,11 @@ import { filter } from 'rxjs';
 export class TopMenuComponent implements OnInit{
   userProfile: any;
   pageTitle: string = 'Overview Dashboard';
+  notifications: Notification[] = [];
 
-  constructor(public authService: AuthService,private firestore: AngularFirestore,private router: Router, private activatedRoute: ActivatedRoute) {
+  constructor(public authService: AuthService,private firestore: AngularFirestore,private router: Router, private activatedRoute: ActivatedRoute, private notificationService: NotificationsService) {
     this.fetchUsers();
+    this.fetchNotifications();
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.isProfileExpanded = false;
@@ -49,6 +53,16 @@ export class TopMenuComponent implements OnInit{
       .subscribe(result => {
         this.userProfile = result[0];
       });
+    
+  }
+
+  private fetchNotifications() {
+    const user = JSON.parse(localStorage.getItem('user')!);
+      this.firestore.collection<Notification>('notification', ref => ref.where('ownerID', '==', user.uid))
+      .valueChanges()
+      .subscribe(result => {
+        this.notifications = result;
+      });
   }
 
   toggleSearchBar() {
@@ -58,11 +72,19 @@ export class TopMenuComponent implements OnInit{
   toggleProfile() {
     this.isNotificationsExpanded = false;
     this.isProfileExpanded = !this.isProfileExpanded;
+
   }
 
   toggleNotifications() {
     this.isProfileExpanded = false;
     this.isNotificationsExpanded = !this.isNotificationsExpanded;
+    if (this.isNotificationsExpanded){
+      this.fetchNotifications();
+    }else{
+      this.notificationService.markAllAsUnread();
+    }
+    
+   
   }
 
   getPageTitle(route: ActivatedRoute): string {
@@ -75,5 +97,36 @@ export class TopMenuComponent implements OnInit{
       child = child.firstChild;
     }
     return 'Overview Dashboard';
+  }
+
+  calcTimeago(timestamp: string): string {
+    const dateThen = new Date(parseInt(timestamp.toString(), 10));
+    const dateNow = new Date();
+    const diffInMs = dateNow.getTime() - dateThen.getTime();
+    const diffInSeconds = Math.floor(diffInMs / 1000); 
+  
+    const seconds = diffInSeconds;
+    const minutes = Math.floor(diffInSeconds / 60);
+    const hours = Math.floor(diffInSeconds / 3600);
+    const days = Math.floor(diffInSeconds / 86400);
+    const weeks = Math.floor(diffInSeconds / 604800);
+    const months = Math.floor(diffInSeconds / 2592000); 
+    const years = Math.floor(diffInSeconds / 31536000); 
+  
+    if (seconds < 60) {
+      return `${seconds} seconds ago`;
+    } else if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    } else if (hours < 24) {
+      return `${hours} hours ago`;
+    } else if (days < 7) {
+      return `${days} days ago`;
+    } else if (weeks < 4) {
+      return `${weeks} weeks ago`;
+    } else if (months < 12) {
+      return `${months} months ago`;
+    } else {
+      return `${years} years ago`;
+    }
   }
 }

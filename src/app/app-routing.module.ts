@@ -27,6 +27,7 @@ import { RestaurantComponent } from './components/restaurant/restaurant.componen
 import { VisitorDashboardComponent } from './components/dashboard/visitor-dashboard/visitor-dashboard.component';
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
+import { ResetSuccessComponent } from './components/forgot-password/reset-success/reset-success.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -35,6 +36,8 @@ const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'confirm-user', component: ConfirmUserComponent },
   { path: 'verify-email-address', component: VerifyEmailComponent },
+  { path: 'password-reset-success', component: ResetSuccessComponent },
+
   {
     path: '',
     component: AppLayoutComponent,

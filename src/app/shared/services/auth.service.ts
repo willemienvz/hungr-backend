@@ -132,7 +132,9 @@ export class AuthService {
   // Reset Forggot password
   ForgotPassword(passwordResetEmail: string) {
     return this.afAuth
-      .sendPasswordResetEmail(passwordResetEmail)
+      .sendPasswordResetEmail(passwordResetEmail,  {
+        url: 'http://localhost:4200/password-reset-success' 
+      })
       .then(() => {
         this.toastr.success('Password reset email sent, check your inbox.')
       })

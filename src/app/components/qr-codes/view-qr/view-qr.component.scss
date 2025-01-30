@@ -4,20 +4,24 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        margin-bottom: 25px;
 
         .col{
-            width: 50%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            gap: 30px;
-            
+            justify-content: center;
+            gap: 10px;
+
+            p{
+                margin: 0;
+            }
+
+            &:last-of-type{
+                flex: 1;
+            }
         }
     }
    
     h3{
-        margin-bottom: 23px;
         color: #2E3646;
         text-align: left;
     }
@@ -49,4 +53,13 @@
 
 .error-message{
     color: #FF0000 !important;
+}
+
+.popup-content{
+    width: 490px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    padding-bottom: 0;
 }

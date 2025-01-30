@@ -81,6 +81,7 @@ import { SuccessAddRestaurantDialogComponent } from './components/restaurant/add
 import { Step3Component } from './components/sign-up/step3/step3.component';
 import {MatTabsModule} from '@angular/material/tabs';
 import { ViewComponent } from './components/restaurant/view/view.component';
+import { ResetSuccessComponent } from './components/forgot-password/reset-success/reset-success.component';
 
 @NgModule({
   declarations: [
@@ -135,6 +136,7 @@ import { ViewComponent } from './components/restaurant/view/view.component';
     SuccessAddRestaurantDialogComponent,
     Step3Component,
     ViewComponent,
+    ResetSuccessComponent,
   ],
   imports: [
     BrowserModule,

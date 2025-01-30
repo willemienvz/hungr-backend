@@ -470,6 +470,16 @@ mat-select{
   line-height: 38px;
   border-radius: 5px;
   --mdc-outlined-text-field-outline-color: transparent;
+
+
+}
+
+.mat-mdc-select-value-text{
+  font-family: 'Poppins';
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20.25px;
+  letter-spacing: -0.001em;
 }
 .mat-mdc-select-panel {
   margin-left: -6px;

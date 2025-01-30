@@ -4,7 +4,7 @@
         <h1>{{pageTitle}} </h1>
     </div>
     <div class="inner">
-        <a href="">Download Full Report</a>
+
         <div class="search-bar">
             <input type="text" placeholder="Type your question or term here..." id="searchInput"
                 *ngIf="isSearchBarExpanded">
@@ -17,24 +17,27 @@
 </nav>
 <nav class="profiledd" *ngIf="isProfileExpanded">
     <h6>{{userProfile.firstName}} {{userProfile.Surname }} {{ !userProfile.ParentID ? ' - Admin' : '' }}</h6>
-    <a>Edit profile</a>
-    <a>Add a user</a>
-    <a>Manage permissions</a>
+    <a routerLink="/settings/general">Edit profile</a>
+    <a routerLink="/manage-users">Add a user</a>
     <a (click)="authService.SignOut()">Log out</a>
 </nav>
 <nav class="profiledd" *ngIf="isNotificationsExpanded">
     <h6>Notifications </h6>
-    <p class="notificationSubtext">Last 7 days</p>
-    <div class="row">
-        <p><span>Name</span>activated their profile</p>
-        <p class="smalltext">2h</p>
+    <div *ngIf="notifications && notifications.length > 0; else noNotifications">
+        @for (item of notifications; track $index) {
+        <div class="row">
+            <div class="leftSide">
+                @if (!item.read) {
+                <div class="redDot"></div>
+                }
+                <p> {{ item.text }}</p>
+            </div>
+
+            <p class="smalltext">{{calcTimeago(item.timestamp)}}</p>
+        </div>
+        }
     </div>
-    <div class="row">
-        <p><span>Name</span>activated their profile</p>
-        <p class="smalltext">2h</p>
-    </div>
-    <div class="row">
-        <p><span>Name</span>activated their profile</p>
-        <p class="smalltext">2h</p>
-    </div>
+    <ng-template #noNotifications>
+        <p>No notifications</p>
+    </ng-template>
 </nav>

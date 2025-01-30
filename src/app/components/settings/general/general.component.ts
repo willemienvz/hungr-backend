@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { User } from '../../../shared/services/user';
 import { Router } from '@angular/router';
+import { NotificationsService } from '../../../shared/services/notifications.service';
 
 @Component({
   selector: 'app-general',
@@ -26,7 +27,7 @@ export class GeneralComponent {
   userDataID:string = '';
   isSaving: boolean = false; 
   userData$!: Observable<any>;
-  constructor( private router: Router,public authService: AuthService, private formBuilder: FormBuilder,private firestore: AngularFirestore) {
+  constructor( private router: Router,public authService: AuthService, private formBuilder: FormBuilder,private firestore: AngularFirestore, private notificationService: NotificationsService) {
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
         console.log(uid);
@@ -103,6 +104,7 @@ export class GeneralComponent {
     this.firestore.doc(`users/${this.currentUserData.uid}`).update(userToSave)
       .then(() => {
         this.isSaving = false;
+        this.notificationService.addNotification('Your profile was updated');
       })
       .catch((error) => {
        this.isSaving = false;
