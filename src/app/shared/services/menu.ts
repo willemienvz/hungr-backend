@@ -15,4 +15,5 @@ export interface Menu {
     items: MenuItem[];
     location:string;
     viewingTime: ViewingTime[];
+    restaurantID:string;
  }

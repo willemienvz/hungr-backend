@@ -2,6 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Menu } from '../../../shared/services/menu';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
+import { environment } from '../../../../environments/environment';
+
 @Component({
   selector: 'app-view-qr',
   templateUrl: './view-qr.component.html',
@@ -20,9 +22,11 @@ export class ViewQrComponent implements OnInit {
   ngOnInit() {
     
   }
-  
+  getCurrentCode(name:string){
+    return this.qrCodeDownloadLink = environment.menuUrl + '' +  name;
+  }
   onChangeURL(url: SafeUrl) {
-    this.qrCodeDownloadLink = url;
+    this.qrCodeDownloadLink = environment.menuUrl + '' +  url;
   }
   openPopup(menuID:string) {
     this.selectedID = menuID;

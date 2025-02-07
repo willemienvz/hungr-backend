@@ -54,7 +54,7 @@ const routes: Routes = [
       { path: 'menus/add-menu', component: AddMenuComponent, data: { title: 'Add Menu' } },
       { path: 'restaurants', component: RestaurantComponent, data: { title: 'Restaurant' } },
       { path: 'menus/edit-menu/:menuID', component: EditMenuComponent, data: { title: 'Edit Menu' } },
-      { path: 'menus/qr-codes', component: QrCodesComponent, data: { title: 'QR codes' } },
+      { path: 'qr-codes', component: QrCodesComponent, data: { title: 'QR codes' } },
       { path: 'restaurants/add-new-restaurant', component: AddComponent, data: { title: 'New Restaurant' } },
       { path: 'restaurants/edit-restaurant', component: EditRestaurantComponent, data: { title: 'Edit Restaurant' } },
       { path: 'settings/branding', component: BrandingComponent, data: { title: 'Branding' } },

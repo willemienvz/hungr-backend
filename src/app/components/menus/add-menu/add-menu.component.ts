@@ -78,6 +78,7 @@ export class AddMenuComponent implements OnInit {
   OwnerID:string='';
   menuName:string='';
   validationError:boolean = false;
+  menuSaved:boolean = false;
   menuNameError:boolean = false;
   restaurantError:boolean = false;
   selectedFileBulk: File | null = null;
@@ -474,7 +475,7 @@ export class AddMenuComponent implements OnInit {
           location: this.findCityAndProvince(this.selectedRestaurant)
         };
         this.firestore.collection('menus').doc(this.currentMenuID).update(this.newMenu);
-        this.nextStep();
+        //this.nextStep();
       }
       this.loading();
     }
@@ -525,6 +526,13 @@ export class AddMenuComponent implements OnInit {
     }
     if (this.currentStep < 5) {
       this.currentStep++;
+    }
+    if (this.currentStep === 5) {
+      if (!this.menuSaved){
+        this.saveMenu();
+        this.menuSaved = true;
+      }
+     
     }
   }
   
