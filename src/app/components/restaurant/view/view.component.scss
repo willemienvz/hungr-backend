@@ -28,6 +28,8 @@ text-align: left;
         gap: 15px;
     }
 
+
+
     .col{
         width: calc(50% - 15px);
         
@@ -57,6 +59,21 @@ letter-spacing: -0.001em;
 text-align: left;
 
         }
+    }
+
+
+    .specialCase{
+      justify-content: center;
+      gap: 16px;
+      height: 76px;
+      .label{
+        margin: 0;
+        flex: unset;
+      }
+  
+      .answer{
+  
+      }
     }
   }
 
@@ -120,3 +137,5 @@ text-align: left;
     background-color: #3ce1af;
     color: #181818;
   }
+
+  

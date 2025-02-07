@@ -2,16 +2,34 @@
     <div class="row">
         <div class="col">
             <h5>{{restuarant.restaurantName}}</h5>
+            
+        </div>
+        <div class="col">
+         
+        </div>
+    </div>
+    <div class="row" style="align-items: flex-end;">
+        <div class="col">
             <p class="label">Address</p>
             <p class="answer">{{restuarant.streetAdress}}</p>
+           
+        </div>
+        <div class="col">
+            <div class="row specialCase">
+                <p class="label">Number of tables</p>
+                <p class="answer">{{restuarant.numberTables}}</p>
+            </div>
+           
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+          
             <p class="label">Assigned Users</p>
             <p class="answer">{{owner}}</p>
         </div>
         <div class="col">
-            <div class="row">
-                <p class="label">Number of tables</p>
-                <p class="answer">{{restuarant.numberTables}}</p>
-            </div>
+           
             <p class="label">Assigned Menu</p>
             <p class="answer">{{menuName}}</p>
         </div>
