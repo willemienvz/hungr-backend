@@ -87,8 +87,11 @@
     font-weight: 700;
 }
 label{
-    color: #9A9A9A;
-    margin-bottom: 8px;
+    color:#9A9A9A;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 20.25px;
+    letter-spacing: -0.1%;
 }
 
 .rowMenu{
@@ -126,4 +129,53 @@ label{
     .block{
         width: calc(50% - 20px);
     }
+}
+
+.col2row{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex: 1;
+    flex-direction: row;
+    gap: 15px;
+
+    .col{
+       flex: 1;
+        display: flex;
+    }
+}
+
+
+input{
+    height: 38px !important;
+}
+
+.backLink{
+    width: 100%;
+    flex-direction: row;
+    display: flex;
+    justify-content: flex-start;
+    gap: 5px;
+    align-items: center;
+    text-decoration: none;
+    color: #2E3646;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pLinkText{
+font-weight: 400;
+font-size: 13px;
+line-height: 18.2px;
+letter-spacing: -0.1%;
+color: #9A9A9A;
+
+.mainLink{
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 18.2px;
+    letter-spacing: -0.1%;
+    color: #9A9A9A;
+}
 }

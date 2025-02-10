@@ -58,6 +58,7 @@ export class EditMenuComponent implements OnInit {
         this.selectedRestaurant = menu.restaurantID;
         this.categories = menu.categories || [];
         this.menuItems = menu.items || [];
+        console.log(menu)
       }
     });
   }
@@ -78,10 +79,11 @@ export class EditMenuComponent implements OnInit {
   fetchRestaurants() {
     const user = JSON.parse(localStorage.getItem('user')!);
     const ownerId = user.uid;
-    this.firestore.collection<Restaurant>('restaurants', ref => ref.where('ownerID', '==', ownerId))
+    this.firestore.collection<Restaurant>('restuarants', ref => ref.where('ownerID', '==', ownerId))
       .valueChanges()
       .subscribe(restaurants => {
         this.restaurants = restaurants;
+        console.log(restaurants);
       });
   }
 

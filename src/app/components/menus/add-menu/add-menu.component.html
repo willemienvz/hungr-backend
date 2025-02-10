@@ -2,6 +2,7 @@
     <div *ngIf="currentStep === 1">
 
         <div class="block">
+            <a class="backLink" routerLink="/menus"><i class="material-icons">chevron_left</i> Back</a>
             <app-progress-bar [progress]="currentStep"></app-progress-bar>
             <div class="row headerRow">
                 <h6 class="labelStep">Step 1</h6>
@@ -32,8 +33,9 @@
 
                     </div>
                 </div>
-                <a class="mainLink" style="text-align: right;" routerLink="/restaurants/add-new-restaurant">Add
-                    restaurant</a>
+                <p class="pLinkText">
+                    Need to create a new restaurant? <a class="mainLink" style="text-align: right;" routerLink="/restaurants/add-new-restaurant"> Click here.</a>
+                </p>
             </div>
 
         </div>

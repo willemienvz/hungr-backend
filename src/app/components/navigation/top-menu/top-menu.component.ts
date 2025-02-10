@@ -14,7 +14,7 @@ import { NotificationsService } from '../../../shared/services/notifications.ser
 })
 export class TopMenuComponent implements OnInit{
   userProfile: any;
-  pageTitle: string = 'Overview Dashboard';
+  pageTitle: string = '';
   notifications: Notification[] = [];
 
   constructor(public authService: AuthService,private firestore: AngularFirestore,private router: Router, private activatedRoute: ActivatedRoute, private notificationService: NotificationsService) {
@@ -40,6 +40,7 @@ export class TopMenuComponent implements OnInit{
 
 
   ngOnInit(): void {
+    this.pageTitle = this.getPageTitle(this.activatedRoute);
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -89,7 +90,7 @@ export class TopMenuComponent implements OnInit{
 
   getPageTitle(route: ActivatedRoute): string {
     let child = route.firstChild;
-    console.log(child)
+    console.log('t', child)
     while (child) {
       if (child.snapshot.data['title']) {
         return child.snapshot.data['title'];
