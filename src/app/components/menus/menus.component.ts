@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Menu } from '../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-menus',
@@ -16,7 +17,7 @@ export class MenusComponent implements OnInit{
   isPopupMenuOpenDraft: boolean[] = [];
   selectedMenuId: string = ''; 
   tempRestaurant:Restaurant = {} as Restaurant;
-  constructor(private firestore: AngularFirestore) {
+  constructor(private firestore: AngularFirestore, private toastr: ToastrService ) {
   }
 
   
@@ -71,6 +72,7 @@ export class MenusComponent implements OnInit{
       .then(() => {
         this.fetchMenus();
         this.closeAllPopups();
+        this.toastr.success('Menu has been deleted!');
       })
       .catch((error) => {
         console.log(error);

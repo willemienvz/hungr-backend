@@ -26,6 +26,7 @@
     "contentful": "^10.7.0",
     "echarts": "^5.5.1",
     "firebase": "^10.8.0",
+    "firebase-admin": "^13.1.0",
     "fusioncharts": "^4.0.2",
     "ngx-colors": "^3.5.3",
     "ngx-echarts": "^18.0.0",

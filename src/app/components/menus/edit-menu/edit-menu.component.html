@@ -35,6 +35,15 @@
             </div>
         </div>
         <div class="step-buttons">
+            <button class="btnGray" routerLink="/menus">
+                Cancel
+            </button>
+            <button class="btnGray" (click)="setAsDraft()">
+                save as draft
+            </button>
+            <button class="btnSecondary" (click)="setAsPublished()">
+                Publish
+            </button>
             <button class="btnSecondary" (click)="nextStep()" [disabled]="menuNameError || restaurantError">
                 Next
             </button>
@@ -68,6 +77,15 @@
             </div>
         </div>
         <div class="step-buttons">
+            <button class="btnGray" routerLink="/menus">
+                Cancel
+            </button>
+            <button class="btnGray" (click)="setAsDraft()">
+                save as draft
+            </button>
+            <button class="btnSecondary" (click)="setAsPublished()">
+                Publish
+            </button>
             <button class="btnSecondary" (click)="nextStep()">Next</button>
         </div>
     </div>
@@ -125,6 +143,15 @@
             <i class="material-icons closeIconItem" (click)="removeMenuItem(itemIndex)">close</i>
         </div>
         <div class="step-buttons">
+            <button class="btnGray" routerLink="/menus">
+                Cancel
+            </button>
+            <button class="btnGray" (click)="setAsDraft()">
+                save as draft
+            </button>
+            <button class="btnSecondary" (click)="setAsPublished()">
+                Publish
+            </button>
             <button class="btnSecondary" (click)="nextStepLast()">Next</button>
         </div>
     </div>

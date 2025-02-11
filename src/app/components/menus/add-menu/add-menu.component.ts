@@ -4,9 +4,11 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { Category } from '../../../shared/services/category';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { finalize } from 'rxjs';
+import { finalize, take } from 'rxjs';
 import { Papa } from 'ngx-papaparse'; 
 import { v4 as uuidv4 } from 'uuid';
+import { BehaviorSubject } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-menu',
@@ -21,6 +23,7 @@ export class AddMenuComponent implements OnInit {
   restaurantName: string = '';
   newMenu:any;
   restaurantDescription: string = '';
+  setAsDraftSaved: boolean = false;
   newLabel: string = '';
   menuItems: {
     itemId: string;
@@ -48,7 +51,9 @@ export class AddMenuComponent implements OnInit {
   newPreparation: string = '';
   newVariation: string = '';
   newPairing: string = '';
-  newSide: string = '';
+  private doneSaveSubject = new BehaviorSubject<boolean>(false);
+  doneSave$ = this.doneSaveSubject.asObservable(); 
+    newSide: string = '';
   categories: Category[] = [];
   restuarants: Restaurant[] = [];
   selectedRestaurant: string = '';
@@ -83,7 +88,7 @@ export class AddMenuComponent implements OnInit {
   restaurantError:boolean = false;
   selectedFileBulk: File | null = null;
   steps: string[] = ['Menu Details', 'Categories', 'Add Items', 'Done'];
-  constructor(private storage: AngularFireStorage, private firestore: AngularFirestore, private papa: Papa ) {}
+  constructor(private storage: AngularFireStorage, private firestore: AngularFirestore, private papa: Papa, private toastr: ToastrService ) {}
 
 
   ngOnInit() {
@@ -92,6 +97,11 @@ export class AddMenuComponent implements OnInit {
     this.fetchRestaurant();
     this.addGenericCategories();
     this.initializeArrays();
+    this.doneSave$.subscribe((value) => {
+      if (value) {
+        this.handleDoneSaveChange();
+      }
+    });
   }
 
   initializeArrays() {
@@ -411,8 +421,9 @@ export class AddMenuComponent implements OnInit {
     saveMenu(): void {
       this.isSaving = true;
       console.log("Menu Items with IDs:", this.menuItems);
-      if (this.currentMenuID.length < 1){
-        this.newMenu= {
+    
+      if (this.currentMenuID.length < 1) {
+        this.newMenu = {
           menuID: '1',
           restaurantID: this.selectedRestaurant,
           categories: this.categories,
@@ -424,44 +435,34 @@ export class AddMenuComponent implements OnInit {
           qrAssigned: false,
           qrUrl: ''
         };
-        console.log(this.newMenu);
+    
         this.firestore.collection('menus').add(this.newMenu)
-        .then((data) => {
-          this.currentMenuID = data.id;
-          this.newMenu= {
-            menuID: data.id,
-            restaurantID: this.selectedRestaurant,
-            categories: this.categories,
-            items: this.menuItems,
-            OwnerID: this.OwnerID,
-            Status: false,
-            isDraft: true,
-            menuName: this.menuName,
-            qrAssigned: false,
-            qrUrl: '',
-            location: this.findCityAndProvince(this.selectedRestaurant)
-          };
-          this.firestore.collection('menus').doc(data.id).update(this.newMenu);
-          
-          this.firestore.collection<Restaurant>('restuarants', ref => ref.where('restaurantID', '==', this.selectedRestaurant))
-            .valueChanges()
-            .subscribe(restuarant => {
-              let temp = restuarant[0];
-              temp.menuID = this.currentMenuID;
-              this.firestore.collection('restuarants').doc(this.selectedRestaurant).update(temp)
-              .then(() => console.log('Restaurant ID edited'))
-              .catch(err => console.error('Error updating Restaurant ID ', err));
+          .then((data) => {
+            this.currentMenuID = data.id;
+            this.newMenu = {
+              ...this.newMenu,
+              menuID: data.id,
+              location: this.findCityAndProvince(this.selectedRestaurant)
+            };
+    
+            return this.firestore.collection('menus').doc(data.id).update(this.newMenu);
+          })
+          .then(() => {
+            return this.firestore.collection('restuarants')
+              .doc(this.selectedRestaurant)
+              .update({ menuID: this.currentMenuID });
+          })
+          .then(() => {
+            console.log('Restaurant ID edited');
+            this.isSaving = false;
+            this.doneSaveSubject.next(true); // Move this outside of Firestore subscriptions
+            this.nextStep();
+          })
+          .catch(error => {
+            console.error('Error adding menu: ', error);
           });
-         
-
-          this.isSaving = false;
-          this.nextStep();
-        })
-        .catch(error => {
-          console.error('Error adding menu: ', error);
-        });
-      }else{
-        this.newMenu= {
+      } else {
+        this.newMenu = {
           menuID: this.currentMenuID,
           restaurantID: this.selectedRestaurant,
           categories: this.categories,
@@ -474,12 +475,20 @@ export class AddMenuComponent implements OnInit {
           qrUrl: '',
           location: this.findCityAndProvince(this.selectedRestaurant)
         };
-        this.firestore.collection('menus').doc(this.currentMenuID).update(this.newMenu);
-        //this.nextStep();
+    
+        this.firestore.collection('menus').doc(this.currentMenuID)
+          .update(this.newMenu)
+          .then(() => {
+            this.doneSaveSubject.next(true); // Ensure it emits only once here
+          });
       }
-      this.loading();
     }
-  
+    
+    private handleDoneSaveChange() {
+      this.toastr.success('Menu has been saved successfully!');
+      console.log('doneSave changed to true');
+    }
+
     toggleLabelInput(itemIndex: number): void {
       console.log(this.categories);
       this.menuItems[itemIndex].showLabelInput = !this.menuItems[itemIndex].showLabelInput;
@@ -493,14 +502,23 @@ export class AddMenuComponent implements OnInit {
       }
     }
 
-    setAsDraft(){
-      this.isSaving = true;
-      this.firestore
-      .collection("menus")
-      .doc(this.currentMenuID)
-      .update({'isDraft':true});
-      this.loading();
+    setAsDraft() {
+      this.saveMenu();
+    
+      this.doneSave$.pipe(take(1)).subscribe((doneSave) => {
+        if (doneSave && !this.setAsDraftSaved) {
+          this.firestore
+            .collection("menus")
+            .doc(this.currentMenuID)
+            .update({ 'isDraft': true })
+            .then(() => {
+              this.setAsDraftSaved = true;
+              this.toastr.success('This menu has been drafted');
+            });
+        }
+      });
     }
+    
     
     findCityAndProvince(restaurantID: string|undefined): string {
       const foundRestaurant = this.restuarants.find(restaurant => restaurant.restaurantID === restaurantID);
@@ -510,11 +528,6 @@ export class AddMenuComponent implements OnInit {
       return '';
   }
 
-  loading():void{
-    setTimeout(() => {
-      this.isSaving =false;
-    }, 800);
-  }
 
   nextStep() {
     if (this.currentStep === 1) {

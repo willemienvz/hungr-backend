@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Category } from '../../../shared/services/category';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-menu',
@@ -40,7 +41,8 @@ export class EditMenuComponent implements OnInit {
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private papa: Papa,
-    private route: ActivatedRoute
+    private route: ActivatedRoute, 
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -171,6 +173,23 @@ export class EditMenuComponent implements OnInit {
   deleteSubCategory(categoryIndex: number, subcategoryIndex: number) {
     this.categories[categoryIndex].subcategories?.splice(subcategoryIndex, 1);
   }
+
+  setAsDraft(){
+    this.firestore
+    .collection("menus")
+    .doc(this.menuID)
+    .update({'isDraft':true});
+    this.toastr.success('This menu has been drafted');
+  }
+
+  setAsPublished(){
+    this.firestore
+    .collection("menus")
+    .doc(this.menuID)
+    .update({'isDraft':false});
+    this.toastr.success('This menu has been published');
+  }
+  
 
   addMenuItem() {
     this.menuItems.push({

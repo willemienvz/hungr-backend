@@ -240,6 +240,35 @@ a{
   background: #3fefba;
 }
 
+.btnGray{
+  color: #181818;
+  background: #E4E4E4;
+  border-radius: 6px;
+  text-align: center;
+  padding:  12px 15px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 14px;
+  letter-spacing: -0.001em;
+  border: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  min-width: 140px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  transition: 0.3s all;
+}
+
+.btnGray:hover{
+  background: #c2c2c2;
+}
+
 .btnSecondary:disabled {
   pointer-events: none;
   color: grey;

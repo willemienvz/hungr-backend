@@ -40,6 +40,10 @@
 
         </div>
         <div class="step-buttons">
+            <button class="btnGray" routerLink="/menus">
+                Cancel
+            </button>
+           
             <button class="btnSecondary" (click)="nextStep()"
                 [disabled]="menuNameError || restaurantError">Next</button>
         </div>
@@ -76,6 +80,12 @@
 
         </div>
         <div class="step-buttons">
+            <button class="btnGray" routerLink="/menus">
+                Cancel
+            </button>
+            <button class="btnGray" (click)="setAsDraft()">
+                save as draft
+            </button>
             <button class="btnSecondary" (click)="nextStep()">Next</button>
         </div>
     </div>
