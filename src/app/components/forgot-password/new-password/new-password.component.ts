@@ -1,38 +1,47 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../../shared/services/auth.service';
-import { getAuth, confirmPasswordReset } from 'firebase/auth';
 import { ActivatedRoute, Router } from '@angular/router';
+import { getAuth, confirmPasswordReset } from 'firebase/auth';
+import { initializeApp, getApps } from 'firebase/app';
+import { environment } from '../../../../environments/environment'; 
 
 @Component({
   selector: 'app-new-password',
   templateUrl: './new-password.component.html',
-  styleUrl: './new-password.component.scss'
+  styleUrls: ['./new-password.component.scss']
 })
 export class NewPasswordComponent implements OnInit {
- showPopup: boolean = true;
- mode: string | null = null;
- oobCode: string | null = null;
- newPassword: string = '';
+  showPopup: boolean = true;
+  oobCode: string | null = null;
+  newPassword: string = '';
 
-  constructor(
-    public authService: AuthService,
-    private readonly route: ActivatedRoute, private readonly router: Router
-  ) { }
+  constructor(private route: ActivatedRoute, private router: Router) {}
+
   ngOnInit() {
+    // ✅ Ensure Firebase is initialized before using Firebase services
+    if (!getApps().length) {
+      initializeApp(environment.firebase);
+      console.log("Firebase App initialized"); // Debugging
+    }
+
     this.oobCode = this.route.snapshot.queryParamMap.get('oobCode');
-    this.mode = this.route.snapshot.queryParamMap.get('mode');
+    console.log("ngOnInit() - oobCode:", this.oobCode);
   }
 
-  openPopup() {
-    this.showPopup = true;
-  }
   async resetPassword() {
+    console.log("resetPassword() called");
+
     if (this.oobCode && this.newPassword) {
       try {
+        console.log("oobCode and newPassword are set", this.oobCode, this.newPassword);
+
+        // ✅ Ensure getAuth() is used after Firebase is initialized
         const auth = getAuth();
+        console.log("Auth instance created:", auth);
+
         await confirmPasswordReset(auth, this.oobCode, this.newPassword);
+        console.log("Password reset successful");
         alert("Password reset successful! Redirecting to login...");
-        setTimeout(() => this.router.navigate(['/login']), 3000);
+        setTimeout(() => this.router.navigate(['/sign-in']), 3000);
       } catch (error) {
         console.error("Error resetting password:", error);
         alert("Failed to reset password. Please try again.");
@@ -41,7 +50,8 @@ export class NewPasswordComponent implements OnInit {
       alert("Invalid password reset link.");
     }
   }
+
   closePopup() {
-    this.showPopup = false;
+    this.router.navigate(['/sign-in']);
   }
 }
