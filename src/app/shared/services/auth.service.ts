@@ -71,7 +71,7 @@ export class AuthService {
   }
   // Sign up with email/password
   SignUp(email: string, password: string, formDataStep1:any, formDataStep2:any,  formDataStep3:any) {
-    return this.afAuth
+  /*   return this.afAuth
       .createUserWithEmailAndPassword(email, password)
       .then((result) => {
         this.SendVerificationMail();
@@ -82,7 +82,8 @@ export class AuthService {
       })
       .catch((error) => {
         this.toastr.error(error.message)
-      });
+      }); */
+
   }
 
   SignUpEditor(email: string, data: any): Promise<void> {
@@ -133,7 +134,7 @@ export class AuthService {
   ForgotPassword(passwordResetEmail: string) {
     return this.afAuth
       .sendPasswordResetEmail(passwordResetEmail,  {
-        url: 'http://localhost:4200/password-reset-success' 
+        url: 'http://localhost:4200/password-reset' 
       })
       .then(() => {
         this.toastr.success('Password reset email sent, check your inbox.')

@@ -28,6 +28,8 @@ import { VisitorDashboardComponent } from './components/dashboard/visitor-dashbo
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
 import { ResetSuccessComponent } from './components/forgot-password/reset-success/reset-success.component';
+import { ConfirmEmailComponent } from './components/sign-up/confirm-email/confirm-email.component';
+import { NewPasswordComponent } from './components/forgot-password/new-password/new-password.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -37,6 +39,8 @@ const routes: Routes = [
   { path: 'confirm-user', component: ConfirmUserComponent },
   { path: 'verify-email-address', component: VerifyEmailComponent },
   { path: 'password-reset-success', component: ResetSuccessComponent },
+  { path: 'password-reset', component: NewPasswordComponent },
+  { path: 'confirm-email', component: ConfirmEmailComponent },
 
   {
     path: '',

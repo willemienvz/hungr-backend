@@ -43,8 +43,8 @@
             <div class="block">
                 <h6>Assign menu</h6>
                 <p style="color: #9A9A9A">Please assign a menu to this restaurant.</p>
-                <div class="block-row" style="justify-content: flex-start; align-items: center;">
-                    <mat-form-field appearance="fill">
+                <div class="block-row" style="justify-content: flex-start; align-items: flex-start;">
+                    <mat-form-field appearance="fill" style="width: 30%;">
                         <mat-select [(ngModel)]="selectedMenu" (selectionChange)="selectMenu($event.value)"
                             name="selectedMenu">
                             <mat-option *ngFor="let menu of menus" [value]="menu">

@@ -82,6 +82,8 @@ import { Step3Component } from './components/sign-up/step3/step3.component';
 import {MatTabsModule} from '@angular/material/tabs';
 import { ViewComponent } from './components/restaurant/view/view.component';
 import { ResetSuccessComponent } from './components/forgot-password/reset-success/reset-success.component';
+import { ConfirmEmailComponent } from './components/sign-up/confirm-email/confirm-email.component';
+import { NewPasswordComponent } from './components/forgot-password/new-password/new-password.component';
 
 @NgModule({
   declarations: [
@@ -137,6 +139,8 @@ import { ResetSuccessComponent } from './components/forgot-password/reset-succes
     Step3Component,
     ViewComponent,
     ResetSuccessComponent,
+    ConfirmEmailComponent,
+    NewPasswordComponent,
   ],
   imports: [
     BrowserModule,
