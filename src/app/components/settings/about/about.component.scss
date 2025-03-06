@@ -109,6 +109,11 @@
     }
 }
 
+textarea{
+    padding: 12px;
+    border: 1px solid #DEDEDE;
+    border-radius: 10px;
+}
 .outerCol{
     width: calc(60% - 25px);
     display: flex;
@@ -179,14 +184,12 @@
   }
   
   .add-image-button {
-    border-radius: 2px;
-    border: 1px solid rgba(222, 222, 222, 1);
-    background-color: #fff;
+    background-color: transparent;
     display: flex;
     gap: 6px;
-    padding: 12px 16px;
     align-items: center;
     flex-direction: row;
+    border: none;
   }
   
   .add-icon {
@@ -257,7 +260,6 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        margin-top: 30px;
 
         h6{
             margin-bottom: 15px;

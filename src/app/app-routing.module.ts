@@ -62,6 +62,7 @@ const routes: Routes = [
       { path: 'restaurants/add-new-restaurant', component: AddComponent, data: { title: 'Restaurant<span class="submenuHeading">/Create a New Restaurant</span>' } },
       { path: 'restaurants/edit-restaurant', component: EditRestaurantComponent, data: { title: 'Restaurant<span class="submenuHeading">/Edit a Restaurant</span>' } },
       { path: 'settings/branding', component: BrandingComponent, data: { title: 'Branding' } },
+      { path: 'settings/about', component: AboutComponent, data: { title: 'About' } },
       { path: 'specials/add-new-special', component: AddSpecialComponent, data: { title: 'Add Specials<span class="submenuHeading">/Add A New special</span>' } },
       { path: 'specials/edit-special/:id', component: EditSpecialComponent, data: { title: 'Edit Specials<span class="submenuHeading">/Edit A special</span>' } },
       { path: 'specials', component: SpecialsLandingComponent, data: { title: 'Visistor Insights' } },
