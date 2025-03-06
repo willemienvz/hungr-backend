@@ -60,25 +60,24 @@
             </div>
 
             <div class="block contactBlock">
-                <h6>Main Contact Person</h6>
-                <mat-radio-group name="selectedContact" [(ngModel)]="selectedContact" class="radiogroup">
-                    <div class="col">
-                        <mat-radio-button [value]="'selected'">Selected Contact Person</mat-radio-button>
-                        <p class="selectedOption">{{ currentUser.firstName }} {{ currentUser.Surname }}</p>
-                    </div>
-                    <div class="col">
-                        <mat-radio-button [value]="'assign'">Assign User</mat-radio-button>
-                        <mat-form-field *ngIf="selectedContact === 'assign'" style="margin-top: 10px;">
-                            <mat-select name="selectedUser" [(ngModel)]="selectedUser">
-                                <mat-option *ngFor="let user of users" [value]="user">{{ user.firstName }} {{
-                                    user.Surname
-                                    }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-
-
-                </mat-radio-group>
+                <h6>Users</h6>
+                <p>Please assign a user to this restaurant</p>
+                <div class="rowMenu">
+                    <mat-form-field appearance="fill">
+                        <mat-select [(ngModel)]="selectedUser" (selectionChange)="selectUser($event.value)"
+                            name="selectedUser">
+                        <mat-option *ngFor="let user of users" [value]="user">{{ user.firstName }} {{
+                            user.Surname
+                            }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <p>Need to add a new user? <a routerLink="/manage-users" class="mainLink"
+                        style="width: 100%;text-align: right;">Click here</a></p>
+                </div>
+                
+                <p *ngIf="selectedUser !== null"  class="selectedOption">{{ selectedUserName }} {{ selectedUserSurname }} <span (click)="removeUser()" class="material-symbols-outlined">
+                    close
+                    </span></p>
             </div>
 
             <div class="rowBottom">
@@ -92,16 +91,12 @@
                     </div>
                 </div>
 
-                <div class="block contactBlock" style="width: 50%;">
+                <div class="block contactBlock">
                     <h6>Number of tables in the restaurant</h6>
-                    <div class="row" style="flex-direction: row;">
-                        <p class="tableNum">{{selectedNumberTable}}</p>
-                        <mat-form-field>
-                            <mat-label>Select number of tables</mat-label>
-                            <mat-select name="selectedNumberTable" [(ngModel)]="selectedNumberTable">
-                                <mat-option *ngFor="let num of tableNums" [value]="num">{{ num }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                    <div class="row" style="align-items: center">
+                        <p style="width: 60%;">Please enter a numerical value</p>
+                        <input style="width: 40%;" type="text" class="formControl"  name="selectedNumberTable"
+                        [(ngModel)]="selectedNumberTable" required>
                     </div>
                 </div>
             </div>

@@ -25,12 +25,18 @@ export class AddComponent implements OnInit{
   user: any;
   OwnerID:string='';
   tableNums: number[] = [];
+
+  selectedUserSurname:string='';
+  selectedUserName:string='';
+  isSaving:boolean=false;
+  userChanged:boolean=false;
   constructor(private firestore: AngularFirestore, private configService: ConfigService, private dialog: MatDialog) {
     for (let i = 1; i <= this.configService.numberOfTables; i++) {
       this.tableNums.push(i);
     }
   }
   ngOnInit() {
+    this.selectedUser = null;
     this.user = JSON.parse(localStorage.getItem('user')!);
     this.OwnerID = this.user.uid;
     this.fetchMenus();
@@ -46,7 +52,7 @@ export class AddComponent implements OnInit{
   }
 
   private fetchUsers() {
-    this.firestore.collection<User>('users', ref => ref.where('parentId', '==', this.OwnerID))
+    this.firestore.collection<User>('users', ref => ref.where('parentId', 'in', [this.OwnerID, '']))
       .valueChanges()
       .subscribe(users => {
         this.users = users;
@@ -68,10 +74,9 @@ export class AddComponent implements OnInit{
   addRestaurant(){
     const menuID = this.selectedMenu ? this.selectedMenu.menuID : '';
     var holdID = '';
-    if (this.selectedContact === 'assign'){
+    
+    if (this.userChanged){
       holdID = this.selectedUser.uid;
-    }else {
-      holdID = this.currentUser.uid;
     }
 
     this.newRestaurant= {
@@ -118,5 +123,20 @@ export class AddComponent implements OnInit{
       .catch(error => {
         console.error('Error adding restaurant: ', error);
       });
+  }
+
+  selectUser(user: User){
+    this.selectedUser =  user;
+    console.log(this.selectedUser);
+    this.selectedUserName =user.firstName;
+    this.selectedUserSurname = user.Surname;
+    this.userChanged = true;
+  }
+
+  removeUser(){
+    this.selectedUser =  null;
+    this.selectedUserName = '';
+    this.selectedUserSurname = '';
+    this.userChanged = true;
   }
 }

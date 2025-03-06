@@ -15,5 +15,9 @@ export const environment = {
         spaceId: '6cy3z1frg2h6',
         accessToken: 'CFPAT-gKu5eM8F3tRXVsAnBJL_dmRnGW6xAZGFh532B2wMT2g',
         environment: 'master', 
+      },
+      yoko:{
+        publicKey: 'pk_test_0a5bd858EPDe3Pjda0e4',
+        secretKey: 'sk_test_9a0b6532prm0QrR6ab34b94bb485'
       }
   };

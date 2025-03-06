@@ -59,35 +59,31 @@
             </div>
 
             <div class="block contactBlock">
-                <h6>Main Contact Person</h6>
-                <mat-radio-group name="selectedContact" [(ngModel)]="selectedContact" class="blockItems">
-                    <div class="col">
-                        <mat-radio-button [value]="'selected'">Selected Contact Person</mat-radio-button>
-                        <p class="selectedOption">{{ selectedUserName }} {{ selectedUserSurname }}</p>
-                    </div>
-                    <div class="col">
-                        <mat-radio-button [value]="'assign'">Assign User</mat-radio-button>
-                        <mat-form-field *ngIf="selectedContact === 'assign'">
-                            <mat-label>Select user...</mat-label>
-                            <mat-select name="selectedUser" [(ngModel)]="selectedUser">
-                                <mat-option [value]="currentUser">{{ currentUser.firstName }} {{ currentUser.Surname
-                                    }}</mat-option>
-                                <mat-option *ngFor="let user of users" [value]="user">{{ user.firstName }} {{
-                                    user.Surname
-                                    }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-
-
-                </mat-radio-group>
+                <h6>Users</h6>
+                <p>Please assign a user to this restaurant</p>
+                <div class="rowMenu">
+                    <mat-form-field appearance="fill">
+                        <mat-select [(ngModel)]="selectedUser" (selectionChange)="selectUser($event.value)"
+                            name="selectedUser">
+                        <mat-option *ngFor="let user of users" [value]="user">{{ user.firstName }} {{
+                            user.Surname
+                            }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <p>Need to add a new user? <a routerLink="/manage-users" class="mainLink"
+                        style="width: 100%;text-align: right;">Click here</a></p>
+                </div>
+                
+                <p *ngIf="selectedUser !== null"  class="selectedOption">{{ selectedUserName }} {{ selectedUserSurname }} <span (click)="removeUser()" class="material-symbols-outlined">
+                    close
+                    </span></p>
             </div>
 
             <div class="blockItemsRow">
                 <div class="block">
                     <h6>Restaurant Status</h6>
                     <div class="toggle-container">
-                        <label [style.color]="restaurantStatus ? '#3CE1AF' : '#444444'">{{ restaurantStatus ? 'Active' :
+                        <label [style.color]="restaurantStatus ? '#444444' : '#444444'">{{ restaurantStatus ? 'Active' :
                             'Inactive' }}</label>
                         <mat-slide-toggle [(ngModel)]="restaurantStatus" color="#3CE1AF"
                             name="restaurantStatus"></mat-slide-toggle>
@@ -95,14 +91,10 @@
                 </div>
                 <div class="block contactBlock">
                     <h6>Number of tables in the restaurant</h6>
-                    <div class="row">
-                        <p class="tableNum">{{selectedNumberTable}}</p>
-                        <mat-form-field>
-                            <mat-label>Select number of tables</mat-label>
-                            <mat-select name="selectedNumberTable" [(ngModel)]="selectedNumberTable">
-                                <mat-option *ngFor="let num of tableNums" [value]="num">{{ num }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                    <div class="row" style="align-items: center">
+                        <p style="width: 60%;">Please enter a numerical value</p>
+                        <input style="width: 40%;" type="text" class="formControl"  name="selectedNumberTable"
+                        [(ngModel)]="selectedNumberTable" required>
                     </div>
                 </div>
 

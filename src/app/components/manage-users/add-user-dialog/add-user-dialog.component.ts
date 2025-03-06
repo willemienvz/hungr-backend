@@ -12,7 +12,7 @@ export class AddUserDialogComponent {
   isSaving: boolean = false;
   constructor(
     public authService: AuthService,
-    private toastr: ToastrService
+    private readonly toastr: ToastrService
   ) { }
  
 

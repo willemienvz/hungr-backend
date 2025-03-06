@@ -27,10 +27,29 @@
     padding: 12px;
     background-color: #F3F4F5;
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    align-items: center;
+    text-align: center;
+    span{
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
+    }
 }
 
-.contactBlock mat-form-field{
-    width: 100%;
+
+.col .contactBlock{
+    gap: 0;
+
+    h6{
+        margin-bottom: 20px;
+    }
+
+    .rowMenu{
+        margin-top: 15px;
+    }
 
 }
 
@@ -70,7 +89,7 @@
 }
 
 .toggle-container{
-    border: 1px solid #DEDEDE;
+    background-color: #F3F4F5;
 }
 
 .btnHolder{
@@ -96,7 +115,7 @@ label{
 
 .rowMenu{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-start;
     gap: 20px;
     flex-direction: row;
@@ -105,7 +124,14 @@ label{
     p{
         color:   #9A9A9A;
         font-size: 14px;
+        margin-top: 10px;
     }
+
+    mat-form-field{
+        width: 32%;
+    }
+
+  
 }
 
 .blockItems{
@@ -178,4 +204,18 @@ color: #9A9A9A;
     letter-spacing: -0.1%;
     color: #9A9A9A;
 }
+}
+
+
+.block-row{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    p{
+        margin-top: 10px;
+    }
 }

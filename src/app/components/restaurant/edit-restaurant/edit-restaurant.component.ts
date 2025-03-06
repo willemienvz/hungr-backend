@@ -34,6 +34,7 @@ export class EditRestaurantComponent {
   selectedUserSurname:string='';
   selectedUserName:string='';
   isSaving:boolean=false;
+  userChanged:boolean=false;
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user')!);
@@ -71,9 +72,10 @@ export class EditRestaurantComponent {
   }
 
   private fetchUsers() {
-    this.firestore.collection<User>('users', ref => ref.where('parentId', '==', this.OwnerID))
+    this.firestore.collection<User>('users', ref => ref.where('parentId', 'in', [this.OwnerID, '']))
       .valueChanges()
       .subscribe(users => {
+        console.log('w',users);
         this.users = users;
       });
 
@@ -106,7 +108,7 @@ export class EditRestaurantComponent {
     const menuID = this.selectedMenu ? this.selectedMenu : '';
     var holdID = '';
    
-    if (this.selectedContact === 'assign'){
+    if (this.userChanged){
       holdID = this.selectedUser.uid;
     }else{
       holdID = this.currentRestaurant.mainContactID;
@@ -145,5 +147,20 @@ export class EditRestaurantComponent {
 
   selectMenu(menuID: string) {
     this.selectedMenuID = menuID;
+  }
+
+  selectUser(user: User){
+    this.selectedUser =  user;
+    console.log(this.selectedUser);
+    this.selectedUserName =user.firstName;
+    this.selectedUserSurname = user.Surname;
+    this.userChanged = true;
+  }
+
+  removeUser(){
+    this.selectedUser =  null;
+    this.selectedUserName = '';
+    this.selectedUserSurname = '';
+    this.userChanged = true;
   }
 }
