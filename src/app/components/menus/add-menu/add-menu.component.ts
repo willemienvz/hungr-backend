@@ -345,6 +345,29 @@ export class AddMenuComponent implements OnInit {
         }
       });
     }
+
+    addMenuItemMore(): void {
+      this.menuItems.push({
+        itemId: uuidv4(),
+        categoryId: undefined,
+        name: '',
+        description: '',
+        price: '',
+        imageUrl: null,
+        preparations: [],
+        variations: [],
+        pairings: [],
+        sides: [],
+        labels: '',
+        showLabelInput: false,
+        displayDetails: {
+          preparation: false,
+          variation: false,
+          pairing: false,
+          side: false,
+        }
+      });
+    }
   
     removeMenuItem(index: number): void {
       this.menuItems.splice(index, 1);
@@ -401,6 +424,10 @@ export class AddMenuComponent implements OnInit {
     onFileSelected(event: Event, itemIndex: number): void {
       this.isSaving = true;
       const fileInput = event.target as HTMLInputElement;
+      if (!fileInput.files || fileInput.files.length === 0) {
+        this.isSaving = false;
+        return;
+      }
       if (fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
         const filePath = `menu-images/${Date.now()}_${file.name}`;
@@ -438,6 +465,7 @@ export class AddMenuComponent implements OnInit {
     
         this.firestore.collection('menus').add(this.newMenu)
           .then((data) => {
+            console.log(data.id);
             this.currentMenuID = data.id;
             this.newMenu = {
               ...this.newMenu,

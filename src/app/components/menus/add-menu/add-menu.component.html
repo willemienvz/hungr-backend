@@ -124,7 +124,7 @@
                     <h6>Manually Add menu items</h6>
                 </div>
                 <label>Please add the menu items and their details below.</label>
-                <button class="btnSecondary" (click)="addMenuItem()">+ Add item</button>
+                <button class="btnSecondary" (click)="addMenuItemMore()">+ Add item</button>
             </div>
         </div>
         <div *ngFor="let menuItem of menuItems; let itemIndex = index" class="menuItemBlock block">
@@ -263,7 +263,6 @@
         </div>
     </div>
     <div *ngIf="currentStep === 5">
-
         <div class="block lastStep">
             <h6 style="color: #3CE1AF;text-align: center;">Your menu has been saved!</h6>
             <h6>Next Steps</h6>
@@ -281,3 +280,5 @@
         </div>
     </div>
 </div>
+
+<app-loading [isLoading]="isSaving"></app-loading>

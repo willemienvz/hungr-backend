@@ -18,6 +18,5 @@ export const environment = {
       },
       yoko:{
         publicKey: 'pk_test_0a5bd858EPDe3Pjda0e4',
-        secretKey: 'sk_test_9a0b6532prm0QrR6ab34b94bb485'
       }
   };

@@ -52,21 +52,21 @@ export class Step2Component {
     const formData = this.step2Form.value;
     //this.next.emit(formData);
   }
+
   startPayment(subscriptionType: 'monthly' | 'annual') {
     const amount = subscriptionType === 'monthly' ? 200 : 1000;
   
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${environment.yoko.secretKey}` // Optional if API is public
     });
   
     this.http.post<{ checkoutUrl: string }>(
       `${this.apiUrl}/createYocoCheckout`,
-      {
+      JSON.stringify({
         amount: amount,
         currency: 'ZAR',
         reference: `sub_${subscriptionType}_${new Date().getTime()}`,
-      },
+      }), 
       { headers } 
     ).subscribe({
       next: (response) => {
@@ -80,6 +80,7 @@ export class Step2Component {
       }
     });
   }
+  
   
   
 }

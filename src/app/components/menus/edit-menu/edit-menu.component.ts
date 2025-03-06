@@ -38,11 +38,11 @@ export class EditMenuComponent implements OnInit {
   restaurantError: boolean = false;
 
   constructor(
-    private firestore: AngularFirestore,
-    private storage: AngularFireStorage,
-    private papa: Papa,
-    private route: ActivatedRoute, 
-    private toastr: ToastrService
+    private readonly firestore: AngularFirestore,
+    private readonly storage: AngularFireStorage,
+    private readonly papa: Papa,
+    private readonly route: ActivatedRoute, 
+    private readonly toastr: ToastrService
   ) {}
 
   ngOnInit() {

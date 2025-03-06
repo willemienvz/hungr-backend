@@ -38,7 +38,22 @@ export class ViewQrComponent implements OnInit {
   closePopup() {
     this.showPopup = false;
   }
-
+  downloadQRCode() {
+    const qrElement = document.querySelector('qrcode canvas') as HTMLCanvasElement;
+    
+    if (qrElement) {
+      const imageUrl = qrElement.toDataURL('image/png'); // Convert to Image
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = 'qrcode.png'; // Set file name
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      console.error("QR code canvas not found!");
+    }
+  }
+  
   private fetchMenu() {
     this.firestore.collection<Menu>('menus', ref => ref.where('menuID', '==', this.selectedID))
       .valueChanges()
