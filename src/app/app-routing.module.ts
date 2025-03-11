@@ -30,6 +30,7 @@ import { SalesInsightsComponent } from './components/dashboard/sales-insights/sa
 import { ResetSuccessComponent } from './components/forgot-password/reset-success/reset-success.component';
 import { ConfirmEmailComponent } from './components/sign-up/confirm-email/confirm-email.component';
 import { NewPasswordComponent } from './components/forgot-password/new-password/new-password.component';
+import { CancelPaymentComponent } from './components/cancel-payment/cancel-payment.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -38,6 +39,7 @@ const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'confirm-user', component: ConfirmUserComponent },
   { path: 'verify-email-address', component: VerifyEmailComponent },
+  { path: 'cancel-payment', component: CancelPaymentComponent },
   { path: 'password-reset-success', component: ResetSuccessComponent },
   { path: 'password-reset', component: NewPasswordComponent },
   { path: 'confirm-email', component: ConfirmEmailComponent },

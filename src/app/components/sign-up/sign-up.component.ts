@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthService } from "../../shared/services/auth.service";
 import { FormDataService } from '../../shared/services/signup/form-data.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { EmailService } from '../../shared/services/email.service';
 import { ToastrService } from 'ngx-toastr';
+import { PayflexService } from '../../shared/services/payflex.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-sign-up',
@@ -16,12 +18,15 @@ export class SignUpComponent {
   formDataStep2: any;
   formDataStep3: any;
   errorMessage: string | null = null;
+  private formData = new BehaviorSubject<any>({});
+  
 
   constructor(
     public authService: AuthService,
     private readonly formDataService: FormDataService,
     private readonly toastr: ToastrService,
-    private readonly auth: AngularFireAuth, private readonly emailService: EmailService
+    private readonly auth: AngularFireAuth, private readonly emailService: EmailService,
+    private readonly payflexService: PayflexService,
   ) {}
 
 
@@ -34,7 +39,7 @@ export class SignUpComponent {
   onNextStepStep2(formData: any) {
     this.formDataStep2 = formData;
     this.formDataService.updateFormData({ ...this.formDataStep1, ...formData });
-    this.currentStep++;
+    this.onCheckout();
   }
 
   onPreviousStep() {
@@ -42,6 +47,18 @@ export class SignUpComponent {
       this.currentStep--;
     }
   }
+
+
+  async onCheckout() {
+    this.formData = this.formDataService.getFormData();
+    localStorage.setItem('formData', JSON.stringify(this.formData))
+    try {
+      await this.payflexService.createOrder(120, this.formData);
+    } catch (error) {
+      console.error('Error during checkout:', error);
+    }
+  }
+
 
   onCompleteStep3(formData: any) {
     this.formDataStep3 = formData;
@@ -66,7 +83,6 @@ export class SignUpComponent {
       const user = userCredential.user;
   
       if (user) {
-        // Update user profile with display name
         await user.updateProfile({
           displayName: name
         });

@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class FormDataService {
-  private formData = new BehaviorSubject<any>({});
+  private readonly formData = new BehaviorSubject<any>({});
   currentFormData = this.formData.asObservable();
 
   updateFormData(data: any) {

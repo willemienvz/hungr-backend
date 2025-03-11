@@ -10,5 +10,7 @@ export class VerifyEmailComponent implements OnInit {
     public authService: AuthService
   ) { }
   ngOnInit() {
+    let data = localStorage.getItem('formData');
+    console.log('storedData', data);
   }
 }

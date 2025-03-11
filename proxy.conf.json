@@ -1,0 +1,9 @@
+{
+    "/auth/merchant": {
+      "target": "https://auth-uat.payflex.co.za",
+      "secure": true,
+      "changeOrigin": true,
+      "logLevel": "debug"
+    }
+  }
+  
