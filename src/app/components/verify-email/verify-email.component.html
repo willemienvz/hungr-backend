@@ -7,13 +7,11 @@
       </div>
       <div class="formGroup">
         <button type="button" class="btn btnPrimary" (click)="verifyAndCreate()">
-          <i class="fas fa-redo-alt"></i>
-          resend email
+          Verify Email
         </button>
       </div>
     </div>
-    <div class="redirectToLogin">
-      <p>Didn't receive the email? Check your details to verify your email address.</p>
-    </div>
   </div>
 </div>
+
+<app-loading [isLoading]="isSaving"></app-loading>

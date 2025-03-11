@@ -12,6 +12,7 @@ import { EmailService } from '../../shared/services/email.service';
 export class VerifyEmailComponent implements OnInit {
   token: string = '';
   formData:any;
+  isSaving: boolean = false;
   constructor(
     public authService: AuthService,
     private readonly route: ActivatedRoute,
@@ -39,6 +40,7 @@ export class VerifyEmailComponent implements OnInit {
 
 
   async signup(formData:any) {
+    this.isSaving = true;
     try {
       const userCredential = await this.auth.createUserWithEmailAndPassword(formData.userEmail, formData.password);
       const user = userCredential.user;
@@ -48,7 +50,7 @@ export class VerifyEmailComponent implements OnInit {
           displayName: formData.firstName
         });
   
-        const confirmationLink = `https://your-angular-app.com/confirm-email?uid=${user.uid}`;
+        const confirmationLink = `https://main.d9ek0iheftizq.amplifyapp.com/confirm-email?uid=${user.uid}`;
 
 
         this.emailService.sendConfirmationEmail(formData.userEmail, confirmationLink, formData.firstName).subscribe({
@@ -56,12 +58,18 @@ export class VerifyEmailComponent implements OnInit {
             this.authService.SetUserData(user, this.formData);
             alert('Confirmation email sent!')
             this.toastr.success('Confirmation email sent!');
+            this.isSaving = false;
           },
           error: (err) =>
+          {
             this.toastr.success('Error sending email:', err)
+            this.isSaving = false;
+          }
+            
         });
       }
     } catch (error) {
+      this.isSaving = false;
       console.error('Signup error:', error);
     }
   }
