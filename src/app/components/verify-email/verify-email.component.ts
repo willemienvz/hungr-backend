@@ -78,9 +78,7 @@ export class VerifyEmailComponent implements OnInit {
       .then((u: any) => {
         u.sendEmailVerification()
         this.toastr.success('Confirmation email sent!');
+        this.isSaving = false;
       })
-      .then(() => {
-        this.toastr.success('Error sending email');
-      });
   }
 }
