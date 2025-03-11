@@ -55,20 +55,28 @@ export class AuthService {
     }
   }
   // Sign in with email/password
-  SignIn(email: string, password: string) {
-    return this.afAuth
-      .signInWithEmailAndPassword(email, password)
-      .then((result) => {
-        this.afAuth.authState.subscribe((user) => {
-          if (user) {
-            this.router.navigate(['dashboard']);
-          }
-        });
-      })
-      .catch((error) => {
-        this.toastr.error('Invalid email and/or password combination.');
-      });
-  }
+ SignIn(email: string, password: string) {
+  return this.afAuth
+    .signInWithEmailAndPassword(email, password)
+    .then(async (result) => {
+      const user = result.user;
+      if (user) {
+        await user.reload(); 
+
+        if (!user.emailVerified) {
+          this.toastr.warning('Your email is not verified. You may have limited access.');
+        } else {
+          this.toastr.success('Login successful!');
+        }
+
+        this.router.navigate(['dashboard']); 
+      }
+    })
+    .catch((error) => {
+      this.toastr.error('Invalid email and/or password combination.');
+    });
+}
+
   // Sign up with email/password
   SignUp(email: string, password: string, formDataStep1:any, formDataStep2:any,  formDataStep3:any) {
   /*   return this.afAuth

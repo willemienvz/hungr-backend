@@ -4,10 +4,10 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-background-image: url('../../../../assets/images/backgrounds/signup.png');
-background-position: top left;
-background-repeat: no-repeat;
-background-size: cover;
+    background-image: url('../../../../assets/images/backgrounds/signup.png');
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-size: cover;
 
     .displayTableCell{
         width: 100%;
@@ -27,7 +27,6 @@ background-size: cover;
             align-items: center;
             flex-direction: column;
             gap:25px;
-            margin-bottom: 25px;
 
             p{
                 text-align: center;

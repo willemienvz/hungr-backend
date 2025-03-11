@@ -50,13 +50,12 @@ export class VerifyEmailComponent implements OnInit {
           displayName: formData.firstName
         });
   
-        const confirmationLink = `https://main.d9ek0iheftizq.amplifyapp.com/confirm-email?uid=${user.uid}`;
+        //const confirmationLink = `https://main.d9ek0iheftizq.amplifyapp.com/confirm-email?uid=${user.uid}`;
 
-
-        this.emailService.sendConfirmationEmail(formData.userEmail, confirmationLink, formData.firstName).subscribe({
+        this.SendVerificationMail();
+       /*  this.emailService.sendConfirmationEmail(formData.userEmail, confirmationLink, formData.firstName).subscribe({
           next: () => {
             this.authService.SetUserData(user, this.formData);
-            alert('Confirmation email sent!')
             this.toastr.success('Confirmation email sent!');
             this.isSaving = false;
           },
@@ -66,11 +65,22 @@ export class VerifyEmailComponent implements OnInit {
             this.isSaving = false;
           }
             
-        });
+        }); */
       }
     } catch (error) {
       this.isSaving = false;
       console.error('Signup error:', error);
     }
+  }
+
+  SendVerificationMail() {
+    return this.auth.currentUser
+      .then((u: any) => {
+        u.sendEmailVerification()
+        this.toastr.success('Confirmation email sent!');
+      })
+      .then(() => {
+        this.toastr.success('Error sending email');
+      });
   }
 }

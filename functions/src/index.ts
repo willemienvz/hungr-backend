@@ -52,3 +52,4 @@ export const sendBrevoEmail = functions.https.onRequest((req, res) => {
 });
 
 
+
