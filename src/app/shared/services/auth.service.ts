@@ -151,29 +151,28 @@ export class AuthService {
   /* Setting up user data when sign in with username/password, 
   sign up with username/password and sign in with social auth  
   provider in Firestore database using AngularFirestore + AngularFirestoreDocument service */
-  SetUserData(user: any, formDataStep1:any, formDataStep2:any, formDataStep3:any) {
+  SetUserData(user: any, formData:any) {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
       `users/${user.uid}`
     );
-    console.log(formDataStep3);
     
     const userData: User = {
       uid: user.uid,
-      firstName: formDataStep1.firstName,
-      Surname: formDataStep1.lastName,
-      email: formDataStep1.userEmail,
-      cellphoneNumber: formDataStep1.cellphone,
+      firstName: formData.firstName,
+      Surname: formData.lastName,
+      email: formData.userEmail,
+      cellphoneNumber: formData.cellphone,
       emailVerified: user.emailVerified,
-      marketingConsent:formDataStep2.receiveMarketingInfo,
-      tipsTutorials:formDataStep2.receiveMarketingInfo,
-      userInsights:formDataStep2.receiveMarketingInfo,
+      marketingConsent:formData.receiveMarketingInfo,
+      tipsTutorials:formData.receiveMarketingInfo,
+      userInsights:formData.receiveMarketingInfo,
       aboutUsDisplayed:false,
       cardHolderName: '',
       cardNumber:'',
       cvv: 0,
       expiryDate: '',
       accountType:'admin',
-      subscriptionType: formDataStep2.billingOption,
+      subscriptionType: formData.billingOption,
       parentId:'',
       about: {
         aboutText: '',

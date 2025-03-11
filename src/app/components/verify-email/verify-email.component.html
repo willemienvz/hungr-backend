@@ -1,15 +1,12 @@
 <div class="displayTable">
   <div class="displayTableCell">
     <div class="authBlock">
-      <h2>Thank You for Registering</h2>
-      <div class="formGroup" *ngIf="authService.userData as user">
-        <p class="text-center">We have sent a confirmation email to <strong>{{user.email}}</strong>.</p>
-        <p class="text-center">Please check your email and click on the link to verfiy your email address.</p>
-      </div>
-
-      <!-- Calling SendVerificationMail() method using authService Api -->
+      <h2>Thank you for your payment</h2>
       <div class="formGroup">
-        <button type="button" class="btn btnPrimary" (click)="authService.SendVerificationMail()">
+        <p class="text-center">Please verify your email address to complete your account setup. </p>
+      </div>
+      <div class="formGroup">
+        <button type="button" class="btn btnPrimary" (click)="verifyAndCreate()">
           <i class="fas fa-redo-alt"></i>
           resend email
         </button>

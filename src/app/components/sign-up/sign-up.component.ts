@@ -74,10 +74,10 @@ export class SignUpComponent {
       this.formDataStep3
     );
 
-    this.signup(this.formDataStep1.userEmail, this.formDataStep1.password, this.formDataStep1.firstName);
+    //this.signup(this.formDataStep1.userEmail, this.formDataStep1.password, this.formDataStep1.firstName);
   }
 
-  async signup(email: string, password: string, name: string) {
+ /*  async signup(email: string, password: string, name: string) {
     try {
       const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
@@ -103,12 +103,12 @@ export class SignUpComponent {
     } catch (error) {
       console.error('Signup error:', error);
     }
-  }
+  } */
   
 
   onSkipStep3() {
     console.log('Form Data from Step 1:', this.formDataStep1);
     console.log('Form Data from Step 2:', this.formDataStep2);
-    this.signup(this.formDataStep1.userEmail, this.formDataStep1.password, this.formDataStep1.firstName);
+  //  this.signup(this.formDataStep1.userEmail, this.formDataStep1.password, this.formDataStep1.firstName);
   }
 }
