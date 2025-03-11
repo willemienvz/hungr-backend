@@ -85,6 +85,7 @@ import { ResetSuccessComponent } from './components/forgot-password/reset-succes
 import { ConfirmEmailComponent } from './components/sign-up/confirm-email/confirm-email.component';
 import { NewPasswordComponent } from './components/forgot-password/new-password/new-password.component';
 import { CancelPaymentComponent } from './components/cancel-payment/cancel-payment.component';
+import { ActionLandingComponent } from './components/action-landing/action-landing.component';
 
 @NgModule({
   declarations: [
@@ -143,6 +144,7 @@ import { CancelPaymentComponent } from './components/cancel-payment/cancel-payme
     ConfirmEmailComponent,
     NewPasswordComponent,
     CancelPaymentComponent,
+    ActionLandingComponent,
   ],
   imports: [
     BrowserModule,

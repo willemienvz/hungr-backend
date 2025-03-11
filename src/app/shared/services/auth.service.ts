@@ -163,7 +163,8 @@ export class AuthService {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
       `users/${user.uid}`
     );
-    
+    console.log('userRef', userRef);
+  
     const userData: User = {
       uid: user.uid,
       firstName: formData.firstName,
@@ -193,6 +194,7 @@ export class AuthService {
         additionalImageUrl: ''
     }
     };
+    console.log('userData', userData);
     return userRef.set(userData, {
       merge: true,
     });

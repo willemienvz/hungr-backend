@@ -52,8 +52,8 @@ export class VerifyEmailComponent implements OnInit {
   
         //const confirmationLink = `https://main.d9ek0iheftizq.amplifyapp.com/confirm-email?uid=${user.uid}`;
 
-        this.SendVerificationMail();
-       /*  this.emailService.sendConfirmationEmail(formData.userEmail, confirmationLink, formData.firstName).subscribe({
+        this.SendVerificationMail(user);
+     /*   this.emailService.sendConfirmationEmail(formData.userEmail, confirmationLink, formData.firstName).subscribe({
           next: () => {
             this.authService.SetUserData(user, this.formData);
             this.toastr.success('Confirmation email sent!');
@@ -73,12 +73,14 @@ export class VerifyEmailComponent implements OnInit {
     }
   }
 
-  SendVerificationMail() {
+  SendVerificationMail(user:any) {
     return this.auth.currentUser
       .then((u: any) => {
         u.sendEmailVerification()
         this.toastr.success('Confirmation email sent!');
         this.isSaving = false;
+        this.authService.SetUserData(user, this.formData);
+
       })
   }
 }
