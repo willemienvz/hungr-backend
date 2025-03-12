@@ -77,14 +77,26 @@ export class VerifyEmailComponent implements OnInit {
     }
   }
 
-  SendVerificationMail(user:any) {
+  SendVerificationMail(user: any) {
     return this.auth.currentUser
       .then((u: any) => {
         u.sendEmailVerification()
-        this.toastr.success('Confirmation email sent!');
-        this.isSaving = false;
-        this.authService.SetUserData(user, this.formData);
-
+          .then(() => {
+            this.toastr.success('Confirmation email sent!');
+            this.authService.SetUserData(user, this.formData);
+          })
+          .catch((error: any) => {
+            this.toastr.error('Failed to send confirmation email. Please try again later.');
+            console.error('Error sending email verification:', error);
+          });
       })
+      .catch((error: any) => {
+        this.toastr.error('Failed to retrieve current user.');
+        console.error('Error retrieving current user:', error);
+      })
+      .finally(() => {
+        this.isSaving = false;
+      });
   }
+  
 }
