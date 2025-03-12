@@ -52,10 +52,9 @@ export class VerifyEmailComponent implements OnInit {
           displayName: formData.firstName
         });
 
-        //this.SendVerificationMail(user);
+        this.SendVerificationMail(user);
   
-        // Generate Firebase Verification Link via Cloud Function
-        const generateLinkFn = this.fns.httpsCallable('generateEmailVerificationLink');
+        /* const generateLinkFn = this.fns.httpsCallable('generateEmailVerificationLink');
         const response = await generateLinkFn({ email: formData.userEmail }).toPromise();
 
         const confirmationLink = response?.link;
@@ -70,7 +69,7 @@ export class VerifyEmailComponent implements OnInit {
             this.toastr.error('Error sending email:', err);
             this.isSaving = false;
           }
-        });
+        }); */
       }
     } catch (error) {
       this.isSaving = false;

@@ -10,6 +10,7 @@ export class EmailService {
   constructor(private readonly http: HttpClient) {}
 
   sendConfirmationEmail(email: string, confirmationLink: string, name: string) {
+    
     return this.http.post(this.firebaseFunctionUrl, {
       email,
       subject: "Confirm Your Email",
