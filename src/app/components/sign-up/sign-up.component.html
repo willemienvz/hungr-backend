@@ -9,3 +9,5 @@
 <div *ngIf="currentStep === 3">
   <app-step3 (previous)="onPreviousStep()" (finish)="onCompleteStep3($event)" (skip)="onSkipStep3()"></app-step3>
 </div>
+
+<app-loading [isLoading]="isSaving"></app-loading>

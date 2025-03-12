@@ -17,6 +17,7 @@ export class SignUpComponent {
   formDataStep1: any;
   formDataStep2: any;
   formDataStep3: any;
+  isSaving: boolean = false;
   errorMessage: string | null = null;
   private formData = new BehaviorSubject<any>({});
   
@@ -50,12 +51,15 @@ export class SignUpComponent {
 
 
   async onCheckout() {
+    this.isSaving = true;
     this.formData = this.formDataService.getFormData();
     localStorage.setItem('formData', JSON.stringify(this.formData))
     try {
       await this.payflexService.createOrder(120, this.formData);
     } catch (error) {
       console.error('Error during checkout:', error);
+    } finally {
+      this.isSaving = false; 
     }
   }
 
