@@ -209,6 +209,11 @@ export class DashboardComponent implements OnInit {
     return `${difference}%`;
   }
 
+  get displayAverageTime(): number {
+    return isNaN(this.averageTime) ? 0 : this.averageTime;
+  }
+  
+
   // Function to calculate the percentage difference between the last 24 hours and the 24 hours before
   getDailyDifferenceMessage(): string {
     const difference = this.calculatePercentageDifference(

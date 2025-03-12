@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { EmailService } from '../../shared/services/email.service';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 @Component({
   selector: 'app-verify-email',
   templateUrl: './verify-email.component.html',
@@ -19,6 +20,7 @@ export class VerifyEmailComponent implements OnInit {
     private readonly toastr: ToastrService,
     private readonly auth: AngularFireAuth,
     private readonly emailService: EmailService,
+    private readonly fns: AngularFireFunctions
   ) { }
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -49,23 +51,26 @@ export class VerifyEmailComponent implements OnInit {
         await user.updateProfile({
           displayName: formData.firstName
         });
-  
-        //const confirmationLink = `https://main.d9ek0iheftizq.amplifyapp.com/confirm-email?uid=${user.uid}`;
 
-        this.SendVerificationMail(user);
-     /*   this.emailService.sendConfirmationEmail(formData.userEmail, confirmationLink, formData.firstName).subscribe({
+        //this.SendVerificationMail(user);
+  
+        // Generate Firebase Verification Link via Cloud Function
+        const generateLinkFn = this.fns.httpsCallable('generateEmailVerificationLink');
+        const response = await generateLinkFn({ email: formData.userEmail }).toPromise();
+
+        const confirmationLink = response?.link;
+
+        this.emailService.sendConfirmationEmail(formData.userEmail, confirmationLink, formData.firstName).subscribe({
           next: () => {
             this.authService.SetUserData(user, this.formData);
             this.toastr.success('Confirmation email sent!');
             this.isSaving = false;
           },
-          error: (err) =>
-          {
-            this.toastr.success('Error sending email:', err)
+          error: (err) => {
+            this.toastr.error('Error sending email:', err);
             this.isSaving = false;
           }
-            
-        }); */
+        });
       }
     } catch (error) {
       this.isSaving = false;

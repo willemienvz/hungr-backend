@@ -51,5 +51,27 @@ export const sendBrevoEmail = functions.https.onRequest((req, res) => {
     });
 });
 
-
+export const generateEmailVerificationLink = functions.https.onCall(
+    async (request: functions.https.CallableRequest<{ email: string }>) => {
+      const email = request.data.email; 
+  
+      if (!email) {
+        throw new functions.https.HttpsError('invalid-argument', 'Email is required');
+      }
+  
+      const actionCodeSettings = {
+        url: 'https://main.d9ek0iheftizq.amplifyapp.com/confirm-email', 
+        handleCodeInApp: true
+      };
+  
+      try {
+        const link = await admin.auth().generateEmailVerificationLink(email, actionCodeSettings);
+        console.log('Generated verification link:', link);
+        return { link };
+      } catch (error) {
+        console.error('Error generating email verification link:', error);
+        throw new functions.https.HttpsError('internal', 'Failed to generate verification link.');
+      }
+    }
+  );
 
