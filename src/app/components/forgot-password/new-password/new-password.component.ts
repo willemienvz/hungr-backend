@@ -18,14 +18,12 @@ export class NewPasswordComponent implements OnInit {
   constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly toastr: ToastrService) {}
 
   ngOnInit() {
-    // ✅ Ensure Firebase is initialized before using Firebase services
     if (!getApps().length) {
       initializeApp(environment.firebase);
       
     }
 
-    this.oobCode = this.route.snapshot.queryParamMap.get('oobCode');
-   
+    this.oobCode = this.route.snapshot.queryParamMap.get('oobCode');    
   }
 
   async resetPassword() {
@@ -37,7 +35,7 @@ export class NewPasswordComponent implements OnInit {
 
      
         const auth = getAuth();
-     
+        console.log(this.newPassword);
 
         await confirmPasswordReset(auth, this.oobCode, this.newPassword);
         this.toastr.success('Password reset successful! Redirecting to login');

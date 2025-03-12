@@ -30,7 +30,6 @@ export class ConfirmEmailComponent implements OnInit {
     this.afAuth.applyActionCode(oobCode)
       .then(() => {
         console.log('Email successfully verified!');
-        alert('Email successfully verified! You can now log in.');
 
         this.afAuth.currentUser.then(user => user?.reload());
 

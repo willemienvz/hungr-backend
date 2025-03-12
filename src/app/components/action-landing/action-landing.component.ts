@@ -24,7 +24,7 @@ export class ActionLandingComponent implements OnInit {
             break;
 
           case 'resetPassword':
-            newPath = 'reset-password';
+            newPath = 'password-reset';
             break;
 
           default:
