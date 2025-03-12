@@ -6,7 +6,8 @@ import { Injectable } from '@angular/core';
 })
 export class PayflexService {
   //private readonly authUrl = '/auth/merchant';
-  private readonly authUrl = 'https://auth-uat.payflex.co.za/auth/merchant';
+  //private readonly authUrl = 'https://auth-uat.payflex.co.za/auth/merchant';
+  private readonly authUrl = 'https://y7mqf7rq33.execute-api.us-east-1.amazonaws.com/prod1/auth/merchant';
   private readonly createOrderUrl = 'https://api.uat.payflex.co.za/order';
 
   private readonly clientId = 's24rhTxLINDzBaOUURG8AeFR8XdnokhY';
