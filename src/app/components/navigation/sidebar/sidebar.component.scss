@@ -1,70 +1,72 @@
-
-.sidebar{
-    width: 243px;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    padding-top: 100px;
-    bottom: 0;
-    overflow-y: auto;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    border-radius: 1px solid #EBEDEE;
-    box-shadow: 0 1px 8px rgba(68, 68, 68, 0.08);
+.sidebar {
+  width: 255px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  padding-top: 100px;
+  bottom: 0;
+  overflow-y: auto;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 1px solid #ebedee;
+  box-shadow: 0 1px 8px rgba(68, 68, 68, 0.08);
 }
 
-.sidebar .subsidebarcontainer{
-    display: flex;
-    flex-direction: column;
-    border-bottom: 1px solid #EBEDEE;
-    padding-bottom: 25px;
-    margin-bottom: 19px;
+.sidebar .subsidebarcontainer {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #ebedee;
+  padding-bottom: 25px;
+  margin-bottom: 10px;
+
+  &:last-of-type {
+    margin-bottom: 0px;
+  }
 }
 
-.sidebar .subsidebarcontainer:last-of-type{
-    border-bottom: none;
+.sidebar .subsidebarcontainer:last-of-type {
+  border-bottom: none;
 }
 
-.sidebar .heading{
-    color: #9A9A9A;
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 22px;
-    letter-spacing: -0.1%;
-    margin-bottom: 8px;
-    padding: 8px 50px;
+.sidebar .heading {
+  color: #9a9a9a;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 22px;
+  letter-spacing: -0.1%;
+  margin-bottom: 8px;
+  padding: 8px 50px;
 }
 
-.sidebar .subsidebarcontainer .material-icons{
-    font-size: 15px;
+.sidebar .subsidebarcontainer .material-icons {
+  font-size: 15px;
 }
 
-.sidebar .subsidebarcontainer a{
-    padding: 8px 50px;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    gap:8px;
-    justify-content: flex-start;
-    align-items: center;
-    color: #444444;
-    font-size: 15px;
-    cursor: pointer;
-    font-weight: 400;
-    text-decoration: none;
+.sidebar .subsidebarcontainer a {
+  padding: 8px 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: flex-start;
+  align-items: center;
+  color: #444444;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 400;
+  text-decoration: none;
 }
 
-.sidebar .subsidebarcontainer .activeMenu{
-    font-weight: 600;
-    color: #181818;
-    background-color: #FFF352;
-    border: 1px solid #EBEDEE;
-
+.sidebar .subsidebarcontainer .activeMenu {
+  font-weight: 600;
+  color: #181818;
+  background-color: #fff352;
+  border: 1px solid #ebedee;
 }
 
-.sidebar .subsidebarcontainer a:hover{
-    font-weight: 600;
-    background-color: #fff9a7;
+.sidebar .subsidebarcontainer a:hover {
+  font-weight: 600;
+  background-color: #fff9a7;
 }

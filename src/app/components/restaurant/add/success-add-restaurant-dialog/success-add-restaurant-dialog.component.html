@@ -1,11 +1,21 @@
 <section class="confirmation-container">
-    <header class="confirmation-header">
-        <h2 class="confirmation-title">{{data.title}}</h2>
-        <i class="material-icons" (click)="closeDialog()"
-            style="cursor: pointer;position: absolute; top: 20px; right: 20px;">close</i>
-    </header>
-    <p class="confirmation-message">
-        {{data.message}}
-    </p>
-    <button class="btnSecondary" (click)="closeDialog()">done</button>
+  <header class="confirmation-header">
+    <h2 class="confirmation-title">{{ data.title }}</h2>
+    <i
+      class="material-icons"
+      (click)="closeDialog()"
+      style="cursor: pointer; position: absolute; top: 20px; right: 20px"
+      >close</i
+    >
+  </header>
+  <p class="confirmation-message">
+    {{ data.message }}
+  </p>
+  <button
+    class="btnSecondary"
+    routerLink="/restaurants"
+    (click)="closeDialog()"
+  >
+    done
+  </button>
 </section>

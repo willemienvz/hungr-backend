@@ -1,148 +1,147 @@
-.outer-container{
+.outer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  height: 100vh;
+
+  .outer-container {
     width: 100%;
+    max-width: 1320px;
     display: flex;
     padding: 50px;
     flex-direction: row;
     justify-content: center;
     align-items: stretch;
     height: 100vh;
+  }
+  .col {
+    width: calc(50% - 20px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 
-    .col{
-        width: calc(50% - 20px);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+  .formCol {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .logo {
+      width: 195px;
+      margin-bottom: 70px;
     }
 
-    .formCol{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        .logo{
-            width: 195px;
-            margin-bottom: 70px;
-        }
-
-        h1{
-           color: #444444;
-           text-align: center;
-           margin-bottom: 24px;
-        }
-
-        .displayTableCell{
-            width: 60%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: flex-start;
-
-            label{
-                color: #9A9A9A;
-                text-align: left;
-                margin-bottom: 12px;
-            }
-
-            .authBlock{
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: flex-start;
-
-                .formGroup{
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-start;
-                    align-items: flex-start;
-                    margin-bottom: 25px;
-
-                 
-
-                    .password-toggle{
-                        width: 100%;
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: space-between;
-                        align-items: center;
-                        position: relative;
-                        .material-icons{
-                            position: absolute;
-                            top: 11px;
-                            right: 13px;
-                            font-size: 19px;
-                            cursor: pointer;
-                            color: #EBEDEE;
-                        }
-                    }
-
-                   
-
-                    .forgotPassword{
-                        width: 100%;
-                        display: flex;
-                        margin-top: 12px;
-                    }
-                }
-
-                .btnHolder{
-                    align-items: center;
-                    margin-bottom: 23px;
-                }
-
-
-              
-            }
-            
-           
-        }
-        .redirectToLogin{
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            .redirect{
-                text-align: center;
-                width: 100%;
-                text-decoration: underline;
-            }
-        }
-        
-    } 
-
-    .downloadappcol{
-        display: flex;
-        flex-direction: column;
-        width: calc(50% - 20px);
-
-        img { 
-            width: 100%;
-            object-fit: cover;
-            height: 100%;
-            border-radius: 10px;
-            object-position: top left;
-        }
+    h1 {
+      color: #444444;
+      text-align: center;
+      margin-bottom: 24px;
     }
 
-.downloadappbox{
+    .displayTableCell {
+      width: 60%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+
+      label {
+        color: #9a9a9a;
+        text-align: left;
+        margin-bottom: 12px;
+      }
+
+      .authBlock {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .formGroup {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: flex-start;
+          margin-bottom: 25px;
+
+          .password-toggle {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            .material-icons {
+              position: absolute;
+              top: 11px;
+              right: 13px;
+              font-size: 19px;
+              cursor: pointer;
+              color: #ebedee;
+            }
+          }
+
+          .forgotPassword {
+            width: 100%;
+            display: flex;
+            margin-top: 12px;
+          }
+        }
+
+        .btnHolder {
+          align-items: center;
+          margin-bottom: 23px;
+        }
+      }
+    }
+    .redirectToLogin {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      .redirect {
+        text-align: center;
+        width: 100%;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .downloadappcol {
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 20px);
+
+    img {
+      width: 100%;
+      object-fit: cover;
+      height: 100%;
+      border-radius: 10px;
+      object-position: top left;
+    }
+  }
+
+  .downloadappbox {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-end;
     width: 100%;
 
-    .downloadappboxinner{
-        width: 50%;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        justify-content: center;
-        align-items: center;
+    .downloadappboxinner {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
     }
-    h3{
-        text-align: center;
-        color: #181818;
+    h3 {
+      text-align: center;
+      color: #181818;
     }
-}
+  }
 }
