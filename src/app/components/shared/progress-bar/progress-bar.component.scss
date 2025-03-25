@@ -1,50 +1,46 @@
 .progress-main-container {
-    border: 1px solid rgba(235, 237, 238, 1);
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    font-size: 13px;
-    color: #444;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: -0.01px;
-    line-height: 100%;
-    justify-content: center;
-    padding: 25px 51px;
-  }
-  
+  border: 1px solid rgba(235, 237, 238, 1);
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  font-size: 13px;
+  color: #444;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.01px;
+  line-height: 100%;
+  justify-content: center;
+  padding: 25px 51px;
+}
 
-  .progress-bar-container {
-    border-radius: 28px;
-    background-color: #f2f3f4;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    position: relative;
-    width: 100%;
-    justify-content: center;
-    height: 15px;
-  }
+.progress-bar-container {
+  border-radius: 28px;
+  background-color: #f2f3f4;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  width: 100%;
+  justify-content: center;
+  height: 15px;
+}
 
+.progress-bar {
+  border-radius: 28px;
+  background-color: #3ce1af;
+  height: 15px;
+  flex-grow: 1;
+  position: absolute;
+  left: 0;
+}
 
-  .progress-bar {
-    border-radius: 28px;
-    background-color: #3ce1af;
-    height: 15px;
-    flex-grow: 1;
-    position: absolute;
-    left: 0;
-  }
+.progress-info {
+  margin: auto 0;
+  font-weight: 600;
+  position: absolute;
+}
 
-  .progress-info {
-    margin: auto 0;
-    font-weight: 600;
-    position: absolute;
-  }
-
-
-  
 .step-indicator {
   display: flex;
   align-items: center;
@@ -83,7 +79,7 @@
 
 .step .line {
   height: 2px;
-  width: 50px
+  width: 50px;
 }
 
 .progress-container {
@@ -103,7 +99,7 @@
   z-index: 5;
 }
 .step-indicator:focus {
-  outline: 2px solid #4A90E2;
+  outline: 2px solid #4a90e2;
   outline-offset: 2px;
 }
 .step-indicator.active {
@@ -113,28 +109,36 @@
   height: 26px;
 }
 
-.row{
+.row {
   justify-content: center;
   align-items: center;
   display: flex;
   flex-direction: row;
- 
+
   width: 100%;
 
-  .inner{
+  .inner {
     justify-content: center;
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  gap: 25px;
-  position: relative;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    position: relative;
   }
 
-  .line{
+  .line {
     width: 100%;
     height: 1px;
-    background-color: #9A9A9A;
+    background-color: #9a9a9a;
     position: absolute;
     z-index: 1;
   }
+}
+
+.completed {
+  background-color: #3ce1af;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-color: #3ce1af;
 }

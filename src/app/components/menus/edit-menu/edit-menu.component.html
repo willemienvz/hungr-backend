@@ -1,179 +1,407 @@
 <div class="container">
-    <div *ngIf="currentStep === 1">
-        <div class="block">
-            <a class="backLink" routerLink="/menus"><i class="material-icons">chevron_left</i> Back</a>
-            <app-progress-bar [progress]="currentStep"></app-progress-bar>
-            <div class="row headerRow">
-                <h6 class="labelStep">Step 1</h6>
-                <h6>General Details</h6>
+  <div *ngIf="currentStep === 1">
+    <div class="block">
+      <a class="backLink" routerLink="/menus"
+        ><i class="material-icons">chevron_left</i> Back</a
+      >
+      <app-progress-bar [progress]="currentStep"></app-progress-bar>
+      <div class="row headerRow">
+        <h6 class="labelStep">Step 1</h6>
+        <h6>General Details</h6>
+      </div>
+      <div class="col2row">
+        <div class="col">
+          <div class="formGroup" [ngClass]="{ error: menuNameError }">
+            <label>Menu Name</label>
+            <input
+              type="text"
+              class="formControl"
+              placeholder="Name your menu"
+              [(ngModel)]="menuName"
+              required
+              (change)="validateMenuName()"
+            />
+            <div *ngIf="menuNameError" class="error-message">
+              Menu name is required.
             </div>
-            <div class="col2row">
-                <div class="col">
-                    <div class="formGroup" [ngClass]="{'error': menuNameError}">
-                        <label>Menu Name</label>
-                        <input type="text" class="formControl" placeholder="Name your menu" [(ngModel)]="menuName"
-                            required (change)="validateMenuName()" />
-                        <div *ngIf="menuNameError" class="error-message">Menu name is required.</div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="formGroup" [ngClass]="{'error': restaurantError}">
-                        <label>Assign Restaurant</label>
-                        <mat-form-field>
-                            <mat-select [(ngModel)]="selectedRestaurant" (change)="validateRestaurant()">
-                                <mat-option *ngFor="let restaurant of restaurants" [value]="restaurant.restaurantID">
-                                    {{ restaurant.restaurantName }}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                        <div *ngIf="restaurantError" class="error-message">Restaurant selection is required.</div>
-                    </div>
-                </div>
-                <p class="pLinkText">
-                    Need to create a new restaurant? <a class="mainLink" style="text-align: right;" routerLink="/restaurants/add-new-restaurant"> Click here.</a>
-                </p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="formGroup" [ngClass]="{ error: restaurantError }">
+            <label>Assign Restaurant</label>
+            <mat-form-field>
+              <mat-select
+                [(ngModel)]="selectedRestaurant"
+                (change)="validateRestaurant()"
+              >
+                <mat-option
+                  *ngFor="let restaurant of restaurants"
+                  [value]="restaurant.restaurantID"
+                >
+                  {{ restaurant.restaurantName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="restaurantError" class="error-message">
+              Restaurant selection is required.
             </div>
+          </div>
         </div>
-        <div class="step-buttons">
-            <button class="btnGray" routerLink="/menus">
-                Cancel
-            </button>
-            <button class="btnGray" (click)="setAsDraft()">
-                save as draft
-            </button>
-            <button class="btnSecondary" (click)="setAsPublished()">
-                Publish
-            </button>
-            <button class="btnSecondary" (click)="nextStep()" [disabled]="menuNameError || restaurantError">
-                Next
-            </button>
-        </div>
+        <p class="pLinkText">
+          Need to create a new restaurant?
+          <a
+            class="mainLink"
+            style="text-align: right"
+            routerLink="/restaurants/add-new-restaurant"
+          >
+            Click here.</a
+          >
+        </p>
+      </div>
     </div>
-
-    <div *ngIf="currentStep === 2">
-        <div class="block">
-            <app-progress-bar [progress]="currentStep"></app-progress-bar>
-            <div class="row headerRow">
-                <h6 class="labelStep">Step 2</h6>
-                <h6>Edit your menu categories</h6>
-            </div>
-            <div class="row addCol">
-                <input type="text" class="formControl" placeholder="Name your category" [(ngModel)]="newCategoryName" />
-                <button class="btnSecondary" (click)="addCategory()">+ Add Category</button>
-            </div>
-        </div>
-        <div class="row catRow">
-            <div *ngFor="let category of categories; let i = index" class="block">
-                <h6>{{ category.name }}</h6>
-                <div class="inputBox">
-                    <input type="text" [(ngModel)]="newSubcategoryName[i]" (keyup.enter)="addSubCategory(i)" />
-                    <label>press enter to add</label>
-                </div>
-                <i class="material-icons dltIcon" (click)="deleteCategory(i)">delete</i>
-                <div *ngFor="let subcategory of category.subcategories" class="subcat">
-                    <p>{{ subcategory.name }}</p>
-                    <i class="material-icons" (click)="deleteSubCategory(i, subcategory.id)">close</i>
-                </div>
-            </div>
-        </div>
-        <div class="step-buttons">
-            <button class="btnGray" routerLink="/menus">
-                Cancel
-            </button>
-            <button class="btnGray" (click)="setAsDraft()">
-                save as draft
-            </button>
-            <button class="btnSecondary" (click)="setAsPublished()">
-                Publish
-            </button>
-            <button class="btnSecondary" (click)="nextStep()">Next</button>
-        </div>
+    <div class="step-buttons">
+      <button class="btnGray" routerLink="/menus">Cancel</button>
+      <button class="btnGray" (click)="setAsDraft()">save as draft</button>
+      <button class="btnSecondary" (click)="setAsPublished()">Publish</button>
+      <button
+        class="btnSecondary"
+        (click)="nextStep()"
+        [disabled]="menuNameError || restaurantError"
+      >
+        Next
+      </button>
     </div>
+  </div>
 
-    <div *ngIf="currentStep === 3">
-        <div class="block">
-            <app-progress-bar [progress]="currentStep"></app-progress-bar>
-            <div class="row headerRow">
-                <h6 class="labelStep">Step 3</h6>
-                <h6>Edit Items in Your Menu</h6>
-            </div>
-            <div class="row addRowOuter">
-                <button class="btnSecondary" (click)="addMenuItem()">+ Add Menu Item</button>
-            </div>
-        </div>
-        <div *ngFor="let menuItem of menuItems; let itemIndex = index" class="menuItemBlock block">
-            <div class="row3col">
-                <div class="itemCol">
-                    <p>Select Category</p>
-                    <mat-select [(value)]="menuItem.categoryId" placeholder="Select Category">
-                        <mat-optgroup *ngFor="let category of categories" [label]="category.name">
-                            <mat-option [value]="category.id">{{ category.name }}</mat-option>
-                            <mat-option *ngFor="let subcategory of category.subcategories" [value]="subcategory.id">
-                                &nbsp;&nbsp;{{ subcategory.name }}
-                            </mat-option>
-                        </mat-optgroup>
-                    </mat-select>
-                </div>
-                <div class="itemCol">
-                    <p>Item Name</p>
-                    <input type="text" [(ngModel)]="menuItem.name" placeholder="Item Name"
-                        [ngModelOptions]="{ standalone: true }" />
-                    <input type="text" [(ngModel)]="menuItem.description" placeholder="Description..."
-                        [ngModelOptions]="{ standalone: true }" />
-                </div>
-                <div class="itemCol priceContainer">
-                    <div class="col">
-                        <p>Price</p>
-                        <input type="text" [(ngModel)]="menuItem.price" placeholder="R 00.00" class="smallerInput"
-                            [ngModelOptions]="{ standalone: true }" (input)="onPriceInput($event, menuItem)" />
-                    </div>
-                    <div class="image">
-                        <div *ngIf="menuItem.imageUrl" class="imagePreview">
-                            <img [src]="menuItem.imageUrl" alt="Uploaded logo" />
-                        </div>
-                        <div id="yourBtn" (click)="getFile(itemIndex)">
-                            <p><i class="material-symbols-outlined">upload</i>Add Image</p>
-                        </div>
-                        <div style="height: 0px; width: 0px; overflow: hidden;">
-                            <input id="upfile" type="file" #fileInput (change)="onFileSelected($event, itemIndex)" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <i class="material-icons closeIconItem" (click)="removeMenuItem(itemIndex)">close</i>
-        </div>
-        <div class="step-buttons">
-            <button class="btnGray" routerLink="/menus">
-                Cancel
-            </button>
-            <button class="btnGray" (click)="setAsDraft()">
-                save as draft
-            </button>
-            <button class="btnSecondary" (click)="setAsPublished()">
-                Publish
-            </button>
-            <button class="btnSecondary" (click)="nextStepLast()">Next</button>
-        </div>
+  <div *ngIf="currentStep === 2">
+    <div class="block">
+      <app-progress-bar [progress]="currentStep"></app-progress-bar>
+      <div class="row headerRow">
+        <h6 class="labelStep">Step 2</h6>
+        <h6>Edit your menu categories</h6>
+      </div>
+      <div class="row addCol">
+        <input
+          type="text"
+          class="formControl"
+          placeholder="Name your category"
+          [(ngModel)]="newCategoryName"
+        />
+        <button class="btnSecondary" (click)="addCategory()">
+          + Add Category
+        </button>
+      </div>
     </div>
+    <div class="row catRow">
+      <div *ngFor="let category of categories; let i = index" class="block">
+        <h6>{{ category.name }}</h6>
+        <div class="inputBox">
+          <input
+            type="text"
+            [(ngModel)]="newSubcategoryName[i]"
+            (keyup.enter)="addSubCategory(i)"
+          />
+          <label>press enter to add</label>
+        </div>
+        <i class="material-icons dltIcon" (click)="deleteCategory(i)">delete</i>
+        <div *ngFor="let subcategory of category.subcategories" class="subcat">
+          <p>{{ subcategory.name }}</p>
+          <i
+            class="material-icons"
+            (click)="deleteSubCategory(i, subcategory.id)"
+            >close</i
+          >
+        </div>
+      </div>
+    </div>
+    <div class="step-buttons">
+      <button class="btnGray" routerLink="/menus">Cancel</button>
+      <button class="btnGray" (click)="setAsDraft()">save as draft</button>
+      <button class="btnSecondary" (click)="setAsPublished()">Publish</button>
+      <button class="btnSecondary" (click)="nextStep()">Next</button>
+    </div>
+  </div>
 
-    <div *ngIf="currentStep === 4">
-        <div class="block lastStep">
-            <h6 style="color: #3CE1AF; text-align: center;">Menu changes have been saved!</h6>
-            <h6>Next Steps</h6>
+  <div *ngIf="currentStep === 3">
+    <div class="block">
+      <app-progress-bar [progress]="currentStep"></app-progress-bar>
+      <div class="row headerRow">
+        <h6 class="labelStep">Step 3</h6>
+        <h6>Edit Items in Your Menu</h6>
+      </div>
+      <div class="row addRowOuter">
+        <button class="btnSecondary" (click)="addMenuItem()">
+          + Add Menu Item
+        </button>
+      </div>
+    </div>
+    <div
+      *ngFor="let menuItem of menuItems; let itemIndex = index"
+      class="menuItemBlock block"
+    >
+      <div class="row addRowOuter">
+        <div class="addittionalRow">
+          <a (click)="toggleDetail('preparation', itemIndex)"
+            >+ add preparation</a
+          >
+          <a (click)="toggleDetail('variation', itemIndex)">+ add variation</a>
+          <a (click)="toggleDetail('pairing', itemIndex)">+ add pairing</a>
+          <a (click)="toggleDetail('side', itemIndex)">+ add side</a>
+        </div>
+      </div>
+      <div class="row3col">
+        <div class="itemCol">
+          <p>Select Category</p>
+          <mat-select
+            [(value)]="menuItem.categoryId"
+            placeholder="Select Category"
+          >
+            <mat-optgroup
+              *ngFor="let category of categories"
+              [label]="category.name"
+            >
+              <mat-option [value]="category.id">{{ category.name }}</mat-option>
+              <mat-option
+                *ngFor="let subcategory of category.subcategories"
+                [value]="subcategory.id"
+              >
+                &nbsp;&nbsp;{{ subcategory.name }}
+              </mat-option>
+            </mat-optgroup>
+          </mat-select>
+        </div>
+        <div class="itemCol">
+          <p>Item Name</p>
+          <input
+            type="text"
+            [(ngModel)]="menuItem.name"
+            placeholder="Item Name"
+            [ngModelOptions]="{ standalone: true }"
+          />
+          <input
+            type="text"
+            [(ngModel)]="menuItem.description"
+            placeholder="Description..."
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </div>
+        <div class="itemCol priceContainer">
+          <div class="col">
+            <p>Price</p>
+            <input
+              type="text"
+              [(ngModel)]="menuItem.price"
+              placeholder="R 00.00"
+              class="smallerInput"
+              [ngModelOptions]="{ standalone: true }"
+              (input)="onPriceInput($event, menuItem)"
+            />
+          </div>
+          <div class="image">
+            <div *ngIf="menuItem.imageUrl" class="imagePreview">
+              <img [src]="menuItem.imageUrl" alt="Uploaded logo" />
+            </div>
+            <div id="yourBtn" (click)="getFile(itemIndex)">
+              <p><i class="material-symbols-outlined">upload</i>Add Image</p>
+            </div>
+            <div style="height: 0px; width: 0px; overflow: hidden">
+              <input
+                id="upfile"
+                type="file"
+                #fileInput
+                (change)="onFileSelected($event, itemIndex)"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <i
+        class="material-icons closeIconItem"
+        (click)="removeMenuItem(itemIndex)"
+        >close</i
+      >
+      <div *ngIf="menuItem.displayDetails.preparation" class="additionalItems">
+        <div class="col">
+          <h6>
+            <i
+              class="material-icons subItemClose"
+              (click)="toggleDetail('preparation', itemIndex)"
+              >close</i
+            >Preparation
+          </h6>
+          <div class="inputHolder">
             <p>
-                You can generate a QR code that will enable your patrons to access your updated menu.
+              Add preparation options for patrons to choose from, for example
+              grilled or fried fish.
             </p>
-            <div class="qrblock">
-                <p>Generate a QR code for this menu</p>
-                <a class="btnSecondary" routerLink="/qr-codes">Generate QR Code</a>
+
+            <div class="inputBox">
+              <input
+                placeholder="Add a preparation"
+                type="text"
+                [(ngModel)]="newPreparation"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup.enter)="addPreparation(itemIndex)"
+              />
+              <label>press enter to add</label>
             </div>
+          </div>
+        </div>
+        <div class="col">
+          <div
+            class="item"
+            *ngFor="let preparation of menuItem.preparations; let i = index"
+          >
+            <p>{{ preparation }}</p>
+            <i class="material-icons" (click)="removePreparation(itemIndex, i)"
+              >close</i
+            >
+          </div>
+        </div>
+      </div>
+      <div *ngIf="menuItem.displayDetails.variation" class="additionalItems">
+        <div class="col">
+          <h6>
+            <i
+              class="material-icons subItemClose"
+              (click)="toggleDetail('variation', itemIndex)"
+              >close</i
+            >Variations
+          </h6>
+          <div class="inputHolder">
+            <p>Add variations of the menu item.</p>
+            <div class="inputBox">
+              <input
+                placeholder="Add a variation"
+                type="text"
+                [(ngModel)]="newVariation"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup.enter)="addVariation(itemIndex)"
+              />
+              <label>press enter to add</label>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div
+            class="item"
+            *ngFor="let variation of menuItem.variations; let i = index"
+          >
+            <p>{{ variation }}</p>
+            <i class="material-icons" (click)="removeVariation(itemIndex, i)"
+              >close</i
+            >
+          </div>
+        </div>
+      </div>
+      <div *ngIf="menuItem.displayDetails.pairing" class="additionalItems">
+        <div class="col">
+          <h6>
+            <i
+              class="material-icons subItemClose"
+              (click)="toggleDetail('pairing', itemIndex)"
+              >close</i
+            >Pairings
+          </h6>
+          <div class="inputHolder">
             <p>
-                <a routerLink="/settings/branding">Click here</a> to edit the appearance of your menus.
+              Add menu items that will go well with this menu item. This will be
+              shown as a pairing to your customers on your menu.
             </p>
-            <label>If you don't want to publish the menu now, you can save as a draft.</label>
+            <div class="inputBox">
+              <input
+                placeholder="Add a pairing"
+                type="text"
+                [(ngModel)]="newPairing"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup.enter)="addPairing(itemIndex)"
+              />
+              <label>press enter to add</label>
+            </div>
+          </div>
         </div>
-        <div class="step-buttons">
-            <a class="btnSecondary" routerLink="/menus">Done</a>
+        <div class="col">
+          <div
+            class="item"
+            *ngFor="let pairing of menuItem.pairings; let i = index"
+          >
+            <p>{{ pairing }}</p>
+            <i class="material-icons" (click)="removePairing(itemIndex, i)"
+              >close</i
+            >
+          </div>
         </div>
+      </div>
+      <div *ngIf="menuItem.displayDetails.side" class="additionalItems">
+        <div class="col">
+          <h6>
+            <i
+              class="material-icons subItemClose"
+              (click)="toggleDetail('side', itemIndex)"
+              >close</i
+            >Sides
+          </h6>
+          <div class="inputHolder">
+            <div class="inputBox">
+              <input
+                placeholder="Add a side"
+                type="text"
+                [(ngModel)]="newSide"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup.enter)="addSide(itemIndex)"
+              />
+              <label>press enter to add</label>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="item" *ngFor="let side of menuItem.sides; let i = index">
+            <p>{{ side }}</p>
+            <i class="material-icons" (click)="removeSide(itemIndex, i)"
+              >close</i
+            >
+          </div>
+        </div>
+      </div>
+      <i
+        class="material-icons closeIconItem"
+        (click)="removeMenuItem(itemIndex)"
+        >close</i
+      >
     </div>
+    <div class="step-buttons">
+      <button class="btnGray" routerLink="/menus">Cancel</button>
+      <button class="btnGray" (click)="setAsDraft()">save as draft</button>
+      <button class="btnSecondary" (click)="setAsPublished()">Publish</button>
+      <button class="btnSecondary" (click)="nextStepLast()">Next</button>
+    </div>
+  </div>
+
+  <div *ngIf="currentStep === 4">
+    <div class="block lastStep">
+      <h6 style="color: #3ce1af; text-align: center">
+        Menu changes have been saved!
+      </h6>
+      <h6>Next Steps</h6>
+      <p>
+        You can generate a QR code that will enable your patrons to access your
+        updated menu.
+      </p>
+      <div class="qrblock">
+        <p>Generate a QR code for this menu</p>
+        <a class="btnSecondary" routerLink="/qr-codes">Generate QR Code</a>
+      </div>
+      <p>
+        <a routerLink="/settings/branding">Click here</a> to edit the appearance
+        of your menus.
+      </p>
+      <label
+        >If you don't want to publish the menu now, you can save as a
+        draft.</label
+      >
+    </div>
+    <div class="step-buttons">
+      <a class="btnSecondary" routerLink="/menus">Done</a>
+    </div>
+  </div>
 </div>
