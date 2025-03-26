@@ -1,111 +1,174 @@
 <div class="inner-page">
-    <form #userForm="ngForm" (ngSubmit)="addRestaurant()">
-        <div class="row" style="align-items: unset; justify-content: unset;">
-            <div class="block" style="height: 100%;">
-                <a class="backLink" routerLink="/restaurants"><i class="material-icons">chevron_left</i> Back</a>
-                <h6>Add Restaurant Details</h6>
-                <div class="block-row">
-                    <div class="col">
-                        <div class="formGroup">
-                            <label>Restaurant Name</label>
-                            <input type="text" class="formControl" placeholder="Name your restaurant..." name="name"
-                                [(ngModel)]="restaurant.name" required>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="formGroup">
-                            <label>Street Address</label>
-                            <input type="text" class="formControl" placeholder="1882 Bodenstein St" name="street"
-                                [(ngModel)]="restaurant.street" required>
-                        </div>
-                        <div class="formGroup">
-                            <label>Province</label>
-                            <input type="text" class="formControl" placeholder="Gauteng" name="province"
-                                [(ngModel)]="restaurant.province" required>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="formGroup">
-                            <label>City</label>
-                            <input type="text" class="formControl" placeholder="Boksburg" name="city"
-                                [(ngModel)]="restaurant.city" required>
-                        </div>
-                        <div class="formGroup">
-                            <label>Zip Code</label>
-                            <input type="text" class="formControl" placeholder="1213" name="zip"
-                                [(ngModel)]="restaurant.zip" required>
-                        </div>
-                    </div>
-
-                </div>
+  <form #userForm="ngForm" (ngSubmit)="addRestaurant()">
+    <div class="row" style="align-items: unset; justify-content: unset">
+      <div class="block" style="height: 100%">
+        <a class="backLink" routerLink="/restaurants"
+          ><i class="material-icons">chevron_left</i> Back</a
+        >
+        <h6>Add Restaurant Details</h6>
+        <div class="block-row">
+          <div class="col">
+            <div class="formGroup">
+              <label>Restaurant Name</label>
+              <input
+                type="text"
+                class="formControl"
+                placeholder="Name your restaurant..."
+                name="name"
+                [(ngModel)]="restaurant.name"
+                required
+              />
             </div>
-
-            <div class="block">
-                <h6>Assign menu</h6>
-                <p style="color: #9A9A9A">Please assign a menu to this restaurant.</p>
-                <div class="block-row" style="justify-content: flex-start; align-items: flex-start;">
-                    <mat-form-field appearance="fill" style="width: 30%;">
-                        <mat-select [(ngModel)]="selectedMenu" (selectionChange)="selectMenu($event.value)"
-                            name="selectedMenu">
-                            <mat-option *ngFor="let menu of menus" [value]="menu">
-                                {{ menu.menuName }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <p class="font-small">Need to create a new menu for this restaurant? <a routerLink="/menus/add-menu"
-                            class="mainLink" style="width: 100%;text-align: right;">Add menu</a></p>
-                </div>
-
-
+          </div>
+          <div class="col">
+            <div class="formGroup">
+              <label>Street Address</label>
+              <input
+                type="text"
+                class="formControl"
+                placeholder="1882 Bodenstein St"
+                name="street"
+                [(ngModel)]="restaurant.street"
+                required
+              />
             </div>
-
-            <div class="block contactBlock">
-                <h6>Users</h6>
-                <p>Please assign a user to this restaurant</p>
-                <div class="rowMenu">
-                    <mat-form-field appearance="fill">
-                        <mat-select [(ngModel)]="selectedUser" (selectionChange)="selectUser($event.value)"
-                            name="selectedUser">
-                        <mat-option *ngFor="let user of users" [value]="user">{{ user.firstName }} {{
-                            user.Surname
-                            }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <p>Need to add a new user? <a routerLink="/manage-users" class="mainLink"
-                        style="width: 100%;text-align: right;">Click here</a></p>
-                </div>
-                
-                <p *ngIf="selectedUser !== null"  class="selectedOption">{{ selectedUserName }} {{ selectedUserSurname }} <span (click)="removeUser()" class="material-symbols-outlined">
-                    close
-                    </span></p>
+            <div class="formGroup">
+              <label>Province</label>
+              <input
+                type="text"
+                class="formControl"
+                placeholder="Gauteng"
+                name="province"
+                [(ngModel)]="restaurant.province"
+                required
+              />
             </div>
-
-            <div class="rowBottom">
-                <div class="block" style="width: 50%;">
-                    <h6>Restaurant Status</h6>
-                    <div class="toggle-container">
-                        <label [style.color]="restaurantStatus ? '#3CE1AF' : '#444444'">{{ restaurantStatus ? 'Active' :
-                            'Inactive' }}</label>
-                        <mat-slide-toggle [(ngModel)]="restaurantStatus" color="#3CE1AF"
-                            name="restaurantStatus"></mat-slide-toggle>
-                    </div>
-                </div>
-
-                <div class="block contactBlock">
-                    <h6>Number of tables in the restaurant</h6>
-                    <div class="row" style="align-items: center">
-                        <p style="width: 60%;">Please enter a numerical value</p>
-                        <input style="width: 40%;" type="text" class="formControl"  name="selectedNumberTable"
-                        [(ngModel)]="selectedNumberTable" required>
-                    </div>
-                </div>
+          </div>
+          <div class="col">
+            <div class="formGroup">
+              <label>City</label>
+              <input
+                type="text"
+                class="formControl"
+                placeholder="Boksburg"
+                name="city"
+                [(ngModel)]="restaurant.city"
+                required
+              />
             </div>
-
+            <div class="formGroup">
+              <label>Zip Code</label>
+              <input
+                type="text"
+                class="formControl"
+                placeholder="1213"
+                name="zip"
+                [(ngModel)]="restaurant.zip"
+                required
+              />
+            </div>
+          </div>
         </div>
-        <div class="formGroup btnHolder">
-            <a routerLink="/settings/general" class="btn btnTertiary">Cancel</a>
-            <button type="submit" class="btn btnSecondary">Save</button>
+      </div>
+
+      <div class="block">
+        <h6>Assign menu</h6>
+        <p style="color: #9a9a9a">Please assign a menu to this restaurant.</p>
+        <div
+          class="block-row"
+          style="justify-content: flex-start; align-items: flex-start"
+        >
+          <mat-form-field appearance="fill" style="width: 30%">
+            <mat-select
+              [(ngModel)]="selectedMenu"
+              (selectionChange)="selectMenu($event.value)"
+              name="selectedMenu"
+            >
+              <mat-option *ngFor="let menu of menus" [value]="menu">
+                {{ menu.menuName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <p class="font-small">
+            Need to create a new menu for this restaurant?
+            <a
+              routerLink="/menus/add-menu"
+              class="mainLink"
+              style="width: 100%; text-align: right"
+              >Add menu</a
+            >
+          </p>
+        </div>
+      </div>
+
+      <div class="block contactBlock">
+        <h6>Users</h6>
+        <p>Please assign a user to this restaurant</p>
+        <div class="rowMenu">
+          <mat-form-field appearance="fill">
+            <mat-select
+              [(ngModel)]="selectedUser"
+              (selectionChange)="selectUser($event.value)"
+              name="selectedUser"
+            >
+              <mat-option *ngFor="let user of users" [value]="user"
+                >{{ user.firstName }} {{ user.Surname }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+          <p>
+            Need to add a new user?
+            <a
+              routerLink="/manage-users"
+              class="mainLink"
+              style="width: 100%; text-align: right"
+              >Click here</a
+            >
+          </p>
         </div>
 
-    </form>
+        <p *ngIf="selectedUser !== null" class="selectedOption">
+          {{ selectedUserName }} {{ selectedUserSurname }}
+          <span (click)="removeUser()" class="material-symbols-outlined">
+            close
+          </span>
+        </p>
+      </div>
+
+      <div class="rowBottom">
+        <div class="block" style="width: 50%">
+          <h6>Restaurant Status</h6>
+          <div class="toggle-container">
+            <label [style.color]="restaurantStatus ? '#16D3D2' : '#444444'">{{
+              restaurantStatus ? "Active" : "Inactive"
+            }}</label>
+            <mat-slide-toggle
+              [(ngModel)]="restaurantStatus"
+              color="#16D3D2"
+              name="restaurantStatus"
+            ></mat-slide-toggle>
+          </div>
+        </div>
+
+        <div class="block contactBlock">
+          <h6>Number of tables in the restaurant</h6>
+          <div class="row" style="align-items: center">
+            <p style="width: 60%">Please enter a numerical value</p>
+            <input
+              style="width: 40%"
+              type="text"
+              class="formControl"
+              name="selectedNumberTable"
+              [(ngModel)]="selectedNumberTable"
+              required
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="formGroup btnHolder">
+      <a routerLink="/settings/general" class="btn btnTertiary">Cancel</a>
+      <button type="submit" class="btn btnSecondary">Save</button>
+    </div>
+  </form>
 </div>

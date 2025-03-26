@@ -1,205 +1,195 @@
-.inner-page{
-    width: 100%;
+.inner-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  .row {
     display: flex;
-    flex-direction: column;
-    gap:15px;
-    .row{
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        gap:15px
-    }
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 15px;
+  }
 
-    .row > * {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    } 
-    
-    
-    .biggerBlock{
-        width: calc(66%);
-        flex: none !important;
-    }
-}
-
-
-.stat{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
+  .row > * {
     flex: 1;
-    .row{
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
+    display: flex;
+    flex-direction: column;
+  }
 
-        .heading{
-          margin-bottom: 0;
-        }
-  
-        .time{
-          text-align: right;
-          margin-bottom: 0;
-        }
-    }
-
-    .list{
-      margin-bottom: 10px;  
-      background-color: rgba(60,225,175,0.15);
-      padding: 20px 25px;
-      border-radius: 10px;
-      min-height: 65px;
-
-    }
-
-    .list:last-of-type{
-        margin-bottom: 0px;  
-        background-color: #F3F4F5;
-      }
-      .list p:first-of-type{
-        font-weight: bold;
-        font-size: 16px;
-        flex:1;
-      }
-
-      .list p:last-of-type{
-        font-size: 24px;
-        width: 15%;
-        text-align: left;
-        flex: unset;
-      }
-
-    
-    .heading{
-        color: #444444;
-        margin-bottom: 10px;
-    }
-
-    .material-icons{
-        cursor: pointer;
-        width: 30px;
-        margin-bottom: 10px;
-        color: #9A9A9A;
-    }
-
-    .time{
-        color: #9A9A9A;
-        margin-bottom: 33px;
-    }
-
- 
+  .biggerBlock {
+    width: calc(66%);
+    flex: none !important;
+  }
 }
 
-.stat1{
+.stat {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  .row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
+    .heading {
+      margin-bottom: 0;
+    }
+
+    .time {
+      text-align: right;
+      margin-bottom: 0;
+    }
+  }
+
+  .list {
+    margin-bottom: 10px;
+    background-color: rgba(22, 211, 210, 0.15);
+    padding: 20px 25px;
+    border-radius: 10px;
+    min-height: 65px;
+  }
+
+  .list:last-of-type {
+    margin-bottom: 0px;
+    background-color: #f3f4f5;
+  }
+  .list p:first-of-type {
+    font-weight: bold;
+    font-size: 16px;
+    flex: 1;
+  }
+
+  .list p:last-of-type {
+    font-size: 24px;
+    width: 15%;
+    text-align: left;
+    flex: unset;
+  }
+
+  .heading {
+    color: #444444;
+    margin-bottom: 10px;
+  }
+
+  .material-icons {
+    cursor: pointer;
+    width: 30px;
+    margin-bottom: 10px;
+    color: #9a9a9a;
+  }
+
+  .time {
+    color: #9a9a9a;
+    margin-bottom: 33px;
+  }
+}
+
+.stat1 {
   display: flex;
   flex-direction: column;
   width: 100%;
   flex: 1;
-  .row{
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
+  .row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 
-      .heading{
-        margin-bottom: 0;
-      }
+    .heading {
+      margin-bottom: 0;
+    }
 
-      .time{
-        text-align: right;
-        margin-bottom: 0;
-      }
+    .time {
+      text-align: right;
+      margin-bottom: 0;
+    }
   }
 
-  .list{
-    margin-bottom: 10px;  
+  .list {
+    margin-bottom: 10px;
     padding: 20px 25px;
     border-radius: 10px;
     min-height: 65px;
-    background-color: #F3F4F5;
+    background-color: #f3f4f5;
   }
 
-  .list:last-of-type{
-      margin-bottom: 0px;  
-    }
-    .list p:first-of-type{
-      font-size: 13px;
-      flex:1;
-    }
-
-    .list p:last-of-type{
-      font-size: 13px;
-      width: 15%;
-      text-align: left;
-      flex: unset;
-    }
-
-  
-  .heading{
-      color: #444444;
-      margin-bottom: 10px;
+  .list:last-of-type {
+    margin-bottom: 0px;
+  }
+  .list p:first-of-type {
+    font-size: 13px;
+    flex: 1;
   }
 
-  .material-icons{
-      cursor: pointer;
-      width: 30px;
-      margin-bottom: 10px;
-      color: #9A9A9A;
+  .list p:last-of-type {
+    font-size: 13px;
+    width: 15%;
+    text-align: left;
+    flex: unset;
   }
 
-  .time{
-      color: #9A9A9A;
-      margin-bottom: 33px;
+  .heading {
+    color: #444444;
+    margin-bottom: 10px;
   }
 
+  .material-icons {
+    cursor: pointer;
+    width: 30px;
+    margin-bottom: 10px;
+    color: #9a9a9a;
+  }
+
+  .time {
+    color: #9a9a9a;
+    margin-bottom: 33px;
+  }
 }
 
-
-.blueBlock{
-  background-color: rgba(#AFDCFF, 0.65);
+.blueBlock {
+  background-color: rgba(#1e1a35, 0.08);
   width: 100%;
-border-radius: 5px;
+  border-radius: 5px;
   padding: 33px;
   color: #444444;
-  font-family: 'Poppins';
-font-size: 36px;
-font-weight: 600;
-line-height: 22px;
-letter-spacing: -0.001em;
-text-align: left;
-justify-content: center;
-flex: 1;
-align-items: center;
-display: flex;
-
+  font-family: "Poppins";
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -0.001em;
+  text-align: left;
+  justify-content: center;
+  flex: 1;
+  align-items: center;
+  display: flex;
 }
 
-.purpleBlock{
-  background-color: rgba(#C8AFEB, 0.65);
+.purpleBlock {
+  background-color: rgba(#1e1a35, 0.08);
   flex: 1;
   width: 100%;
-border-radius: 5px;
+  border-radius: 5px;
   padding: 33px;
   color: #444444;
-  font-family: 'Poppins';
-font-size: 24px;
-font-weight: 600;
-line-height: 3px;
-letter-spacing: -0.001em;
-text-align: left;
-justify-content: center;
-align-items: center;
-display: flex;
+  font-family: "Poppins";
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 3px;
+  letter-spacing: -0.001em;
+  text-align: left;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
-.block{
+.block {
   gap: 20px;
   display: flex;
 }

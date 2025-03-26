@@ -46,10 +46,10 @@ $hungr-backend-theme: mat.define-light-theme(
   --mdc-switch-selected-focus-handle-color: #fff;
   --mdc-switch-selected-hover-handle-color: #fff;
   --mdc-switch-selected-pressed-handle-color: #fff;
-  --mdc-switch-selected-focus-track-color: #3ce1af;
-  --mdc-switch-selected-hover-track-color: #3ce1af;
-  --mdc-switch-selected-pressed-track-color: #3ce1af;
-  --mdc-switch-selected-track-color: #3ce1af;
+  --mdc-switch-selected-focus-track-color: #16d3d2;
+  --mdc-switch-selected-hover-track-color: #16d3d2;
+  --mdc-switch-selected-pressed-track-color: #16d3d2;
+  --mdc-switch-selected-track-color: #16d3d2;
   --mdc-switch-disabled-selected-handle-color: #424242;
   --mdc-switch-disabled-selected-icon-color: #fff;
   --mdc-switch-disabled-selected-track-color: #424242;
@@ -177,7 +177,7 @@ input[type="number"] {
 }
 
 .btnPrimary {
-  background: #fff352;
+  background: #16d3d2;
   border-radius: 6px;
   text-align: center;
   padding: 12px 15px;
@@ -206,11 +206,12 @@ input[type="number"] {
   opacity: 0.6;
 }
 .btnPrimary:hover {
-  background: #fff463;
+  background: #1b1b3a;
+  color: #16d3d2;
 }
 .btnSecondary {
   color: #181818;
-  background: #3ce1af;
+  background: #16d3d2;
   border-radius: 6px;
   text-align: center;
   padding: 12px 15px;
@@ -234,7 +235,8 @@ input[type="number"] {
 }
 
 .btnSecondary:hover {
-  background: #3fefba;
+  background: #181818;
+  color: #16d3d2;
 }
 
 .btnGray {
@@ -484,7 +486,7 @@ a {
 
 /* Change the track color */
 .mat-slide-toggle-bar {
-  background-color: #3ce1af;
+  background-color: #16d3d2;
 }
 
 mat-select {

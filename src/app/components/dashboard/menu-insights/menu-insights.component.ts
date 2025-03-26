@@ -13,7 +13,7 @@ interface ItemPair {
 @Component({
   selector: 'app-menu-insights',
   templateUrl: './menu-insights.component.html',
-  styleUrls: ['./menu-insights.component.scss']
+  styleUrls: ['./menu-insights.component.scss'],
 })
 export class MenuInsightsComponent {
   userDataID: string = '';
@@ -39,7 +39,7 @@ export class MenuInsightsComponent {
     private router: Router,
     private firestore: AngularFirestore
   ) {
-    if (this.accountType === 'true'){
+    if (this.accountType === 'true') {
       this.layoutMinimised = true;
     }
     this.authService.getCurrentUserId().then((uid) => {
@@ -48,7 +48,7 @@ export class MenuInsightsComponent {
         this.fetchMenus();
         this.fetchRestaurants();
       } else {
-        console.log("No authenticated user");
+        console.log('No authenticated user');
         this.router.navigate(['/signin']);
       }
     });
@@ -69,11 +69,13 @@ export class MenuInsightsComponent {
         this.viewingTotalCurrentWeek = this.calculateTotalViews(menuData, 7);
         this.viewingTotalLast24Hours = this.calculateTotalViews(menuData, 1);
       },
-      error: (error) => console.error("Error fetching menus:", error),
+      error: (error) => console.error('Error fetching menus:', error),
     });
   }
 
-  countVisitsPerDay(menuData: any[]): { [date: string]: { [menuId: string]: number } } {
+  countVisitsPerDay(menuData: any[]): {
+    [date: string]: { [menuId: string]: number };
+  } {
     const dailyVisits: { [date: string]: { [menuId: string]: number } } = {};
 
     menuData.forEach((menu) => {
@@ -99,7 +101,9 @@ export class MenuInsightsComponent {
 
   fetchRestaurants() {
     this.restaurant$ = this.firestore
-      .collection('restuarants', (ref) => ref.where('ownerID', '==', this.userDataID))
+      .collection('restuarants', (ref) =>
+        ref.where('ownerID', '==', this.userDataID)
+      )
       .snapshotChanges();
 
     this.restaurant$.subscribe({
@@ -109,13 +113,15 @@ export class MenuInsightsComponent {
           this.fetchOrdersForRestaurant(restaurantId);
         });
       },
-      error: (error) => console.error("Error fetching restaurants:", error),
+      error: (error) => console.error('Error fetching restaurants:', error),
     });
   }
 
   fetchOrdersForRestaurant(restaurantId: string) {
     this.firestore
-      .collection('orders', (ref) => ref.where('restaurantID', '==', restaurantId))
+      .collection('orders', (ref) =>
+        ref.where('restaurantID', '==', restaurantId)
+      )
       .snapshotChanges()
       .subscribe({
         next: (orders) => {
@@ -125,14 +131,22 @@ export class MenuInsightsComponent {
           this.calculateCategoryOrderPercentages();
           this.findFrequentItemPairs(orders);
         },
-        error: (error) => console.error(`Error fetching orders for restaurant ${restaurantId}:`, error),
+        error: (error) =>
+          console.error(
+            `Error fetching orders for restaurant ${restaurantId}:`,
+            error
+          ),
       });
   }
 
-  calculateTotalViews(menuData: any[], days: number, offset: number = 0): number {
+  calculateTotalViews(
+    menuData: any[],
+    days: number,
+    offset: number = 0
+  ): number {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days - offset);
-    
+
     const endDate = new Date();
     endDate.setDate(endDate.getDate() - offset);
 
@@ -206,18 +220,28 @@ export class MenuInsightsComponent {
   }
 
   calculateCategoryOrderPercentages() {
-    const totalOrders = Object.values(this.categoryOrderCounts).reduce((sum, count) => sum + count, 0);
+    const totalOrders = Object.values(this.categoryOrderCounts).reduce(
+      (sum, count) => sum + count,
+      0
+    );
 
-    const categoryPercentages = Object.keys(this.categoryOrderCounts).map(category => ({
-      category,
-      percentage: ((this.categoryOrderCounts[category] / totalOrders) * 100).toFixed(2),
-    }));
+    const categoryPercentages = Object.keys(this.categoryOrderCounts).map(
+      (category) => ({
+        category,
+        percentage: (
+          (this.categoryOrderCounts[category] / totalOrders) *
+          100
+        ).toFixed(2),
+      })
+    );
 
     this.updateCategoryPercentageChart(categoryPercentages);
   }
 
-  updateCategoryPercentageChart(categoryPercentages: { category: string; percentage: string }[]) {
-    const colors = ['#3CE1AF', '#AFDCFF', '#C8AFEB', '#FFF56E', '#AFDCFF'];
+  updateCategoryPercentageChart(
+    categoryPercentages: { category: string; percentage: string }[]
+  ) {
+    const colors = ['#16D3D2', '#AFDCFF', '#C8AFEB', '#FFF56E', '#AFDCFF'];
     const dataWithColors = categoryPercentages.map((item, index) => ({
       value: parseFloat(item.percentage),
       name: item.category,
@@ -225,7 +249,10 @@ export class MenuInsightsComponent {
     }));
 
     this.chartOptionsCategoryPercentages = {
-      tooltip: { trigger: 'item', formatter: (params) => `${params.name}: ${params.value}%` },
+      tooltip: {
+        trigger: 'item',
+        formatter: (params) => `${params.name}: ${params.value}%`,
+      },
       series: [
         {
           name: 'Order Percentage',
@@ -238,19 +265,23 @@ export class MenuInsightsComponent {
   }
 
   updateMostOrderedItemsChart() {
-    const itemNames = this.topOrderedItems.map(item => item.name);
-    const itemCounts = this.topOrderedItems.map(item => item.count);
+    const itemNames = this.topOrderedItems.map((item) => item.name);
+    const itemCounts = this.topOrderedItems.map((item) => item.count);
 
     this.chartOptionsMostOrderedItems = {
       tooltip: { trigger: 'axis' },
-      xAxis: { type: 'category', data: itemNames, axisLabel: { rotate: 0, fontSize: 12 } },
+      xAxis: {
+        type: 'category',
+        data: itemNames,
+        axisLabel: { rotate: 0, fontSize: 12 },
+      },
       yAxis: { type: 'value', name: 'Order Count' },
       series: [
         {
           name: 'Order Count',
           type: 'bar',
           data: itemCounts,
-          itemStyle: { color: '#3CE1AF' },
+          itemStyle: { color: '#16D3D2' },
           label: { show: true, position: 'top', fontSize: 12 },
         },
       ],
@@ -267,7 +298,8 @@ export class MenuInsightsComponent {
         for (let j = i + 1; j < items.length; j++) {
           const itemA = items[i].name;
           const itemB = items[j].name;
-          const pairKey = itemA < itemB ? `${itemA}-${itemB}` : `${itemB}-${itemA}`;
+          const pairKey =
+            itemA < itemB ? `${itemA}-${itemB}` : `${itemB}-${itemA}`;
 
           if (pairCounts[pairKey]) {
             pairCounts[pairKey]++;
@@ -286,25 +318,27 @@ export class MenuInsightsComponent {
       .sort((a, b) => b.count - a.count);
   }
 
-  updateChartOptions(dailyVisits: { [date: string]: { [menuId: string]: number } }) {
+  updateChartOptions(dailyVisits: {
+    [date: string]: { [menuId: string]: number };
+  }) {
     const dates = Object.keys(dailyVisits).sort();
     const menuIds = new Set<string>();
-  
+
     // Populate menuIds from dailyVisits data
-    dates.forEach(date => {
-      Object.keys(dailyVisits[date]).forEach(menuId => menuIds.add(menuId));
+    dates.forEach((date) => {
+      Object.keys(dailyVisits[date]).forEach((menuId) => menuIds.add(menuId));
     });
-  
+
     // Prepare series data for each menuId
-    const seriesData = Array.from(menuIds).map(menuId => ({
+    const seriesData = Array.from(menuIds).map((menuId) => ({
       name: menuId,
       type: 'line',
       smooth: true,
-      data: dates.map(date => dailyVisits[date][menuId] || 0), // Use 0 if no data for that date
+      data: dates.map((date) => dailyVisits[date][menuId] || 0), // Use 0 if no data for that date
       areaStyle: {},
       lineStyle: { color: this.getMenuColor(menuId) },
     }));
-  
+
     this.chartOptions = {
       title: {
         text: 'Daily Menu Visits',

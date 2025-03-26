@@ -1,57 +1,57 @@
 .confirmation-container {
-    display: flex;
-    max-width: 399px;
-    flex-direction: column;
-    overflow: hidden;
-    align-items: center;
-    color: #2e3646;
-    text-align: center;
-    letter-spacing: -0.02px;
-    padding: 18px;
-    border: 1px solid #dedede;
-    justify-content: center;
-    gap: 20px;
-  }
-  .confirmation-header {
-    align-self: flex-end;
-    display: flex;
-    width: 267px;
-    max-width: 100%;
-    gap: 20px;
-    justify-content: space-between;
-  }
-  .confirmation-title {
-font-family: 'Poppins';
-font-size: 18px;
-font-weight: 700;
-line-height: 22.5px;
-letter-spacing: -0.001em;
-text-align: center;
-  }
-  .confirmation-icon {
-    object-fit: contain;
-    object-position: center;
-    width: 15px;
-    align-self: flex-start;
-  }
-  .confirmation-message {
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 20px;
-    width: 274px;
-  }
-  .confirmation-button {
-    align-self: stretch;
-    border-radius: 6px;
-    background-color: #3ce1af;
-    margin-top: 27px;
-    width: 171px;
-    max-width: 100%;
-    font-size: 16px;
-    color: #181818;
-    text-transform: uppercase;
-    line-height: 1;
-    padding: 10px 30px;
-    border: none;
-    cursor: pointer;
-  }
+  display: flex;
+  max-width: 399px;
+  flex-direction: column;
+  overflow: hidden;
+  align-items: center;
+  color: #2e3646;
+  text-align: center;
+  letter-spacing: -0.02px;
+  padding: 18px;
+  border: 1px solid #dedede;
+  justify-content: center;
+  gap: 20px;
+}
+.confirmation-header {
+  align-self: flex-end;
+  display: flex;
+  width: 267px;
+  max-width: 100%;
+  gap: 20px;
+  justify-content: space-between;
+}
+.confirmation-title {
+  font-family: "Poppins";
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22.5px;
+  letter-spacing: -0.001em;
+  text-align: center;
+}
+.confirmation-icon {
+  object-fit: contain;
+  object-position: center;
+  width: 15px;
+  align-self: flex-start;
+}
+.confirmation-message {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  width: 274px;
+}
+.confirmation-button {
+  align-self: stretch;
+  border-radius: 6px;
+  background-color: #16d3d2;
+  margin-top: 27px;
+  width: 171px;
+  max-width: 100%;
+  font-size: 16px;
+  color: #181818;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 10px 30px;
+  border: none;
+  cursor: pointer;
+}

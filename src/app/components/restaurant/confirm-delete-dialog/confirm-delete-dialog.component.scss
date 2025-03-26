@@ -1,70 +1,70 @@
 .delete-confirmation {
-    border-radius: 10px;
-    background-color: #fff;
-    display: flex;
-    max-width: 399px;
-    flex-direction: column;
-    overflow: hidden;
-    font-family: Poppins, sans-serif;
-    text-align: center;
-    padding: 23px 25px;
-    border: 1px solid #dedede;
-  }
+  border-radius: 10px;
+  background-color: #fff;
+  display: flex;
+  max-width: 399px;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: Poppins, sans-serif;
+  text-align: center;
+  padding: 23px 25px;
+  border: 1px solid #dedede;
+}
 
-  .confirmation-header {
-    display: flex;
-    gap: 41px;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
+.confirmation-header {
+  display: flex;
+  gap: 41px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
 
-  .confirmation-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #2e3646;
-    line-height: 1;
-    letter-spacing: -0.02px;
-    margin: 0;
-  }
+.confirmation-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2e3646;
+  line-height: 1;
+  letter-spacing: -0.02px;
+  margin: 0;
+}
 
-  .close-icon {
-    width: 15px;
-    height: 15px;
-    object-fit: contain;
-  }
+.close-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
 
-  .confirmation-message {
-    color: #2e3646;
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 20px;
-    margin: 20px auto 0;
-    max-width: 283px;
-  }
+.confirmation-message {
+  color: #2e3646;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 20px auto 0;
+  max-width: 283px;
+}
 
-  .confirmation-actions {
-    display: flex;
-    margin-top: 28px;
-    gap: 15px;
-  }
+.confirmation-actions {
+  display: flex;
+  margin-top: 28px;
+  gap: 15px;
+}
 
-  .action-button {
-    flex: 1;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding: 10px 30px;
-    border: none;
-    cursor: pointer;
-  }
+.action-button {
+  flex: 1;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 10px 30px;
+  border: none;
+  cursor: pointer;
+}
 
-  .cancel {
-    background-color: #e4e4e4;
-    color: #181818;
-  }
+.cancel {
+  background-color: #e4e4e4;
+  color: #181818;
+}
 
-  .confirm {
-    background-color: #3ce1af;
-    color: #181818;
-  }
+.confirm {
+  background-color: #16d3d2;
+  color: #181818;
+}

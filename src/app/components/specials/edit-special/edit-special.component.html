@@ -8,12 +8,19 @@
         </a>
         <app-progress-bar [progress]="currentStep"></app-progress-bar>
       </div>
-      <h6 class="mainTitle"><span style="color: #3CE1AF;">Step 1:</span> Special Basics</h6>
+      <h6 class="mainTitle">
+        <span style="color: #16d3d2">Step 1:</span> Special Basics
+      </h6>
       <form [formGroup]="specialForm">
         <div class="formGroup">
           <p>Special Title</p>
-          <input type="text" class="formControl" formControlName="specialTitle" placeholder="Enter special title"
-            required>
+          <input
+            type="text"
+            class="formControl"
+            formControlName="specialTitle"
+            placeholder="Enter special title"
+            required
+          />
         </div>
         <div class="formGroup">
           <p>Select Menu</p>
@@ -25,7 +32,10 @@
         </div>
         <div class="formGroup">
           <p>Type of Special</p>
-          <mat-select formControlName="typeSpecial" (selectionChange)="onSpecialTypeChange()">
+          <mat-select
+            formControlName="typeSpecial"
+            (selectionChange)="onSpecialTypeChange()"
+          >
             <mat-option *ngFor="let type of specialTypes" [value]="type.id">
               {{ type.name }}
             </mat-option>
@@ -36,14 +46,29 @@
           <div class="row">
             <div class="col">
               <p>Start Date</p>
-              <input type="date" class="formControl" formControlName="dateFrom" placeholder="Start date" required>
+              <input
+                type="date"
+                class="formControl"
+                formControlName="dateFrom"
+                placeholder="Start date"
+                required
+              />
             </div>
             <div class="col">
               <p>End Date</p>
-              <input type="date" class="formControl" formControlName="dateTo" placeholder="End date" required>
+              <input
+                type="date"
+                class="formControl"
+                formControlName="dateTo"
+                placeholder="End date"
+                required
+              />
             </div>
           </div>
-          <div *ngIf="specialForm.errors?.['dateRangeInvalid']" class="error-message">
+          <div
+            *ngIf="specialForm.errors?.['dateRangeInvalid']"
+            class="error-message"
+          >
             Start date must be before end date.
           </div>
         </div>
@@ -63,13 +88,19 @@
         </a>
         <app-progress-bar [progress]="currentStep"></app-progress-bar>
       </div>
-      <h6 class="mainTitle"><span style="color: #3CE1AF;">Step 2:</span> Days and Times</h6>
+      <h6 class="mainTitle">
+        <span style="color: #16d3d2">Step 2:</span> Days and Times
+      </h6>
       <form [formGroup]="specialForm">
         <div class="formGroup">
           <p>What day(s) of the week should this special be valid?</p>
           <div class="weekday-selector">
-            <span *ngFor="let day of weekdays" class="weekday" [class.selected]="isSelected(day)"
-              (click)="toggleSelection(day)">
+            <span
+              *ngFor="let day of weekdays"
+              class="weekday"
+              [class.selected]="isSelected(day)"
+              (click)="toggleSelection(day)"
+            >
               {{ day }}
             </span>
           </div>
@@ -80,15 +111,30 @@
             <div class="row">
               <div class="col">
                 <p>Start time</p>
-                <input type="time" class="formControl" formControlName="timeFrom" placeholder="Start time" required>
+                <input
+                  type="time"
+                  class="formControl"
+                  formControlName="timeFrom"
+                  placeholder="Start time"
+                  required
+                />
               </div>
               <div class="col">
                 <p>End time</p>
-                <input type="time" class="formControl" formControlName="timeTo" placeholder="End time" required>
+                <input
+                  type="time"
+                  class="formControl"
+                  formControlName="timeTo"
+                  placeholder="End time"
+                  required
+                />
               </div>
             </div>
           </div>
-          <div *ngIf="specialForm.errors?.['timeRangeInvalid']" class="error-message">
+          <div
+            *ngIf="specialForm.errors?.['timeRangeInvalid']"
+            class="error-message"
+          >
             Start time must be before end time.
           </div>
         </div>
@@ -109,18 +155,28 @@
         </a>
         <app-progress-bar [progress]="currentStep"></app-progress-bar>
       </div>
-      <h6 class="mainTitle"><span style="color: #3CE1AF;">Step 3:</span> Special Details</h6>
+      <h6 class="mainTitle">
+        <span style="color: #16d3d2">Step 3:</span> Special Details
+      </h6>
       <form [formGroup]="specialForm">
         <!-- Weekly Special -->
         <div *ngIf="selectedSpecialType === 1">
           <p>Select Items and Prices</p>
           <div class="row">
             <mat-select formControlName="typeSpecialDetails">
-              <mat-option *ngFor="let item of selectedMenu?.items" [value]="item.name">
+              <mat-option
+                *ngFor="let item of selectedMenu?.items"
+                [value]="item.name"
+              >
                 {{ item.name }}
               </mat-option>
             </mat-select>
-            <input type="text" formControlName="amount" placeholder="Promotional price" (keydown.enter)="addItem()">
+            <input
+              type="text"
+              formControlName="amount"
+              placeholder="Promotional price"
+              (keydown.enter)="addItem()"
+            />
           </div>
         </div>
 
@@ -129,12 +185,19 @@
           <p>Select Category</p>
           <div class="row">
             <mat-select formControlName="featureSpecialUnder">
-              <mat-option *ngFor="let category of selectedMenu?.categories" [value]="category.id">
+              <mat-option
+                *ngFor="let category of selectedMenu?.categories"
+                [value]="category.id"
+              >
                 {{ category.name }}
               </mat-option>
             </mat-select>
-            <input type="number" formControlName="percentage" placeholder="Enter percentage discount"
-              (keydown.enter)="addItem()">
+            <input
+              type="number"
+              formControlName="percentage"
+              placeholder="Enter percentage discount"
+              (keydown.enter)="addItem()"
+            />
           </div>
         </div>
 
@@ -143,15 +206,23 @@
           <h6>Combo Details</h6>
           <div class="row">
             <mat-select formControlName="typeSpecialDetails" multiple>
-              <mat-option *ngFor="let item of selectedMenu?.items" [value]="item.name">
+              <mat-option
+                *ngFor="let item of selectedMenu?.items"
+                [value]="item.name"
+              >
                 {{ item.name }}
               </mat-option>
             </mat-select>
-            <input type="text" formControlName="comboPrice" placeholder="Enter combo price" (keydown.enter)="addItem()">
+            <input
+              type="text"
+              formControlName="comboPrice"
+              placeholder="Enter combo price"
+              (keydown.enter)="addItem()"
+            />
           </div>
         </div>
 
-        <p style="text-align: right;width: 100%;">Press enter to add an item</p>
+        <p style="text-align: right; width: 100%">Press enter to add an item</p>
         <!-- Display List of Added Items -->
         <div *ngIf="addedItems.length > 0" class="item-list">
           <h6>Items</h6>
@@ -181,9 +252,17 @@
         <app-progress-bar [progress]="currentStep"></app-progress-bar>
       </div>
       <h6 class="mainTitle">Step 4: Add Media</h6>
-      <p style="margin-bottom: 30px;">Uploading media helps to raise awareness of the special.</p>
-      <a class="btnSecondary" (click)="openImageUploadModal()"><mat-icon>upload</mat-icon> Add Image</a>
-      <img style="margin-top:30px;max-width: 80%;" [src]="uploadedImageUrl" alt="">
+      <p style="margin-bottom: 30px">
+        Uploading media helps to raise awareness of the special.
+      </p>
+      <a class="btnSecondary" (click)="openImageUploadModal()"
+        ><mat-icon>upload</mat-icon> Add Image</a
+      >
+      <img
+        style="margin-top: 30px; max-width: 80%"
+        [src]="uploadedImageUrl"
+        alt=""
+      />
     </div>
     <div class="navRow">
       <button (click)="previousStep()" class="btnTertiary">Back</button>
@@ -197,26 +276,31 @@
       <h6 class="mainTitle">Step 5: Overview</h6>
       <p>Review all the information you have entered before submission.</p>
       <div class="summary-container">
-        <h3 class="summary-title">{{ specialForm.value.specialTitle || 'Special Name' }}</h3>
+        <h3 class="summary-title">
+          {{ specialForm.value.specialTitle || "Special Name" }}
+        </h3>
 
         <div class="summary-card">
           <!-- Special Type -->
-          <p class="summary-info">{{ getSpecialTypeLabel(selectedSpecialType) }}</p>
+          <p class="summary-info">
+            {{ getSpecialTypeLabel(selectedSpecialType) }}
+          </p>
 
           <!-- Date Range -->
           <p class="summary-info">
-            Valid from {{ specialForm.value.dateFrom | date: 'd MMMM' }} - {{ specialForm.value.dateTo | date: 'd MMMM'
-            }}
+            Valid from {{ specialForm.value.dateFrom | date : "d MMMM" }} -
+            {{ specialForm.value.dateTo | date : "d MMMM" }}
           </p>
 
           <!-- Days -->
           <p class="summary-info">
-            Every {{ selectedDays.join(', ') || 'No days selected' }}
+            Every {{ selectedDays.join(", ") || "No days selected" }}
           </p>
 
           <!-- Time Range -->
           <p class="summary-info">
-            From {{ specialForm.value.timeFrom || '00:00' }} to {{ specialForm.value.timeTo || '00:00' }}
+            From {{ specialForm.value.timeFrom || "00:00" }} to
+            {{ specialForm.value.timeTo || "00:00" }}
           </p>
         </div>
 
@@ -225,14 +309,18 @@
           <p>Promotional Items</p>
           <div *ngFor="let item of addedItems" class="promo-item">
             <span class="item-name">{{ item.name }}</span>
-            <span class="item-price">Promotional Price: R {{ item.amount }}</span>
+            <span class="item-price"
+              >Promotional Price: R {{ item.amount }}</span
+            >
           </div>
         </div>
       </div>
     </div>
     <div class="navRow">
       <button (click)="previousStep()" class="btnTertiary">Back</button>
-      <button (click)="updateSpecial()" class="btnSecondary">Save & Update</button>
+      <button (click)="updateSpecial()" class="btnSecondary">
+        Save & Update
+      </button>
     </div>
   </div>
 </div>
@@ -241,10 +329,19 @@
   <div class="modal-content">
     <span class="close" (click)="closeImageUploadModal()">&times;</span>
     <h6>Upload Image</h6>
-    <input type="file" (change)="onFileSelected($event)" accept="image/*">
-    <p>Acceptable file formats: PNG, JPG<br />File sizes: Files that are less than 5 MB.</p>
+    <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+    <p>
+      Acceptable file formats: PNG, JPG<br />File sizes: Files that are less
+      than 5 MB.
+    </p>
     <div class="row">
-      <a class="btnSecondary" [class.disabled]="!uploadDone" (click)="uploadDone && closeImageUploadModal()"> Done</a>
+      <a
+        class="btnSecondary"
+        [class.disabled]="!uploadDone"
+        (click)="uploadDone && closeImageUploadModal()"
+      >
+        Done</a
+      >
     </div>
   </div>
 </div>

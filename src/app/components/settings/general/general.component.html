@@ -1,208 +1,202 @@
 <div class="settingspage inner-page">
-    <div class="block">
-        <form [formGroup]="accountForm" (ngSubmit)="saveAccountDetails()" class="formBlock">
-            <div class="leftCol">
-                <div class="row">
-                    <h6>Profile</h6>
-                </div>
+  <div class="block">
+    <form
+      [formGroup]="accountForm"
+      (ngSubmit)="saveAccountDetails()"
+      class="formBlock"
+    >
+      <div class="leftCol">
+        <div class="row">
+          <h6>Profile</h6>
+        </div>
 
-                <div class="row">
-                    <div class="formGroup">
-                        <div class="label-container">
-                            <label>First name</label>
-                            <div class="error-message">
-                                First name is required.
-                            </div>
-                        </div>
-                        <div class="input-holder">
-                            <input type="text" class="formControl" placeholder="John" formControlName="name" />
-                        </div>
-                    </div>
-                    <div class="formGroup">
-                        <div class="label-container">
-                            <label>Surname</label>
-                            <div class="error-message">
-                                Surname is required.
-                            </div>
-                        </div>
-                        <div class="input-holder">
-                            <input type="text" class="formControl" placeholder="Smith" formControlName="surname" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="formGroup">
-                        <div class="label-container">
-                            <label>Password</label>
-                            <div class="error-message">
-                                Password is required.
-                            </div>
-                        </div>
-                        <div class="input-holder">
-                            <input type="password" class="formControl" formControlName="password" />
-                        </div>
-                    </div>
-                </div>
+        <div class="row">
+          <div class="formGroup">
+            <div class="label-container">
+              <label>First name</label>
+              <div class="error-message">First name is required.</div>
             </div>
-            <div class="rightCol">
-                <div class="row">
-                    <h6>Contact Details</h6>
-                </div>
-                <div class="row">
-                    <div class="formGroup">
-                        <div class="label-container">
-                            <label>Phone number</label>
-                            <div class="error-message">
-                                Phone number is required.
-                            </div>
-                        </div>
-                        <div class="input-holder">
-                            <input type="tel" class="formControl" placeholder="+278212345678" formControlName="phone" />
-                        </div>
-                    </div>
-                </div>
-
+            <div class="input-holder">
+              <input
+                type="text"
+                class="formControl"
+                placeholder="John"
+                formControlName="name"
+              />
             </div>
+          </div>
+          <div class="formGroup">
+            <div class="label-container">
+              <label>Surname</label>
+              <div class="error-message">Surname is required.</div>
+            </div>
+            <div class="input-holder">
+              <input
+                type="text"
+                class="formControl"
+                placeholder="Smith"
+                formControlName="surname"
+              />
+            </div>
+          </div>
+        </div>
 
-        </form>
+        <div class="row">
+          <div class="formGroup">
+            <div class="label-container">
+              <label>Password</label>
+              <div class="error-message">Password is required.</div>
+            </div>
+            <div class="input-holder">
+              <input
+                type="password"
+                class="formControl"
+                formControlName="password"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rightCol">
+        <div class="row">
+          <h6>Contact Details</h6>
+        </div>
+        <div class="row">
+          <div class="formGroup">
+            <div class="label-container">
+              <label>Phone number</label>
+              <div class="error-message">Phone number is required.</div>
+            </div>
+            <div class="input-holder">
+              <input
+                type="tel"
+                class="formControl"
+                placeholder="+278212345678"
+                formControlName="phone"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="row btnRow">
+      <a class="btnTertiary" (click)="authService.SignOut()">log out</a>
+      <a class="btnSecondary" (click)="saveAll()">Save Changes</a>
+    </div>
+  </div>
+
+  <div class="block" style="display: none">
+    <div class="row">
+      <h6 style="margin-bottom: 0; min-width: 120px">HUNGR Plan</h6>
+      <div class="rowInner">
+        <p>Option 1 (Digital Menu)</p>
         <div class="row btnRow">
-            <a class="btnTertiary" (click)="authService.SignOut()">log out</a>
-            <a class="btnSecondary" (click)="saveAll()">Save Changes</a>
+          <a class="btnTertiary" (click)="cancelSubscribtion()"
+            >cancel subscription</a
+          >
+          <a class="btnSecondary" (click)="upgrade()">Upgrade</a>
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <h6>Billing</h6>
+    <div class="row">
+      <div class="formGroup" style="flex: 3">
+        <div class="label-container">
+          <label>Card Holder Name</label>
+          <div class="error-message">Card Holder Name is required.</div>
+        </div>
+        <div class="input-holder">
+          <input type="text" class="formControl" placeholder="JS Smith" />
+        </div>
+      </div>
+      <div class="formGroup" style="flex: 3">
+        <div class="label-container">
+          <label>Card number</label>
+          <div class="error-message">Card number is required.</div>
+        </div>
+        <div class="input-holder">
+          <input type="text" class="formControl" placeholder="xxxx xxxx 1234" />
+        </div>
+      </div>
+      <div class="formGroup" style="flex: 1">
+        <div class="label-container">
+          <label>CVV</label>
+          <div class="error-message">CVV is required.</div>
+        </div>
+        <div class="input-holder">
+          <input type="text" class="formControl" placeholder="xxx" />
+        </div>
+      </div>
+      <div class="formGroup" style="flex: 1">
+        <div class="label-container">
+          <label>Expiry Date</label>
+          <div class="error-message">Expiry Date is required.</div>
+        </div>
+        <div class="input-holder">
+          <input type="text" class="formControl" placeholder="mm/yy" />
+        </div>
+      </div>
     </div>
 
-    <div class="block" style="display:none">
-        <div class="row">
-            <h6 style="margin-bottom: 0;min-width: 120px;">HUNGR Plan</h6>
-            <div class="rowInner">
-                <p>Option 1 (Digital Menu)</p>
-                <div class="row btnRow">
-                    <a class="btnTertiary" (click)="cancelSubscribtion()">cancel subscription</a>
-                    <a class="btnSecondary" (click)="upgrade()">Upgrade</a>
-                </div>
-            </div>
-        </div>
+    <div class="row btnHolder">
+      <a class="btnSecondary">Save changes</a>
     </div>
-    <div class="block">
-        <h6>Billing</h6>
-        <div class="row">
-            <div class="formGroup" style="flex:3">
-                <div class="label-container">
-                    <label>Card Holder Name</label>
-                    <div class="error-message">
-                        Card Holder Name is required.
-                    </div>
-                </div>
-                <div class="input-holder">
-                    <input type="text" class="formControl" placeholder="JS Smith" />
-                </div>
-            </div>
-            <div class="formGroup" style="flex:3">
-                <div class="label-container">
-                    <label>Card number</label>
-                    <div class="error-message">
-                        Card number is required.
-                    </div>
-                </div>
-                <div class="input-holder">
-                    <input type="text" class="formControl" placeholder="xxxx xxxx 1234" />
-                </div>
-            </div>
-            <div class="formGroup" style="flex:1">
-                <div class="label-container">
-                    <label>CVV</label>
-                    <div class="error-message">
-                        CVV is required.
-                    </div>
-                </div>
-                <div class="input-holder">
-                    <input type="text" class="formControl" placeholder="xxx" />
-                </div>
-            </div>
-            <div class="formGroup" style="flex:1">
-                <div class="label-container">
-                    <label>Expiry Date</label>
-                    <div class="error-message">
-                        Expiry Date is required.
-                    </div>
-                </div>
-                <div class="input-holder">
-                    <input type="text" class="formControl" placeholder="mm/yy" />
-                </div>
-            </div>
-        </div>
-
-
-
-
-        <div class="row btnHolder">
-            <a class="btnSecondary">Save changes</a>
-        </div>
+  </div>
+  <div class="block">
+    <div class="row">
+      <h6 class="heading">Notifications</h6>
     </div>
-    <div class="block">
-        <div class="row">
-            <h6 class="heading">Notifications</h6>
-        </div>
-        <div class="toggleHolder">
-            <div class="toggle-container">
-                <label>Email Notifications</label>
-                <mat-slide-toggle [(ngModel)]="currentUserData.marketingConsent" color="#3CE1AF"></mat-slide-toggle>
-            </div>
+    <div class="toggleHolder">
+      <div class="toggle-container">
+        <label>Email Notifications</label>
+        <mat-slide-toggle
+          [(ngModel)]="currentUserData.marketingConsent"
+          color="#16D3D2"
+        ></mat-slide-toggle>
+      </div>
 
-            <div class="toggle-container">
-                <label>Tips & Tutorials</label>
-                <mat-slide-toggle [(ngModel)]="currentUserData.tipsTutorials" color="#3CE1AF"></mat-slide-toggle>
-            </div>
+      <div class="toggle-container">
+        <label>Tips & Tutorials</label>
+        <mat-slide-toggle
+          [(ngModel)]="currentUserData.tipsTutorials"
+          color="#16D3D2"
+        ></mat-slide-toggle>
+      </div>
 
-            <div class="toggle-container">
-                <label>User Insights</label>
-                <mat-slide-toggle [(ngModel)]="currentUserData.userInsights" color="#3CE1AF"></mat-slide-toggle>
-            </div>
-        </div>
-
+      <div class="toggle-container">
+        <label>User Insights</label>
+        <mat-slide-toggle
+          [(ngModel)]="currentUserData.userInsights"
+          color="#16D3D2"
+        ></mat-slide-toggle>
+      </div>
     </div>
+  </div>
 
-
-    <div class="block posBlock">
-        <h6>POS Integration</h6>
-        <div class="row">
-            <p>This is the POS system that is currently linked to your HUNGR account..</p>
-            <div class="formGroup">
-                <div class="label-container">
-                    <div class="error-message">
-                        POS System name
-                    </div>
-                </div>
-                <div class="input-holder">
-                    <mat-select placeholder="POS System name">
-                        <mat-optgroup>
-                            <mat-option value="gaap">GAAP</mat-option>
-                            <mat-option value="oracle">Oracle Micros</mat-option>
-                            <mat-option value="pilot">Pilot</mat-option>
-                        </mat-optgroup>
-                    </mat-select>
-                </div>
-            </div>
+  <div class="block posBlock">
+    <h6>POS Integration</h6>
+    <div class="row">
+      <p>
+        This is the POS system that is currently linked to your HUNGR account..
+      </p>
+      <div class="formGroup">
+        <div class="label-container">
+          <div class="error-message">POS System name</div>
         </div>
-
+        <div class="input-holder">
+          <mat-select placeholder="POS System name">
+            <mat-optgroup>
+              <mat-option value="gaap">GAAP</mat-option>
+              <mat-option value="oracle">Oracle Micros</mat-option>
+              <mat-option value="pilot">Pilot</mat-option>
+            </mat-optgroup>
+          </mat-select>
+        </div>
+      </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  </div>
 </div>
 
 <app-loading [isLoading]="isSaving"></app-loading>

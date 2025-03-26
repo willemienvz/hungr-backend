@@ -1,14 +1,17 @@
 @if (layoutMinimised) {
 <div class="inner-page">
   <div class="row">
-    <app-stats-overview-block heading="Total menu views" tooltiptext="Tooltip Text" timeText="Last 7 days"
-      [stat]="viewingTotalCurrentWeek.toString()" [movement]="getWeeklyDifferenceMessage()"
-      textSize="L"></app-stats-overview-block>
+    <app-stats-overview-block
+      heading="Total menu views"
+      tooltiptext="Tooltip Text"
+      timeText="Last 7 days"
+      [stat]="viewingTotalCurrentWeek.toString()"
+      [movement]="getWeeklyDifferenceMessage()"
+      textSize="L"
+    ></app-stats-overview-block>
     <div class="block">
       <h6 class="heading">Average Viewing Time</h6>
-      <div class="blueBlock">
-        {{ displayAverageTime }} min
-      </div>
+      <div class="blueBlock">{{ displayAverageTime }} min</div>
     </div>
     <div class="block">
       <h6 class="heading">Most Popular Viewing time</h6>
@@ -17,26 +20,44 @@
       </div>
     </div>
   </div>
-
 </div>
 
-}
-@else {
+} @else {
 <div class="inner-page">
   <div class="row">
-    <app-stats-overview-block heading="Total menu views" tooltiptext="Tooltip Text" timeText="Last 7 days"
-      [stat]="viewingTotalCurrentWeek.toString()" [movement]="getWeeklyDifferenceMessage()"
-      textSize="L"></app-stats-overview-block>
-    <app-stats-overview-block heading="New views" tooltiptext="Tooltip Text" timeText="Last 24 hours"
-      [stat]="viewingTotalLast24Hours.toString()" [movement]="getDailyDifferenceMessage()"
-      textSize="L"></app-stats-overview-block>
+    <app-stats-overview-block
+      heading="Total menu views"
+      tooltiptext="Tooltip Text"
+      timeText="Last 7 days"
+      [stat]="viewingTotalCurrentWeek.toString()"
+      [movement]="getWeeklyDifferenceMessage()"
+      textSize="L"
+    ></app-stats-overview-block>
+    <app-stats-overview-block
+      heading="New views"
+      tooltiptext="Tooltip Text"
+      timeText="Last 24 hours"
+      [stat]="viewingTotalLast24Hours.toString()"
+      [movement]="getDailyDifferenceMessage()"
+      textSize="L"
+    ></app-stats-overview-block>
 
-    <app-stats-table-block heading="Top categories" tooltiptext="Tooltip Text" timeText="Last 24 hours"
-      [data]="topOrderedCategories"></app-stats-table-block>
+    <app-stats-table-block
+      heading="Top categories"
+      tooltiptext="Tooltip Text"
+      timeText="Last 24 hours"
+      [data]="topOrderedCategories"
+    ></app-stats-table-block>
 
-    <app-stats-overview-block heading="Total orders" tooltiptext="Tooltip Text" [showLeft]=true timeText="Last 7 days"
-      [stat]="currentWeekOrderCount.toString()" textSize="L"
-      [movement]="orderMovementPercentage.toFixed(0) + '%'"></app-stats-overview-block>
+    <app-stats-overview-block
+      heading="Total orders"
+      tooltiptext="Tooltip Text"
+      [showLeft]="true"
+      timeText="Last 7 days"
+      [stat]="currentWeekOrderCount.toString()"
+      textSize="L"
+      [movement]="orderMovementPercentage.toFixed(0) + '%'"
+    ></app-stats-overview-block>
   </div>
   <div class="row">
     <div class="block biggerBlock">
@@ -49,8 +70,6 @@
     </div>
   </div>
   <div class="row">
-
-
     <div class="block stat1">
       <div class="row">
         <h6 class="heading">Category insights</h6>
@@ -58,20 +77,23 @@
       </div>
       <div class="row list">
         <p>Most Ordered Category</p>
-        <p><b>{{mostOrderedCategory}}</b></p>
+        <p>
+          <b>{{ mostOrderedCategory }}</b>
+        </p>
       </div>
       <div class="row list">
         <p>Least Ordered Category</p>
-        <p><b>{{leastOrderedCategory}}</b></p>
+        <p>
+          <b>{{ leastOrderedCategory }}</b>
+        </p>
       </div>
     </div>
 
-    <app-most-ordered heading="Most ordered items" tooltiptext="Tooltip Text"
-      [data]="topOrderedItems"></app-most-ordered>
-
-
-
-
+    <app-most-ordered
+      heading="Most ordered items"
+      tooltiptext="Tooltip Text"
+      [data]="topOrderedItems"
+    ></app-most-ordered>
 
     <div class="block stat">
       <div class="row">
@@ -81,14 +103,22 @@
 
       <div class="row list">
         <p>Order Value</p>
-        <p [ngStyle]="{ 'color': orderMovementPercentage > 0 ? '#1FCC96' : '#FF6767' }">
+        <p
+          [ngStyle]="{
+            color: orderMovementPercentage > 0 ? '#1FCC96' : '#FE1B54'
+          }"
+        >
           <b>{{ orderMovementPercentage.toFixed(0) }}%</b>
         </p>
       </div>
 
       <div class="row list">
         <p>Staff Tips</p>
-        <p [ngStyle]="{ 'color': tipValueMovementPercentage > 0 ? '#1FCC96' : '#FF6767' }">
+        <p
+          [ngStyle]="{
+            color: tipValueMovementPercentage > 0 ? '#1FCC96' : '#FE1B54'
+          }"
+        >
           <b>{{ tipValueMovementPercentage.toFixed(0) }}%</b>
         </p>
       </div>
