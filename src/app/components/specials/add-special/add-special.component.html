@@ -15,7 +15,7 @@
       </h6>
       <form [formGroup]="specialForm">
         <div class="formGroup">
-          <p>Special Title</p>
+          <p class="label">Special Title</p>
           <input
             type="text"
             class="formControl"
@@ -23,17 +23,36 @@
             placeholder="Enter special title"
             required
           />
+          <div
+            class="error-message"
+            *ngIf="
+              specialForm.get('specialTitle')?.touched &&
+              specialForm.get('specialTitle')?.invalid
+            "
+          >
+            Special Title is required.
+          </div>
         </div>
         <div class="formGroup">
-          <p>Select Menu</p>
+          <p class="label">Select Menu</p>
           <mat-select formControlName="menu" (selectionChange)="onMenuChange()">
             <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
               {{ menu.menuName }}
             </mat-option>
           </mat-select>
+          <div
+            class="error-message"
+            *ngIf="
+              specialForm.get('menu')?.touched &&
+              specialForm.get('menu')?.invalid
+            "
+          >
+            Menu selection is required.
+          </div>
         </div>
+
         <div class="formGroup">
-          <p>Type of Special</p>
+          <p class="label">Type of Special</p>
           <mat-select
             formControlName="typeSpecial"
             (selectionChange)="onSpecialTypeChange()"
@@ -42,12 +61,21 @@
               {{ type.name }}
             </mat-option>
           </mat-select>
+          <div
+            class="error-message"
+            *ngIf="
+              specialForm.get('typeSpecial')?.touched &&
+              specialForm.get('typeSpecial')?.invalid
+            "
+          >
+            Type of special is required.
+          </div>
         </div>
+
         <div class="formGroup dateRow">
-          <p>Select Dates</p>
           <div class="row">
             <div class="col">
-              <p>Start Date</p>
+              <p class="label">Start Date</p>
               <input
                 type="date"
                 class="formControl"
@@ -55,9 +83,19 @@
                 placeholder="Start date"
                 required
               />
+              <div
+                class="error-message"
+                *ngIf="
+                  specialForm.get('dateFrom')?.touched &&
+                  specialForm.get('dateFrom')?.invalid
+                "
+              >
+                Start date is required.
+              </div>
             </div>
+
             <div class="col">
-              <p>End Date</p>
+              <p class="label">End Date</p>
               <input
                 type="date"
                 class="formControl"
@@ -65,6 +103,15 @@
                 placeholder="End date"
                 required
               />
+              <div
+                class="error-message"
+                *ngIf="
+                  specialForm.get('dateTo')?.touched &&
+                  specialForm.get('dateTo')?.invalid
+                "
+              >
+                End date is required.
+              </div>
             </div>
           </div>
 
@@ -357,8 +404,15 @@
     <i class="material-icons popup-close" routerLink="/specials">close</i>
     <div class="row">
       <div class="col">
-        <h1>Your changes have been saved</h1>
+        <h1>Your new special is now Live</h1>
+        <p>
+          Your new Special has successfully been saved and published. It can be
+          viewed by anyone viewing your menu.
+        </p>
+        <a routerLink="/specials" class="btnSecondary">Done</a>
       </div>
     </div>
   </div>
 </div>
+
+<app-loading [isLoading]="isSaving"></app-loading>

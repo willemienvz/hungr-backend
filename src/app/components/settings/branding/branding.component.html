@@ -4,15 +4,15 @@
       <div class="block logoBlock">
         <h6>Logo</h6>
         <p>Please upload your logo.</p>
-        <input
-          class="btnTertiary"
-          type="file"
-          (change)="onFileSelected($event)"
-          style="font-weight: 500; text-transform: capitalize"
-        />
 
         <div class="row" style="margin-top: 20px">
-          <button (click)="onUpload()" class="btnSecondary">Upload</button>
+          <a
+            class="btnTertiary"
+            (click)="openImageUploadModal()"
+            style="font-weight: 500; text-transform: capitalize"
+          >
+            Upload Logo
+          </a>
           <div *ngIf="imageUrl" class="imagePreview">
             <i
               *ngIf="imageUrl"
@@ -522,6 +522,28 @@
           >Save Changes</a
         >
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [class.open]="showImageUploadModal">
+  <div class="modal-content">
+    <span class="close" (click)="closeImageUploadModal()">&times;</span>
+    <h6>Upload Logo</h6>
+    <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+    <p>
+      Acceptable file formats: PNG, JPG<br />
+      File sizes: Files less than 5 MB.
+    </p>
+    <div class="row" style="margin-top: 15px">
+      <a
+        class="btnSecondary"
+        [class.disabled]="!selectedFile"
+        (click)="selectedFile && onUpload()"
+      >
+        Upload</a
+      >
+      <a class="btnTertiary" (click)="closeImageUploadModal()">Cancel</a>
     </div>
   </div>
 </div>

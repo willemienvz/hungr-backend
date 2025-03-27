@@ -13,7 +13,7 @@
       </h6>
       <form [formGroup]="specialForm">
         <div class="formGroup">
-          <p>Special Title</p>
+          <p class="label">Special Title</p>
           <input
             type="text"
             class="formControl"
@@ -23,7 +23,7 @@
           />
         </div>
         <div class="formGroup">
-          <p>Select Menu</p>
+          <p class="label">Select Menu</p>
           <mat-select formControlName="menu" (selectionChange)="onMenuChange()">
             <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
               {{ menu.menuName }}
@@ -31,7 +31,7 @@
           </mat-select>
         </div>
         <div class="formGroup">
-          <p>Type of Special</p>
+          <p class="label">Type of Special</p>
           <mat-select
             formControlName="typeSpecial"
             (selectionChange)="onSpecialTypeChange()"
@@ -42,10 +42,9 @@
           </mat-select>
         </div>
         <div class="formGroup dateRow">
-          <p>Select Dates</p>
           <div class="row">
             <div class="col">
-              <p>Start Date</p>
+              <p class="label">Start Date</p>
               <input
                 type="date"
                 class="formControl"
@@ -55,7 +54,7 @@
               />
             </div>
             <div class="col">
-              <p>End Date</p>
+              <p class="label">End Date</p>
               <input
                 type="date"
                 class="formControl"
@@ -93,7 +92,9 @@
       </h6>
       <form [formGroup]="specialForm">
         <div class="formGroup">
-          <p>What day(s) of the week should this special be valid?</p>
+          <p class="label">
+            What day(s) of the week should this special be valid?
+          </p>
           <div class="weekday-selector">
             <span
               *ngFor="let day of weekdays"
@@ -106,11 +107,11 @@
           </div>
         </div>
         <div class="formGroup">
-          <p>What times should this special be valid?</p>
+          <p class="label">What times should this special be valid?</p>
           <div class="dateRow">
             <div class="row">
               <div class="col">
-                <p>Start time</p>
+                <p class="label">Start time</p>
                 <input
                   type="time"
                   class="formControl"
@@ -120,7 +121,7 @@
                 />
               </div>
               <div class="col">
-                <p>End time</p>
+                <p class="label">End time</p>
                 <input
                   type="time"
                   class="formControl"
@@ -181,8 +182,8 @@
         </div>
 
         <!-- Category Special -->
-        <div *ngIf="selectedSpecialType === 2">
-          <p>Select Category</p>
+        <div *ngIf="selectedSpecialType === 2" class="full-container">
+          <p class="label">Select Category</p>
           <div class="row">
             <mat-select formControlName="featureSpecialUnder">
               <mat-option
@@ -356,3 +357,4 @@
     </div>
   </div>
 </div>
+<app-loading [isLoading]="isSaving"></app-loading>

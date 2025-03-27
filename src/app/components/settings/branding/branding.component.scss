@@ -540,3 +540,55 @@ h6 {
 ::ng-deep .mat-mdc-form-field-infix {
   width: auto !important;
 }
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 46%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 20px;
+  align-items: flex-start;
+
+  .row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+}
+
+.close {
+  color: #aaa;
+  position: absolute;
+  font-size: 28px;
+  font-weight: bold;
+  right: 15px;
+  top: 15px;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.open {
+  display: block; /* Show when open */
+}

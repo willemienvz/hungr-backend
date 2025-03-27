@@ -2,21 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { finalize } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
 import { ToastrService } from 'ngx-toastr';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-add-special',
   templateUrl: './add-special.component.html',
-  styleUrls: ['./add-special.component.scss']
+  styleUrls: ['./add-special.component.scss'],
 })
 export class AddSpecialComponent implements OnInit {
   isSaving: boolean = false;
   currentStep = 1;
-selectedSpecialType: number = 1;
+  selectedSpecialType: number = 1;
   uploadDone: boolean = false;
   specialForm: FormGroup;
   specialTypes = [
@@ -28,7 +29,7 @@ selectedSpecialType: number = 1;
   selectedDays: string[] = [];
   menus: Menu[] = [];
   selectedMenu: Menu | null = null;
-  addedItems: { name: string; amount: string }[] = []; 
+  addedItems: { name: string; amount: string }[] = [];
   imageUploadProgress: number = 0;
   showImageUploadModal: boolean = false;
   uploadedImageUrl: string | null = null;
@@ -43,22 +44,25 @@ selectedSpecialType: number = 1;
     private fb: FormBuilder,
     private toastr: ToastrService
   ) {
-    this.specialForm = this.fb.group({
-      menu: [null, Validators.required],
-      specialTitle: ['', Validators.required],
-      dateFrom: [{ value: ''  }, Validators.required],
-      dateTo: [{ value: '' }, Validators.required],
-      typeSpecial: [{ value: ''}, Validators.required],
-      typeSpecialDetails: [[]],
-      comboPrice: [''], 
-      percentage: [''], 
-      amount: ['', Validators.required],
-      featureSpecialUnder: [{ value: '',}],
-      timeFrom: [{ value: '', }, Validators.required],
-      timeTo: [{ value: '', disabled: true }, Validators.required],
-    }, {
-      validators: [dateRangeValidator(), timeRangeValidator()]
-    });
+    this.specialForm = this.fb.group(
+      {
+        menu: [null, Validators.required],
+        specialTitle: ['', Validators.required],
+        dateFrom: [{ value: '' }, Validators.required],
+        dateTo: [{ value: '' }, Validators.required],
+        typeSpecial: [{ value: '' }, Validators.required],
+        typeSpecialDetails: [[]],
+        comboPrice: [''],
+        percentage: [''],
+        amount: ['', Validators.required],
+        featureSpecialUnder: [{ value: '' }],
+        timeFrom: [{ value: '' }, Validators.required],
+        timeTo: [{ value: '', disabled: true }, Validators.required],
+      },
+      {
+        validators: [dateRangeValidator(), timeRangeValidator()],
+      }
+    );
   }
 
   ngOnInit() {
@@ -66,34 +70,42 @@ selectedSpecialType: number = 1;
   }
   addItem(): void {
     const selectedType = this.selectedSpecialType;
-  
-    if (selectedType === 1) { // Weekly Special
-      const selectedItemName = this.specialForm.get('typeSpecialDetails')?.value;
+
+    if (selectedType === 1) {
+      // Weekly Special
+      const selectedItemName =
+        this.specialForm.get('typeSpecialDetails')?.value;
       const amount = this.specialForm.get('amount')?.value;
-  
+
       if (selectedItemName && amount) {
         this.addedItems.push({ name: selectedItemName, amount });
         this.specialForm.get('typeSpecialDetails')?.reset();
         this.specialForm.get('amount')?.reset();
       }
-    } 
-    else if (selectedType === 2) { // Category Special
+    } else if (selectedType === 2) {
+      // Category Special
       const categoryName = this.specialForm.get('featureSpecialUnder')?.value;
       const percentage = this.specialForm.get('percentage')?.value;
-  
+
       if (categoryName && percentage) {
-        this.addedItems.push({ name: `Category: ${categoryName}`, amount: `${percentage}%` });
+        this.addedItems.push({
+          name: `Category: ${categoryName}`,
+          amount: `${percentage}%`,
+        });
         this.specialForm.get('featureSpecialUnder')?.reset();
         this.specialForm.get('percentage')?.reset();
       }
-    } 
-    else  if (selectedType === 3) { // Combo Special
+    } else if (selectedType === 3) {
+      // Combo Special
       const comboItems = this.specialForm.get('typeSpecialDetails')?.value; // Array of items
       const comboPrice = this.specialForm.get('comboPrice')?.value;
-  
+
       if (Array.isArray(comboItems) && comboItems.length > 0 && comboPrice) {
         const comboItemNames = comboItems.join(', ');
-        this.addedItems.push({ name: `Combo: ${comboItemNames}`, amount: comboPrice });
+        this.addedItems.push({
+          name: `Combo: ${comboItemNames}`,
+          amount: comboPrice,
+        });
         this.specialForm.get('typeSpecialDetails')?.reset();
         this.specialForm.get('comboPrice')?.reset();
       }
@@ -101,10 +113,14 @@ selectedSpecialType: number = 1;
   }
   getSpecialTypeLabel(type: number): string {
     switch (type) {
-      case 1: return 'Weekly Special';
-      case 2: return 'Category Special';
-      case 3: return 'Combo Special';
-      default: return 'Special Type';
+      case 1:
+        return 'Weekly Special';
+      case 2:
+        return 'Category Special';
+      case 3:
+        return 'Combo Special';
+      default:
+        return 'Special Type';
     }
   }
   removeItem(index: number): void {
@@ -131,9 +147,10 @@ selectedSpecialType: number = 1;
     const user = JSON.parse(localStorage.getItem('user')!);
     const OwnerID = user.uid;
     this.owner = user.uid;
-    this.firestore.collection<Menu>('menus', ref => ref.where('OwnerID', '==', OwnerID))
+    this.firestore
+      .collection<Menu>('menus', (ref) => ref.where('OwnerID', '==', OwnerID))
       .valueChanges()
-      .subscribe(menus => {
+      .subscribe((menus) => {
         this.menus = menus;
         console.log(menus);
       });
@@ -143,7 +160,8 @@ selectedSpecialType: number = 1;
     const menuControl = this.specialForm.get('menu');
     if (menuControl?.value) {
       this.specialForm.enable();
-      this.selectedMenu = this.menus.find(menu => menu.menuID === menuControl.value) || null;
+      this.selectedMenu =
+        this.menus.find((menu) => menu.menuID === menuControl.value) || null;
     } else {
       this.specialForm.disable();
       menuControl?.enable();
@@ -151,7 +169,6 @@ selectedSpecialType: number = 1;
     }
   }
 
- 
   toggleSelection(day: string) {
     const index = this.selectedDays.indexOf(day);
     if (index >= 0) {
@@ -165,7 +182,6 @@ selectedSpecialType: number = 1;
     return this.selectedDays.includes(day);
   }
 
-
   openImageUploadModal() {
     this.showImageUploadModal = true;
   }
@@ -175,8 +191,13 @@ selectedSpecialType: number = 1;
   }
 
   onFileSelected(event: any) {
+    this.isSaving = true;
     const file: File = event.target.files[0];
-    this.uploadImageToFirebase(file);
+    if (file) {
+      this.uploadImageToFirebase(file);
+    } else {
+      this.isSaving = false;
+    }
   }
 
   uploadImageToFirebase(file: File) {
@@ -184,48 +205,66 @@ selectedSpecialType: number = 1;
     const fileRef = this.storage.ref(filePath);
     const uploadTask = this.storage.upload(filePath, file);
 
-    uploadTask.percentageChanges().subscribe(progress => {
+    uploadTask.percentageChanges().subscribe((progress) => {
       this.imageUploadProgress = progress || 0;
     });
 
-    uploadTask.snapshotChanges().pipe(
-      finalize(() => {
-        fileRef.getDownloadURL().subscribe(url => {
-          this.uploadedImageUrl = url;
-          console.log('Uploaded Image URL:', url);
-          this.uploadDone = true;
-        });
-      })
-    ).subscribe();
+    uploadTask
+      .snapshotChanges()
+      .pipe(
+        finalize(() => {
+          fileRef.getDownloadURL().subscribe({
+            next: (url) => {
+              this.uploadedImageUrl = url;
+              console.log('Uploaded Image URL:', url);
+              this.uploadDone = true;
+              this.isSaving = false;
+            },
+            error: (err) => {
+              console.error('Failed to get download URL:', err);
+              this.isSaving = false;
+            },
+          });
+        }),
+        catchError((err) => {
+          console.error('Upload failed:', err);
+          this.isSaving = false;
+          return of();
+        })
+      )
+      .subscribe();
   }
 
   onSubmit() {
     this.isSaving = true;
-      const formValue = this.specialForm.getRawValue();
-      const data = {
-        ...formValue,
-        addedItems: this.addedItems,
-        selectedDays: this.selectedDays,
-        imageUrl: this.uploadedImageUrl, 
-        OwnerID: this.owner,
-        specialID: '1',
-        active: true
-      };
+    const formValue = this.specialForm.getRawValue();
+    console.log(formValue);
+    const data = {
+      ...formValue,
+      addedItems: this.addedItems,
+      selectedDays: this.selectedDays,
+      imageUrl: this.uploadedImageUrl,
+      OwnerID: this.owner,
+      specialID: '1',
+      active: true,
+    };
 
-      this.firestore.collection('specials').add(data)
-        .then((results) => {
-          const newData = {
-            ...data,
-            specialID: results.id
-          };
-          this.firestore.collection('specials').doc(results.id).update(newData);
-          this.isSaving = false;
-          this.showSuccess('Special saved successfully!'); 
-        })
-        .catch(error => {
-          console.error('Error saving to Firestore:', error);
-          this.isSaving = false;
-        });
+    this.firestore
+      .collection('specials')
+      .add(data)
+      .then((results) => {
+        const newData = {
+          ...data,
+          specialID: results.id,
+        };
+        this.firestore.collection('specials').doc(results.id).update(newData);
+        this.isSaving = false;
+        this.showSuccess('Special saved successfully!');
+      })
+      .catch((error) => {
+        console.error('Error saving to Firestore:', error);
+        this.isSaving = false;
+      });
   }
 
   cancelUpload() {
@@ -241,26 +280,28 @@ selectedSpecialType: number = 1;
         ...formValue,
         addedItems: this.addedItems,
         selectedDays: this.selectedDays,
-        imageUrl: this.uploadedImageUrl, 
+        imageUrl: this.uploadedImageUrl,
         specialID: '1',
         OwnerID: this.owner,
-        active: false
+        active: false,
       };
-      this.firestore.collection('specials').add(data)
+      this.firestore
+        .collection('specials')
+        .add(data)
         .then((results) => {
           const newData = {
             ...data,
-            specialID: results.id
+            specialID: results.id,
           };
           this.firestore.collection('specials').doc(results.id).update(newData);
           this.isSaving = false;
           this.toastr.success('Your changes have been saved');
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error saving draft to Firestore:', error);
           this.isSaving = false;
         });
-    }else{
+    } else {
       this.isSaving = false;
       this.toastr.error('Some fields have not been completed. ');
     }
@@ -269,16 +310,38 @@ selectedSpecialType: number = 1;
   private showSuccess(message: string) {
     this.successPopupMessage = message;
     this.showSuccessPopup = true;
-    
   }
   nextStep() {
+    if (this.currentStep === 1) {
+      const controlsToCheck = [
+        'specialTitle',
+        'menu',
+        'typeSpecial',
+        'dateFrom',
+        'dateTo',
+      ];
+
+      let hasErrors = false;
+      controlsToCheck.forEach((controlName) => {
+        const control = this.specialForm.get(controlName);
+        control?.markAsTouched();
+        if (control?.invalid) {
+          hasErrors = true;
+        }
+      });
+
+      if (hasErrors || this.specialForm.errors?.['dateRangeInvalid']) {
+        return;
+      }
+    }
+
     if (this.currentStep < 5) this.currentStep++;
   }
-  
+
   previousStep() {
     if (this.currentStep > 1) this.currentStep--;
   }
-  
+
   onSpecialTypeChange() {
     this.selectedSpecialType = this.specialForm.get('typeSpecial')?.value;
   }
