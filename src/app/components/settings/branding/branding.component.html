@@ -346,7 +346,7 @@
                       ngx-colors-trigger
                       [(ngModel)]="subHeadingColor"
                       (ngModelChange)="
-                        applyChanges('Main Heading Color', $event)
+                        applyChanges('Sub Heading Color', $event)
                       "
                     ></ngx-colors>
                     <mat-form-field>
@@ -533,7 +533,8 @@
     <input type="file" (change)="onFileSelected($event)" accept="image/*" />
     <p>
       Acceptable file formats: PNG, JPG<br />
-      File sizes: Files less than 5 MB.
+      File sizes: Files less than 5 MB.<br />
+      <strong>Required dimensions: 150px x 50px</strong>
     </p>
     <div class="row" style="margin-top: 15px">
       <a

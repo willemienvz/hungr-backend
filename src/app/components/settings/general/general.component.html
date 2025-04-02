@@ -85,16 +85,21 @@
     </div>
   </div>
 
-  <div class="block" style="display: none">
+  <div class="block">
     <div class="row">
       <h6 style="margin-bottom: 0; min-width: 120px">HUNGR Plan</h6>
       <div class="rowInner">
-        <p>Option 1 (Digital Menu)</p>
+        <p>
+          Option 1 (Digital Menu) -
+          {{
+            currentUser?.subscriptionType === "annual1" ? "Annual" : "Monthly"
+          }}
+        </p>
         <div class="row btnRow">
-          <a class="btnTertiary" (click)="cancelSubscribtion()"
+          <!-- <a class="btnTertiary" (click)="cancelSubscribtion()"
             >cancel subscription</a
-          >
-          <a class="btnSecondary" (click)="upgrade()">Upgrade</a>
+          >-->
+          <a class="btnSecondary" href="mailto:support@hungr.co">Change</a>
         </div>
       </div>
     </div>
@@ -175,7 +180,7 @@
     </div>
   </div>
 
-  <div class="block posBlock">
+  <!--  <div class="block posBlock">
     <h6>POS Integration</h6>
     <div class="row">
       <p>
@@ -196,7 +201,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>
 
 <app-loading [isLoading]="isSaving"></app-loading>

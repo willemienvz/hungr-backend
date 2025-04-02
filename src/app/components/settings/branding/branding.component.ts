@@ -189,7 +189,36 @@ export class BrandingComponent {
   }
 
   onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
+    const file: File = event.target.files[0];
+
+    if (!file) return;
+
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      img.src = e.target.result;
+
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+
+        const requiredWidth = 150;
+        const requiredHeight = 50;
+
+        if (width === requiredWidth && height === requiredHeight) {
+          this.selectedFile = file;
+          this.toastr.success('Image dimensions are valid.');
+        } else {
+          this.toastr.error(
+            `Image must be exactly ${requiredWidth}px by ${requiredHeight}px. Your image is ${width}x${height}px.`
+          );
+          this.selectedFile = null;
+        }
+      };
+    };
+
+    reader.readAsDataURL(file);
   }
 
   onUpload(): void {

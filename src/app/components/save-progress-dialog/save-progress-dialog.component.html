@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Save Progress?</h2>
+<mat-dialog-content
+  >You will be leaving this page . Save your progress on this page to continue
+  at a later stage. Not saving will result in lost progress.</mat-dialog-content
+>
+<mat-dialog-actions align="end" style="gap: 10px">
+  <button
+    class="btnTertiary"
+    mat-button
+    mat-dialog-close
+    [mat-dialog-close]="false"
+  >
+    Cancel
+  </button>
+  <button
+    class="btnSecondary"
+    mat-button
+    color="primary"
+    [mat-dialog-close]="true"
+  >
+    Save
+  </button>
+</mat-dialog-actions>

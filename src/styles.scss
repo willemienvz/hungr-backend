@@ -174,8 +174,16 @@ input[type="number"] {
   letter-spacing: -0.001em;
   padding: 12px;
   color: #181818;
+  outline: none !important;
+}
+.mdc-text-field--filled:not(.mdc-text-field--disabled)
+  .mdc-line-ripple::before {
+  border: none !important;
 }
 
+.mdc-text-field--filled .mdc-line-ripple::after {
+  border: none !important;
+}
 .btnPrimary {
   background: #16d3d2;
   border-radius: 6px;
@@ -337,9 +345,18 @@ input[type="number"] {
   transition: 0.3s all;
 }
 
+ngx-colors-panel button {
+  font-family: "Poppins", sans-serif !important;
+}
+
 .mainLink:hover {
   color: #444444;
   text-decoration: underline;
+}
+
+.mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled)
+  .mat-mdc-text-field-wrapper {
+  border-radius: 5px;
 }
 
 .mainLinkLarge {
@@ -646,4 +663,7 @@ input[type="submit"]:disabled {
   padding: 5px 0 !important;
   height: 38px !important;
   min-height: unset;
+  justify-content: center;
+  align-items: center;
+  display: flex !important;
 }

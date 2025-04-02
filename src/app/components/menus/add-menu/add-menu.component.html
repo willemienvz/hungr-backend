@@ -32,8 +32,11 @@
             <mat-form-field>
               <mat-select
                 [(ngModel)]="selectedRestaurant"
-                (change)="validateRestaurant()"
+                (selectionChange)="validateRestaurant()"
               >
+                <mat-option value="" disabled selected hidden>
+                  Assign your menu to a restaurant
+                </mat-option>
                 <mat-option
                   *ngFor="let restaurant of restuarants"
                   [value]="restaurant.restaurantID"
@@ -49,12 +52,8 @@
         </div>
         <p class="pLinkText">
           Need to create a new restaurant?
-          <a
-            class="mainLink"
-            style="text-align: right"
-            routerLink="/restaurants/add-new-restaurant"
-          >
-            Click here.</a
+          <a class="mainLink" (click)="onAddRestaurantClick($event)"
+            >Click here.</a
           >
         </p>
       </div>

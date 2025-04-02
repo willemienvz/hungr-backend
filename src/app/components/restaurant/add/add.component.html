@@ -34,14 +34,20 @@
             </div>
             <div class="formGroup">
               <label>Province</label>
-              <input
-                type="text"
-                class="formControl"
-                placeholder="Gauteng"
-                name="province"
-                [(ngModel)]="restaurant.province"
-                required
-              />
+              <mat-form-field appearance="fill" style="width: 100%">
+                <mat-select
+                  [(ngModel)]="restaurant.province"
+                  name="province"
+                  required
+                >
+                  <mat-option
+                    *ngFor="let province of saProvinces"
+                    [value]="province"
+                  >
+                    {{ province }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
           </div>
           <div class="col">
@@ -71,14 +77,16 @@
         </div>
       </div>
 
-      <div class="block">
-        <h6>Assign menu</h6>
-        <p style="color: #9a9a9a">Please assign a menu to this restaurant.</p>
+      <div class="block" style="gap: 0">
+        <h6 style="margin-bottom: 10px">Assign menu</h6>
+        <p style="color: #9a9a9a; margin-bottom: 8px">
+          Please assign a menu to this restaurant.
+        </p>
         <div
           class="block-row"
           style="justify-content: flex-start; align-items: flex-start"
         >
-          <mat-form-field appearance="fill" style="width: 30%">
+          <mat-form-field appearance="fill" style="width: 32%">
             <mat-select
               [(ngModel)]="selectedMenu"
               (selectionChange)="selectMenu($event.value)"
@@ -92,7 +100,7 @@
           <p class="font-small">
             Need to create a new menu for this restaurant?
             <a
-              routerLink="/menus/add-menu"
+              (click)="onAddMenuClick($event)"
               class="mainLink"
               style="width: 100%; text-align: right"
               >Add menu</a
@@ -101,9 +109,11 @@
         </div>
       </div>
 
-      <div class="block contactBlock">
-        <h6>Users</h6>
-        <p>Please assign a user to this restaurant</p>
+      <div class="block contactBlock" style="gap: 0">
+        <h6 style="margin-bottom: 10px">Users</h6>
+        <p style="color: #9a9a9a; margin-bottom: 8px">
+          Please assign a user to this restaurant
+        </p>
         <div class="rowMenu">
           <mat-form-field appearance="fill">
             <mat-select
@@ -119,7 +129,7 @@
           <p>
             Need to add a new user?
             <a
-              routerLink="/manage-users"
+              (click)="onAddUserClick($event)"
               class="mainLink"
               style="width: 100%; text-align: right"
               >Click here</a

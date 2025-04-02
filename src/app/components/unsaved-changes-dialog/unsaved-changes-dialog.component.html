@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Discard Changes?</h2>
+<mat-dialog-content>
+  You have unsaved changes. If you continue, your progress will be lost.
+</mat-dialog-content>
+<mat-dialog-actions align="end" style="gap: 10px">
+  <button
+    class="btnTertiary"
+    mat-button
+    mat-dialog-close
+    [mat-dialog-close]="false"
+  >
+    Cancel
+  </button>
+  <button
+    class="btnSecondary"
+    mat-button
+    color="primary"
+    [mat-dialog-close]="true"
+  >
+    Yes, discard
+  </button>
+</mat-dialog-actions>

@@ -34,14 +34,20 @@
             </div>
             <div class="formGroup">
               <label>Province</label>
-              <input
-                type="text"
-                class="formControl"
-                placeholder="Gauteng"
-                name="province"
-                [(ngModel)]="restaurant.province"
-                required
-              />
+              <mat-form-field appearance="fill" style="width: 100%">
+                <mat-select
+                  [(ngModel)]="restaurant.province"
+                  name="province"
+                  required
+                >
+                  <mat-option
+                    *ngFor="let province of saProvinces"
+                    [value]="province"
+                  >
+                    {{ province }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
           </div>
           <div class="col">
@@ -72,11 +78,13 @@
       </div>
     </div>
     <div class="col">
-      <div class="block">
-        <h6>Assign menu</h6>
-        <label>Please assign a menu to this restaurant.</label>
+      <div class="block" style="gap: 0">
+        <h6 style="margin-bottom: 10px">Assign menu</h6>
+        <label style="color: #9a9a9a; margin-bottom: 8px"
+          >Please assign a menu to this restaurant.</label
+        >
         <div class="rowMenu">
-          <mat-form-field appearance="fill">
+          <mat-form-field appearance="fill" style="width: 32%">
             <mat-select
               [(ngModel)]="selectedMenu"
               (selectionChange)="selectMenu($event.value)"
@@ -99,9 +107,9 @@
         </div>
       </div>
 
-      <div class="block contactBlock">
-        <h6>Users</h6>
-        <p>Please assign a user to this restaurant</p>
+      <div class="block contactBlock" style="margin-bottom: 0">
+        <h6 style="margin-bottom: 10px">Users</h6>
+        <p style="color: #9a9a9a">Please assign a user to this restaurant</p>
         <div class="rowMenu">
           <mat-form-field appearance="fill">
             <mat-select

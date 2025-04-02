@@ -12,136 +12,172 @@ import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-edit-restaurant',
   templateUrl: './edit-restaurant.component.html',
-  styleUrl: './edit-restaurant.component.scss'
+  styleUrl: './edit-restaurant.component.scss',
 })
 export class EditRestaurantComponent {
   selectedMenu: string = '';
   selectedMenuID: string = '';
   newRestaurant: Restaurant = {} as Restaurant;
-  restaurant: any = {}; 
+  restaurant: any = {};
   menus: Menu[] = [];
   users: User[] = [];
   currentUser: User = {} as User;
-  selectedContact: string = 'selected'; 
+  selectedContact: string = 'selected';
   selectedUser: User = {} as User;
-  selectedNumberTable : string ='';
-  restaurantStatus:boolean= false;
+  selectedNumberTable: string = '';
+  restaurantStatus: boolean = false;
   user: any;
-  OwnerID:string='';
+  OwnerID: string = '';
   tableNums: number[] = [];
-  currentRestaurantID:string='';
+  currentRestaurantID: string = '';
   currentRestaurant: Restaurant = {} as Restaurant;
-  selectedUserSurname:string='';
-  selectedUserName:string='';
-  isSaving:boolean=false;
-  userChanged:boolean=false;
+  selectedUserSurname: string = '';
+  selectedUserName: string = '';
+  isSaving: boolean = false;
+  userChanged: boolean = false;
+
+  saProvinces: string[] = [
+    'Eastern Cape',
+    'Free State',
+    'Gauteng',
+    'KwaZulu-Natal',
+    'Limpopo',
+    'Mpumalanga',
+    'North West',
+    'Northern Cape',
+    'Western Cape',
+  ];
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user')!);
     this.OwnerID = this.user.uid;
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       this.currentRestaurantID = params['id'];
-     
     });
     this.fetchMenus();
     this.fetchUsers();
-    
+
     this.fetchRestaurant(this.currentRestaurantID);
   }
 
-  constructor(private dialog: MatDialog,private snackBar: MatSnackBar,private firestore: AngularFirestore, private configService: ConfigService,private route: ActivatedRoute) {
+  constructor(
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private firestore: AngularFirestore,
+    private configService: ConfigService,
+    private route: ActivatedRoute
+  ) {
     for (let i = 1; i <= this.configService.numberOfTables; i++) {
       this.tableNums.push(i);
     }
   }
 
   private fetchMenus() {
-    this.firestore.collection<Menu>('menus', ref => ref.where('OwnerID', '==', this.OwnerID))
+    this.firestore
+      .collection<Menu>('menus', (ref) =>
+        ref.where('OwnerID', '==', this.OwnerID)
+      )
       .valueChanges()
-      .subscribe(menus => {
+      .subscribe((menus) => {
         this.menus = menus;
       });
   }
-  private fetchUser(id:string) {
-    this.firestore.collection<User>('users', ref => ref.where('uid', '==', id))
+  private fetchUser(id: string) {
+    this.firestore
+      .collection<User>('users', (ref) => ref.where('uid', '==', id))
       .valueChanges()
-      .subscribe(users => {
+      .subscribe((users) => {
         this.selectedUserName = users[0].firstName;
         this.selectedUserSurname = users[0].Surname;
       });
   }
 
   private fetchUsers() {
-    this.firestore.collection<User>('users', ref => ref.where('parentId', 'in', [this.OwnerID, '']))
+    this.firestore
+      .collection<User>('users', (ref) =>
+        ref.where('parentId', 'in', [this.OwnerID, ''])
+      )
       .valueChanges()
-      .subscribe(users => {
-        console.log('w',users);
+      .subscribe((users) => {
+        console.log('w', users);
         this.users = users;
       });
 
-    this.firestore.collection<User>('users', ref => ref.where('uid', '==', this.OwnerID))
+    this.firestore
+      .collection<User>('users', (ref) => ref.where('uid', '==', this.OwnerID))
       .valueChanges()
-      .subscribe(users => {
+      .subscribe((users) => {
         this.currentUser = users[0];
       });
   }
 
-  private fetchRestaurant(id:string){
-    this.firestore.collection<Restaurant>('restuarants', ref => ref.where('restaurantID', '==', this.currentRestaurantID))
-    .valueChanges()
-    .subscribe(restaurant => {
-      this.currentRestaurant =restaurant[0];
-      this.restaurant.city = this.currentRestaurant.city;
-      this.selectedNumberTable  = this.currentRestaurant.numberTables;
-      this.restaurant.province  = this.currentRestaurant.province;
-      this.restaurant.name  = this.currentRestaurant.restaurantName;
-      this.restaurantStatus  = this.currentRestaurant.status;
-      this.restaurant.street  = this.currentRestaurant.streetAdress;
-      this.restaurant.zip = this.currentRestaurant.zip;
-      this.selectedMenu = this.currentRestaurant.menuID;
-      this.fetchUser(this.currentRestaurant.mainContactID);
-    });
+  private fetchRestaurant(id: string) {
+    this.firestore
+      .collection<Restaurant>('restuarants', (ref) =>
+        ref.where('restaurantID', '==', this.currentRestaurantID)
+      )
+      .valueChanges()
+      .subscribe((restaurant) => {
+        this.currentRestaurant = restaurant[0];
+        this.restaurant.city = this.currentRestaurant.city;
+        this.selectedNumberTable = this.currentRestaurant.numberTables;
+        this.restaurant.province = this.currentRestaurant.province;
+        this.restaurant.name = this.currentRestaurant.restaurantName;
+        this.restaurantStatus = this.currentRestaurant.status;
+        this.restaurant.street = this.currentRestaurant.streetAdress;
+        this.restaurant.zip = this.currentRestaurant.zip;
+        this.selectedMenu = this.currentRestaurant.menuID;
+        this.fetchUser(this.currentRestaurant.mainContactID);
+      });
   }
 
-  editRestaurant(){
+  editRestaurant() {
     this.isSaving = false;
     const menuID = this.selectedMenu ? this.selectedMenu : '';
     var holdID = '';
-   
-    if (this.userChanged){
+
+    if (this.userChanged) {
       holdID = this.selectedUser.uid;
-    }else{
+    } else {
       holdID = this.currentRestaurant.mainContactID;
     }
 
-   var tempRestaurant= {
+    var tempRestaurant = {
       city: this.restaurant.city,
       mainContactID: holdID,
       menuID: menuID,
       numberTables: this.selectedNumberTable,
       ownerID: this.currentUser.uid,
       province: this.restaurant.province,
-      restaurantName:  this.restaurant.name,
+      restaurantName: this.restaurant.name,
       status: this.restaurantStatus,
       streetAdress: this.restaurant.street,
-      zip: this.restaurant.zip
+      zip: this.restaurant.zip,
     };
 
     console.log(tempRestaurant);
-    this.firestore.collection('restuarants').doc(this.currentRestaurantID).update(tempRestaurant)
+    this.firestore
+      .collection('restuarants')
+      .doc(this.currentRestaurantID)
+      .update(tempRestaurant)
       .then(() => {
         this.dialog.open(SuccessAddRestaurantDialogComponent, {
           width: '400px',
-          data: { message: 'Your restaurant has been updated.',
-            title:'Restaurant Edited'
-           }
+          data: {
+            message: 'Your restaurant has been updated.',
+            title: 'Restaurant Edited',
+          },
         });
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error updating restaurant:', error);
-        this.snackBar.open('Failed to update restaurant. Please try again.', 'Close', {
-          duration: 3000,
-        });
+        this.snackBar.open(
+          'Failed to update restaurant. Please try again.',
+          'Close',
+          {
+            duration: 3000,
+          }
+        );
       });
   }
 
@@ -149,16 +185,16 @@ export class EditRestaurantComponent {
     this.selectedMenuID = menuID;
   }
 
-  selectUser(user: User){
-    this.selectedUser =  user;
+  selectUser(user: User) {
+    this.selectedUser = user;
     console.log(this.selectedUser);
-    this.selectedUserName =user.firstName;
+    this.selectedUserName = user.firstName;
     this.selectedUserSurname = user.Surname;
     this.userChanged = true;
   }
 
-  removeUser(){
-    this.selectedUser =  null;
+  removeUser() {
+    this.selectedUser = null;
     this.selectedUserName = '';
     this.selectedUserSurname = '';
     this.userChanged = true;

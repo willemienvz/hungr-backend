@@ -42,8 +42,8 @@ import { ViewQrComponent } from './components/qr-codes/view-qr/view-qr.component
 import { DeleteQrComponent } from './components/qr-codes/delete-qr/delete-qr.component';
 import { AddQrComponent } from './components/qr-codes/add-qr/add-qr.component';
 import { QRCodeModule } from 'angularx-qrcode';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SummaryComponent } from './components/restaurant/summary/summary.component';
 import { AddComponent } from './components/restaurant/add/add.component';
@@ -51,7 +51,7 @@ import { EditRestaurantComponent } from './components/restaurant/edit-restaurant
 import { BrandingComponent } from './components/settings/branding/branding.component';
 import { NgxColorsModule } from 'ngx-colors';
 import { MenusComponent } from './components/menus/menus.component';
-import {MatIconModule} from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { AddMenuComponent } from './components/menus/add-menu/add-menu.component';
 import { ProgressBarComponent } from './components/shared/progress-bar/progress-bar.component';
 import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.component';
@@ -63,29 +63,32 @@ import { EditSpecialComponent } from './components/specials/edit-special/edit-sp
 import { ToastrModule } from 'ngx-toastr';
 import { HelpComponent } from './components/help/help/help.component';
 import { TutorialsComponent } from './components/help/tutorials/tutorials.component';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RestaurantComponent } from './components/restaurant/restaurant.component';
 import { ViewingtimegraphComponent } from './components/graphs/viewingtimegraph/viewingtimegraph.component';
 import { VisitorDashboardComponent } from './components/dashboard/visitor-dashboard/visitor-dashboard.component';
-import { FusionChartsModule } from "angular-fusioncharts";
+import { FusionChartsModule } from 'angular-fusioncharts';
 import { NgxEchartsModule } from 'ngx-echarts';
 
 // Import FusionCharts library and chart modules
-import * as FusionCharts from "fusioncharts";
-import * as charts from "fusioncharts/fusioncharts.charts";
-import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
+import * as FusionCharts from 'fusioncharts';
+import * as charts from 'fusioncharts/fusioncharts.charts';
+import * as FusionTheme from 'fusioncharts/themes/fusioncharts.theme.fusion';
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
 import { ConfirmDeleteDialogComponent } from './components/restaurant/confirm-delete-dialog/confirm-delete-dialog.component';
 import { SuccessAddRestaurantDialogComponent } from './components/restaurant/add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
 import { Step3Component } from './components/sign-up/step3/step3.component';
-import {MatTabsModule} from '@angular/material/tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 import { ViewComponent } from './components/restaurant/view/view.component';
 import { ResetSuccessComponent } from './components/forgot-password/reset-success/reset-success.component';
 import { ConfirmEmailComponent } from './components/sign-up/confirm-email/confirm-email.component';
 import { NewPasswordComponent } from './components/forgot-password/new-password/new-password.component';
 import { CancelPaymentComponent } from './components/cancel-payment/cancel-payment.component';
 import { ActionLandingComponent } from './components/action-landing/action-landing.component';
+import { SaveProgressDialogComponent } from './components/save-progress-dialog/save-progress-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { UnsavedChangesDialogComponent } from './components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @NgModule({
   declarations: [
@@ -145,6 +148,8 @@ import { ActionLandingComponent } from './components/action-landing/action-landi
     NewPasswordComponent,
     CancelPaymentComponent,
     ActionLandingComponent,
+    SaveProgressDialogComponent,
+    UnsavedChangesDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -159,6 +164,7 @@ import { ActionLandingComponent } from './components/action-landing/action-landi
     MatSlideToggleModule,
     QRCodeModule,
     CommonModule,
+    MatDialogModule,
     MatSelectModule,
     MatInputModule,
     MatFormFieldModule,
@@ -174,9 +180,8 @@ import { ActionLandingComponent } from './components/action-landing/action-landi
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),
     }),
-
   ],
   providers: [FormDataService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -357,7 +357,9 @@ mat-form-field {
   align-items: center;
   gap: 5px;
 }
-
+.pLinkText {
+  margin-bottom: 10px;
+}
 .additionalItems {
   width: 100%;
   display: flex;
@@ -371,6 +373,7 @@ mat-form-field {
     width: 100%;
     display: flex;
     flex-direction: row !important;
+    margin-bottom: 20px;
   }
   .inputHolder {
     flex-direction: column !important;

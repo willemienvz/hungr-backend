@@ -11,23 +11,29 @@ import { NotificationsService } from '../../../shared/services/notifications.ser
 @Component({
   selector: 'app-general',
   templateUrl: './general.component.html',
-  styleUrls: ['./general.component.scss']
+  styleUrls: ['./general.component.scss'],
 })
 export class GeneralComponent {
-  isTooltipOpen:boolean = false;
+  isTooltipOpen: boolean = false;
   aboutUsVisible: boolean = true;
   emailNotificationsEnabled: boolean = false;
   tipsAndTutorialsEnabled: boolean = false;
   userInsightsEnabled: boolean = false;
   isPopupMenuOpen: boolean[] = [];
-  currentUser:any;
-  currentUserData!:User;
-  userdateAll:any;
+  currentUser: any;
+  currentUserData!: User;
+  userdateAll: any;
   accountForm!: FormGroup;
-  userDataID:string = '';
-  isSaving: boolean = false; 
+  userDataID: string = '';
+  isSaving: boolean = false;
   userData$!: Observable<any>;
-  constructor( private router: Router,public authService: AuthService, private formBuilder: FormBuilder,private firestore: AngularFirestore, private notificationService: NotificationsService) {
+  constructor(
+    private router: Router,
+    public authService: AuthService,
+    private formBuilder: FormBuilder,
+    private firestore: AngularFirestore,
+    private notificationService: NotificationsService
+  ) {
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
         console.log(uid);
@@ -37,32 +43,32 @@ export class GeneralComponent {
           this.currentUser = JSON.parse(userString);
           console.log(this.currentUser);
         }
-        this.userData$ = this.firestore.doc(`users/${this.userDataID}`).valueChanges();
-        this.userData$.subscribe(data => {
+        this.userData$ = this.firestore
+          .doc(`users/${this.userDataID}`)
+          .valueChanges();
+        this.userData$.subscribe((data) => {
           this.currentUserData = data;
+          console.log('currentUserData', this.currentUserData);
           this.updateFormWithUserData();
         });
       } else {
-        console.log("No authenticated user");
+        console.log('No authenticated user');
         this.router.navigate(['/signin']);
       }
     });
-   
   }
 
   ngOnInit(): void {
     this.accountForm = this.formBuilder.group({
       name: ['', Validators.required],
-      surname:  ['', Validators.required],
-      password:  ['', Validators.required],
-      email:  [{value:'', disabled: true}, Validators.required],
-      phone:  ['', Validators.required],
+      surname: ['', Validators.required],
+      password: ['', Validators.required],
+      email: [{ value: '', disabled: true }, Validators.required],
+      phone: ['', Validators.required],
     });
   }
 
-  getUserData() {
-   
-  }
+  getUserData() {}
 
   updateFormWithUserData() {
     if (this.currentUserData && this.accountForm) {
@@ -75,52 +81,50 @@ export class GeneralComponent {
     }
   }
 
-
-
   togglePopupMenu(index: number) {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
-  
-  opentooltip(){
+
+  opentooltip() {
     this.isTooltipOpen != this.isTooltipOpen;
   }
 
-  saveAccountDetails() {
-    
-  }
+  saveAccountDetails() {}
 
-  saveAll(){
-    this.isSaving = true; 
+  saveAll() {
+    this.isSaving = true;
     const userToSave: Partial<User> = {
       firstName: this.accountForm.get('name')?.value,
       Surname: this.accountForm.get('surname')?.value,
       cellphoneNumber: this.accountForm.get('phone')?.value,
-      marketingConsent: this.currentUserData.marketingConsent, 
-      tipsTutorials: this.currentUserData.tipsTutorials, 
+      marketingConsent: this.currentUserData.marketingConsent,
+      tipsTutorials: this.currentUserData.tipsTutorials,
       userInsights: this.currentUserData.userInsights,
-      aboutUsDisplayed: this.currentUserData.aboutUsDisplayed
+      aboutUsDisplayed: this.currentUserData.aboutUsDisplayed,
     };
 
-    this.firestore.doc(`users/${this.currentUserData.uid}`).update(userToSave)
+    this.firestore
+      .doc(`users/${this.currentUserData.uid}`)
+      .update(userToSave)
       .then(() => {
         this.isSaving = false;
         this.notificationService.addNotification('Your profile was updated');
       })
       .catch((error) => {
-       this.isSaving = false;
+        this.isSaving = false;
         console.error('Error updating user data:', error);
       });
-}
+  }
 
-saveProfile(){
-  //TODO
-}
+  saveProfile() {
+    //TODO
+  }
 
-cancelSubscribtion(){
-//TODO
-}
+  cancelSubscribtion() {
+    //TODO
+  }
 
-upgrade(){
-  //TODO
-}
+  upgrade() {
+    //TODO
+  }
 }
