@@ -1,221 +1,213 @@
-.inner-page{
-    
-
-    form{
-        width: 100%;
-        flex-direction: column;
-        gap: 15px;
-        display: flex;
-    }
-}
-
-.col{
+.inner-page {
+  form {
     width: 100%;
-    display: flex;
     flex-direction: column;
     gap: 15px;
-
-    .block{
-        gap: 25px;
-        display: flex;
-        flex-direction: column;
-    }
+    display: flex;
+  }
 }
 
-.selectedOption{
-    width: 100%;
-    padding: 12px;
-    background-color: #F3F4F5;
+.col {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .block {
+    gap: 25px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.selectedOption {
+  width: 100%;
+  padding: 12px;
+  background-color: #f3f4f5;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  align-items: center;
+  text-align: center;
+  span {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+  }
+}
+
+.col .contactBlock {
+  gap: 0;
+
+  h6 {
     margin-bottom: 20px;
-    display: flex;
-    flex-direction: row;
-    position: relative;
-    align-items: center;
-    text-align: center;
-    span{
-        position: absolute;
-        right: 10px;
-        cursor: pointer;
-    }
+  }
+
+  .rowMenu {
+    margin-top: 15px;
+  }
 }
 
-
-.col .contactBlock{
-    gap: 0;
-
-    h6{
-        margin-bottom: 20px;
-    }
-
-    .rowMenu{
-        margin-top: 15px;
-    }
-
+.backLink {
+  width: 100%;
+  flex-direction: row;
+  display: flex;
+  justify-content: flex-start;
+  gap: 5px;
+  align-items: center;
+  text-decoration: none;
+  color: #2e3646;
 }
 
-.backLink{
+.row {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+  align-items: flex-start;
+
+  .formGroup {
     width: 100%;
-    flex-direction: row;
-    display: flex;
-    justify-content: flex-start;
-    gap: 5px;
-    align-items: center;
-    text-decoration: none;
-    color: #2E3646;
+  }
 }
 
-.row{
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    gap: 8px;
-    justify-content: center;
-    align-items: flex-start;
-
-    .formGroup{
-        width: 100%;
-    }
+.tableNum {
+  color: #181818;
+  width: 84px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: 56px;
+  background-color: #f3f4f5;
 }
 
-.tableNum{
-    color: #181818;
-    width: 84px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    height: 56px;
-    background-color: #F3F4F5;
+.toggle-container {
+  background-color: #f3f4f5;
 }
 
-.toggle-container{
-    background-color: #F3F4F5;
+.btnHolder {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-direction: row;
 }
 
-.btnHolder{
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-direction: row;
+.success-message {
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+label {
+  color: #9a9a9a;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 20.25px;
+  letter-spacing: -0.1%;
 }
 
-.success-message{
-    width: 100%;
-    text-align: center;
-    font-size: 20px;
-    font-weight: 700;
-}
-label{
-    color:#9A9A9A;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 20.25px;
-    letter-spacing: -0.1%;
-}
+.rowMenu {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-direction: row;
+  width: 100%;
 
-.rowMenu{
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 20px;
-    flex-direction: row;
-    width: 100%;
+  p {
+    color: #9a9a9a;
+    font-size: 14px;
+    margin-top: 10px;
+  }
 
-    p{
-        color:   #9A9A9A;
-        font-size: 14px;
-        margin-top: 10px;
-    }
-
-    mat-form-field{
-        width: 32%;
-    }
-
-  
+  mat-form-field {
+    width: 32%;
+  }
 }
 
-.blockItems{
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    flex-direction: row;
-    width: 100%;
-
+.blockItems {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-direction: row;
+  width: 100%;
 }
 
-.blockItemsRow{
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    flex-direction: row;
-    width: 100%;
+.blockItemsRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-direction: row;
+  width: 100%;
 
-    .block{
-        width: calc(50% - 20px);
-    }
+  .block {
+    width: calc(50% - 20px);
+  }
 }
 
-.col2row{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
+.col2row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  flex-direction: row;
+  gap: 15px;
+
+  .col {
     flex: 1;
-    flex-direction: row;
-    gap: 15px;
-
-    .col{
-       flex: 1;
-        display: flex;
-    }
-}
-
-
-input{
-    height: 38px !important;
-}
-
-.backLink{
-    width: 100%;
-    flex-direction: row;
     display: flex;
-    justify-content: flex-start;
-    gap: 5px;
-    align-items: center;
-    text-decoration: none;
-    color: #2E3646;
-    font-size: 16px;
-    font-weight: 600;
+  }
 }
 
-.pLinkText{
-font-weight: 400;
-font-size: 13px;
-line-height: 18.2px;
-letter-spacing: -0.1%;
-color: #9A9A9A;
+input {
+  height: 38px !important;
+}
 
-.mainLink{
+.backLink {
+  width: 100%;
+  flex-direction: row;
+  display: flex;
+  justify-content: flex-start;
+  gap: 5px;
+  align-items: center;
+  text-decoration: none;
+  color: #2e3646;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pLinkText {
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18.2px;
+  letter-spacing: -0.1%;
+  color: #9a9a9a;
+  margin-top: 41px;
+
+  .mainLink {
     font-weight: 400;
     font-size: 13px;
     line-height: 18.2px;
     letter-spacing: -0.1%;
-    color: #9A9A9A;
+    color: #9a9a9a;
+  }
 }
-}
 
+.block-row {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: flex-start;
 
-.block-row{
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    gap: 8px;
-    justify-content: space-between;
-    align-items: flex-start;
-
-    p{
-        margin-top: 10px;
-    }
+  p {
+    margin-top: 10px;
+  }
 }

@@ -28,6 +28,7 @@
     "firebase": "^10.8.0",
     "firebase-admin": "^13.1.0",
     "fusioncharts": "^4.0.2",
+    "ngx-color-picker": "^18.0.0",
     "ngx-colors": "^3.5.3",
     "ngx-echarts": "^18.0.0",
     "ngx-papaparse": "^8.0.0",

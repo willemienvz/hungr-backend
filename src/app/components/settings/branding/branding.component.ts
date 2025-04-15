@@ -459,4 +459,27 @@ export class BrandingComponent {
         });
     }
   }
+
+  discardChanges(): void {
+    if (this.lastSavedDocId) {
+      this.firestore
+        .collection('branding')
+        .doc(this.lastSavedDocId)
+        .get()
+        .toPromise()
+        .then((doc) => {
+          if (doc.exists) {
+            const brandingData = doc.data();
+            this.loadBrandingSettings(brandingData);
+            this.toastr.info('Changes discarded');
+          }
+        })
+        .catch((error) => {
+          this.toastr.error('Error discarding changes');
+          console.error('Discard error:', error);
+        });
+    } else {
+      this.toastr.warning('No saved branding data to discard');
+    }
+  }
 }

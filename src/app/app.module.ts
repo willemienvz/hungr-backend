@@ -70,10 +70,6 @@ import { VisitorDashboardComponent } from './components/dashboard/visitor-dashbo
 import { FusionChartsModule } from 'angular-fusioncharts';
 import { NgxEchartsModule } from 'ngx-echarts';
 
-// Import FusionCharts library and chart modules
-import * as FusionCharts from 'fusioncharts';
-import * as charts from 'fusioncharts/fusioncharts.charts';
-import * as FusionTheme from 'fusioncharts/themes/fusioncharts.theme.fusion';
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
 import { ConfirmDeleteDialogComponent } from './components/restaurant/confirm-delete-dialog/confirm-delete-dialog.component';
@@ -89,6 +85,7 @@ import { ActionLandingComponent } from './components/action-landing/action-landi
 import { SaveProgressDialogComponent } from './components/save-progress-dialog/save-progress-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from './components/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
   declarations: [
@@ -176,6 +173,7 @@ import { UnsavedChangesDialogComponent } from './components/unsaved-changes-dial
     MatChipsModule,
     MatTabsModule,
     MatCheckboxModule,
+    ColorPickerModule,
     ToastrModule.forRoot(),
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),

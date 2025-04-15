@@ -17,7 +17,9 @@
           <h6>Add a special</h6>
         </div>
         <div class="col">
-          <a class="btnSecondary" routerLink="/specials/add-new-special">+ Add special</a>
+          <a class="btnSecondary" routerLink="/specials/add-new-special"
+            >+ Add special</a
+          >
         </div>
       </div>
     </div>
@@ -27,7 +29,7 @@
     <div class="block">
       <h6>Active Specials</h6>
       <div class="row rowSpecials">
-        <table class="specialTable">
+        <table class="specialTable" *ngIf="specials.length > 0">
           <thead>
             <th>Name</th>
             <th>Description</th>
@@ -38,18 +40,25 @@
             <tr *ngFor="let special of specials; let i = index">
               <td>
                 <div>
-                  <img [src]="special.imageUrl" alt="" class="imageSpecial" style="max-width: 80px;" />
-                  <p>{{special.specialTitle}}</p>
+                  <img
+                    [src]="special.imageUrl"
+                    alt=""
+                    class="imageSpecial"
+                    style="max-width: 80px"
+                  />
+                  <p>{{ special.specialTitle }}</p>
                 </div>
               </td>
               <td>
                 <div>
-                  <p *ngFor="let day of special.selectedDays; let i = index">{{day}}</p>
-                  <p>{{special.timeFrom}} - {{special.timeTo}}</p>
+                  <p *ngFor="let day of special.selectedDays; let i = index">
+                    {{ day }}
+                  </p>
+                  <p>{{ special.timeFrom }} - {{ special.timeTo }}</p>
                 </div>
               </td>
               <td>
-                {{getSpecialTypeLabel(special.typeSpecial)}}
+                {{ getSpecialTypeLabel(special.typeSpecial) }}
               </td>
               <td>
                 <a [routerLink]="['/specials/edit-special', special.specialID]">
@@ -62,8 +71,10 @@
             </tr>
           </tbody>
         </table>
+        <div class="noSpecials" *ngIf="specials.length === 0">
+          <p>No specials have been added</p>
+        </div>
       </div>
     </div>
   </div>
-
 </div>

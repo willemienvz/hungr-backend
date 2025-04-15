@@ -41,17 +41,14 @@
           ></i>
         </div>
         <div class="row inputRow">
-          <p>Background colour</p>
           <div class="colorPicker">
-            <ngx-colors
-              ngx-colors-trigger
-              [(ngModel)]="backgroundColor"
-              (ngModelChange)="applyChanges('Background Color', $event)"
-            ></ngx-colors>
-            <mat-form-field>
-              <input matInput [(ngModel)]="backgroundColor" />
-            </mat-form-field>
+            <input
+              [(colorPicker)]="backgroundColor"
+              [style.background]="backgroundColor"
+              class="colourPicker"
+            />
           </div>
+          <p>Background colour</p>
         </div>
       </div>
     </div>
@@ -110,29 +107,29 @@
                 <label>Colours</label>
                 <div class="blockInnerColours">
                   <div class="col">
-                    <label>Main Colour</label>
-                    <div class="colorPicker">
-                      <ngx-colors
-                        ngx-colors-trigger
-                        [(ngModel)]="buttonColor"
-                        (ngModelChange)="applyChanges('Button Color', $event)"
-                      ></ngx-colors>
-                      <mat-form-field>
-                        <input matInput [(ngModel)]="buttonColor" />
-                      </mat-form-field>
+                    <div class="rowCol">
+                      <div class="colorPicker">
+                        <input
+                          [(colorPicker)]="buttonColor"
+                          [style.background]="buttonColor"
+                          class="colourPicker"
+                          (ngModelChange)="applyChanges('Button Color', $event)"
+                        />
+                      </div>
+                      <label>Main Colour</label>
                     </div>
-                    <label>Text Colour</label>
-                    <div class="colorPicker">
-                      <ngx-colors
-                        ngx-colors-trigger
-                        [(ngModel)]="buttonTextColor"
-                        (ngModelChange)="
-                          applyChanges('Button Text Color', $event)
-                        "
-                      ></ngx-colors>
-                      <mat-form-field>
-                        <input matInput [(ngModel)]="buttonTextColor" />
-                      </mat-form-field>
+                    <div class="rowCol">
+                      <div class="colorPicker">
+                        <input
+                          [(colorPicker)]="buttonTextColor"
+                          [style.background]="buttonTextColor"
+                          class="colourPicker"
+                          (ngModelChange)="
+                            applyChanges('Button Text Color', $event)
+                          "
+                        />
+                      </div>
+                      <label>Text Colour</label>
                     </div>
                   </div>
                   <div class="col buttonExample">
@@ -192,34 +189,32 @@
                 <label>Colours</label>
                 <div class="blockInnerColours">
                   <div class="col">
-                    <label>Main Colour</label>
-                    <div class="colorPicker">
-                      <ngx-colors
-                        ngx-colors-trigger
-                        [(ngModel)]="buttonSecondaryColor"
-                        (ngModelChange)="
-                          applyChanges('Button Secondary Color', $event)
-                        "
-                      ></ngx-colors>
-                      <mat-form-field>
-                        <input matInput [(ngModel)]="buttonSecondaryColor" />
-                      </mat-form-field>
-                    </div>
-                    <label>Text Colour</label>
-                    <div class="colorPicker">
-                      <ngx-colors
-                        ngx-colors-trigger
-                        [(ngModel)]="buttonSecondaryTextColor"
-                        (ngModelChange)="
-                          applyChanges('Button Secondary Text Color', $event)
-                        "
-                      ></ngx-colors>
-                      <mat-form-field>
+                    <div class="rowCol">
+                      <div class="colorPicker">
                         <input
-                          matInput
-                          [(ngModel)]="buttonSecondaryTextColor"
+                          [(colorPicker)]="buttonSecondaryColor"
+                          [style.background]="buttonSecondaryColor"
+                          class="colourPicker"
+                          (ngModelChange)="
+                            applyChanges('Button Secondary Color', $event)
+                          "
                         />
-                      </mat-form-field>
+                      </div>
+                      <label>Main Colour</label>
+                    </div>
+
+                    <div class="rowCol">
+                      <div class="colorPicker">
+                        <input
+                          [(colorPicker)]="buttonSecondaryTextColor"
+                          [style.background]="buttonSecondaryTextColor"
+                          class="colourPicker"
+                          (ngModelChange)="
+                            applyChanges('Button Secondary Text Color', $event)
+                          "
+                        />
+                      </div>
+                      <label>Text Colour</label>
                     </div>
                   </div>
                   <div class="col buttonExample">
@@ -285,20 +280,15 @@
                     </mat-select>
                   </div>
                 </div>
-                <div class="row">
+                <div class="rowCol">
                   <label class="label">Colour</label>
-                  <div class="colorPicker">
-                    <ngx-colors
-                      ngx-colors-trigger
-                      [(ngModel)]="mainHeadingColor"
-                      (ngModelChange)="
-                        applyChanges('Main Heading Color', $event)
-                      "
-                    ></ngx-colors>
-                    <mat-form-field>
-                      <input matInput [(ngModel)]="mainHeadingColor" />
-                    </mat-form-field>
-                  </div>
+                  <input
+                    [(colorPicker)]="mainHeadingColor"
+                    [style.background]="mainHeadingColor"
+                    class="colourPicker"
+                    [cpPosition]="'right'"
+                    (ngModelChange)="applyChanges('Main Heading Color', $event)"
+                  />
                 </div>
                 <div class="row">
                   <p style="font-weight: 600">Sub-Headings Style</p>
@@ -339,20 +329,15 @@
                     </mat-select>
                   </div>
                 </div>
-                <div class="row">
+                <div class="rowCol">
                   <label class="label">Colour</label>
-                  <div class="colorPicker">
-                    <ngx-colors
-                      ngx-colors-trigger
-                      [(ngModel)]="subHeadingColor"
-                      (ngModelChange)="
-                        applyChanges('Sub Heading Color', $event)
-                      "
-                    ></ngx-colors>
-                    <mat-form-field>
-                      <input matInput [(ngModel)]="subHeadingColor" />
-                    </mat-form-field>
-                  </div>
+                  <input
+                    [(colorPicker)]="subHeadingColor"
+                    [style.background]="subHeadingColor"
+                    class="colourPicker"
+                    [cpPosition]="'right'"
+                    (ngModelChange)="applyChanges('Sub Heading Color', $event)"
+                  />
                 </div>
                 <div class="row">
                   <p style="font-weight: 600">Body</p>
@@ -393,18 +378,15 @@
                     </mat-select>
                   </div>
                 </div>
-                <div class="row">
+                <div class="rowCol">
                   <label class="label">Colour</label>
-                  <div class="colorPicker">
-                    <ngx-colors
-                      ngx-colors-trigger
-                      [(ngModel)]="bodyColor"
-                      (ngModelChange)="applyChanges('Body Color', $event)"
-                    ></ngx-colors>
-                    <mat-form-field>
-                      <input matInput [(ngModel)]="bodyColor" />
-                    </mat-form-field>
-                  </div>
+                  <input
+                    [(colorPicker)]="bodyColor"
+                    [style.background]="bodyColor"
+                    class="colourPicker"
+                    [cpPosition]="'right'"
+                    (ngModelChange)="applyChanges('Body Color', $event)"
+                  />
                 </div>
               </div>
               <div class="colText previewTexrt">
@@ -517,7 +499,9 @@
     </div>
     <div class="btnBlock">
       <div class="row">
-        <a class="btnTertiary" style="width: 130px">Discard</a>
+        <a class="btnTertiary" (click)="discardChanges()" style="width: 130px"
+          >Discard</a
+        >
         <a class="btnSecondary" (click)="updateBrandingDetails()"
           >Save Changes</a
         >
@@ -530,12 +514,22 @@
   <div class="modal-content">
     <span class="close" (click)="closeImageUploadModal()">&times;</span>
     <h6>Upload Logo</h6>
+    <div class="dataHold">
+      <div class="rowData">
+        <p>File formats:</p>
+        <p>PNG / JPG</p>
+      </div>
+      <div class="rowData">
+        <p>Size:</p>
+        <p>1080x1080</p>
+      </div>
+      <div class="rowData">
+        <p>Max file size:</p>
+        <p>500kb</p>
+      </div>
+    </div>
     <input type="file" (change)="onFileSelected($event)" accept="image/*" />
-    <p>
-      Acceptable file formats: PNG, JPG<br />
-      File sizes: Files less than 5 MB.<br />
-      <strong>Required dimensions: 150px x 50px</strong>
-    </p>
+
     <div class="row" style="margin-top: 15px">
       <a
         class="btnSecondary"

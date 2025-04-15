@@ -51,30 +51,122 @@ const routes: Routes = [
     component: AppLayoutComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: 'dashboard', component: DashboardComponent, data: { title: 'Overview Dashboard' }},
-      { path: 'menu-insights', component: MenuInsightsComponent, data: { title: 'Menu Insights' } },
-      { path: 'visitor-insights', component: VisitorDashboardComponent, data: { title: 'Visistor Insights' } },
-      { path: 'sales-insights', component: SalesInsightsComponent, data: { title: 'Sales Insights' } },
-      { path: 'settings/general', component: GeneralComponent, data: { title: 'Settings' } },
-      { path: 'settings/about-us', component: AboutComponent, data: { title: 'About us' } },
-      { path: 'manage-users', component: ManageUsersComponent, data: { title: 'Manage Users' } },
+      {
+        path: 'dashboard',
+        component: DashboardComponent,
+        data: { title: 'Overview Dashboard' },
+      },
+      {
+        path: 'menu-insights',
+        component: MenuInsightsComponent,
+        data: { title: 'Menu Insights' },
+      },
+      {
+        path: 'visitor-insights',
+        component: VisitorDashboardComponent,
+        data: { title: 'Visistor Insights' },
+      },
+      {
+        path: 'sales-insights',
+        component: SalesInsightsComponent,
+        data: { title: 'Sales Insights' },
+      },
+      {
+        path: 'settings/general',
+        component: GeneralComponent,
+        data: { title: 'General Settings' },
+      },
+      {
+        path: 'settings/about-us',
+        component: AboutComponent,
+        data: { title: 'About us' },
+      },
+      {
+        path: 'manage-users',
+        component: ManageUsersComponent,
+        data: { title: 'Manage Users' },
+      },
       { path: 'menus', component: MenusComponent, data: { title: 'Menu' } },
-      { path: 'menus/add-menu', component: AddMenuComponent, data: { title: 'Menus <span class="submenuHeading">/Create a New Menu</span>' } },
-      { path: 'restaurants', component: RestaurantComponent, data: { title: 'Restaurant' } },
-      { path: 'menus/edit-menu/:menuID', component: EditMenuComponent, data: { title: 'Edit Menu <span class="submenuHeading">/Edit Menu</span>' } },
-      { path: 'qr-codes', component: QrCodesComponent, data: { title: 'QR codes' } },
-      { path: 'restaurants/add-new-restaurant', component: AddComponent, data: { title: 'Restaurant<span class="submenuHeading">/Create a New Restaurant</span>' } },
-      { path: 'restaurants/edit-restaurant', component: EditRestaurantComponent, data: { title: 'Restaurant<span class="submenuHeading">/Edit a Restaurant</span>' } },
-      { path: 'settings/branding', component: BrandingComponent, data: { title: 'Branding' } },
-      { path: 'settings/about', component: AboutComponent, data: { title: 'About' } },
-      { path: 'specials/add-new-special', component: AddSpecialComponent, data: { title: 'Add Specials<span class="submenuHeading">/Add A New special</span>' } },
-      { path: 'specials/edit-special/:id', component: EditSpecialComponent, data: { title: 'Edit Specials<span class="submenuHeading">/Edit A special</span>' } },
-      { path: 'specials', component: SpecialsLandingComponent, data: { title: 'Visistor Insights' } },
+      {
+        path: 'menus/add-menu',
+        component: AddMenuComponent,
+        data: {
+          title: 'Menus <span class="submenuHeading">/Create a New Menu</span>',
+        },
+      },
+      {
+        path: 'restaurants',
+        component: RestaurantComponent,
+        data: { title: 'Restaurant' },
+      },
+      {
+        path: 'menus/edit-menu/:menuID',
+        component: EditMenuComponent,
+        data: {
+          title: 'Edit Menu <span class="submenuHeading">/Edit Menu</span>',
+        },
+      },
+      {
+        path: 'qr-codes',
+        component: QrCodesComponent,
+        data: { title: 'QR codes' },
+      },
+      {
+        path: 'restaurants/add-new-restaurant',
+        component: AddComponent,
+        data: {
+          title:
+            'Restaurant<span class="submenuHeading">/Create a New Restaurant</span>',
+        },
+      },
+      {
+        path: 'restaurants/edit-restaurant',
+        component: EditRestaurantComponent,
+        data: {
+          title:
+            'Restaurant<span class="submenuHeading">/Edit a Restaurant</span>',
+        },
+      },
+      {
+        path: 'settings/branding',
+        component: BrandingComponent,
+        data: { title: 'Branding' },
+      },
+      {
+        path: 'settings/about',
+        component: AboutComponent,
+        data: { title: 'About' },
+      },
+      {
+        path: 'specials/add-new-special',
+        component: AddSpecialComponent,
+        data: {
+          title:
+            'Add Specials<span class="submenuHeading">/Add A New special</span>',
+        },
+      },
+      {
+        path: 'specials/edit-special/:id',
+        component: EditSpecialComponent,
+        data: {
+          title:
+            'Edit Specials<span class="submenuHeading">/Edit A special</span>',
+        },
+      },
+      {
+        path: 'specials',
+        component: SpecialsLandingComponent,
+        data: { title: 'Specials' },
+      },
       { path: 'help', component: HelpComponent, data: { title: 'Help' } },
-      { path: 'help/all-tutorials', component: TutorialsComponent, data: { title: 'All Tutorials' } },
-      { path: '', redirectTo: '/dashboard', pathMatch: 'full' } 
-    ]
-  }
+      {
+        path: 'help/all-tutorials',
+        component: TutorialsComponent,
+        data: { title: 'All Tutorials' },
+      },
+      { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+    ],
+  },
 ];
 
 @NgModule({
