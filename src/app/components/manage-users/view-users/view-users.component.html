@@ -1,0 +1,70 @@
+<div class="popup" *ngIf="showPopup">
+  <div class="popup-content">
+    <i class="material-icons popup-close" (click)="closePopup()">close</i>
+    <div class="authBlock">
+      <h3>{{ user.firstName }} {{ user.Surname }}</h3>
+      <form #editForm="ngForm" (ngSubmit)="updateUser(user)">
+        <div class="row">
+          <div class="formGroup">
+            <label>Name</label>
+            <input
+              type="text"
+              class="formControl"
+              name="name"
+              [(ngModel)]="user.firstName"
+              required
+            />
+          </div>
+          <div class="formGroup">
+            <label>Email address</label>
+            <input
+              type="email"
+              class="formControl"
+              name="email"
+              [(ngModel)]="user.email"
+              required
+              disabled
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="formGroup">
+            <label>Surname</label>
+            <input
+              type="text"
+              class="formControl"
+              name="lastname"
+              [(ngModel)]="user.Surname"
+              required
+            />
+          </div>
+          <div class="formGroup">
+            <label>Phone number</label>
+            <input
+              type="text"
+              class="formControl"
+              name="phone"
+              [(ngModel)]="user.cellphoneNumber"
+              required
+            />
+          </div>
+        </div>
+        <div class="formGroup btnHolder">
+          <input
+            class="btn btnTertiary"
+            type="button"
+            value="Cancel"
+            (click)="closePopup()"
+          />
+          <input
+            type="submit"
+            class="btn btnPrimary"
+            [disabled]="!editForm.valid"
+            value="Save Changes"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<app-loading [isLoading]="isSaving"></app-loading>

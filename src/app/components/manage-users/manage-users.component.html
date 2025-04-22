@@ -1,50 +1,69 @@
 <div class="inner-page">
-    <div class="block">
-        <div class="row">
-            <div class="formGroup">
-                <div class="label-container">
-                    <label>Main Admin</label>
-                </div>
-                <div class="input-holder">
-                    <input type="text" class="formControl" placeholder="John" disabled="true" [value]="mainUserName" />
-                </div>
-            </div>
-            <a class="btnSecondary" (click)="addUser.openPopup()">+ Add user</a>
+  <div class="block">
+    <div class="row">
+      <div class="formGroup">
+        <div class="label-container">
+          <label>Main Admin</label>
         </div>
-
-          <h6>Editors</h6>
-          <div class="userTable">
-              <table>
-                <thead>
-                  <tr>
-                      <th></th>
-                      <th>User</th>
-                      <th>Email Address</th>
-                      <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- <tr *ngFor="let user of users; let i = index" [ngStyle]="{ background: !user.status ? '#F2F3F4' : 'none' }"> -->
-                    <tr *ngFor="let user of users; let i = index">
-                      <td>{{ i+1 }}</td>
-                      <td>{{ user.firstName }} {{user.Surname}}</td>
-                      <td>{{ user.email }}</td>
-                      <td style="text-align: right;">
-                          <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
-                          <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-                              <a href="#">View</a>
-                              <a href="#">Edit</a>
-                              <a (click)="deleteUser(user.uid)">Delete</a>
-                              <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
-                          </div>
-                      </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+        <div class="input-holder">
+          <input
+            type="text"
+            class="formControl"
+            placeholder="John"
+            disabled="true"
+            [value]="mainUserName"
+          />
+        </div>
+      </div>
+      <a class="btnSecondary" (click)="addUser.openPopup()">+ Add user</a>
     </div>
-    
+
+    <h6>Editors</h6>
+    <div class="userTable">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>User</th>
+            <th>Email Address</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ user.firstName }} {{ user.Surname }}</td>
+            <td>{{ user.email }}</td>
+            <td style="text-align: right">
+              <i class="material-icons" (click)="togglePopupMenu(i)"
+                >more_vert</i
+              >
+              <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
+                <a (click)="editUser(user, i)">Edit</a>
+                <a (click)="confirmDeleteUser(user.uid, i)">Delete</a>
+                <i class="material-icons closeBtn" (click)="togglePopupMenu(i)"
+                  >close</i
+                >
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <app-add-user-dialog #addUser></app-add-user-dialog>
 <app-loading [isLoading]="isSaving"></app-loading>
+<app-view-users #editDialog></app-view-users>
+
+<div class="modal-overlay" *ngIf="showConfirmDelete">
+  <div class="modal">
+    <h3>Confirm Deletion</h3>
+    <p>Are you sure you want to delete this user?</p>
+    <div class="modal-buttons">
+      <button class="btn btnTertiary" (click)="cancelDelete()">Cancel</button>
+      <button class="btn btnSecondary" (click)="proceedDelete()">Delete</button>
+    </div>
+  </div>
+</div>

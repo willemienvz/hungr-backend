@@ -86,6 +86,7 @@ import { SaveProgressDialogComponent } from './components/save-progress-dialog/s
 import { MatDialogModule } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from './components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { ViewUsersComponent } from './components/manage-users/view-users/view-users.component';
 
 @NgModule({
   declarations: [
@@ -147,6 +148,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
     ActionLandingComponent,
     SaveProgressDialogComponent,
     UnsavedChangesDialogComponent,
+    ViewUsersComponent,
   ],
   imports: [
     BrowserModule,

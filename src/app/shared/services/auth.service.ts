@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 import { Component } from '@angular/core';
 import { DataService } from './data.service';
 import { ToastrService } from 'ngx-toastr';
+import firebase from 'firebase/compat/app';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -22,8 +24,7 @@ export class AuthService {
     public router: Router,
     public ngZone: NgZone,
     public dataService: DataService,
-     private toastr: ToastrService,
-   
+    private toastr: ToastrService
   ) {
     /* Saving user data in localstorage when 
     logged in and setting up null when logged out */
@@ -39,15 +40,15 @@ export class AuthService {
     });
   }
 
-   /**
+  /**
    * Checks if an email is already registered with Firebase.
    * @param email The email to check.
    * @returns A Promise<boolean> indicating whether the email is in use.
    */
-   async isEmailInUse(email: string): Promise<boolean> {
+  async isEmailInUse(email: string): Promise<boolean> {
     try {
       const signInMethods = await this.afAuth.fetchSignInMethodsForEmail(email);
-      console.log('a', signInMethods)
+      console.log('a', signInMethods);
       return signInMethods.length > 0;
     } catch (error) {
       console.error('Error checking email:', error);
@@ -55,31 +56,39 @@ export class AuthService {
     }
   }
   // Sign in with email/password
- SignIn(email: string, password: string) {
-  return this.afAuth
-    .signInWithEmailAndPassword(email, password)
-    .then(async (result) => {
-      const user = result.user;
-      if (user) {
-        await user.reload(); 
+  SignIn(email: string, password: string) {
+    return this.afAuth
+      .signInWithEmailAndPassword(email, password)
+      .then(async (result) => {
+        const user = result.user;
+        if (user) {
+          await user.reload();
 
-        if (!user.emailVerified) {
-          this.toastr.warning('Your email is not verified. You may have limited access.');
-        } else {
-          this.toastr.success('Login successful!');
+          if (!user.emailVerified) {
+            this.toastr.warning(
+              'Your email is not verified. You may have limited access.'
+            );
+          } else {
+            this.toastr.success('Login successful!');
+          }
+
+          this.router.navigate(['dashboard']);
         }
-
-        this.router.navigate(['dashboard']); 
-      }
-    })
-    .catch((error) => {
-      this.toastr.error('Invalid email and/or password combination.');
-    });
-}
+      })
+      .catch((error) => {
+        this.toastr.error('Invalid email and/or password combination.');
+      });
+  }
 
   // Sign up with email/password
-  SignUp(email: string, password: string, formDataStep1:any, formDataStep2:any,  formDataStep3:any) {
-  /*   return this.afAuth
+  SignUp(
+    email: string,
+    password: string,
+    formDataStep1: any,
+    formDataStep2: any,
+    formDataStep3: any
+  ) {
+    /*   return this.afAuth
       .createUserWithEmailAndPassword(email, password)
       .then((result) => {
         this.SendVerificationMail();
@@ -91,23 +100,45 @@ export class AuthService {
       .catch((error) => {
         this.toastr.error(error.message)
       }); */
-
   }
 
   SignUpEditor(email: string, data: any): Promise<void> {
-    const user = JSON.parse(localStorage.getItem('user')!);
-    const parentId = user.uid;
+    const parentId = JSON.parse(localStorage.getItem('user')!).uid;
     const password = 'th1s1s@t3mpP@ssw0rdPl3@s3Ch@ng3m3!123';
-  
+
+    // Use environment config directly — not firebase.app().options
+    const secondaryApp = firebase.initializeApp(
+      environment.firebase,
+      'Secondary'
+    );
+
     return new Promise<void>((resolve, reject) => {
-      this.afAuth.createUserWithEmailAndPassword(email, password)
+      secondaryApp
+        .auth()
+        .createUserWithEmailAndPassword(email, password)
         .then((result) => {
-          this.SendVerificationMailEditor();
-          this.SetUserDataEditor(result.user, data.email, data.lastname, data.name, data.phone, parentId);
-          resolve(); 
+          result.user?.sendEmailVerification().catch((err) => {
+            console.warn(
+              'Non-critical: email verification send failed',
+              err.message
+            );
+          });
+
+          this.SetUserDataEditor(
+            result.user,
+            email,
+            data.lastname,
+            data.name,
+            data.phone,
+            parentId
+          ).then(() => {
+            secondaryApp.delete(); // Clean up
+            resolve();
+          });
         })
         .catch((error) => {
-          reject(error); 
+          secondaryApp.delete();
+          reject(error);
         });
     });
   }
@@ -121,18 +152,22 @@ export class AuthService {
       });
   }
 
-   // Send email verfificaiton when new editor sign up
-   SendVerificationMailEditor() {
+  // Send email verfificaiton when new editor sign up
+  SendVerificationMailEditor() {
     const currentUser = this.afAuth.currentUser;
     if (currentUser) {
-      return currentUser.then((user: any) => {
-        return user.sendEmailVerification().then(() => {
-        }).catch((error: any) => {
-          console.log('Error sending verification email: ' + error.message);
+      return currentUser
+        .then((user: any) => {
+          return user
+            .sendEmailVerification()
+            .then(() => {})
+            .catch((error: any) => {
+              console.log('Error sending verification email: ' + error.message);
+            });
+        })
+        .catch((error: any) => {
+          console.log('Error getting current user: ' + error.message);
         });
-      }).catch((error: any) => {
-        console.log('Error getting current user: ' + error.message);
-      });
     } else {
       console.log('No user is currently signed in.');
       return Promise.resolve();
@@ -141,14 +176,14 @@ export class AuthService {
   // Reset Forggot password
   ForgotPassword(passwordResetEmail: string) {
     return this.afAuth
-      .sendPasswordResetEmail(passwordResetEmail,  {
-        url: 'http://localhost:4200/password-reset' 
+      .sendPasswordResetEmail(passwordResetEmail, {
+        url: 'http://localhost:4200/password-reset',
       })
       .then(() => {
-        this.toastr.success('Password reset email sent, check your inbox.')
+        this.toastr.success('Password reset email sent, check your inbox.');
       })
       .catch((error) => {
-        this.toastr.error(error)
+        this.toastr.error(error);
       });
   }
   // Returns true when user is looged in and email is verified
@@ -159,12 +194,12 @@ export class AuthService {
   /* Setting up user data when sign in with username/password, 
   sign up with username/password and sign in with social auth  
   provider in Firestore database using AngularFirestore + AngularFirestoreDocument service */
-  SetUserData(user: any, formData:any) {
+  SetUserData(user: any, formData: any) {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
       `users/${user.uid}`
     );
     console.log('userRef', userRef);
-  
+
     const userData: User = {
       uid: user.uid,
       firstName: formData.firstName,
@@ -172,17 +207,17 @@ export class AuthService {
       email: formData.userEmail,
       cellphoneNumber: formData.cellphone,
       emailVerified: user.emailVerified,
-      marketingConsent:formData.receiveMarketingInfo,
-      tipsTutorials:formData.receiveMarketingInfo,
-      userInsights:formData.receiveMarketingInfo,
-      aboutUsDisplayed:false,
+      marketingConsent: formData.receiveMarketingInfo,
+      tipsTutorials: formData.receiveMarketingInfo,
+      userInsights: formData.receiveMarketingInfo,
+      aboutUsDisplayed: false,
       cardHolderName: '',
-      cardNumber:'',
+      cardNumber: '',
       cvv: 0,
       expiryDate: '',
-      accountType:'admin',
+      accountType: 'admin',
       subscriptionType: formData.billingOption,
-      parentId:'',
+      parentId: '',
       about: {
         aboutText: '',
         businessHours: '',
@@ -191,53 +226,59 @@ export class AuthService {
         isBusinessHoursVisible: false,
         isContactDetailsVisible: false,
         mainImageUrl: '',
-        additionalImageUrl: ''
-    }
+        additionalImageUrl: '',
+      },
     };
     console.log('userData', userData);
     return userRef.set(userData, {
       merge: true,
     });
   }
-  SetUserDataEditor(user: any, email: string, lastName:string, firstName:string, phone:string, parentId:string) {
-      const userRef: AngularFirestoreDocument<any> = this.afs.doc(
-        `users/${user.uid}`
-      );
-      const userData: User = {
-        uid: user.uid,
-        firstName: firstName,
-        Surname: lastName,
-        email: email,
-        cellphoneNumber: phone,
-        emailVerified: user.emailVerified,
-        marketingConsent: false,
-        tipsTutorials: false,
-        userInsights: false,
-        aboutUsDisplayed: false,
-        cardHolderName: '',
-        cardNumber: '',
-        cvv: 0,
-        expiryDate: '',
-        accountType: 'editor',
-        subscriptionType: '',
-        parentId: parentId,
-        about: {
-          aboutText: '',
-          businessHours: '',
-          email: '',
-          cellphone: '',
-          isBusinessHoursVisible: false,
-          isContactDetailsVisible: false,
-          mainImageUrl: '',
-          additionalImageUrl: ''
-      }
-
-      };
-      return userRef.set(userData, {
-        merge: true,
-      });
+  SetUserDataEditor(
+    user: any,
+    email: string,
+    lastName: string,
+    firstName: string,
+    phone: string,
+    parentId: string
+  ) {
+    const userRef: AngularFirestoreDocument<any> = this.afs.doc(
+      `users/${user.uid}`
+    );
+    const userData: User = {
+      uid: user.uid,
+      firstName: firstName,
+      Surname: lastName,
+      email: email,
+      cellphoneNumber: phone,
+      emailVerified: user.emailVerified,
+      marketingConsent: false,
+      tipsTutorials: false,
+      userInsights: false,
+      aboutUsDisplayed: false,
+      cardHolderName: '',
+      cardNumber: '',
+      cvv: 0,
+      expiryDate: '',
+      accountType: 'editor',
+      subscriptionType: '',
+      parentId: parentId,
+      about: {
+        aboutText: '',
+        businessHours: '',
+        email: '',
+        cellphone: '',
+        isBusinessHoursVisible: false,
+        isContactDetailsVisible: false,
+        mainImageUrl: '',
+        additionalImageUrl: '',
+      },
+    };
+    return userRef.set(userData, {
+      merge: true,
+    });
   }
-  
+
   // Sign out
   SignOut() {
     return this.afAuth.signOut().then(() => {
@@ -260,17 +301,18 @@ export class AuthService {
 
   sendEmailInvitation(email: string, docId: string) {
     const actionCodeSettings = {
-      url: 'https://main.d9ek0iheftizq.amplifyapp.com/confirm-user?docId=' + docId,
-      handleCodeInApp: true // This must be true
+      url:
+        'https://main.d9ek0iheftizq.amplifyapp.com/confirm-user?docId=' + docId,
+      handleCodeInApp: true, // This must be true
     };
 
-    return this.afAuth.sendSignInLinkToEmail(email, actionCodeSettings)
+    return this.afAuth
+      .sendSignInLinkToEmail(email, actionCodeSettings)
       .then(() => {
-        console.log('success sent');        
+        console.log('success sent');
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error sending email invitation: ', error);
       });
   }
- 
 }
