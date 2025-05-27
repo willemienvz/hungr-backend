@@ -181,6 +181,56 @@ export class EditRestaurantComponent {
       });
   }
 
+  saveDraft() {
+    this.isSaving = false;
+    const menuID = this.selectedMenu ? this.selectedMenu : '';
+    var holdID = '';
+
+    if (this.userChanged) {
+      holdID = this.selectedUser.uid;
+    } else {
+      holdID = this.currentRestaurant.mainContactID;
+    }
+
+    var tempRestaurant = {
+      city: this.restaurant.city,
+      mainContactID: holdID,
+      menuID: menuID,
+      numberTables: this.selectedNumberTable,
+      ownerID: this.currentUser.uid,
+      province: this.restaurant.province,
+      restaurantName: this.restaurant.name,
+      status: false,
+      streetAdress: this.restaurant.street,
+      zip: this.restaurant.zip,
+    };
+
+    console.log(tempRestaurant);
+    this.firestore
+      .collection('restuarants')
+      .doc(this.currentRestaurantID)
+      .update(tempRestaurant)
+      .then(() => {
+        this.dialog.open(SuccessAddRestaurantDialogComponent, {
+          width: '400px',
+          data: {
+            message: 'Your restaurant has been updated.',
+            title: 'Restaurant Edited',
+          },
+        });
+      })
+      .catch((error) => {
+        console.error('Error updating restaurant:', error);
+        this.snackBar.open(
+          'Failed to update restaurant. Please try again.',
+          'Close',
+          {
+            duration: 3000,
+          }
+        );
+      });
+  }
+
   selectMenu(menuID: string) {
     this.selectedMenuID = menuID;
   }

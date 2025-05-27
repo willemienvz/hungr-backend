@@ -274,37 +274,40 @@ export class AddSpecialComponent implements OnInit {
 
   onDraftSave() {
     this.isSaving = true;
-    if (this.specialForm.valid) {
-      const formValue = this.specialForm.getRawValue();
-      const data = {
-        ...formValue,
-        addedItems: this.addedItems,
-        selectedDays: this.selectedDays,
-        imageUrl: this.uploadedImageUrl,
-        specialID: '1',
-        OwnerID: this.owner,
-        active: false,
-      };
-      this.firestore
-        .collection('specials')
-        .add(data)
-        .then((results) => {
-          const newData = {
-            ...data,
-            specialID: results.id,
-          };
-          this.firestore.collection('specials').doc(results.id).update(newData);
-          this.isSaving = false;
-          this.toastr.success('Your changes have been saved');
-        })
-        .catch((error) => {
-          console.error('Error saving draft to Firestore:', error);
-          this.isSaving = false;
-        });
-    } else {
-      this.isSaving = false;
-      this.toastr.error('Some fields have not been completed. ');
-    }
+
+    const formValue = this.specialForm.getRawValue();
+    const data = {
+      ...formValue,
+      addedItems: this.addedItems,
+      selectedDays: this.selectedDays,
+      imageUrl: this.uploadedImageUrl,
+      specialID: '1',
+      OwnerID: this.owner,
+      active: false,
+    };
+
+    this.firestore
+      .collection('specials')
+      .add(data)
+      .then((results) => {
+        const newData = {
+          ...data,
+          specialID: results.id,
+        };
+        return this.firestore
+          .collection('specials')
+          .doc(results.id)
+          .update(newData);
+      })
+      .then(() => {
+        this.isSaving = false;
+        this.toastr.success('Draft saved successfully.');
+      })
+      .catch((error) => {
+        console.error('Error saving draft to Firestore:', error);
+        this.isSaving = false;
+        this.toastr.error('Failed to save draft.');
+      });
   }
 
   private showSuccess(message: string) {

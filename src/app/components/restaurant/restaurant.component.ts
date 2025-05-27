@@ -1,21 +1,26 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
-import {MatDialog} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { ViewComponent } from './view/view.component';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-restaurant',
   templateUrl: './restaurant.component.html',
-  styleUrl: './restaurant.component.scss'
+  styleUrl: './restaurant.component.scss',
 })
 export class RestaurantComponent {
-  isTooltipOpen:boolean = false;
+  isTooltipOpen: boolean = false;
   isPopupMenuOpen: boolean[] = [];
   isSaving: boolean = false;
   restuarants: Restaurant[] = [];
-  constructor(private firestore: AngularFirestore,  private elementRef: ElementRef, public dialog: MatDialog) {
-  }
+  constructor(
+    private readonly toastr: ToastrService,
+    private firestore: AngularFirestore,
+    private elementRef: ElementRef,
+    public dialog: MatDialog
+  ) {}
   ngOnInit() {
     this.isSaving = true;
     this.fetchRestaurant();
@@ -26,18 +31,18 @@ export class RestaurantComponent {
       this.closeAllPopupMenu();
     }
   }
-  
+
   togglePopupMenu(index: number) {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
 
-  openDialog(id:string, index: number, name:string): void {
+  openDialog(id: string, index: number, name: string): void {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
       width: '400px',
-      data: {name: name}
+      data: { name: name },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.deleteRestaurant(id, index);
       } else {
@@ -48,39 +53,44 @@ export class RestaurantComponent {
   private fetchRestaurant() {
     const user = JSON.parse(localStorage.getItem('user')!);
     const OwnerID = user.uid;
-    this.firestore.collection<Restaurant>('restuarants', ref => ref.where('ownerID', '==', OwnerID))
+    this.firestore
+      .collection<Restaurant>('restuarants', (ref) =>
+        ref.where('ownerID', '==', OwnerID)
+      )
       .valueChanges()
-      .subscribe(restuarants => {
+      .subscribe((restuarants) => {
         this.restuarants = restuarants;
-        console.log(this.restuarants)
+        console.log(this.restuarants);
         this.isSaving = false;
       });
   }
 
-  deleteRestaurant(id:string, index: number){
-    this.firestore.collection('restuarants').doc(id).delete()
-        .then(() => {
-            console.log("Restaurant successfully deleted!");
-        })
-        .catch((error) => {
-            console.error("Error removing restaurant: ", error);
-        });
+  deleteRestaurant(id: string, index: number) {
+    this.firestore
+      .collection('restuarants')
+      .doc(id)
+      .delete()
+      .then(() => {
+        this.toastr.success('Restaurant successfully deleted!');
+      })
+      .catch((error) => {
+        this.toastr.error('Error removing restaurant');
+        console.error('Error removing restaurant: ', error);
+      });
   }
 
   private closeAllPopupMenu() {
     this.isPopupMenuOpen.fill(false);
   }
 
-  
-  viewRestaurant(id:string, index: number){
+  viewRestaurant(id: string, index: number) {
     const dialogRef = this.dialog.open(ViewComponent, {
       width: '700px',
-      data: {id: id}
+      data: { id: id },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        
       } else {
       }
     });

@@ -130,6 +130,63 @@ export class AddComponent implements OnInit {
     }
   }
 
+  saveDraft() {
+    const menuID = this.selectedMenu ? this.selectedMenu.menuID : '';
+    let holdID = this.userChanged ? this.selectedUser.uid : '';
+
+    this.newRestaurant = {
+      ...this.newRestaurant,
+      city: this.restaurant.city || '',
+      mainContactID: holdID,
+      menuID: menuID,
+      numberTables: this.selectedNumberTable || '',
+      ownerID: this.currentUser?.uid || '',
+      province: this.restaurant.province || '',
+      restaurantName: this.restaurant.name || '',
+      status: this.restaurantStatus ?? true,
+      streetAdress: this.restaurant.street || '',
+      zip: this.restaurant.zip || '',
+    };
+
+    const restaurantCollection = this.firestore.collection('restuarants');
+
+    const handleSuccess = () => {
+      this.dialog.open(SuccessAddRestaurantDialogComponent, {
+        width: '400px',
+        data: {
+          message: 'Your new restaurant has been successfully created.',
+          title: 'Restaurant Added',
+        },
+      });
+    };
+
+    if (this.newRestaurant.restaurantID) {
+      restaurantCollection
+        .doc(this.newRestaurant.restaurantID)
+        .update(this.newRestaurant)
+        .then(handleSuccess)
+        .catch((error) => {
+          this.toastr.error('An error occurred while updating the restaurant.');
+          console.error('Error updating restaurant: ', error);
+        });
+    } else {
+      restaurantCollection
+        .add(this.newRestaurant)
+        .then((docRef) => {
+          this.newRestaurant.restaurantID = docRef.id;
+          return docRef.update({
+            ...this.newRestaurant,
+            restaurantID: docRef.id,
+          });
+        })
+        .then(handleSuccess)
+        .catch((error) => {
+          this.toastr.error('An error occurred while saving the restaurant.');
+          console.error('Error adding restaurant: ', error);
+        });
+    }
+  }
+
   addRestaurant(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (

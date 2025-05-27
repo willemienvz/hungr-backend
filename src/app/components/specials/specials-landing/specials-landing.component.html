@@ -51,10 +51,12 @@
               </td>
               <td>
                 <div>
+                  @if (special.selectedDays.length > 0) {
                   <p *ngFor="let day of special.selectedDays; let i = index">
                     {{ day }}
                   </p>
-                  <p>{{ special.timeFrom }} - {{ special.timeTo }}</p>
+                  <p>{{ special?.timeFrom }} - {{ special?.timeTo }}</p>
+                  }
                 </div>
               </td>
               <td>

@@ -72,6 +72,33 @@ export class EditSpecialComponent implements OnInit {
     this.fetchSpecialData();
     this.fetchMenus();
   }
+  onDraftSave() {
+    this.isSaving = true;
+
+    const formValue = this.specialForm.getRawValue();
+    const data = {
+      ...formValue,
+      addedItems: this.addedItems,
+      selectedDays: this.selectedDays,
+      imageUrl: this.uploadedImageUrl,
+      OwnerID: this.owner,
+      active: false,
+    };
+
+    this.firestore
+      .collection('specials')
+      .doc(this.specialId)
+      .update(data)
+      .then(() => {
+        this.isSaving = false;
+        this.toastr.success('Draft saved successfully.');
+      })
+      .catch((error) => {
+        console.error('Error saving draft to Firestore:', error);
+        this.isSaving = false;
+        this.toastr.error('Failed to save draft.');
+      });
+  }
 
   fetchSpecialData() {
     this.firestore
