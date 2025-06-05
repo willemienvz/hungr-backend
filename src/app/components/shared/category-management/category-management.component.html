@@ -1,0 +1,66 @@
+<div class="category-management">
+  <div class="block openTop">
+    <div class="addCol">
+
+      <div class="formGroup">
+        <div class="label-tooltip-container">
+          <label for="categoryInput">Add a Menu Category</label>
+          <div class="tooltip-wrapper">
+            <i class="material-icons tooltip-icon">help_outline</i>
+            <div class="tooltip-text">
+              Create categories to organize your menu items (e.g., Appetizers, Main Courses, Desserts)
+            </div>
+          </div>
+        </div>
+        <input
+          id="categoryInput"
+          type="text"
+          class="formControl"
+          placeholder="Name your category"
+          [ngModel]="newCategoryName"
+          (ngModelChange)="onNewCategoryNameChange($event)"
+        />
+     
+      </div>
+      <button class="btnSecondary" (click)="onAddCategory()">
+        + Add Category
+      </button>
+    </div>
+  </div>
+  <div class="catRow">
+    <div *ngFor="let category of categories; let i = index" class="category">
+      <div class="title">
+        <h6>{{ category.name }}</h6>
+        <app-svg-icon 
+          iconName="delete" 
+          class="dltIcon" 
+          size="18px" 
+          (click)="onDeleteCategory(i)"
+        ></app-svg-icon>
+      </div>
+      <div class="subcategory-wrapper">
+      <div class="inputBox">
+        <input
+          type="text"
+          [ngModel]="newSubcategoryName[i]"
+          (ngModelChange)="onNewSubcategoryNameChange(i, $event)"
+          (keyup.enter)="onAddSubCategory(i)"
+          placeholder="Type sub-category name here"
+        />
+        <label>press enter to add</label>
+      </div>
+
+      <div *ngFor="let subcategory of category.subcategories; let j = index" class="subcategory">
+        <p>{{ subcategory.name }}</p>
+        <div class="deleteIcon">
+          <app-svg-icon 
+            iconName="close" 
+            size="16px" 
+            (click)="onDeleteSubCategory(i, j)"
+          ></app-svg-icon>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div> 

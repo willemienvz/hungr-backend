@@ -1,0 +1,68 @@
+// Styles for menu form step component
+// Most styles are inherited from parent components 
+
+// Import shared menu styles
+@import '../../menus/shared/menu-shared.scss';
+
+.restaurant-col {
+  display: flex;
+  flex-direction: column;
+
+}
+.col-resturant-set {
+  margin-top: 26px;
+  &.pLine {
+    height:38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+// Additional styles specific to menu form step
+.step1-container {
+
+  
+ 
+  
+  .add-restaurant-link {
+    color: #16d3d2;
+    text-decoration: none;
+    font-size: 14px;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  /* KB - Added styles for the add restaurant later checkbox */
+  .checkbox-section {
+   
+    
+  }
+
+  .checkbox-container {
+    display: flex;
+    justify-content: flex-start;
+    align-self: center;
+    flex-direction: row;
+    width: 100%;
+
+    label {
+      display: flex;
+      justify-content: flex-start;
+      align-self: center;
+      flex-direction: row;
+      gap: 9px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 16.5px;
+      letter-spacing: -0.02em;
+      color: #2e3646;
+      cursor: pointer;
+
+      input[type="checkbox"] {
+        cursor: pointer;
+      }
+    }
+  }
+} 

@@ -1,535 +1,55 @@
-.container {
-  display: flex;
-  padding: 20px;
-  flex-direction: column;
-  gap: 20px;
+/* KB */ // Using shared styles to eliminate duplication between add-menu and edit-menu
+@import '../shared/menu-shared.scss';
 
-  .row {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-  }
+// Add-menu specific styles only
 
-  .block {
-    width: 100%;
-    position: relative;
-  }
-
-  .headerRow {
-    gap: 14px;
-    margin-bottom: 20px;
-    justify-content: center;
-    align-items: center;
-    margin-top: 25px;
-  }
-}
-
-.labelStep {
-  color: rgba(22, 211, 210, 1);
-  font-weight: 700;
-  text-transform: uppercase;
-}
-.row3col {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1%;
-
-  .col3row {
-    width: 32%;
-    display: flex;
-  }
-  .headerRow {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    .headerContainer {
-      justify-content: center;
-      align-items: center;
-    }
-  }
-
-  .btnCol {
-    flex-wrap: wrap;
-    gap: 10px;
-    a {
-      width: 48%;
-    }
-  }
-}
-.col2row {
+// Popup styles specific to add-menu
+.popup {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex: 1;
-  flex-direction: row;
-  gap: 15px;
-
-  .col {
-    flex: 1;
-    display: flex;
-  }
-}
-
-.formGroup {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-mat-form-field {
-  width: 100%;
-}
-
-.headerContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-}
-
-.outerBlock {
-  padding: 10px 13px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 15px;
-  background-color: #f3f4f5;
-  border-radius: 5px;
-
-  input {
-    flex: 1;
-    height: 100%;
-  }
-}
-
-.row {
-  flex-wrap: wrap;
-  gap: 15px;
-
-  i {
-    cursor: pointer;
-  }
-
-  .category {
-    width: calc(50% - 8px);
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-
-    .title {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      background-color: #f3f4f5;
-      position: relative;
-
-      .addBox {
-        position: absolute;
-        right: 30px;
-      }
-
-      .menuSub {
-        position: absolute;
-        right: 10px;
-      }
-    }
-  }
-}
-
-.popup-menu {
-  position: absolute;
-  right: 0px;
-  transition: 0.3s all;
-  background-color: #f8f9fb;
-  border: 1px solid #dedede;
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-  padding: 13px;
-  border-radius: 10px;
-  width: 90px;
-  z-index: 50;
-  a {
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-    font-weight: 400;
-    line-height: 10px;
-    letter-spacing: -2%;
-    color: #181818;
-    width: 100%;
-    cursor: pointer;
-    text-align: left;
-    text-decoration: none;
-  }
-  .closeBtn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-  }
-}
-
-.subcategory {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  position: relative;
-  border: 1px solid #c8afeb;
-  margin-bottom: 8px;
-  p {
-    font-weight: bold;
-  }
-
-  .deleteIcon {
-    position: absolute;
-    right: 10px;
-    i {
-      color: #c8afeb;
-    }
-  }
-}
-
-.subcategory:last-of-type {
-  margin-bottom: 0px;
-}
-.mainLink {
-  width: unset;
-  margin-top: 50px;
-}
-.inputHolder {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-
-  p {
-    position: absolute;
-    right: 10px;
-    color: #9a9a9a;
-  }
-}
-
-.uploadBlock {
-  padding: 30px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  background-color: #f3f4f5;
-  border-radius: 5px;
-  cursor: pointer;
-  min-width: 50%;
-
-  i {
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-  }
-}
-.innerHold {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 10px;
-}
-.backBtn {
-  cursor: pointer;
-
-  p {
-    color: #9a9a9a;
-  }
-
-  i {
-    font-size: 13px;
-    color: #9a9a9a;
-  }
-}
-
-.itemCol {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.itemCol:first-of-type,
-.itemCol:last-of-type {
-  width: 25%;
-}
-
-.step2 {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-}
-
-.step1 {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.smallerInput {
-  width: 100%;
-}
-.image {
-  width: 47%;
-  display: flex;
-  flex-direction: column;
-}
-
-.labelAdd {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  color: #9a9a9a;
-  cursor: pointer;
-  span {
-    text-decoration: underline;
-  }
-}
-.priceContainer {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-
-  .col {
-    gap: 10px;
-    display: flex;
-    flex-direction: column;
-  }
-}
-.labelRow {
-  justify-content: space-between;
-  align-items: center;
-}
-
-.itemCol {
-  gap: 10px;
-  mat-select {
-    border: 1px solid gray;
-    padding: 10px;
-  }
-}
-
-.itemCol:nth-of-type(2) {
-  width: 50%;
-  flex: 1;
-}
-
-.uploadImg {
-  border: 1px solid grey;
-  background-color: transparent;
-}
-
-#yourBtn {
-  width: 150px;
-  padding: 5px 10px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border: 1px solid #dedede;
-  text-align: center;
-  cursor: pointer;
-}
-
-#yourBtn p {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-}
-
-.pLinkText {
-  margin-top: 41px;
-}
-
-.additionalItems {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1%;
-  border-top: 1px solid #9a9a9a;
-  border-radius: 2px;
-  padding: 33px 0px;
-  position: relative;
-  margin-top: 30px;
-  .col {
-    width: 100%;
-    display: flex;
-    flex-direction: row !important;
-    margin-bottom: 20px;
-  }
-  .inputHolder {
-    flex-direction: column !important;
-    justify-content: flex-start;
-    align-items: flex-start;
-    p {
-      position: relative;
-      right: 0;
-    }
-  }
-  h6 {
-    width: 25%;
-    display: flex;
-    gap: 5px;
-    justify-content: flex-start;
-    align-items: center;
-    flex-direction: row;
-  }
-
-  .subItemClose {
-    cursor: pointer;
-  }
-
-  .col:first-of-type {
-    flex-direction: column;
-    gap: 25px;
-    .inputHolder {
-      width: 77%;
-      display: flex;
-      flex-direction: row;
-      gap: 15px;
-
-      input {
-        width: 80%;
-      }
-      a {
-        flex: 1;
-      }
-    }
-  }
-
-  .col:last-of-type {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-end;
-
-    .item {
-      width: calc(50% - 8px);
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 13px;
-      position: relative;
-      border: 1px solid #c8afeb;
-      border-radius: 2px;
-      background-color: white;
-      i {
-        position: absolute;
-        right: 12px;
-        color: #c8afeb;
-        cursor: pointer;
-      }
-    }
-  }
-}
-
-.closeIconItem {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  color: #000;
-}
-
-input {
-  height: 58px;
-  border-color: #000;
-}
-
-.colrow {
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  margin-bottom: 0 !important;
-  .labelStep {
-    span {
-      text-transform: uppercase;
-    }
-  }
-}
-.topRow {
-  flex-direction: column !important;
-  justify-content: center;
-  align-items: center;
-  margin-top: 25px;
-  .row {
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-  }
-}
-.step3 .row3col {
-  position: relative;
-  .col3row {
-    position: absolute;
-  }
-}
-
-.innerRow {
-  width: 100%;
-  background-color: #f3f4f5;
-  padding: 10px 10px 10px 25px;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 40px;
-
-  .btnHold {
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-    justify-content: flex-end;
-    align-items: center;
-  }
-}
-
-.nextSteps {
-  gap: 15px;
-  display: flex;
-  flex-direction: column;
-}
-.preview {
-  background-image: url("../../../../assets/images/branding/phone.png");
-  background-position: center;
-  background-size: contain;
   height: 100%;
-  background-repeat: no-repeat;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  max-width: 90%;
-  margin: auto;
-  gap: 20px;
-  min-height: 450px;
+
+  .popup-content {
+    background-color: #fefefe;
+    padding: 25px;
+    border: 1px solid #dedede;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+
+    .popup-close {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      cursor: pointer;
+      font-size: 24px;
+      
+      &:hover {
+        transform: rotate(180deg);
+      }
+    }
+
+    .row {
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      justify-content: center;
+      gap: 20px;
+      align-items: center;
+    }
+  }
 }
 
+// Step-specific overrides for add-menu
 .step3 {
   width: 100%;
   display: flex;
@@ -545,6 +65,7 @@ input {
   .col:first-of-type {
     width: 60%;
   }
+  
   .col:last-of-type {
     width: 40%;
   }
@@ -554,299 +75,40 @@ input {
   }
 }
 
-.popup-content {
-  display: flex;
-  gap: 20px;
-  flex-direction: column;
-  .row {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    justify-content: center;
-    gap: 20px;
-    align-items: center;
+/* KB: CDK drag and drop styling for menu item reordering */
+.menu-items-container {
+  .menu-item-drag-container {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    
+    &.cdk-drag-animating {
+      transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+    }
   }
 }
 
-.uploadItems .col {
-  background-color: #ecedee;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 25px;
-  border-radius: 5px;
-  width: calc(50% - 10px);
-  flex-direction: column;
-  gap: 15px;
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background: white;
+  transform: rotate(2deg);
 }
 
-.uploadItems {
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-  width: 100%;
-}
-
-.labelContainer {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.error input,
-.error .mdc-text-field {
-  border: 1px solid red;
-}
-
-.error-message {
-  color: red;
-}
-
-.uploadItems {
-  border: 2px dashed #ccc;
-  padding: 20px;
-  text-align: center;
-  position: relative;
-  transition: background-color 0.3s;
-}
-
-.uploadItems.dragging {
-  background-color: #f0f8ff;
-}
-
-.uploadItems i {
-  font-size: 48px;
-  margin-bottom: 10px;
-}
-
-.uploadItems h6,
-.uploadItems p {
-  margin: 0;
-}
-
-.btn {
-  background-color: #007bff;
-  color: #fff;
-  padding: 5px 10px;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.btn:hover {
-  background-color: #0056b3;
-}
-
-.imagePreview {
-  width: 110px;
-  img {
-    width: 100%;
+.cdk-drag-placeholder {
+  opacity: 0.4;
+  background: var(--hungr-light-grey-2);
+  border: 2px dashed #16d3d2;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  min-height: 80px;
+  
+  &:last-child {
+    margin-bottom: 0;
   }
 }
 
-h6 {
-  color: #444;
-}
-label {
-  color: #9a9a9a;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 20.25px;
-  letter-spacing: -0.1%;
-}
-
-.step-buttons {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  gap: 15px;
-  margin-top: 25px;
-}
-
-::ng-deep .mat-mdc-form-field-subscript-wrapper {
-  display: none !important;
-}
-
-.addCol {
-  flex-wrap: nowrap;
-  margin-top: 25px;
-  input {
-    width: 350px;
+.cdk-drop-list-dragging {
+  .menu-item-drag-container:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
-}
-
-.catRow {
-  gap: 15px;
-  justify-content: space-between;
-  margin-top: 15px;
-  .block {
-    width: calc(50% - 8px);
-    position: relative;
-  }
-  .delete {
-    position: absolute;
-    top: 10px;
-    right: 5px;
-  }
-
-  h6 {
-    margin-bottom: 25px;
-  }
-}
-
-.dltIcon {
-  position: absolute;
-  top: 10px;
-  right: 5px;
-}
-
-.subcat {
-  width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-top: 10px;
-  justify-content: space-between;
-  padding: 7px 15px;
-  border-radius: 5px;
-  border: 1px solid #9747ff;
-}
-
-.blockInner {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 25px;
-}
-
-.menuItemBlock {
-  margin-top: 25px;
-}
-
-.addittionalRow {
-  justify-content: center;
-  align-items: center;
-  background-color: #f2f3f4;
-  width: unset;
-  flex-direction: row;
-  display: flex;
-  a {
-    color: #181818;
-    border-radius: 6px;
-    text-align: center;
-    padding: 12px 15px;
-    font-family: "Poppins", sans-serif;
-    font-size: 13px;
-
-    line-height: 14px;
-    letter-spacing: -0.001em;
-    border: none;
-    cursor: pointer;
-    min-width: 140px;
-    text-decoration: none;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    transition: 0.3s all;
-  }
-}
-
-.addRowOuter {
-  justify-content: flex-end;
-  align-items: flex-end;
-}
-
-.inputBox {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  width: 100%;
-
-  label {
-    position: absolute;
-    right: 10px;
-  }
-
-  input {
-    width: 100% !important;
-  }
-}
-
-.qrblock {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border-radius: 6px;
-  background-color: #f3f4f5;
-  margin: 30px 0;
-}
-
-::ng-deep mat-select {
-  height: 38px !important;
-  display: flex !important;
-}
-
-.lastStep p a {
-  font-family: "Poppins", sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 130%;
-  letter-spacing: -0.02em;
-  text-decoration: underline;
-  color: #181818;
-}
-
-.lastStep label {
-  color: #9a9a9a;
-  font-family: "Poppins", sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 18.2px;
-  letter-spacing: -0.001em;
-  display: flex;
-  text-align: left;
-  margin-top: 30px;
-}
-
-input {
-  height: 38px !important;
-}
-
-.backLink {
-  width: 100%;
-  flex-direction: row;
-  display: flex;
-  justify-content: flex-start;
-  gap: 5px;
-  align-items: center;
-  text-decoration: none;
-  color: #2e3646;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.pLinkText {
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 18.2px;
-  letter-spacing: -0.1%;
-  color: #9a9a9a;
-
-  .mainLink {
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 18.2px;
-    letter-spacing: -0.1%;
-    color: #9a9a9a;
-  }
-}
+} 

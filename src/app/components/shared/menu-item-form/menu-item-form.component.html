@@ -1,0 +1,231 @@
+<div class="menu-item-form">
+  <div class="menuItemBlock" [class.collapsed]="isCollapsed">
+
+    <!-- KB: Collapsed header view showing only name, chevron, and delete button -->
+    <div *ngIf="isCollapsed" class="collapsed-header">
+      <!-- KB: Add drag handle for collapsed view -->
+       <div class="itemTitle">
+      <div class="drag-handle" cdkDragHandle>
+        <i class="material-icons">drag_indicator</i>
+      </div>
+      <div class="item-name">
+        <h6>{{menuItem.name || 'Unnamed Menu Item'}}</h6>
+      </div>
+    </div>
+      <div class="header-actions">
+        <button type="button" class="chevron-btn" (click)="toggleCollapsed()">
+          <i class="material-icons">expand_more</i>
+        </button>
+        <button type="button" class="delete-btn" (click)="onRemoveMenuItem()">
+          <app-svg-icon 
+          iconName="delete" 
+          class="dltIcon" 
+          size="18px" 
+          (click)="onRemoveMenuItem()"
+        ></app-svg-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- KB: Expanded form content -->
+    <div *ngIf="!isCollapsed" class="expanded-content">
+      <div class="addRowOuter">
+        <div class="itemTitle">
+          <!-- KB: Add drag handle for expanded view -->
+          <div class="drag-handle" cdkDragHandle>
+            <i class="material-icons">drag_indicator</i>
+          </div>
+          <h6>{{menuItem.name ? menuItem.name : 'Add Menu Item'}}</h6>
+          <!-- KB: Add collapse button in expanded view -->
+       
+        </div>
+        <div class="addRowInner">
+          <div class="addittionalRow">
+            <button *ngIf="!menuItem.displayDetails.preparation" type="button" class="toggle-btn" (click)="onToggleDetail('preparation')">
+              + add preparation
+            </button>
+            <button *ngIf="!menuItem.displayDetails.variation" type="button" class="toggle-btn" (click)="onToggleDetail('variation')">
+              + add variation
+            </button>
+            <button *ngIf="!menuItem.displayDetails.pairing" type="button" class="toggle-btn" (click)="onToggleDetail('pairing')">
+              + add pairing
+            </button>
+            <button *ngIf="!menuItem.displayDetails.side" type="button" class="toggle-btn" (click)="onToggleDetail('side')">
+              + add side
+            </button>
+          </div>
+
+          <div class="header-actions">
+            <button type="button" class="chevron-btn" (click)="toggleCollapsed()">
+              <i class="material-icons">expand_less</i>
+            </button>
+            <button type="button" class="delete-btn" (click)="onRemoveMenuItem()">
+              <app-svg-icon 
+              iconName="delete" 
+              class="dltIcon" 
+              size="18px" 
+              (click)="onRemoveMenuItem()"
+            ></app-svg-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="itemFormGrid">
+        <div class="col first">
+          <div class="fieldHolder">
+            <label>Select Menu Category</label>
+      
+            <mat-form-field subscriptSizing="dynamic">
+            <mat-select
+              class="select-arrow-fix"
+              [(value)]="menuItem.categoryId"
+              placeholder="Select Category"
+            >
+              <mat-optgroup
+                *ngFor="let category of categories"
+                [label]="category.name"
+              >
+                <mat-option [value]="category.id">{{ category.name }}</mat-option>
+                <mat-option
+                  *ngFor="let subcategory of category.subcategories"
+                  [value]="subcategory.id"
+                >
+                  &nbsp;&nbsp;{{ subcategory.name }}
+                </mat-option>
+              </mat-optgroup>
+            </mat-select>
+          </mat-form-field>
+          </div> 
+        
+        </div>
+        <div class="col second">
+     
+            <div class="fieldHolder">
+              <label>Item Name</label>
+            <input
+              type="text"
+              [(ngModel)]="menuItem.name"
+              placeholder="Item Name"
+              [ngModelOptions]="{ standalone: true }"
+            />
+        
+      </div>
+          
+        </div>
+        
+        <div class="col priceContainer third">
+          <div class="fieldHolder">
+            <label>Item Price</label>
+            <input
+              type="text"
+              [(ngModel)]="menuItem.price"
+              placeholder="R 00.00"
+              class="smallerInput"
+              [ngModelOptions]="{ standalone: true }"
+              (input)="onPriceInput($event)"
+            />
+          </div>
+        </div>
+        <div class="col fourth">
+          <div class="image-upload">
+           
+            <div class="upload-btn" (click)="onGetFile()" [class.disabled]="isUploadingImage">
+              <i class="material-symbols-outlined">{{ isUploadingImage ? 'hourglass_empty' : 'upload' }}</i>
+              <p>{{ isUploadingImage ? 'Uploading...' : 'Add Image' }}</p>
+            </div>
+            <div style="height: 0px; width: 0px; overflow: hidden">
+              <input
+                id="upfile"
+                type="file"
+                #fileInput
+                (change)="onFileSelected($event)"
+                accept="image/*"
+              />
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col fifth">
+          <div class="fieldHolder">
+            <label>Description</label>
+            <textarea
+              [(ngModel)]="menuItem.description"
+              placeholder="Description..."
+              [ngModelOptions]="{ standalone: true }"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        <div class="col sixth">
+          <div class="fieldHolder">
+            <div *ngIf="menuItem.imageUrl" class="image-preview">
+              <img [src]="menuItem.imageUrl" alt="Uploaded image" />
+              <button 
+                type="button" 
+                class="remove-btn" 
+                (click)="onRemoveImage()"
+                [disabled]="isUploadingImage"
+                [title]="isUploadingImage ? 'Processing...' : 'Remove image'"
+              >
+                <i class="material-icons">{{ isUploadingImage ? 'hourglass_empty' : 'close' }}</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KB: Use reusable detail component for preparation -->
+      <app-menu-item-detail
+        *ngIf="menuItem.displayDetails.preparation"
+        [config]="preparationConfig"
+        [items]="menuItem.preparations"
+        [newItemValue]="newPreparation"
+        (closeDetail)="onToggleDetail('preparation')"
+        (addItem)="onAddPreparation()"
+        (removeItem)="onRemovePreparation($event)"
+        (newItemValueChange)="onNewPreparationChange($event)">
+      </app-menu-item-detail>
+
+      <!-- KB: Use reusable detail component for variation -->
+      <app-menu-item-detail
+        *ngIf="menuItem.displayDetails.variation"
+        [config]="variationConfig"
+        [items]="menuItem.variations"
+        [newItemValue]="newVariation"
+        (closeDetail)="onToggleDetail('variation')"
+        (addItem)="onAddVariation()"
+        (removeItem)="onRemoveVariation($event)"
+        (newItemValueChange)="onNewVariationChange($event)">
+      </app-menu-item-detail>
+
+      <!-- KB: Use reusable detail component for pairing -->
+      <app-menu-item-detail
+        *ngIf="menuItem.displayDetails.pairing"
+        [config]="pairingConfig"
+        [items]="menuItem.pairings"
+        [newItemValue]="newPairing"
+        (closeDetail)="onToggleDetail('pairing')"
+        (addItem)="onAddPairing()"
+        (removeItem)="onRemovePairing($event)"
+        (newItemValueChange)="onNewPairingChange($event)">
+      </app-menu-item-detail>
+
+      <!-- KB: Use reusable detail component for side -->
+      <app-menu-item-detail
+        *ngIf="menuItem.displayDetails.side"
+        [config]="sideConfig"
+        [items]="menuItem.sides"
+        [newItemValue]="newSide"
+        (closeDetail)="onToggleDetail('side')"
+        (addItem)="onAddSide()"
+        (removeItem)="onRemoveSide($event)"
+        (newItemValueChange)="onNewSideChange($event)">
+      </app-menu-item-detail>
+
+    
+    </div>
+
+  </div>
+</div> 

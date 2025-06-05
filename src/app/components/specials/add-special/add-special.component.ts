@@ -345,6 +345,12 @@ export class AddSpecialComponent implements OnInit {
     if (this.currentStep > 1) this.currentStep--;
   }
 
+  navigateToStep(step: number): void {
+    if (step < this.currentStep && step >= 1) {
+      this.currentStep = step;
+    }
+  }
+
   onSpecialTypeChange() {
     this.selectedSpecialType = this.specialForm.get('typeSpecial')?.value;
   }

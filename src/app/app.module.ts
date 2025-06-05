@@ -69,6 +69,7 @@ import { ViewingtimegraphComponent } from './components/graphs/viewingtimegraph/
 import { VisitorDashboardComponent } from './components/dashboard/visitor-dashboard/visitor-dashboard.component';
 import { FusionChartsModule } from 'angular-fusioncharts';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
@@ -87,6 +88,14 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from './components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ViewUsersComponent } from './components/manage-users/view-users/view-users.component';
+import { MenuFormStepComponent } from './components/shared/menu-form-step/menu-form-step.component';
+import { CategoryManagementComponent } from './components/shared/category-management/category-management.component';
+import { MenuItemFormComponent } from './components/shared/menu-item-form/menu-item-form.component';
+import { StepNavigationComponent } from './components/shared/step-navigation/step-navigation.component';
+import { SvgIconComponent } from './components/shared/svg-icon/svg-icon.component';
+import { MenuItemSelectionComponent } from './components/shared/menu-item-selection/menu-item-selection.component';
+import { StepHeaderComponent } from './components/shared/step-header/step-header.component';
+import { MenuItemDetailComponent } from './components/shared/menu-item-detail/menu-item-detail.component';
 
 @NgModule({
   declarations: [
@@ -149,6 +158,14 @@ import { ViewUsersComponent } from './components/manage-users/view-users/view-us
     SaveProgressDialogComponent,
     UnsavedChangesDialogComponent,
     ViewUsersComponent,
+    MenuFormStepComponent,
+    CategoryManagementComponent,
+    MenuItemFormComponent,
+    StepNavigationComponent,
+    SvgIconComponent,
+    MenuItemSelectionComponent,
+    StepHeaderComponent,
+    MenuItemDetailComponent,
   ],
   imports: [
     BrowserModule,
@@ -176,10 +193,16 @@ import { ViewUsersComponent } from './components/manage-users/view-users/view-us
     MatTabsModule,
     MatCheckboxModule,
     ColorPickerModule,
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'toast-bottom-center',
+      preventDuplicates: true,
+
+    }),
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),
     }),
+    DragDropModule,
   ],
   providers: [FormDataService],
   bootstrap: [AppComponent],

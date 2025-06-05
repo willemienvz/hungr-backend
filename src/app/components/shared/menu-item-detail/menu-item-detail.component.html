@@ -1,0 +1,46 @@
+<!-- KB: Reusable detail section component that can handle preparation, variation, pairing, and side details -->
+<div class="details-section">
+  <div class="detail-header grid">
+    <div class="header-title">
+      <h6>{{ config.title }}</h6>
+    </div>
+    <div class="header-actions">
+      <p *ngIf="config.description">{{ config.description }}</p>
+      <button type="button" class="toggle-btn" (click)="onCloseDetail()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+  </div>
+
+  <div class="detail-content grid">
+    <!-- KB: Optional description text, only shown if provided in config -->
+    
+    <div class="add-input-group">
+
+        <div class="inputBox">
+            <input
+            [placeholder]="config.placeholder"
+            type="text"
+            [ngModel]="newItemValue"
+            (ngModelChange)="onNewItemValueChange($event)"
+            [ngModelOptions]="{ standalone: true }"
+            (keyup.enter)="onAddItem()"
+            />
+            <label>press enter to add</label>
+          </div>
+     
+
+    </div>
+    <div class="item-list">
+      <div
+        class="item-tag"
+        *ngFor="let item of items; let i = index"
+      >
+        <span>{{ item }}</span>
+        <button type="button" class="remove-btn" (click)="onRemoveItem(i)">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

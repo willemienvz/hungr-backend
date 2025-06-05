@@ -39,6 +39,20 @@ $hungr-backend-theme: mat.define-light-theme(
   margin: 0;
   transition: 0.3s all;
 
+  --hungr-main-color: #FE1B54;
+  --hungr-secondary-color: #16D3D2;
+  --hungr-tertiary-color: #3CE1AF;
+  --hungr-quinary-color: #9747FF;
+  --hungr-light-grey: #EBEDEE;
+  --hungr-light-grey-2: #F2F3F4;
+  --hungr-dark-grey: #9A9A9A;
+  --hungr-darker-grey: #444444;
+  --hungr-font-family: "Poppins", sans-serif;
+  --hungr-red: #FE1B54;
+
+  --mat-option-selected-state-label-text-color: var(--hungr-secondary-color);
+  --mat-minimal-pseudo-checkbox-selected-checkmark-color: var(--hungr-secondary-color);
+
   --mdc-switch-selected-focus-state-layer-color: #fff;
   --mdc-switch-selected-handle-color: #fff;
   --mdc-switch-selected-hover-state-layer-color: #fff;
@@ -77,6 +91,7 @@ $hungr-backend-theme: mat.define-light-theme(
   --mdc-switch-unselected-pressed-track-color: #e0e0e0;
   --mdc-switch-unselected-track-color: #e0e0e0;
   --mdc-switch-disabled-label-text-color: rgba(0, 0, 0, 0.38);
+  --mat-select-container-elevation-shadow : 0 5px 10px rgba(0,0,0,0.1);
 }
 
 .material-symbols-outlined {
@@ -139,7 +154,7 @@ h6 {
 }
 
 .mat-mdc-text-field-wrapper {
-  border: 1px solid black;
+  border: 1px solid #9A9A9A;
   border-radius: 5px;
 }
 
@@ -163,7 +178,7 @@ input[type="password"],
 input[type="email"],
 input[type="tel"],
 input[type="number"] {
-  border: 1px solid #9a9a9a;
+  border: 1px solid var(--hungr-dark-grey);
   width: 100%;
   height: 38px;
   border-radius: 5px;
@@ -175,7 +190,38 @@ input[type="number"] {
   padding: 12px;
   color: #181818;
   outline: none !important;
+
+  &::placeholder {
+    color:var(--hungr-dark-grey);
+    font-size:14px;
+  }
 }
+
+textarea {
+  border: 1px solid var(--hungr-dark-grey);
+  width: 100%;
+  border-radius: 5px;
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.001em;
+  padding: 12px;
+  color: #181818;
+  outline: none !important;
+
+  &::placeholder {
+    color:var(--hungr-dark-grey);
+    font-size:14px;
+  }
+}
+.error-text {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 0px;
+  font-family: "Poppins", sans-serif;
+}
+
 .mdc-text-field--filled:not(.mdc-text-field--disabled)
   .mdc-line-ripple::before {
   border: none !important;
@@ -215,7 +261,7 @@ input[type="number"] {
 }
 .btnPrimary:hover {
   background: #1b1b3a;
-  color: #16d3d2;
+  color: #fff;
 }
 .btnSecondary {
   color: #181818;
@@ -244,7 +290,7 @@ input[type="number"] {
 
 .btnSecondary:hover {
   background: #181818;
-  color: #16d3d2;
+  color: #fff;
 }
 
 .btnGray {
@@ -273,7 +319,8 @@ input[type="number"] {
 }
 
 .btnGray:hover {
-  background: #c2c2c2;
+  background: #181818;
+  color: #fff;
 }
 
 .btnSecondary:disabled {
@@ -502,11 +549,18 @@ a {
 }
 
 .block {
-  border: 1px solid #ebedee;
+  border: 1px solid var(--hungr-light-grey);
   background-color: white;
   padding: 25px;
-  box-shadow: 0 1px 8px rgba(68, 68, 68, 0.08);
+
   border-radius: 10px;
+
+  &.openTop {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top:none;
+    padding-top:0px;
+  }
 }
 .toggle-container {
   width: 100%;
@@ -544,8 +598,9 @@ mat-select {
   letter-spacing: -0.001em;
 }
 .mat-mdc-select-panel {
-  margin-left: -6px;
+  margin-left: 0px;
   margin-top: 6px;
+
 }
 ::ng-deep .mat-select-panel {
   background-color: transparent !important;
@@ -680,10 +735,37 @@ input[type="submit"]:disabled {
 
 .mdc-text-field--outlined .mat-mdc-form-field-infix,
 .mdc-text-field--no-label .mat-mdc-form-field-infix {
-  padding: 5px 0 !important;
-  height: 38px !important;
+  padding: 0 !important;
+  height: 35px !important;
   min-height: unset;
   justify-content: center;
   align-items: center;
   display: flex !important;
+
+  
 }
+
+.select-arrow-fix {
+  .mat-mdc-select-arrow-wrapper {
+    display: none !important;
+    
+  }
+  &::after {
+    content: '';
+    background-image: url('data:image/svg+xml;charset=utf8,<svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.82043 0.310934L5.94495 4.43546L10.0695 0.310934C10.4841 -0.103645 11.1538 -0.103645 11.5683 0.310934C11.9829 0.725513 11.9829 1.39522 11.5683 1.80979L6.68907 6.68907C6.27449 7.10364 5.60478 7.10364 5.19021 6.68907L0.310934 1.80979C-0.103645 1.39522 -0.103645 0.725513 0.310934 0.310934C0.725513 -0.0930144 1.40585 -0.103645 1.82043 0.310934Z" fill="%23000"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 12px 7px;
+    width: 12px;
+    height: 7px;
+    display: block !important;
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 10;
+  }
+}
+
+

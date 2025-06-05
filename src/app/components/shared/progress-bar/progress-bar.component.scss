@@ -1,3 +1,7 @@
+:host {
+  position: relative;
+}
+
 .progress-main-container {
   border: 1px solid rgba(235, 237, 238, 1);
   background-color: #fff;
@@ -97,6 +101,26 @@
   background-color: #fff;
   position: relative;
   z-index: 5;
+  
+  /* KB - Add clickable styles for completed steps */
+  &.clickable {
+    cursor: pointer;
+    
+    &:hover {
+      transform: scale(1.1);
+      border-color: var(--hungr-tertiary-color);
+      box-shadow: 0 2px 8px rgba(22, 211, 210, 0.3);
+    }
+    
+    &:active {
+      transform: scale(1.05);
+    }
+  }
+  
+  /* KB - Non-clickable steps should have default cursor */
+  &:not(.clickable) {
+    cursor: default;
+  }
 }
 .step-indicator:focus {
   outline: 2px solid #4a90e2;
@@ -104,7 +128,7 @@
 }
 .step-indicator.active {
   background-color: rgba(255, 255, 255, 1);
-  border: 2px solid rgba(22, 211, 210, 1);
+  border: 2px solid var(--hungr-tertiary-color);
   width: 26px;
   height: 26px;
 }
@@ -114,6 +138,8 @@
   align-items: center;
   display: flex;
   flex-direction: row;
+  position: relative;
+  z-index: 10;
 
   width: 100%;
 
@@ -136,9 +162,37 @@
 }
 
 .completed {
-  background-color: #16d3d2;
+  background-color:  var(--hungr-tertiary-color);
   display: flex;
   justify-content: center;
   align-items: center;
-  border-color: #16d3d2;
+  border-color: var(--hungr-tertiary-color);
+}
+
+/* KB - Back button container styles */
+.back-button-container {
+
+  position: absolute;
+  left: 0;
+  top: 2px;
+  z-index: 1000;
+  
+  .backLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #444;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: var(--hungr-tertiary-color);
+    }
+    
+    i {
+      font-size: 18px;
+    }
+  }
 }

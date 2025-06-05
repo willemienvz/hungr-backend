@@ -1,0 +1,29 @@
+/* KB - Step header component styles matching existing menu design */
+.headerRow {
+
+
+  gap: .5rem;
+
+
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  flex-direction: row;
+  display:flex;
+}
+
+.labelStep {
+  color: var(--hungr-tertiary-color);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.description {
+  margin-top: 15px;
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  font-family: var(--hungr-font-family);
+} 

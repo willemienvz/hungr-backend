@@ -1,0 +1,8 @@
+<!-- KB - Step header component template with step number, title and optional description -->
+<div class="row headerRow">
+  <h6 class="labelStep">Step {{ stepNumber }}</h6>
+  <h6>{{ stepTitle }}</h6>
+</div>
+<div *ngIf="showDescription && description" class="description">
+  {{ description }}
+</div> 

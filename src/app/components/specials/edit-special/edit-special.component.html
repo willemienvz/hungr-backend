@@ -3,10 +3,12 @@
   <div *ngIf="currentStep === 1">
     <div class="block rowSpecial">
       <div class="row navRow">
-        <a class="mainLink" routerLink="/specials">
-          <i class="material-symbols-outlined">arrow_back_ios</i>Back
-        </a>
-        <app-progress-bar [progress]="currentStep"></app-progress-bar>
+        <app-progress-bar 
+          [progress]="currentStep" 
+          [backRoute]="'/specials'"
+          [backText]="'Back'"
+          (stepClick)="navigateToStep($event)">
+        </app-progress-bar>
       </div>
       <h6 class="mainTitle">
         <span style="color: #16d3d2">Step 1:</span> Special Basics
@@ -82,10 +84,12 @@
   <div *ngIf="currentStep === 2">
     <div class="block rowSpecial">
       <div class="row navRow">
-        <a class="mainLink" routerLink="/specials">
-          <i class="material-symbols-outlined">arrow_back_ios</i>Back
-        </a>
-        <app-progress-bar [progress]="currentStep"></app-progress-bar>
+        <app-progress-bar 
+          [progress]="currentStep" 
+          [backRoute]="'/specials'"
+          [backText]="'Back'"
+          (stepClick)="navigateToStep($event)">
+        </app-progress-bar>
       </div>
       <h6 class="mainTitle">
         <span style="color: #16d3d2">Step 2:</span> Days and Times
@@ -154,10 +158,12 @@
   <div *ngIf="currentStep === 3">
     <div class="block rowSpecial">
       <div class="row navRow">
-        <a class="mainLink" routerLink="/specials">
-          <i class="material-symbols-outlined">arrow_back_ios</i>Back
-        </a>
-        <app-progress-bar [progress]="currentStep"></app-progress-bar>
+        <app-progress-bar 
+          [progress]="currentStep" 
+          [backRoute]="'/specials'"
+          [backText]="'Back'"
+          (stepClick)="navigateToStep($event)">
+        </app-progress-bar>
       </div>
       <h6 class="mainTitle">
         <span style="color: #16d3d2">Step 3:</span> Special Details
@@ -253,10 +259,12 @@
   <div *ngIf="currentStep === 4">
     <div class="block rowSpecial">
       <div class="row navRow">
-        <a class="mainLink" routerLink="/specials">
-          <i class="material-symbols-outlined">arrow_back_ios</i>Back
-        </a>
-        <app-progress-bar [progress]="currentStep"></app-progress-bar>
+        <app-progress-bar 
+          [progress]="currentStep" 
+          [backRoute]="'/specials'"
+          [backText]="'Back'"
+          (stepClick)="navigateToStep($event)">
+        </app-progress-bar>
       </div>
       <h6 class="mainTitle">Step 4: Add Media</h6>
       <p style="margin-bottom: 30px">

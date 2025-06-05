@@ -1,0 +1,67 @@
+<div class="block openTop">
+  <div class="blockInner">
+    <div class="col uploadBlock" (click)="onBulkUploadClick()">
+      <i class="material-symbols-outlined">upload</i>
+      <div class="innerHold">
+        <h6>Bulk Upload</h6>
+        <p>Upload your spreadsheet to add menu items.</p>
+      </div>
+    </div>
+    <div class="col uploadBlock" (click)="onManualAddClick()">
+      <i class="material-symbols-outlined">edit_note</i>
+      <div class="innerHold">
+        <h6>Manually Add Items</h6>
+        <p>Manually add items individually.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KB - Upload File Modal -->
+<div class="modal" [class.open]="showUploadModal">
+  <div class="modal-content">
+    <span class="close" (click)="closeUploadModal()">&times;</span>
+    <h6>Upload a file</h6>
+    <p>Please upload a file to automatically add your menu items.</p>
+    
+    <div class="upload-options">
+      <div class="upload-option" (click)="fileInput.click()">
+        <i class="material-symbols-outlined">upload</i>
+        <div class="option-content">
+          <h6>Select a file</h6>
+          <p>Short list of acceptable formats.</p>
+        </div>
+      </div>
+      
+      <div class="upload-option" (click)="onDownloadTemplate()">
+        <i class="material-symbols-outlined">download</i>
+        <div class="option-content">
+          <h6>Download Template</h6>
+          <p>Formatted menu template.<br>Easy to update and upload.</p>
+        </div>
+      </div>
+    </div>
+    
+    <input #fileInput type="file" (change)="onFileSelected($event)" accept=".csv,.xlsx,.xls" style="display: none;">
+    
+    <div class="modal-buttons">
+      <button class="btnTertiary" (click)="closeUploadModal()">CANCEL</button>
+      <button class="btnTertiary" (click)="onSaveAsDraft()">SAVE AS DRAFT</button>
+      <button class="btnSecondary" (click)="fileInput.click()">SELECT</button>
+    </div>
+  </div>
+</div>
+
+<!-- KB - Success Modal -->
+<div class="modal" [class.open]="showSuccessModal">
+  <div class="modal-content">
+    <span class="close" (click)="closeSuccessModal()">&times;</span>
+    <h6>File Successfully uploaded</h6>
+    <p>Your menu items have been successfully uploaded.</p>
+    
+    <div class="modal-buttons">
+      <button class="btnTertiary" (click)="closeSuccessModal()">SAVE MENU</button>
+      <button class="btnSecondary" (click)="closeSuccessModal()">VIEW MENU</button>
+    </div>
+  </div>
+</div> 

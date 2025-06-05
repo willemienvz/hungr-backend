@@ -1,0 +1,30 @@
+<div class="step-navigation">
+  <div class="step-buttons">
+    <div class="left-buttons">
+      <button *ngIf="showCancel" class="btnGray" [routerLink]="cancelRoute" [class.disabled]="isDisabled">
+        Cancel
+      </button>
+      <button *ngIf="showDraft" class="btnGray" (click)="onDraft()" [disabled]="isDisabled">
+        Save as Draft
+      </button>
+      <button *ngIf="showPublish" class="btnPrimary" (click)="onPublish()" [disabled]="isDisabled">
+        Save
+      </button>
+      <button *ngIf="showPrevious" class="btn btn-outline" (click)="onPrevious()" [disabled]="isDisabled">
+        <i class="material-icons">chevron_left</i>
+        Previous
+      </button>
+      <button *ngIf="showNext" class="btnPrimary" (click)="onNext()" [disabled]="nextDisabled || isDisabled">
+        {{ nextText }}
+      </button>
+      <a *ngIf="showDone" class="btnPrimary" [routerLink]="cancelRoute" [class.disabled]="isDisabled">
+        Done
+      </a>
+    </div>
+    <div class="right-buttons">
+     
+     
+  
+    </div>
+  </div>
+</div> 

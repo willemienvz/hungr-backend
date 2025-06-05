@@ -1,0 +1,59 @@
+// Styles for step navigation component
+// Most styles are inherited from parent components 
+
+// Import shared menu styles
+@import '../../menus/shared/menu-shared.scss';
+
+// Additional styles specific to step navigation
+.step-navigation {
+  .step-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+
+    .left-buttons,
+    .right-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+  }
+  
+  /* KB - Enhanced loading state for all buttons */
+  .loading,
+  &.loading {
+    .step-buttons {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  }
+  
+  // Loading state
+  .loading {
+    opacity: 0.7;
+    pointer-events: none;
+    
+    .btn {
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        margin: auto;
+        border: 2px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+} 

@@ -1,0 +1,58 @@
+<div class="block step1-container openTop">
+  <div class="col2row">
+    <div class="col">
+      <div class="formGroup" [ngClass]="{ error: menuNameError }">
+        <label>Menu Name</label>
+        <input
+          type="text"
+          class="formControl"
+          placeholder="Name your menu"
+          [ngModel]="menuName"
+          (ngModelChange)="onMenuNameChange($event)"
+          required
+          (change)="onValidateMenuName()"
+        />
+        <div *ngIf="menuNameError" class="error-text">
+          Menu name is required.
+        </div>
+      </div>
+    </div>
+    <div class="col restaurant-col" [ngClass]="{'col-resturant-set': addRestaurantLater}">
+      <div class="formGroup" [ngClass]="{ error: restaurantError }" *ngIf="!addRestaurantLater">
+        <label>Assign Restaurant</label>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-select
+            class="select-arrow-fix"
+            [ngModel]="selectedRestaurant"
+            (ngModelChange)="onSelectedRestaurantChange($event)"
+            (selectionChange)="onValidateRestaurant()"
+        
+          >
+            <mat-option value="" disabled selected hidden>
+              Assign your menu to a restaurant
+            </mat-option>
+            <mat-option
+              *ngFor="let restaurant of restaurants"
+              [value]="restaurant.restaurantID"
+            >
+              {{ restaurant.restaurantName }}
+            </mat-option>
+            <mat-option value="later">
+              Add restaurant later
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div *ngIf="restaurantError" class="error-text">
+          Restaurant selection is required.
+        </div>
+      </div>
+ 
+    </div>
+    <div class="col-resturant-set pLine">
+    <p class="pLinkText" >
+      Need to create a new restaurant?
+      <a class="add-restaurant-link" (click)="onAddRestaurantClick($event)">Click here.</a>
+    </p>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,167 @@
+/* KB: Styles for reusable menu item detail component */
+.details-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--hungr-light-grey);
+
+  .grid {
+    grid-template-columns: 1fr 3fr;
+    display:grid;
+  }
+  
+  .detail-header {
+ 
+    margin-bottom: 1.5rem;
+
+    .header-actions {
+      display:flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    h6 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 601;
+      color: var(--hungr-darker-grey);
+    }
+    
+    .toggle-btn {
+      background: none;
+      border: none;
+      
+      cursor: pointer;
+
+      transition: all 0.2s ease;
+      
+      &:hover {
+        color: var(--hungr-red);
+        opacity:0.8;
+      }
+      
+      i {
+        line-height: 1;
+        font-size: 20px;
+      }
+    }
+  }
+  
+  .detail-content {
+   
+    margin-bottom: 2rem;
+    
+    p {
+      margin: 0 0 15px 0;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    
+    .add-input-group {
+      grid-column: 2;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      .inputBox {
+        width:100%;
+      }
+      input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        width:100%;
+        
+      
+      }
+      
+      button {
+        background-color: #16d3d2;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+        
+        &:hover {
+          background-color: #14b8b7;
+        }
+      }
+    }
+    
+    .item-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex-wrap: wrap;
+      gap: 8px;
+      grid-column: 2;
+      
+      .item-tag {
+       
+        padding: 8px 12px;
+        border-radius: 5px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        transition: all 0.2s ease;
+        font-family: var(--hungr-font-family);
+        border: 1px solid var(--hungr-quinary-color);
+        width:100%;
+        
+     
+        
+        span {
+          color: var(--hungr-darker-grey);
+          font-weight: 300;
+        }
+        
+        .remove-btn {
+          background: none;
+          border: none;
+          color: var(--hungr-darker-grey);
+          cursor: pointer;
+          padding: 2px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          transition: all 0.2s ease;
+          
+          &:hover {
+         
+            color: #a71e2a;
+          }
+          
+          i {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.inputBox {
+    position: relative;
+    label {
+      position: absolute;
+      right: 0;
+      top: 0;
+      font-size:12px;
+      font-weight:300;
+      padding: 0 10px;
+      pointer-events: none;
+      height: 38px;
+      justify-content: center;
+      align-content: center;
+      color:var(--hungr-dark-grey);
+    }
+  }

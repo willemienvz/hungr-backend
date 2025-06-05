@@ -8,6 +8,8 @@ import { Category } from '../../../shared/services/category';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { MenuService, MenuItemInterface } from '../shared/menu.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-edit-menu',
@@ -22,12 +24,14 @@ export class EditMenuComponent implements OnInit {
   menuName: string = '';
   selectedRestaurant: string = '';
   categories: Category[] = [];
-  menuItems: any[] = [];
+  menuItems: MenuItemInterface[] = [];
   restaurants: Restaurant[] = [];
   menuID: string = '';
   currentStep: number = 1;
   newCategoryName: string = '';
   newSubcategoryName: string[] = [];
+  isPopupMenuOpen: boolean[] = [];
+  isAddInputVisible: boolean[] = [];
   newPreparation: string = '';
   newVariation: string = '';
   newPairing: string = '';
@@ -36,13 +40,15 @@ export class EditMenuComponent implements OnInit {
   tempNum: number = 0;
   menuNameError: boolean = false;
   restaurantError: boolean = false;
-
+  addRestaurantLater: boolean = false;
+  uploadFilePopUp: boolean = false;
   constructor(
     private readonly firestore: AngularFirestore,
     private readonly storage: AngularFireStorage,
     private readonly papa: Papa,
     private readonly route: ActivatedRoute,
-    private readonly toastr: ToastrService
+    private readonly toastr: ToastrService,
+    private readonly menuService: MenuService
   ) {}
 
   ngOnInit() {
@@ -52,97 +58,100 @@ export class EditMenuComponent implements OnInit {
     this.loadMenuData();
     this.fetchRestaurants();
   }
+
   addPreparation(itemIndex: number): void {
-    if (this.newPreparation.trim()) {
-      this.menuItems[itemIndex].preparations.push(this.newPreparation.trim());
-      this.newPreparation = '';
-    }
+    
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'preparations', this.newPreparation);
+    this.newPreparation = '';
   }
 
   removePreparation(itemIndex: number, prepIndex: number): void {
-    this.menuItems[itemIndex].preparations.splice(prepIndex, 1);
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'preparations', prepIndex);
   }
 
   addVariation(itemIndex: number): void {
-    if (this.newVariation.trim()) {
-      this.menuItems[itemIndex].variations.push(this.newVariation.trim());
-      this.newVariation = '';
-    }
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'variations', this.newVariation);
+    this.newVariation = '';
   }
 
   removeVariation(itemIndex: number, variationIndex: number): void {
-    this.menuItems[itemIndex].variations.splice(variationIndex, 1);
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'variations', variationIndex);
   }
 
   addPairing(itemIndex: number): void {
-    if (this.newPairing.trim()) {
-      this.menuItems[itemIndex].pairings.push(this.newPairing.trim());
-      this.newPairing = '';
-    }
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'pairings', this.newPairing);
+    this.newPairing = '';
   }
 
   removePairing(itemIndex: number, pairingIndex: number): void {
-    this.menuItems[itemIndex].pairings.splice(pairingIndex, 1);
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'pairings', pairingIndex);
   }
 
   addSide(itemIndex: number): void {
-    if (this.newSide.trim()) {
-      this.menuItems[itemIndex].sides.push(this.newSide.trim());
-      this.newSide = '';
-    }
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'sides', this.newSide);
+    this.newSide = '';
   }
+
   removeSide(itemIndex: number, sideIndex: number): void {
-    this.menuItems[itemIndex].sides.splice(sideIndex, 1);
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'sides', sideIndex);
   }
 
   loadMenuData() {
-    this.firestore
-      .collection('menus')
-      .doc(this.menuID)
-      .valueChanges()
-      .subscribe((menu: any) => {
-        if (menu) {
-          this.menuName = menu.menuName;
-          this.selectedRestaurant = menu.restaurantID;
-          this.categories = menu.categories || [];
-          this.menuItems = menu.items || [];
-          console.log(menu);
-        }
-      });
+    this.menuService.loadMenu(this.menuID).subscribe((menu: any) => {
+      if (menu) {
+        this.menuName = menu.menuName;
+        this.selectedRestaurant = menu.restaurantID;
+        this.categories = menu.categories || [];
+        this.menuItems = menu.items || [];
+        this.addRestaurantLater = menu.addRestaurantLater || false;
+        this.initializeArrays();
+        console.log(menu);
+      }
+    });
   }
+
+  initializeArrays() {
+    this.newSubcategoryName = this.menuService.initializeArrays(this.categories.length);
+    this.isPopupMenuOpen = Array(this.categories.length).fill(false);
+    this.isAddInputVisible = Array(this.categories.length).fill(false);
+  }
+
   getFile(itemIndex: number): void {
     this.tempNum = itemIndex;
     this.fileInput.nativeElement.click();
   }
+
   onPriceInput(event: any, menuItem: any): void {
-    let inputValue = event.target.value;
-    if (!inputValue.startsWith('R ')) {
-      inputValue = 'R ' + inputValue.replace(/^R\s*/, '');
-    }
-    menuItem.price = inputValue;
-    event.target.value = inputValue;
+    const formattedPrice = this.menuService.formatPriceInput(event.target.value);
+    menuItem.price = formattedPrice;
+    event.target.value = formattedPrice;
   }
 
   fetchRestaurants() {
     const user = JSON.parse(localStorage.getItem('user')!);
     const ownerId = user.uid;
-    this.firestore
-      .collection<Restaurant>('restuarants', (ref) =>
-        ref.where('ownerID', '==', ownerId)
-      )
-      .valueChanges()
-      .subscribe((restaurants) => {
-        this.restaurants = restaurants;
-        console.log(restaurants);
-      });
+    this.menuService.fetchRestaurants(ownerId).subscribe((restaurants) => {
+      this.restaurants = restaurants;
+      console.log(restaurants);
+    });
   }
 
   validateMenuName() {
-    this.menuNameError = !this.menuName.trim();
+    this.menuNameError = !this.menuService.validateMenuName(this.menuName);
   }
 
   validateRestaurant() {
-    this.restaurantError = !this.selectedRestaurant.trim();
+    this.restaurantError = !this.addRestaurantLater && !this.menuService.validateRestaurant(this.selectedRestaurant);
+  }
+
+  onAddRestaurantLaterChange(checked: boolean) {
+    this.addRestaurantLater = checked;
+    if (checked) {
+      this.selectedRestaurant = '';
+      this.restaurantError = false;
+    } else {
+      this.validateRestaurant();
+    }
   }
 
   nextStep() {
@@ -155,6 +164,9 @@ export class EditMenuComponent implements OnInit {
     }
     if (this.currentStep < 5) {
       this.currentStep++;
+      if (this.currentStep === 4 && this.menuItems.length === 0) {
+        this.menuItems = this.menuService.addMenuItem(this.menuItems);
+      }
     }
   }
 
@@ -169,20 +181,41 @@ export class EditMenuComponent implements OnInit {
     }
   }
 
+  navigateToStep(step: number): void {
+    if ((step < this.currentStep && step >= 1) || (this.currentStep === 3 && step === 4)) {
+      this.currentStep = step;
+      if (step === 4 && this.menuItems.length === 0) {
+        this.menuItems = this.menuService.addMenuItem(this.menuItems);
+      }
+    }
+  }
+
+  closePopupuploadFile() {
+    this.uploadFilePopUp = false;
+  }
+
+  openPopupuploadFile() {
+    this.uploadFilePopUp = true;
+  }
+
+
+  downloadTemplate() {
+    this.menuService.downloadTemplate();
+  }
+
+
   saveMenu() {
     this.isSaving = true;
 
     const updatedMenu = {
       menuName: this.menuName,
-      restaurantID: this.selectedRestaurant,
+      restaurantID: this.addRestaurantLater ? '' : this.selectedRestaurant,
       categories: this.categories,
       items: this.menuItems,
+      addRestaurantLater: this.addRestaurantLater
     };
-    console.log(updatedMenu);
-    this.firestore
-      .collection('menus')
-      .doc(this.menuID)
-      .update(updatedMenu)
+
+    this.menuService.updateMenu(this.menuID, updatedMenu)
       .then(() => {
         this.isSaving = false;
         console.log('Menu updated successfully!');
@@ -194,112 +227,84 @@ export class EditMenuComponent implements OnInit {
   }
 
   addCategory() {
-    if (this.newCategoryName.trim()) {
-      const newId = this.categories.length
-        ? Math.max(...this.categories.map((cat) => cat.id)) + 1
-        : 1;
-      this.categories.push({
-        id: newId,
-        name: this.newCategoryName,
-        subcategories: [],
-      });
-      this.newCategoryName = '';
-    }
+    this.categories = this.menuService.addCategory(this.categories, this.newCategoryName);
+    this.newCategoryName = '';
+    this.initializeArrays();
   }
 
   addSubCategory(categoryIndex: number) {
-    const subcategories = this.categories[categoryIndex].subcategories || [];
-    if (this.newSubcategoryName[categoryIndex]?.trim()) {
-      const newId = subcategories.length
-        ? Math.max(...subcategories.map((sub) => sub.id)) + 1
-        : 1;
-      subcategories.push({
-        id: newId,
-        name: this.newSubcategoryName[categoryIndex],
-      });
-      this.newSubcategoryName[categoryIndex] = '';
-    }
+    this.categories = this.menuService.addSubCategory(this.categories, categoryIndex, this.newSubcategoryName[categoryIndex]);
+    this.newSubcategoryName[categoryIndex] = '';
   }
 
   deleteCategory(index: number) {
-    this.categories.splice(index, 1);
+    this.categories = this.menuService.deleteCategory(this.categories, index);
+    this.initializeArrays();
   }
 
   deleteSubCategory(categoryIndex: number, subcategoryIndex: number) {
-    this.categories[categoryIndex].subcategories?.splice(subcategoryIndex, 1);
+    this.categories = this.menuService.deleteSubCategory(this.categories, categoryIndex, subcategoryIndex);
+  }
+
+  togglePopupMenu(index: number) {
+    this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
 
   setAsDraft() {
-    this.saveMenu();
-    this.firestore
-      .collection('menus')
-      .doc(this.menuID)
-      .update({ isDraft: true });
-    this.toastr.success('This menu has been drafted');
+    const updatedMenu = {
+      menuName: this.menuName,
+      restaurantID: this.addRestaurantLater ? '' : this.selectedRestaurant,
+      categories: this.categories,
+      items: this.menuItems,
+      isDraft: true,
+      Status: 'draft',
+      addRestaurantLater: this.addRestaurantLater
+    };
+    this.menuService.updateMenu(this.menuID, updatedMenu);
   }
 
   setAsPublished() {
-    this.saveMenu();
-    this.firestore
-      .collection('menus')
-      .doc(this.menuID)
-      .update({ isDraft: false });
-    this.toastr.success('This menu has been published');
+    const updatedMenu = {
+      menuName: this.menuName,
+      restaurantID: this.addRestaurantLater ? '' : this.selectedRestaurant,
+      categories: this.categories,
+      items: this.menuItems,
+      isDraft: false,
+      Status: 'published',
+      addRestaurantLater: this.addRestaurantLater
+    };
+    this.menuService.updateMenu(this.menuID, updatedMenu);
   }
 
   addMenuItem() {
-    this.menuItems.push({
-      itemId: uuidv4(),
-      categoryId: undefined,
-      name: '',
-      description: '',
-      price: '',
-      imageUrl: null,
-      preparations: [],
-      variations: [],
-      pairings: [],
-      sides: [],
-      displayDetails: {
-        preparation: false,
-        variation: false,
-        pairing: false,
-        side: false,
-      },
-    });
+    this.menuItems = this.menuService.addMenuItem(this.menuItems);
   }
 
   removeMenuItem(index: number) {
-    this.menuItems.splice(index, 1);
+    this.menuItems = this.menuService.removeMenuItem(this.menuItems, index);
   }
 
   toggleDetail(
     detailType: 'preparation' | 'variation' | 'pairing' | 'side',
     itemIndex: number
   ) {
-    this.menuItems[itemIndex].displayDetails[detailType] =
-      !this.menuItems[itemIndex].displayDetails[detailType];
+    this.menuItems = this.menuService.toggleDetail(this.menuItems, detailType, itemIndex);
   }
 
   onFileSelected(event: Event, itemIndex: number): void {
-    this.isSaving = true;
-    const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files[0]) {
-      const file = fileInput.files[0];
-      const filePath = `menu-images/${Date.now()}_${file.name}`;
-      const fileRef = this.storage.ref(filePath);
-      const task = this.storage.upload(filePath, file);
-
-      task
-        .snapshotChanges()
-        .pipe(
-          finalize(() => {
-            fileRef.getDownloadURL().subscribe((url) => {
-              this.menuItems[this.tempNum].imageUrl = url;
-              this.isSaving = false;
-            });
-          })
-        )
-        .subscribe();
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      this.menuService.uploadMenuItemImage(file).then(url => {
+        this.menuItems = this.menuService.updateMenuItemImage(this.menuItems, itemIndex, url);
+      }).catch(error => {
+        console.error('Error uploading image:', error);
+        this.toastr.error('Error uploading image');
+      });
     }
+  }
+
+  onMenuItemDrop(event: CdkDragDrop<MenuItemInterface[]>) {
+    moveItemInArray(this.menuItems, event.previousIndex, event.currentIndex);
   }
 }

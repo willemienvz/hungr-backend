@@ -1,3 +1,10 @@
+<!-- KB - Add back button at the top if showBackButton is true -->
+<div *ngIf="showBackButton" class="back-button-container">
+  <a class="backLink" (click)="onBackButtonClick()" style="cursor: pointer;">
+    <i class="material-icons">arrow_back</i> {{ backText }}
+  </a>
+</div>
+
 <div class="row">
   <div class="inner">
     <div
@@ -5,11 +12,16 @@
       tabindex="0"
       [class.completed]="progress > 1"
       [class.active]="progress === 1"
+      [class.clickable]="isStepClickable(1)"
+      (click)="onStepClick(1)"
+      (keydown.enter)="onStepClick(1)"
+      (keydown.space)="onStepClick(1)"
       role="progressbar"
       aria-valuenow="1"
       aria-valuemin="1"
       aria-valuemax="4"
       aria-label="Step 1 of 4"
+      [attr.aria-disabled]="!isStepClickable(1)"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -29,11 +41,16 @@
       tabindex="0"
       [class.completed]="progress > 2"
       [class.active]="progress === 2"
+      [class.clickable]="isStepClickable(2)"
+      (click)="onStepClick(2)"
+      (keydown.enter)="onStepClick(2)"
+      (keydown.space)="onStepClick(2)"
       role="progressbar"
       aria-valuenow="2"
       aria-valuemin="1"
       aria-valuemax="4"
       aria-label="Step 2 of 4"
+      [attr.aria-disabled]="!isStepClickable(2)"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -53,11 +70,16 @@
       tabindex="0"
       [class.completed]="progress > 3"
       [class.active]="progress === 3"
+      [class.clickable]="isStepClickable(3)"
+      (click)="onStepClick(3)"
+      (keydown.enter)="onStepClick(3)"
+      (keydown.space)="onStepClick(3)"
       role="progressbar"
       aria-valuenow="3"
       aria-valuemin="1"
       aria-valuemax="4"
       aria-label="Step 3 of 4"
+      [attr.aria-disabled]="!isStepClickable(3)"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -77,11 +99,16 @@
       tabindex="0"
       [class.completed]="progress > 4"
       [class.active]="progress === 4"
+      [class.clickable]="isStepClickable(4)"
+      (click)="onStepClick(4)"
+      (keydown.enter)="onStepClick(4)"
+      (keydown.space)="onStepClick(4)"
       role="progressbar"
       aria-valuenow="4"
       aria-valuemin="1"
       aria-valuemax="4"
       aria-label="Step 4 of 4"
+      [attr.aria-disabled]="!isStepClickable(4)"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
