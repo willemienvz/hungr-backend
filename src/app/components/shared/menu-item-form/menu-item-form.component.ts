@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { MenuItemInterface, MenuService } from '../../menus/shared/menu.service';
 import { Category } from '../../../shared/services/category';
 import { DetailConfig } from '../menu-item-detail/menu-item-detail.component';
@@ -10,7 +10,7 @@ type DetailType = 'preparation' | 'variation' | 'pairing' | 'side';
   templateUrl: './menu-item-form.component.html',
   styleUrls: ['./menu-item-form.component.scss']
 })
-export class MenuItemFormComponent {
+export class MenuItemFormComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
   
   @Input() menuItem!: MenuItemInterface;
@@ -43,7 +43,7 @@ export class MenuItemFormComponent {
   isUploadingImage = false;
 
   /* KB: Add collapsed state for collapsible form functionality */
-  isCollapsed = false;
+  isCollapsed = true;
 
   /* KB: Define configurations for each detail type to use with the reusable component */
   preparationConfig: DetailConfig = {
@@ -74,6 +74,17 @@ export class MenuItemFormComponent {
   };
 
   constructor(private menuService: MenuService) {}
+
+  ngOnInit() {
+    // Set collapsed state based on whether this is a new/empty menu item
+    // New items created by createMenuItem() have: name='', description='', price='R ', imageUrl=null
+    const isNewItem = !this.menuItem.name && 
+                     !this.menuItem.description && 
+                     (this.menuItem.price === 'R ' || !this.menuItem.price) && 
+                     !this.menuItem.imageUrl;
+    
+    this.isCollapsed = !isNewItem;
+  }
 
   /* KB: Toggle collapsed state to show/hide form content */
   toggleCollapsed() {

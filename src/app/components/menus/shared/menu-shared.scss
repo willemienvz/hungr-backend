@@ -409,11 +409,13 @@ mat-form-field {
   display:flex;
   justify-content: center;
   margin: 10px 0 10px;
+
+  &.fixed {
   position: fixed;
   z-index: 10000;
   bottom: 10px;
   right: 20px;
-}
+}}
 
 .inputBox {
   position: relative;
