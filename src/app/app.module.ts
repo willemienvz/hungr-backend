@@ -44,6 +44,7 @@ import { AddQrComponent } from './components/qr-codes/add-qr/add-qr.component';
 import { QRCodeModule } from 'angularx-qrcode';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SummaryComponent } from './components/restaurant/summary/summary.component';
 import { AddComponent } from './components/restaurant/add/add.component';
@@ -96,6 +97,9 @@ import { SvgIconComponent } from './components/shared/svg-icon/svg-icon.componen
 import { MenuItemSelectionComponent } from './components/shared/menu-item-selection/menu-item-selection.component';
 import { StepHeaderComponent } from './components/shared/step-header/step-header.component';
 import { MenuItemDetailComponent } from './components/shared/menu-item-detail/menu-item-detail.component';
+import { MenuItemPairingComponent } from './components/shared/menu-item-pairing/menu-item-pairing.component';
+import { ImageUploadModalComponent } from './components/shared/image-upload-modal/image-upload-modal.component';
+import { MenuCompletionSuccessComponent } from './components/shared/menu-completion-success/menu-completion-success.component';
 
 @NgModule({
   declarations: [
@@ -166,6 +170,9 @@ import { MenuItemDetailComponent } from './components/shared/menu-item-detail/me
     MenuItemSelectionComponent,
     StepHeaderComponent,
     MenuItemDetailComponent,
+    MenuItemPairingComponent,
+    ImageUploadModalComponent,
+    MenuCompletionSuccessComponent,
   ],
   imports: [
     BrowserModule,
@@ -184,6 +191,7 @@ import { MenuItemDetailComponent } from './components/shared/menu-item-detail/me
     MatSelectModule,
     MatInputModule,
     MatFormFieldModule,
+    MatAutocompleteModule,
     BrowserAnimationsModule,
     MatRadioModule,
     AngularFireStorageModule,

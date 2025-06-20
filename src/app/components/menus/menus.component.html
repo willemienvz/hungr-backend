@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row">
         <h6 class="heading">Add a new menu</h6>
-        <a class="btnSecondary" routerLink="/menus/add-menu">+ add new menu</a>
+        <a class="btnSecondary" routerLink="/menus/add-menu/1">+ add new menu</a>
       </div>
     </div>
   </div>
@@ -39,7 +39,7 @@
               </div>
             </td>
             <td style="text-align: right" class="actionCol">
-              <a [routerLink]="['/menus/edit-menu', menu.menuID]">
+              <a [routerLink]="['/menus/edit-menu', menu.menuID, 1]">
                 <i class="material-icons">edit</i>
               </a>
               <a (click)="deleteMenu(menu.menuID)">
@@ -70,7 +70,7 @@
             <td>{{ menu.location }}</td>
             <td>Draft</td>
             <td style="text-align: right" class="actionCol">
-              <a [routerLink]="['/menus/edit-menu', menu.menuID]">
+              <a [routerLink]="['/menus/edit-menu', menu.menuID, 1]">
                 <i class="material-icons">edit</i>
               </a>
               <a (click)="deleteMenu(menu.menuID)">

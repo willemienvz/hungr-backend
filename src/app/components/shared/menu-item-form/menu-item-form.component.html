@@ -2,10 +2,10 @@
   <div class="menuItemBlock" [class.collapsed]="isCollapsed">
 
     <!-- KB: Collapsed header view showing only name, chevron, and delete button -->
-    <div *ngIf="isCollapsed" class="collapsed-header">
+    <div *ngIf="isCollapsed" class="collapsed-header" (click)="toggleCollapsed()">
       <!-- KB: Add drag handle for collapsed view -->
        <div class="itemTitle">
-      <div class="drag-handle" cdkDragHandle>
+      <div class="drag-handle" cdkDragHandle (click)="$event.stopPropagation()">
         <i class="material-icons">drag_indicator</i>
       </div>
       <div class="item-name">
@@ -16,7 +16,7 @@
         <button type="button" class="chevron-btn" (click)="toggleCollapsed()">
           <i class="material-icons">expand_more</i>
         </button>
-        <button type="button" class="delete-btn" (click)="onRemoveMenuItem()">
+        <button type="button" class="delete-btn" (click)="onRemoveMenuItem(); $event.stopPropagation()">
           <app-svg-icon 
           iconName="delete" 
           class="dltIcon" 
@@ -124,6 +124,7 @@
               class="smallerInput"
               [ngModelOptions]="{ standalone: true }"
               (input)="onPriceInput($event)"
+              (keypress)="onPriceKeypress($event)"
             />
           </div>
         </div>
@@ -134,18 +135,45 @@
               <i class="material-symbols-outlined">{{ isUploadingImage ? 'hourglass_empty' : 'upload' }}</i>
               <p>{{ isUploadingImage ? 'Uploading...' : 'Add Image' }}</p>
             </div>
-            <div style="height: 0px; width: 0px; overflow: hidden">
-              <input
-                id="upfile"
-                type="file"
-                #fileInput
-                (change)="onFileSelected($event)"
-                accept="image/*"
-              />
-            </div>
+
           </div>
         </div>
 
+        <div class="col add_tag_col">
+
+          <div class="fieldHolder">
+            <label>Add Label</label>
+          <!-- KB: Optional description text, only shown if provided in config -->
+          
+          <div class="add-input-group">
+      
+              <div class="inputBox">
+                  <input
+                  [placeholder]="'New Label'"
+                  type="text"
+                  [ngModel]="newLabel"
+                  (ngModelChange)="onNewLabelChange($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  (keyup.enter)="onAddLabel()"
+                  />
+                  <label>press enter to add</label>
+                </div>
+           
+      
+          </div>
+          <div class="detail-label-add">
+            <div
+              class="item-tag"
+             *ngFor="let label of menuItem.labels; let i = index" 
+            >
+              <span>{{ label }}</span>
+              <button type="button" class="remove-btn" (click)="onRemoveLabel(i)">
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+          </div>
+        </div> 
+      </div> 
 
         <div class="col fifth">
           <div class="fieldHolder">
@@ -160,12 +188,27 @@
         </div>
         <div class="col sixth">
           <div class="fieldHolder">
-            <div *ngIf="menuItem.imageUrl" class="image-preview">
+            <div *ngIf="menuItem.imageUrls && menuItem.imageUrls.length > 0" class="images-container">
+              <div *ngFor="let imageUrl of menuItem.imageUrls; let i = index" class="image-preview-item">
+                <img [src]="imageUrl" alt="Menu item image" />
+                <button 
+                  type="button" 
+                  class="remove-btn" 
+                  (click)="onRemoveImage(i)"
+                  [disabled]="isUploadingImage"
+                  [title]="isUploadingImage ? 'Processing...' : 'Remove image'"
+                >
+                  <i class="material-icons">{{ isUploadingImage ? 'hourglass_empty' : 'close' }}</i>
+                </button>
+              </div>
+            </div>
+            <!-- Backward compatibility: show single image if imageUrls doesn't exist but imageUrl does -->
+            <div *ngIf="(!menuItem.imageUrls || menuItem.imageUrls.length === 0) && menuItem.imageUrl" class="image-preview">
               <img [src]="menuItem.imageUrl" alt="Uploaded image" />
               <button 
                 type="button" 
                 class="remove-btn" 
-                (click)="onRemoveImage()"
+                (click)="onRemoveImage(0)"
                 [disabled]="isUploadingImage"
                 [title]="isUploadingImage ? 'Processing...' : 'Remove image'"
               >
@@ -200,17 +243,16 @@
         (newItemValueChange)="onNewVariationChange($event)">
       </app-menu-item-detail>
 
-      <!-- KB: Use reusable detail component for pairing -->
-      <app-menu-item-detail
+      <!-- KB: Use specialized menu item pairing component -->
+      <app-menu-item-pairing
         *ngIf="menuItem.displayDetails.pairing"
-        [config]="pairingConfig"
-        [items]="menuItem.pairings"
-        [newItemValue]="newPairing"
+        [availableMenuItems]="availableMenuItems"
+        [selectedPairingIds]="menuItem.pairingIds || []"
+        [currentMenuItemId]="menuItem.itemId"
         (closeDetail)="onToggleDetail('pairing')"
-        (addItem)="onAddPairing()"
-        (removeItem)="onRemovePairing($event)"
-        (newItemValueChange)="onNewPairingChange($event)">
-      </app-menu-item-detail>
+        (addPairing)="onAddMenuItemPairing($event)"
+        (removePairing)="onRemoveMenuItemPairing($event)">
+      </app-menu-item-pairing>
 
       <!-- KB: Use reusable detail component for side -->
       <app-menu-item-detail

@@ -123,7 +123,7 @@ export class AddComponent implements OnInit {
     if (result) {
       try {
         await this.addRestaurant(); // Save restaurant first
-        this.router.navigate(['/menus/add-menu']); // Then navigate
+        this.router.navigate(['/menus/add-menu', 1]); // Then navigate
       } catch (err) {
         // Do nothing on failure
       }

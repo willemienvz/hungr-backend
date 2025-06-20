@@ -82,9 +82,12 @@
       </app-step-header>
     </div>
     <app-menu-item-selection
+      [existingMenuItems]="menuItems"
+      [categories]="categories"
       (bulkUploadClick)="openPopupuploadFile()"
-      (manualAddClick)="addMenuItem()"
+      (manualAddClick)="navigateToStep(4)"
       (stepClick)="navigateToStep($event)"
+      (menuItemsUploaded)="onMenuItemsUploaded($event)"
     ></app-menu-item-selection>
 
   </div>
@@ -126,10 +129,12 @@
           [menuItem]="menuItem"
           [itemIndex]="itemIndex"
           [categories]="categories"
+          [availableMenuItems]="menuItems"
           [newPreparation]="newPreparation"
           [newVariation]="newVariation"
           [newPairing]="newPairing"
           [newSide]="newSide"
+          [newLabel]="newLabel"
           (removeMenuItem)="removeMenuItem($event)"
           (toggleDetail)="toggleDetail($event.detailType, $event.itemIndex)"
           (addPreparation)="addPreparation($event)"
@@ -138,8 +143,12 @@
           (removeVariation)="removeVariation($event.itemIndex, $event.variationIndex)"
           (addPairing)="addPairing($event)"
           (removePairing)="removePairing($event.itemIndex, $event.pairingIndex)"
+          (addMenuItemPairing)="addMenuItemPairing($event)"
+          (removeMenuItemPairing)="removeMenuItemPairing($event)"
           (addSide)="addSide($event)"
           (removeSide)="removeSide($event.itemIndex, $event.sideIndex)"
+          (addLabel)="addLabel($event)"
+          (removeLabel)="removeLabel($event.itemIndex, $event.labelIndex)"
           (fileSelected)="onFileSelected($event.event, $event.itemIndex)"
           (priceInput)="onPriceInput($event.event, $event.menuItem)"
           (getFile)="getFile($event)"
@@ -147,6 +156,7 @@
           (newVariationChange)="newVariation = $event"
           (newPairingChange)="newPairing = $event"
           (newSideChange)="newSide = $event"
+          (newLabelChange)="newLabel = $event"
         ></app-menu-item-form>
       </div>
     </div>
@@ -161,42 +171,15 @@
   </div>
 
   <div *ngIf="currentStep === 5">
-    <div class="block lastStep">
-      <app-progress-bar 
-        [progress]="4" 
-        [backRoute]="'/menus'"
-        [allowStepNavigation]="false">
-      </app-progress-bar>
-      
-      <h6 style="color: #16d3d2; text-align: center">
-        Your menu has been saved!
-      </h6>
-      <h6>Next Steps</h6>
-      <p>
-        Now that your menu has been set up, you can generate a QR code that will
-        enable your patrons to access your menu.
-      </p>
-      <div class="qrblock">
-        <p>Generate a QR code for this menu</p>
-        <a class="btnSecondary" routerLink="/qr-codes">Generate QR Code</a>
-      </div>
-      <p>
-        <a routerLink="/settings/branding">Click here</a> to edit the appearance
-        of your menus.
-      </p>
-      <label
-        >If you don't want to publish you menu right now, you can save and
-        continue at a later stage.</label
-      >
-    </div>
-    
-    <app-step-navigation
-      [showCancel]="true"
-      [showNext]="false"
-      [showDraft]="true"
-      [showDone]="true"
+    <app-menu-completion-success
+      [backRoute]="'/menus'"
+      [menuId]="currentMenuID"
       [isSaving]="isSaving"
-    ></app-step-navigation>
+      [showSaveDraft]="true"
+      [showPublishMenu]="true"
+      (saveAsDraft)="setAsDraft()"
+      (publishMenu)="setAsPublished()"
+    ></app-menu-completion-success>
   </div>
 </div>
 

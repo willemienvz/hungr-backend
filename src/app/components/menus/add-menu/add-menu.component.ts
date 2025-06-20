@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { BehaviorSubject } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { MenuService, MenuItemInterface } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -32,6 +32,8 @@ export class AddMenuComponent implements OnInit {
   restaurantDescription: string = '';
   setAsDraftSaved: boolean = false;
   newLabel: string = '';
+  private doneSaveSubject = new BehaviorSubject<boolean>(false);
+  doneSave$ = this.doneSaveSubject.asObservable();
   menuItems: MenuItemInterface[] = [];
   uploadFilePopUp = false;
   draggedOver = false;
@@ -39,8 +41,6 @@ export class AddMenuComponent implements OnInit {
   newPreparation: string = '';
   newVariation: string = '';
   newPairing: string = '';
-  private doneSaveSubject = new BehaviorSubject<boolean>(false);
-  doneSave$ = this.doneSaveSubject.asObservable();
   newSide: string = '';
   categories: Category[] = [];
   restaurants: Restaurant[] = [];
@@ -85,6 +85,7 @@ export class AddMenuComponent implements OnInit {
     private toastr: ToastrService,
     private dialog: MatDialog,
     private router: Router,
+    private route: ActivatedRoute,
     private menuService: MenuService
   ) {}
 
@@ -97,6 +98,24 @@ export class AddMenuComponent implements OnInit {
     this.doneSave$.subscribe((value) => {
       if (value) {
         this.handleDoneSaveChange();
+      }
+    });
+
+    // Read step from route parameter
+    this.route.params.subscribe((params) => {
+      const step = params['step'];
+      if (step) {
+        const stepNumber = parseInt(step, 10);
+        if (stepNumber >= 1 && stepNumber <= 5) {
+          this.currentStep = stepNumber;
+        } else {
+          // Invalid step, redirect to step 1
+          this.router.navigate(['/menus/add-menu/1'], { replaceUrl: true });
+        }
+      } else {
+        // No step specified, default to step 1
+        this.currentStep = 1;
+        this.router.navigate(['/menus/add-menu/1'], { replaceUrl: true });
       }
     });
   }
@@ -162,11 +181,13 @@ export class AddMenuComponent implements OnInit {
         description: item.description,
         price: item.price,
         imageUrl: null,
+        imageUrls: [],
         preparations: item.preparations ? item.preparations.split('|') : [],
         variations: item.variations ? item.variations.split('|') : [],
         pairings: item.pairings ? item.pairings.split('|') : [],
+        pairingIds: [],
         sides: item.sides ? item.sides.split('|') : [],
-        labels: item.labels || '',
+        labels: item.labels ? item.labels.split('|') : [],
         showLabelInput: false,
         displayDetails: {
           preparation: false,
@@ -194,7 +215,7 @@ export class AddMenuComponent implements OnInit {
   }
 
   goToStep(step: number) {
-    this.currentStep = step;
+    this.router.navigate(['/menus/add-menu', step]);
   }
 
   isValid(): boolean {
@@ -291,7 +312,7 @@ export class AddMenuComponent implements OnInit {
   }
 
   deleteLabel(itemIndex: number, labelIndex: number) {
-    this.menuItems[itemIndex].labels = '';
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'labels', labelIndex);
   }
 
   addMenuItem(): void {
@@ -332,6 +353,14 @@ export class AddMenuComponent implements OnInit {
 
   removePairing(itemIndex: number, pairingIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'pairings', pairingIndex);
+  }
+
+  addMenuItemPairing(data: {itemIndex: number, pairingId: string}): void {
+    this.menuItems = this.menuService.addMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
+  }
+
+  removeMenuItemPairing(data: {itemIndex: number, pairingId: string}): void {
+    this.menuItems = this.menuService.removeMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
   }
 
   addSide(itemIndex: number): void {
@@ -398,7 +427,7 @@ export class AddMenuComponent implements OnInit {
   }
 
   private handleDoneSaveChange() {
-    this.currentStep = 5;
+    this.router.navigate(['/menus/add-menu', 5]);
   }
 
   toggleLabelInput(itemIndex: number): void {
@@ -406,11 +435,12 @@ export class AddMenuComponent implements OnInit {
   }
 
   addLabel(itemIndex: number): void {
-    if (this.newLabel.trim()) {
-      this.menuItems[itemIndex].labels = this.newLabel.trim();
-      this.newLabel = '';
-      this.toggleLabelInput(itemIndex);
-    }
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'labels', this.newLabel);
+    this.newLabel = '';
+  }
+
+  removeLabel(itemIndex: number, labelIndex: number): void {
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'labels', labelIndex);
   }
 
   setAsDraft() {
@@ -459,10 +489,10 @@ export class AddMenuComponent implements OnInit {
     }
     
     if (this.currentStep === 3) {
-      this.currentStep = 4;
       if (this.menuItems.length === 0) {
         this.menuItems = this.menuService.addMenuItem(this.menuItems);
       }
+      this.router.navigate(['/menus/add-menu', 4]);
       return;
     }
     
@@ -472,22 +502,22 @@ export class AddMenuComponent implements OnInit {
     }
     
     if (this.currentStep < 5) {
-      this.currentStep++;
+      this.router.navigate(['/menus/add-menu', this.currentStep + 1]);
     }
   }
 
   previousStep() {
     if (this.currentStep > 1) {
-      this.currentStep--;
+      this.router.navigate(['/menus/add-menu', this.currentStep - 1]);
     }
   }
 
   navigateToStep(step: number): void {
-    if (step < this.currentStep && step >= 1) {
-      this.currentStep = step;
+    if ((step < this.currentStep && step >= 1) || step === 4) {
       if (step === 4 && this.menuItems.length === 0) {
         this.menuItems = this.menuService.addMenuItem(this.menuItems);
       }
+      this.router.navigate(['/menus/add-menu', step]);
     }
   }
 
@@ -497,5 +527,25 @@ export class AddMenuComponent implements OnInit {
 
   onMenuItemDrop(event: CdkDragDrop<MenuItemInterface[]>) {
     moveItemInArray(this.menuItems, event.previousIndex, event.currentIndex);
+  }
+
+  /* KB - Handle bulk uploaded menu items */
+  onMenuItemsUploaded(event: {items: MenuItemInterface[], replaceExisting: boolean}) {
+    if (event.replaceExisting) {
+      // Replace all existing items
+      this.menuItems = [...event.items];
+    } else {
+      // Append to existing items
+      this.menuItems = [...this.menuItems, ...event.items];
+    }
+    
+    // Navigate to the menu items step to show the uploaded items
+    this.router.navigate(['/menus/add-menu', 4]);
+    
+    this.toastr.success(`${event.items.length} menu items ${event.replaceExisting ? 'replaced' : 'added'} successfully!`);
+  }
+
+  setAsPublished() {
+    this.saveMenu();
   }
 }

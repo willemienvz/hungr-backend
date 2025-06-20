@@ -1,0 +1,124 @@
+<div class="image-upload-modal" (click)="$event.stopPropagation()">
+  <!-- Header -->
+  <div class="modal-header">
+    <h6>{{ config.title }}</h6>
+    <button type="button" class="close" (click)="onCancel()">
+        <i class="material-icons">close</i>
+      </button>
+    <!-- <span class="close" (click)="onCancel()">&times;</span> -->
+  </div>
+
+  <!-- Upload Info -->
+  <div class="upload-info">
+    <div class="info-row">
+      <span class="info-label">File formats:</span>
+      <span class="info-value">{{ formatString }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Size:</span>
+      <span class="info-value">{{ config.dimensions }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Max file size:</span>
+      <span class="info-value">{{ config.maxFileSize }}kb</span>
+    </div>
+  </div>
+
+  <!-- Upload Area -->
+  <div class="upload-area"
+       [class.drag-over]="isDragOver"
+       [class.has-images]="hasImages"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave($event)"
+       (drop)="onDrop($event)">
+    
+    <!-- Image Previews Grid -->
+    <div *ngIf="hasImages" class="images-grid">
+      <div *ngFor="let image of allImages" class="image-preview-item">
+        <img [src]="image.url" alt="Preview" />
+        <button type="button" 
+                class="remove-image-btn" 
+                (click)="onRemoveImage(image.index)"
+                title="Remove image">
+          <i class="material-icons">close</i>
+        </button>
+        <div *ngIf="image.isNew" class="new-image-badge">New</div>
+      </div>
+      
+      <!-- Add More Button (only if not at max limit) -->
+      <div *ngIf="!config.maxFiles || allImages.length < config.maxFiles" 
+           class="add-more-item"
+           (click)="onUploadMedia()">
+        <i class="material-symbols-outlined">add</i>
+        <p>Add Image</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!hasImages && !isDragOver" class="empty-state">
+      <div class="upload-placeholder">
+        <div class="placeholder-content">
+          <i class="material-symbols-outlined upload-icon">upload</i>
+          <p class="upload-text">Drag and drop your images here</p>
+          <p class="upload-subtext">or click upload media below</p>
+            <button *ngIf="!hasImages" type="button" 
+                class="upload-media-btn btnPrimary"
+                (click)="onUploadMedia()"
+                [disabled]="isUploading || (config.maxFiles && allImages.length >= config.maxFiles)">
+            <i class="material-symbols-outlined">{{ isUploading ? 'hourglass_empty' : 'add' }}</i>
+            {{ isUploading ? 'Processing...' : 'UPLOAD MEDIA' }}
+            </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drag Overlay -->
+    <div *ngIf="isDragOver && !hasImages" class="drag-overlay">
+      <div class="drag-content">
+        <i class="material-symbols-outlined">cloud_upload</i>
+        <p>Drop your images here</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="material-icons">error</i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Upload Button -->
+  <div class="upload-button-container">
+   
+    <!--
+    <button *ngIf="hasImages" 
+            type="button" 
+            class="clear-all-btn"
+            (click)="onRemoveAllImages()"
+            [disabled]="isUploading">
+      <i class="material-symbols-outlined">clear_all</i>
+      CLEAR ALL
+    </button> -->
+  </div>
+
+  <!-- Hidden File Input -->
+  <input type="file"
+         #fileInput
+         style="display: none"
+         (change)="onFileSelected($event)"
+         [accept]="config.allowedMimeTypes?.join(',')"
+         [multiple]="config.allowMultiple" />
+
+  <!-- Action Buttons -->
+  <div class="modal-buttons">
+    <button type="button" class="btnTertiary" (click)="onCancel()">
+      CANCEL
+    </button>
+    <button type="button" 
+            class="btnSecondary" 
+            (click)="onSave()"
+            [disabled]="isUploading">
+      SAVE
+    </button>
+  </div>
+</div> 

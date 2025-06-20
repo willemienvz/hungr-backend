@@ -1,0 +1,261 @@
+.completion-container {
+  max-width: 100%;
+  margin: 0 auto;
+
+}
+
+.completion-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex:1;
+}
+
+.white-box {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+
+    border: 1px solid var(--hungr-light-grey);
+}
+
+// Success Header Block
+.success-header-block {
+    position:relative;
+
+    .back-button-container {
+
+        position: absolute;
+        left: 10px;
+        top: 20px;
+        z-index: 1000;
+        
+        .backLink {
+            background:transparent;
+            border:none;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #444;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+          transition: color 0.3s ease;
+          
+          &:hover {
+            color: var(--hungr-tertiary-color);
+          }
+          
+          i {
+            font-size: 18px;
+          }
+        }
+      }
+      
+
+  .success-message {
+    h6 {
+      color: #16d3d2;
+      text-align: center;
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      font-family: var(--hungr-font-family);
+    }
+  }
+}
+
+// Next Steps Block
+.next-steps-block {
+  h6 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    font-family: var(--hungr-font-family);
+  }
+
+  flex:1;
+
+  > p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    font-family: var(--hungr-font-family);
+  }
+
+  .qr-block {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    p {
+      font-size: 14px;
+      color: #333;
+    
+      font-weight: 500;
+      font-family: var(--hungr-font-family);
+    }
+
+    
+  }
+
+  > p {
+    a {
+      color: #16d3d2;
+      text-decoration: underline;
+      font-size: 14px;
+      font-family: var(--hungr-font-family);
+
+      &:hover {
+        color: #14b8b7;
+      }
+    }
+  }
+
+  label {
+    font-size: 12px;
+    color: #999;
+    font-style: italic;
+    display: block;
+    margin-top: 15px;
+    font-family: var(--hungr-font-family);
+  }
+}
+
+// Right Column - Preview
+.right-column {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.preview-section {
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  h6 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    font-family: var(--hungr-font-family);
+  }
+}
+
+.phone-mockup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  flex:1;
+}
+
+.phone-frame {
+  width: 300px;
+  height: 600px;
+  background: #000;
+  border-radius: 30px;
+  padding: 8px;
+  
+  position: relative;
+
+  // Notch
+  &::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 25px;
+    background: #000;
+    border-radius: 15px;
+    z-index: 2;
+  }
+
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    background: #f8f8f8;
+    border-radius: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+// Bottom Navigation
+.bottom-navigation {
+  width: 100%;
+  margin-top: 20px;
+
+  display: flex;
+  align-items:center;
+  justify-content: center;
+
+  ::ng-deep .step-navigation {
+    .step-buttons {
+        margin-top:0 !important;
+        padding-top:0 !important;
+      .left-buttons {
+        display: flex;
+        align-items:center;
+        justify-content: center;
+        gap: 20px;
+        
+        .btnGray, .btnPrimary {
+          min-width: 150px;
+          padding: 12px 24px;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .completion-container {
+    padding: 15px;
+  }
+
+  .completion-content {
+    gap: 20px;
+  }
+
+  .left-column {
+    gap: 20px;
+  }
+
+  .success-header-block,
+  .next-steps-block .qr-block {
+    padding: 15px;
+  }
+
+  .phone-frame {
+    width: 250px;
+    height: 500px;
+  }
+} 

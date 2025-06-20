@@ -6,7 +6,7 @@ import { Papa } from 'ngx-papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { Category } from '../../../shared/services/category';
 import { Restaurant } from '../../../shared/services/restaurant';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { MenuService, MenuItemInterface } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -36,17 +36,24 @@ export class EditMenuComponent implements OnInit {
   newVariation: string = '';
   newPairing: string = '';
   newSide: string = '';
+  newLabel: string = '';
   isSaving: boolean = false;
   tempNum: number = 0;
   menuNameError: boolean = false;
   restaurantError: boolean = false;
   addRestaurantLater: boolean = false;
   uploadFilePopUp: boolean = false;
+  
+  // Filter properties
+  selectedCategoryFilter: number | null = null;
+  searchTerm: string = '';
+  filteredMenuItems: MenuItemInterface[] = [];
   constructor(
     private readonly firestore: AngularFirestore,
     private readonly storage: AngularFireStorage,
     private readonly papa: Papa,
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly toastr: ToastrService,
     private readonly menuService: MenuService
   ) {}
@@ -54,6 +61,22 @@ export class EditMenuComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe((params) => {
       this.menuID = params['menuID'];
+      
+      // Read step from route parameter
+      const step = params['step'];
+      if (step) {
+        const stepNumber = parseInt(step, 10);
+        if (stepNumber >= 1 && stepNumber <= 5) {
+          this.currentStep = stepNumber;
+        } else {
+          // Invalid step, redirect to step 1
+          this.router.navigate(['/menus/edit-menu', this.menuID, 1], { replaceUrl: true });
+        }
+      } else {
+        // No step specified, default to step 1
+        this.currentStep = 1;
+        this.router.navigate(['/menus/edit-menu', this.menuID, 1], { replaceUrl: true });
+      }
     });
     this.loadMenuData();
     this.fetchRestaurants();
@@ -87,13 +110,30 @@ export class EditMenuComponent implements OnInit {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'pairings', pairingIndex);
   }
 
+  addMenuItemPairing(data: {itemIndex: number, pairingId: string}): void {
+    this.menuItems = this.menuService.addMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
+  }
+
+  removeMenuItemPairing(data: {itemIndex: number, pairingId: string}): void {
+    this.menuItems = this.menuService.removeMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
+  }
+
   addSide(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'sides', this.newSide);
     this.newSide = '';
   }
 
+  addLabel(itemIndex: number): void {
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'labels', this.newLabel);
+    this.newLabel = '';
+  }
+
   removeSide(itemIndex: number, sideIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'sides', sideIndex);
+  }
+
+  removeLabel(itemIndex: number, labelIndex: number): void {
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'labels', labelIndex);
   }
 
   loadMenuData() {
@@ -105,6 +145,7 @@ export class EditMenuComponent implements OnInit {
         this.menuItems = menu.items || [];
         this.addRestaurantLater = menu.addRestaurantLater || false;
         this.initializeArrays();
+        this.applyFilters(); // Initialize filters
         console.log(menu);
       }
     });
@@ -163,30 +204,31 @@ export class EditMenuComponent implements OnInit {
       }
     }
     if (this.currentStep < 5) {
-      this.currentStep++;
-      if (this.currentStep === 4 && this.menuItems.length === 0) {
+      const nextStep = this.currentStep + 1;
+      if (nextStep === 4 && this.menuItems.length === 0) {
         this.menuItems = this.menuService.addMenuItem(this.menuItems);
       }
+      this.router.navigate(['/menus/edit-menu', this.menuID, nextStep]);
     }
   }
 
   nextStepLast() {
     this.saveMenu();
-    this.currentStep++;
+    this.router.navigate(['/menus/edit-menu', this.menuID, this.currentStep + 1]);
   }
 
   previousStep() {
     if (this.currentStep > 1) {
-      this.currentStep--;
+      this.router.navigate(['/menus/edit-menu', this.menuID, this.currentStep - 1]);
     }
   }
 
   navigateToStep(step: number): void {
     if ((step < this.currentStep && step >= 1) || (this.currentStep === 3 && step === 4)) {
-      this.currentStep = step;
       if (step === 4 && this.menuItems.length === 0) {
         this.menuItems = this.menuService.addMenuItem(this.menuItems);
       }
+      this.router.navigate(['/menus/edit-menu', this.menuID, step]);
     }
   }
 
@@ -278,10 +320,12 @@ export class EditMenuComponent implements OnInit {
 
   addMenuItem() {
     this.menuItems = this.menuService.addMenuItem(this.menuItems);
+    this.applyFilters();
   }
 
   removeMenuItem(index: number) {
     this.menuItems = this.menuService.removeMenuItem(this.menuItems, index);
+    this.applyFilters();
   }
 
   toggleDetail(
@@ -305,6 +349,105 @@ export class EditMenuComponent implements OnInit {
   }
 
   onMenuItemDrop(event: CdkDragDrop<MenuItemInterface[]>) {
-    moveItemInArray(this.menuItems, event.previousIndex, event.currentIndex);
+    // For filtered view, we need to handle reordering differently
+    if (this.selectedCategoryFilter !== null || this.searchTerm) {
+      // If filtering is active, reorder within the filtered array and then update the original
+      moveItemInArray(this.filteredMenuItems, event.previousIndex, event.currentIndex);
+      
+      // Update the original array to match the new order
+      // This is complex, so for now we'll just reapply filters
+      this.applyFilters();
+    } else {
+      // No filtering active, work directly with the original array
+      moveItemInArray(this.menuItems, event.previousIndex, event.currentIndex);
+      this.applyFilters();
+    }
+  }
+
+  /* KB - Handle bulk uploaded menu items */
+  onMenuItemsUploaded(event: {items: MenuItemInterface[], replaceExisting: boolean}) {
+    if (event.replaceExisting) {
+      // Replace all existing items
+      this.menuItems = [...event.items];
+    } else {
+      // Append to existing items
+      this.menuItems = [...this.menuItems, ...event.items];
+    }
+    
+    // Apply filters to new items
+    this.applyFilters();
+    
+    // Navigate to the menu items step to show the uploaded items
+    this.navigateToStep(4);
+    
+    this.toastr.success(`${event.items.length} menu items ${event.replaceExisting ? 'replaced' : 'added'} successfully!`);
+  }
+
+  // Filter methods
+  applyFilters(): void {
+    this.filteredMenuItems = this.menuItems.filter(item => {
+      const matchesCategory = this.selectedCategoryFilter === null || 
+        item.categoryId === this.selectedCategoryFilter;
+      
+      if (!this.searchTerm) {
+        return matchesCategory;
+      }
+      
+      const searchLower = this.searchTerm.toLowerCase();
+      
+      // Search in name and description
+      const matchesNameDescription = 
+        item.name?.toLowerCase().includes(searchLower) ||
+        item.description?.toLowerCase().includes(searchLower);
+      
+      // Search in labels
+      const matchesLabels = item.labels?.some(label => 
+        label.toLowerCase().includes(searchLower)
+      );
+      
+      // Search in pairings
+      const matchesPairings = item.pairings?.some(pairing => 
+        pairing.toLowerCase().includes(searchLower)
+      );
+      
+      // Search in sides
+      const matchesSides = item.sides?.some(side => 
+        side.toLowerCase().includes(searchLower)
+      );
+      
+      // Search in variations
+      const matchesVariations = item.variations?.some(variation => 
+        variation.toLowerCase().includes(searchLower)
+      );
+      
+      // Search in preparations
+      const matchesPreparations = item.preparations?.some(preparation => 
+        preparation.toLowerCase().includes(searchLower)
+      );
+      
+      const matchesSearch = matchesNameDescription || matchesLabels || 
+        matchesPairings || matchesSides || matchesVariations || matchesPreparations;
+      
+      return matchesCategory && matchesSearch;
+    });
+  }
+
+  onCategoryFilterChange(value: any): void {
+    // Handle clearing the filter (when "All Categories" is selected)
+    if (value === null || value === '' || value === 'all') {
+      this.selectedCategoryFilter = null;
+    } else {
+      this.selectedCategoryFilter = parseInt(value, 10);
+    }
+    this.applyFilters();
+  }
+
+  onSearchTermChange(searchTerm: string): void {
+    this.searchTerm = searchTerm;
+    this.applyFilters();
+  }
+
+  getOriginalItemIndex(menuItem: MenuItemInterface): number {
+    return this.menuItems.findIndex(item => item.itemId === menuItem.itemId);
   }
 }

@@ -16,8 +16,6 @@
     align-items: center;
 }
 
-
-
 .navbar .inner:first-of-type{
     gap: 70px;
     justify-content: flex-start;
@@ -46,7 +44,37 @@
 
 .navbar .inner h1{
     color: #444444;
+}
 
+.breadcrumb-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.title.parent-title {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.title.parent-title:hover {
+    color: #f39c12;
+}
+
+.title.current-title {
+    font-weight: 500;
+    font-size: 14px;
+    align-self: flex-end;
+    line-height: 1;
+}
+
+.breadcrumb-separator {
+  
+    font-weight: 500;
+    font-size: 14px;
+    margin: 0 3px 0px;
+    align-self: flex-end;
+    line-height: 1;
 }
 
 .navbar .inner a{

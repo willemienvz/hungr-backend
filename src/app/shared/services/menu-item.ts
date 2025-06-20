@@ -10,7 +10,7 @@ export interface MenuItem {
   variations: string[];
   pairings: string[];
   sides: string[];
-  labels: string;
+  labels: string[];
   showLabelInput: boolean;
   displayDetails: {
       preparation: boolean;

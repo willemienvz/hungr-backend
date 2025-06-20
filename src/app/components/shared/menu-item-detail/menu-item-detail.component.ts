@@ -5,7 +5,7 @@ export interface DetailConfig {
   title: string;
   placeholder: string;
   description?: string;
-  propertyName: 'preparations' | 'variations' | 'pairings' | 'sides';
+  propertyName: 'preparations' | 'variations' | 'pairings' | 'sides' | 'labels';
 }
 
 @Component({

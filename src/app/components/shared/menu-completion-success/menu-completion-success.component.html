@@ -1,0 +1,76 @@
+<div class="completion-container">
+  <div class="completion-content">
+    <!-- Left Column -->
+    <div class="left-column">
+      <!-- Success Header Block -->
+      <div class="success-header-block white-box">
+        <div class="back-section back-button-container">
+          <button 
+            class="back-button backLink" 
+            [routerLink]="backRoute"
+            *ngIf="showBackButton"
+          >
+            <i class="material-icons">arrow_back</i>
+            Back
+          </button>
+        
+        </div>
+        <div class="success-message">
+          <h6>Your menu has been saved!</h6>
+        </div>
+      </div>
+
+      <!-- Next Steps Section -->
+      <div class="next-steps-block white-box">
+        <h6>Next Steps</h6>
+        <p>Now that your menu has been set up, you can generate a QR code that will enable your patrons to access your menu.</p>
+        
+        <!-- QR Code Generation Block -->
+        <div class="qr-block">
+          <p>Generate a QR code for this menu</p>
+          <button 
+            class="btnSecondary" 
+            (click)="onGenerateQRCode()"
+          >
+            GENERATE QR CODE
+          </button>
+        </div>
+        
+        <!-- Additional Links -->
+        <p>
+          <a routerLink="/settings/branding">Click here</a> to edit the appearance of your menus.
+        </p>
+        
+        <label>If you don't want to publish the menu now, you can save and continue at a later stage.</label>
+      </div>
+    </div>
+
+    <!-- Right Column - Preview -->
+    <div class="right-column white-box">
+      <div class="preview-section">
+        <h6>Preview</h6>
+        <div class="phone-mockup">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <!-- Phone content would go here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-navigation">
+    <app-step-navigation
+      [showCancel]="false"
+      [showNext]="false"
+      [showDone]="false"
+      [showDraft]="showSaveDraft"
+      [showPublish]="showPublishMenu"
+      [isSaving]="isSaving"
+      (draft)="onSaveAsDraft()"
+      (publish)="onPublishMenu()"
+    ></app-step-navigation>
+  </div>
+</div> 

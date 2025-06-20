@@ -1,7 +1,24 @@
 <nav class="navbar">
     <div class="inner">
         <img src="../../../assets/images/shared/logo.png" alt="" style="width: 150px;" />
-        <h1 class="title" [innerHTML]="pageTitle"></h1>
+        <div class="breadcrumb-container">
+            <!-- Debug info -->
+        
+            
+            <ng-container *ngIf="breadcrumbs.length > 0; else singleTitle">
+                <!-- Parent route (clickable) -->
+                <h1 class="title parent-title" 
+                    (click)="navigateToBreadcrumb(breadcrumbs[0].url)">
+                    {{ breadcrumbs[0].label }}
+                </h1>
+                <span class="breadcrumb-separator">/</span>
+                <!-- Current page (not clickable) -->
+                <h1 class="title current-title">{{ getCurrentPageTitle() }}</h1>
+            </ng-container>
+            <ng-template #singleTitle>
+                <h1 class="title">{{ getCurrentPageTitle() }}</h1>
+            </ng-template>
+        </div>
     </div>
     <div class="inner">
 

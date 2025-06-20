@@ -1,0 +1,68 @@
+<!-- Menu Item Pairing Section -->
+<div class="details-section">
+  <div class="detail-header grid">
+    <div class="header-title">
+      <h6>Pairings</h6>
+    </div>
+    <div class="header-actions">
+      <p>Add menu items that pair well with this one.</p>
+      <button type="button" class="toggle-btn" (click)="onCloseDetail()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+  </div>
+
+    <div class="detail-content grid">
+    <!-- Autocomplete input for selecting menu items -->
+    <div class="add-input-group">
+      <div class="inputBox">
+        <input
+          type="text"
+          placeholder="Search and select menu items..."
+          [formControl]="autocompleteControl"
+          [matAutocomplete]="auto"
+        />
+        <label>search and select</label>
+        <mat-autocomplete 
+          #auto="matAutocomplete" 
+          [displayWith]="displayFn"
+          (optionSelected)="onMenuItemSelected($event)"
+        >
+          <mat-option 
+            *ngFor="let menuItem of filteredMenuItems | async" 
+            [value]="menuItem"
+          >
+            <span>{{ menuItem.name }}</span>
+          </mat-option>
+          
+          <!-- Show no results message when no items match -->
+          <mat-option 
+            *ngIf="(filteredMenuItems | async)?.length === 0" 
+            class="no-results-option" 
+            disabled
+          >
+            <span class="no-results-text">No menu items found</span>
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <!-- Selected pairings list -->
+    <div class="item-list">
+      <div
+        class="item-tag"
+        *ngFor="let pairing of selectedPairings"
+      >
+        <span>{{ pairing.name }}</span>
+        <button type="button" class="remove-btn" (click)="onRemovePairing(pairing.id)">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      
+      <!-- Empty state when no pairings selected -->
+       <!-- <div *ngIf="selectedPairings.length === 0" class="empty-state">
+      <p>No pairings selected yet. Search above to add menu items that pair well with this one.</p>
+      </div> -->
+    </div>
+  </div>
+</div> 

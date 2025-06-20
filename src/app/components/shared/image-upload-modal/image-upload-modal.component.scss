@@ -1,0 +1,340 @@
+.image-upload-modal {
+
+  max-width: 90vw;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+  font-family: var(--hungr-font-family);
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h6 {
+      font-family: "Poppins", sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+    }
+
+    .close {
+      position: absolute;
+      right: 25px;
+      top: 25px;
+      cursor: pointer;
+      border:none;
+      background: transparent;
+      font-size: 28px;
+      font-weight: bold;
+      color: #aaa;
+
+      &:hover {
+        color: #333;
+      }
+    }
+  }
+
+  .upload-info {
+    margin-bottom: 24px;
+
+    .info-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+      align-items: center;
+        gap: 1rem;
+
+      .info-label {
+        color: #666;
+        font-weight: 500;
+        text-align:right;
+        width:200px;
+      }
+
+      .info-value {
+        color: #1a1a1a;
+        font-weight: 600;
+        width:200px;
+      }
+    }
+  }
+
+  .upload-area {
+    position: relative;
+    border: 2px dashed #d0d0d0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    background: #fafafa;
+
+    &.drag-over {
+      border-color: #4CAF50;
+      background-color: #f0fff0;
+    }
+
+    &.has-images {
+      border-style: solid;
+      border-color: #e0e0e0;
+      background: white;
+      padding: 16px;
+    }
+
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      width: 100%;
+
+      .image-preview-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f5f5f5;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 8px;
+        }
+
+        .remove-image-btn {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          background: rgba(255, 68, 68, 0.9);
+          border: none;
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+          opacity: 0;
+
+          &:hover {
+            background: rgba(204, 0, 0, 0.9);
+            transform: scale(1.1);
+          }
+
+          i {
+            color: white;
+            font-size: 14px;
+          }
+        }
+
+        .new-image-badge {
+          position: absolute;
+          bottom: 4px;
+          left: 4px;
+          background: #4CAF50;
+          color: white;
+          font-size: 10px;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 600;
+        }
+
+        &:hover .remove-image-btn {
+          opacity: 1;
+        }
+      }
+
+      .add-more-item {
+        aspect-ratio: 1;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #fafafa;
+
+        &:hover {
+          border-color: #4CAF50;
+          background: #f0fff0;
+        }
+
+        i {
+          font-size: 24px;
+          color: #999;
+          margin-bottom: 4px;
+        }
+
+        p {
+          font-size: 12px;
+          color: #666;
+          margin: 0;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .empty-state {
+      width: 100%;
+      text-align: center;
+
+      .upload-placeholder {
+        .placeholder-content {
+          .upload-icon {
+            font-size: 48px;
+            color: #999;
+            margin-bottom: 16px;
+          }
+
+          .upload-text {
+            font-size: 16px;
+            color: #666;
+            margin: 0 0 8px 0;
+            font-weight: 500;
+          }
+
+          .upload-subtext {
+            font-size: 14px;
+            color: #999;
+            margin: 0;
+          }
+        }
+
+          .upload-media-btn {
+      margin: 1rem auto 0;
+
+      i {
+        font-size: 18px;
+      }
+    }
+      }
+    }
+
+    .drag-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(76, 175, 80, 0.1);
+      border: 2px dashed #4CAF50;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+
+      .drag-content {
+        text-align: center;
+        color: #4CAF50;
+
+        i {
+          font-size: 48px;
+          margin-bottom: 8px;
+        }
+
+        p {
+          font-size: 16px;
+          font-weight: 600;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #fff3f3;
+    border: 1px solid #ffcccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #cc0000;
+    font-size: 14px;
+
+    i {
+      font-size: 18px;
+    }
+  }
+
+  .upload-button-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+
+  
+
+    .clear-all-btn {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s;
+
+      &:hover:not(:disabled) {
+        background: #ff5252;
+      }
+
+      &:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+// Overlay styling for the dialog backdrop
+::ng-deep .cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+::ng-deep .cdk-global-overlay-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Override Material Dialog panel styles specifically for image upload modal
+::ng-deep .image-upload-modal-panel .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+}
+
+::ng-deep .image-upload-modal-panel .mat-mdc-dialog-surface {
+  border-radius: 16px !important;
+} 

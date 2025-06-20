@@ -24,12 +24,12 @@
     <h6>Upload a file</h6>
     <p>Please upload a file to automatically add your menu items.</p>
     
-    <div class="upload-options">
+    <div class="upload-options" *ngIf="!isProcessingFile">
       <div class="upload-option" (click)="fileInput.click()">
         <i class="material-symbols-outlined">upload</i>
         <div class="option-content">
           <h6>Select a file</h6>
-          <p>Short list of acceptable formats.</p>
+          <p>CSV or xlsx/xls</p>
         </div>
       </div>
       
@@ -41,13 +41,51 @@
         </div>
       </div>
     </div>
+
+    <!-- Processing indicator -->
+    <div class="processing-indicator" *ngIf="isProcessingFile">
+      <i class="material-symbols-outlined spinning">progress_activity</i>
+      <h6>Processing file...</h6>
+      <p>Please wait while we process your uploaded file.</p>
+    </div>
     
     <input #fileInput type="file" (change)="onFileSelected($event)" accept=".csv,.xlsx,.xls" style="display: none;">
     
-    <div class="modal-buttons">
+    <div class="modal-buttons" *ngIf="!isProcessingFile">
       <button class="btnTertiary" (click)="closeUploadModal()">CANCEL</button>
       <button class="btnTertiary" (click)="onSaveAsDraft()">SAVE AS DRAFT</button>
       <button class="btnSecondary" (click)="fileInput.click()">SELECT</button>
+    </div>
+  </div>
+</div>
+
+<!-- KB - Choice Modal (Replace or Append) -->
+<div class="modal" [class.open]="showChoiceModal">
+  <div class="modal-content">
+    <span class="close" (click)="closeChoiceModal()">&times;</span>
+    <h6>File processed successfully!</h6>
+    <p>We found {{parsedMenuItems.length}} menu items in your file. You already have {{existingMenuItems.length}} items in your menu.</p>
+    
+    <div class="choice-options">
+      <div class="choice-option" (click)="onReplaceExisting()">
+        <i class="material-symbols-outlined">sync</i>
+        <div class="option-content">
+          <h6>Replace existing items</h6>
+          <p>Remove all current menu items and replace them with the uploaded items.</p>
+        </div>
+      </div>
+      
+      <div class="choice-option" (click)="onAppendToExisting()">
+        <i class="material-symbols-outlined">add</i>
+        <div class="option-content">
+          <h6>Add to existing items</h6>
+          <p>Keep current menu items and add the uploaded items to your menu.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="btnTertiary" (click)="closeChoiceModal()">CANCEL</button>
     </div>
   </div>
 </div>

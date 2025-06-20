@@ -90,9 +90,12 @@
       </app-step-header>
     </div>
     <app-menu-item-selection
+      [existingMenuItems]="menuItems"
+      [categories]="categories"
       (bulkUploadClick)="openPopupuploadFile()"
       (manualAddClick)="navigateToStep(4)"
       (stepClick)="navigateToStep($event)"
+      (menuItemsUploaded)="onMenuItemsUploaded($event)"
     ></app-menu-item-selection>
 
   </div>
@@ -122,6 +125,82 @@
       </div>
     </div>
 
+    <div class="block filter-section">
+      <h6>Filter by</h6>
+      <div class="col2row">
+        <div class="col">
+          <div class="formGroup">
+            <label>Menu Category</label>
+            <mat-form-field subscriptSizing="dynamic">
+              <mat-select
+                class="select-arrow-fix"
+                [ngModel]="selectedCategoryFilter === null ? 'all' : selectedCategoryFilter"
+                (ngModelChange)="onCategoryFilterChange($event)"
+              >
+                <mat-option [value]="'all'">All Categories</mat-option>
+                <mat-option
+                  *ngFor="let category of categories"
+                  [value]="category.id"
+                >
+                  {{ category.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col">
+          <div class="formGroup">
+            <label>Search</label>
+            <div class="search-input-container">
+              <input
+                type="text"
+                class="formControl search-input"
+                placeholder="Search menu items..."
+                [ngModel]="searchTerm"
+                (ngModelChange)="onSearchTermChange($event)"
+              />
+              <app-svg-icon
+                iconName="search"
+                size="16px"
+                color="#999"
+                class="search-icon"
+              ></app-svg-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KB: No results message when filters return empty results -->
+    <div *ngIf="menuItems.length > 0 && filteredMenuItems.length === 0" class="block no-results-block">
+      <div class="no-results-content">
+        <app-svg-icon
+          iconName="no-results"
+          size="48px"
+          color="#999"
+          class="no-results-icon"
+        ></app-svg-icon>
+        <h4>No menu items found</h4>
+        <p>No menu items match your current filters.</p>
+        <div class="filter-actions">
+          <button 
+            *ngIf="selectedCategoryFilter !== null" 
+            class="btnSecondary small" 
+            (click)="onCategoryFilterChange('all')"
+          >
+            Clear Category Filter
+          </button>
+          <button 
+            *ngIf="searchTerm" 
+            class="btnSecondary small" 
+            (click)="onSearchTermChange('')"
+          >
+            Clear Search
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- KB: Add CDK drag and drop container for menu item reordering -->
     <div 
       cdkDropList 
@@ -130,17 +209,19 @@
     >
       <div 
         cdkDrag 
-        *ngFor="let menuItem of menuItems; let itemIndex = index"
+        *ngFor="let menuItem of filteredMenuItems; let itemIndex = index"
         class="menu-item-drag-container"
       >
         <app-menu-item-form
           [menuItem]="menuItem"
-          [itemIndex]="itemIndex"
+          [itemIndex]="getOriginalItemIndex(menuItem)"
           [categories]="categories"
+          [availableMenuItems]="menuItems"
           [newPreparation]="newPreparation"
           [newVariation]="newVariation"
           [newPairing]="newPairing"
           [newSide]="newSide"
+          [newLabel]="newLabel"
           (removeMenuItem)="removeMenuItem($event)"
           (toggleDetail)="toggleDetail($event.detailType, $event.itemIndex)"
           (addPreparation)="addPreparation($event)"
@@ -149,8 +230,12 @@
           (removeVariation)="removeVariation($event.itemIndex, $event.variationIndex)"
           (addPairing)="addPairing($event)"
           (removePairing)="removePairing($event.itemIndex, $event.pairingIndex)"
+          (addMenuItemPairing)="addMenuItemPairing($event)"
+          (removeMenuItemPairing)="removeMenuItemPairing($event)"
           (addSide)="addSide($event)"
           (removeSide)="removeSide($event.itemIndex, $event.sideIndex)"
+          (addLabel)="addLabel($event)"
+          (removeLabel)="removeLabel($event.itemIndex, $event.labelIndex)"
           (fileSelected)="onFileSelected($event.event, $event.itemIndex)"
           (priceInput)="onPriceInput($event.event, $event.menuItem)"
           (getFile)="getFile($event)"
@@ -158,6 +243,7 @@
           (newVariationChange)="newVariation = $event"
           (newPairingChange)="newPairing = $event"
           (newSideChange)="newSide = $event"
+          (newLabelChange)="newLabel = $event"
         ></app-menu-item-form>
       </div>
     </div>
@@ -173,40 +259,14 @@
   </div>
 
   <div *ngIf="currentStep === 5">
-    <div class="block lastStep">
-      <app-progress-bar 
-      [progress]="currentStep" 
+    <app-menu-completion-success
       [backRoute]="'/menus'"
-      (stepClick)="navigateToStep($event)">
-      </app-progress-bar>
-      
-      <h6 style="color: #16d3d2; text-align: center">
-        Menu changes have been saved!
-      </h6>
-      <h6>Next Steps</h6>
-      <p>
-        You can generate a QR code that will enable your patrons to access your
-        updated menu.
-      </p>
-      <div class="qrblock">
-        <p>Generate a QR code for this menu</p>
-        <a class="btnSecondary" routerLink="/qr-codes">Generate QR Code</a>
-      </div>
-      <p>
-        <a routerLink="/settings/branding">Click here</a> to edit the appearance
-        of your menus.
-      </p>
-      <label
-        >If you don't want to publish the menu now, you can save as a
-        draft.</label
-      >
-    </div>
-    
-    <app-step-navigation
-      [showCancel]="false"
-      [showNext]="false"
-      [showDone]="true"
+      [menuId]="menuID"
       [isSaving]="isSaving"
-    ></app-step-navigation>
+      [showSaveDraft]="true"
+      [showPublishMenu]="true"
+      (saveAsDraft)="setAsDraft()"
+      (publishMenu)="setAsPublished()"
+    ></app-menu-completion-success>
   </div>
 </div>

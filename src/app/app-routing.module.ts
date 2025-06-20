@@ -64,7 +64,7 @@ const routes: Routes = [
       {
         path: 'visitor-insights',
         component: VisitorDashboardComponent,
-        data: { title: 'Visistor Insights' },
+        data: { title: 'Visitor Insights' },
       },
       {
         path: 'sales-insights',
@@ -95,12 +95,26 @@ const routes: Routes = [
         },
       },
       {
+        path: 'menus/add-menu/:step',
+        component: AddMenuComponent,
+        data: {
+          title: 'Menus <span class="submenuHeading">/Create a New Menu</span>',
+        },
+      },
+      {
         path: 'restaurants',
         component: RestaurantComponent,
         data: { title: 'Restaurant' },
       },
       {
         path: 'menus/edit-menu/:menuID',
+        component: EditMenuComponent,
+        data: {
+          title: 'Edit Menu <span class="submenuHeading">/Edit Menu</span>',
+        },
+      },
+      {
+        path: 'menus/edit-menu/:menuID/:step',
         component: EditMenuComponent,
         data: {
           title: 'Edit Menu <span class="submenuHeading">/Edit Menu</span>',
