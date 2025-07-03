@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable, startWith, map } from 'rxjs';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -14,7 +14,7 @@ export interface PairingReference {
   templateUrl: './menu-item-pairing.component.html',
   styleUrls: ['./menu-item-pairing.component.scss']
 })
-export class MenuItemPairingComponent implements OnInit {
+export class MenuItemPairingComponent implements OnInit, OnChanges {
   @Input() availableMenuItems: MenuItemInterface[] = [];
   @Input() selectedPairingIds: string[] = [];
   @Input() currentMenuItemId: string = '';
@@ -35,6 +35,13 @@ export class MenuItemPairingComponent implements OnInit {
     console.log('Available menu items for pairing:', this.availableMenuItems.length);
     console.log('Current menu item ID:', this.currentMenuItemId);
     console.log('Selected pairing IDs:', this.selectedPairingIds);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // Re-initialize when selectedPairingIds or availableMenuItems change
+    if (changes['selectedPairingIds'] || changes['availableMenuItems']) {
+      this.initializeSelectedPairings();
+    }
   }
 
   private initializeSelectedPairings() {
@@ -72,18 +79,16 @@ export class MenuItemPairingComponent implements OnInit {
     const selectedItem: MenuItemInterface = event.option.value;
     if (selectedItem && selectedItem.itemId) {
       console.log('Selected menu item for pairing:', selectedItem.name);
+      // Only emit the event - let parent handle state management
       this.addPairing.emit(selectedItem.itemId);
-      this.selectedPairings.push({ id: selectedItem.itemId, name: selectedItem.name });
-      this.selectedPairingIds.push(selectedItem.itemId); // Update local array to prevent duplicates
       this.autocompleteControl.setValue('');
     }
   }
 
   onRemovePairing(pairingId: string) {
     console.log('Removing pairing:', pairingId);
+    // Only emit the event - let parent handle state management
     this.removePairing.emit(pairingId);
-    this.selectedPairings = this.selectedPairings.filter(p => p.id !== pairingId);
-    this.selectedPairingIds = this.selectedPairingIds.filter(id => id !== pairingId);
   }
 
   onCloseDetail() {

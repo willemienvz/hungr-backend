@@ -768,4 +768,101 @@ input[type="submit"]:disabled {
   }
 }
 
+/* ===============================================
+   SHARED COMPONENT STYLES
+   Global styles for shared components used across the application
+   =============================================== */
 
+/* Header Block - Used by step-based components */
+.headerBlock {
+  padding: 25px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--hungr-light-grey);
+  background-color: #fff;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  margin-bottom: 20px;
+
+  &:not(.closedBottom) {
+    margin-bottom: 0;
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+/* Step Label - Used in step headers */
+.labelStep {
+  color: var(--hungr-tertiary-color);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Add Item Button - Used in forms */
+.addItemBtn {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0 10px;
+
+  &.fixed {
+    position: fixed;
+    z-index: 10000;
+    bottom: 10px;
+    right: 20px;
+  }
+}
+
+/* Navigation Row - Used for step navigation */
+.navRow {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Form Group - Consistent form styling */
+.formGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Block styling for content sections */
+.block {
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid var(--hungr-light-grey);
+  padding: 20px;
+
+  &.rowSpecial {
+    margin-bottom: 20px;
+  }
+}
+
+/* Back Link styling */
+.backLink {
+  display: flex;
+  align-items: center;
+  color: #666;
+  text-decoration: none;
+  margin-bottom: 20px;
+  font-size: 14px;
+  position: absolute;
+
+  i {
+    margin-right: 5px;
+  }
+
+  &:hover {
+    color: var(--hungr-tertiary-color);
+  }
+}

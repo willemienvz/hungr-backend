@@ -1,0 +1,117 @@
+.price-input-container {
+  width: 100%;
+  
+  .field-holder {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .price-input-label {
+    color: #9a9a9a;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 20.25px;
+    letter-spacing: -0.1%;
+    margin: 0;
+
+    .required-asterisk {
+      color: #ff6b6b;
+      margin-left: 4px;
+    }
+  }
+
+  .input-wrapper {
+    position: relative;
+    width: 100%;
+
+    &.error {
+      .price-input {
+        border-color: #ff6b6b;
+        background-color: #fff5f5;
+      }
+    }
+
+    &.disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+
+  .price-input {
+    width: 100%;
+    height: 38px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: var(--hungr-font-family, 'Poppins', sans-serif);
+    background-color: #fff;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: #16d3d2;
+      background-color: #f0fffe;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: #bbb;
+    }
+
+    &:disabled {
+      background-color: #f5f5f5;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    &::placeholder {
+      color: #999;
+      font-style: italic;
+    }
+  }
+
+  .error-message {
+    color: #ff6b6b;
+    font-size: 12px;
+    font-weight: 400;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &::before {
+      content: '⚠';
+      font-size: 14px;
+    }
+  }
+}
+
+// Specific styling for smaller inputs (like in menu item forms)
+.price-input-container.compact {
+  .price-input {
+    max-width: 120px;
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .price-input-label {
+    font-size: 14px;
+  }
+}
+
+// Integration with existing form styles
+.formGroup .price-input-container,
+.formControl.price-input-container {
+  .price-input {
+    // Inherit existing form control styles while maintaining price-specific behavior
+    background-color: inherit;
+    
+    &:focus {
+      border-color: #16d3d2;
+      background-color: #f0fffe;
+    }
+  }
+} 

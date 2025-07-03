@@ -7,6 +7,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { User } from '../../../shared/services/user';
 import { Router } from '@angular/router';
 import { NotificationsService } from '../../../shared/services/notifications.service';
+import { MatDialog } from '@angular/material/dialog';
+import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @Component({
   selector: 'app-general',
@@ -27,12 +29,15 @@ export class GeneralComponent {
   userDataID: string = '';
   isSaving: boolean = false;
   userData$!: Observable<any>;
+  hasUnsavedChanges: boolean = false;
+  private originalFormValues: any = {};
   constructor(
     private router: Router,
     public authService: AuthService,
     private formBuilder: FormBuilder,
     private firestore: AngularFirestore,
-    private notificationService: NotificationsService
+    private notificationService: NotificationsService,
+    private dialog: MatDialog
   ) {
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
@@ -66,6 +71,40 @@ export class GeneralComponent {
       email: [{ value: '', disabled: true }, Validators.required],
       phone: ['', Validators.required],
     });
+    this.setupFormTracking();
+  }
+
+  private setupFormTracking() {
+    // Track form changes
+    this.accountForm.valueChanges.subscribe(() => {
+      this.markAsChanged();
+    });
+  }
+
+  private markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+    this.originalFormValues = { ...this.accountForm.value };
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          this.router.navigate([route]);
+        }
+      });
+    } else {
+      this.router.navigate([route]);
+    }
   }
 
   getUserData() {}
@@ -78,6 +117,7 @@ export class GeneralComponent {
         email: this.currentUserData.email,
         phone: this.currentUserData.cellphoneNumber,
       });
+      this.markAsSaved(); // Mark as saved since we're loading data
     }
   }
 
@@ -108,6 +148,7 @@ export class GeneralComponent {
       .update(userToSave)
       .then(() => {
         this.isSaving = false;
+        this.markAsSaved();
         this.notificationService.addNotification('Your profile was updated');
       })
       .catch((error) => {

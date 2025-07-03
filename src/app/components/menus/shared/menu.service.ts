@@ -64,9 +64,7 @@ export class MenuService {
   // Category management
   addCategory(categories: Category[], newCategoryName: string): Category[] {
     if (newCategoryName.trim()) {
-      const newId = categories.length
-        ? Math.max(...categories.map((cat) => cat.id)) + 1
-        : 1;
+      const newId = this.getNextUniqueId(categories);
       const newCategory: Category = {
         id: newId,
         name: newCategoryName.trim(),
@@ -81,9 +79,7 @@ export class MenuService {
     if (subcategoryName?.trim()) {
       const updatedCategories = [...categories];
       const category = updatedCategories[categoryIndex];
-      const newSubId = category.subcategories.length
-        ? Math.max(...category.subcategories.map((sub) => sub.id)) + 1
-        : 1;
+      const newSubId = this.getNextUniqueId(updatedCategories);
       category.subcategories.push({
         id: newSubId,
         name: subcategoryName.trim(),
@@ -91,6 +87,68 @@ export class MenuService {
       return updatedCategories;
     }
     return categories;
+  }
+
+  /**
+   * CRITICAL FIX FOR CATEGORY ID CONFLICTS:
+   * 
+   * The original implementation assigned IDs separately for main categories and subcategories,
+   * which caused conflicts where both could have the same ID. For example:
+   * - Main category "Appetizers" might have ID: 1
+   * - Subcategory "Hot Appetizers" under "Appetizers" might also have ID: 1
+   * 
+   * This caused issues when assigning menu items to categories because the system
+   * couldn't distinguish between main categories and subcategories with the same ID.
+   * 
+   * The fix ensures ALL categories and subcategories get unique IDs across the entire
+   * category hierarchy, eliminating conflicts and enabling proper category assignment.
+   */
+  
+  // Helper method to get the next unique ID across all categories and subcategories
+  private getNextUniqueId(categories: Category[]): number {
+    const allIds: number[] = [];
+    
+    // Collect all main category IDs
+    categories.forEach(category => {
+      allIds.push(category.id);
+      
+      // Collect all subcategory IDs
+      if (category.subcategories) {
+        category.subcategories.forEach(subcategory => {
+          allIds.push(subcategory.id);
+        });
+      }
+    });
+    
+    // Return the next available ID
+    return allIds.length > 0 ? Math.max(...allIds) + 1 : 1;
+  }
+
+  // Helper method to fix duplicate IDs in existing category structures
+  fixCategoryIds(categories: Category[]): Category[] {
+    const fixedCategories: Category[] = [];
+    let currentId = 1;
+    
+    categories.forEach(category => {
+      const fixedCategory: Category = {
+        ...category,
+        id: currentId++,
+        subcategories: []
+      };
+      
+      if (category.subcategories) {
+        category.subcategories.forEach(subcategory => {
+          fixedCategory.subcategories!.push({
+            ...subcategory,
+            id: currentId++
+          });
+        });
+      }
+      
+      fixedCategories.push(fixedCategory);
+    });
+    
+    return fixedCategories;
   }
 
   deleteCategory(categories: Category[], index: number): Category[] {
@@ -331,10 +389,91 @@ export class MenuService {
   }
 
   getCategoryIdByName(categories: Category[], categoryName: string): number | null {
+    // First check main categories
     const category = categories.find(
       (cat) => cat.name.toLowerCase() === categoryName.toLowerCase()
     );
-    return category ? category.id : null;
+    if (category) return category.id;
+
+    // Then check subcategories
+    for (const cat of categories) {
+      if (cat.subcategories) {
+        const subcategory = cat.subcategories.find(
+          (sub) => sub.name.toLowerCase() === categoryName.toLowerCase()
+        );
+        if (subcategory) return subcategory.id;
+      }
+    }
+
+    return null;
+  }
+
+  // Helper method to find category or subcategory by ID
+  findCategoryById(categories: Category[], categoryId: number): { category: Category; subcategory?: Category } | null {
+    // Check main categories first
+    const mainCategory = categories.find(cat => cat.id === categoryId);
+    if (mainCategory) {
+      return { category: mainCategory };
+    }
+
+    // Check subcategories
+    for (const category of categories) {
+      if (category.subcategories) {
+        const subcategory = category.subcategories.find(sub => sub.id === categoryId);
+        if (subcategory) {
+          return { category, subcategory };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // Diagnostic method to check for ID conflicts
+  checkCategoryIdConflicts(categories: Category[]): { hasConflicts: boolean; conflicts: any[] } {
+    const idMap = new Map<number, string[]>();
+    const conflicts: any[] = [];
+
+    // Collect all IDs and their sources
+    categories.forEach(category => {
+      const sources = idMap.get(category.id) || [];
+      sources.push(`Main Category: ${category.name}`);
+      idMap.set(category.id, sources);
+
+      if (category.subcategories) {
+        category.subcategories.forEach(subcategory => {
+          const subSources = idMap.get(subcategory.id) || [];
+          subSources.push(`Subcategory: ${subcategory.name} (under ${category.name})`);
+          idMap.set(subcategory.id, subSources);
+        });
+      }
+    });
+
+    // Find conflicts
+    idMap.forEach((sources, id) => {
+      if (sources.length > 1) {
+        conflicts.push({ id, sources });
+      }
+    });
+
+    return {
+      hasConflicts: conflicts.length > 0,
+      conflicts
+    };
+  }
+
+  // Helper method to display category structure for debugging
+  displayCategoryStructure(categories: Category[]): void {
+    console.log('=== Category Structure ===');
+    categories.forEach(category => {
+      console.log(`📁 ${category.name} (ID: ${category.id})`);
+      if (category.subcategories && category.subcategories.length > 0) {
+        category.subcategories.forEach(subcategory => {
+          console.log(`  📄 ${subcategory.name} (ID: ${subcategory.id})`);
+        });
+      }
+    });
+    console.log('=========================');
   }
 
   initializeArrays(categoriesLength: number): string[] {

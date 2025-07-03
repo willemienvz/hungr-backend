@@ -1,0 +1,330 @@
+# Hungr Backend Dashboard - Cursor Rules
+
+## Project Overview
+Angular-based restaurant management dashboard for the Hungr digital menu platform. Enables restaurant owners to manage menus, analytics, users, specials, and QR codes with Firebase backend integration.
+
+## Technology Stack
+- **Framework**: Angular 17+ with TypeScript
+- **Backend**: Firebase (Firestore, Functions, Auth, Storage)
+- **UI**: Angular Material + Custom SCSS
+- **Charts**: FusionCharts/ECharts for analytics
+- **Build**: Angular CLI with Webpack
+- **Deployment**: Firebase Hosting (auto-deploy via Amplify)
+
+## Core Architecture Patterns
+
+### Component Organization
+- **Feature modules**: Organize by restaurant management features (menus, specials, users)
+- **Shared components**: Reusable UI components in `/shared` folder
+- **Service-based architecture**: Firebase services for all data operations
+- **Lazy loading**: Route-based code splitting for performance
+
+### State Management
+- **Services for state**: Use Angular services with BehaviorSubjects for shared state
+- **Local component state**: Use reactive forms and component properties
+- **Firebase real-time**: Implement real-time data subscriptions where needed
+- **Error handling**: Centralized error handling service
+
+## Critical Development Priorities
+
+### 🚨 IMMEDIATE FIXES (Day 1)
+1. **Date validation bug in specials creation** - Users can bypass required date fields
+2. **Security vulnerabilities** - Exposed Firebase API keys in environment files
+3. **Loading states** - Missing button disabling and loading indicators
+
+### 🏗️ PHASE 1: Core Infrastructure (Week 1)
+1. **Reusable components**: PriceInputComponent, ImageUploadModal, ConfirmationModals
+2. **Firebase Functions**: Email notifications, data management, user management
+3. **Analytics dashboard**: Fix charts and implement real data display
+
+## Development Standards
+
+### Code Quality
+```typescript
+// Always use strict TypeScript typing
+interface MenuItemCreate {
+  name: string;
+  description: string;
+  price: number;
+  categoryId: string;
+  imageUrl?: string;
+}
+
+// Use Angular reactive forms for all forms
+this.menuForm = this.fb.group({
+  name: ['', [Validators.required, Validators.minLength(2)]],
+  price: ['', [Validators.required, Validators.min(0)]]
+});
+
+// Implement proper error handling
+catchError(error => {
+  this.errorService.handleError(error);
+  return EMPTY;
+})
+```
+
+### Component Structure
+```typescript
+@Component({
+  selector: 'app-feature-name',
+  templateUrl: './feature-name.component.html',
+  styleUrls: ['./feature-name.component.scss']
+})
+export class FeatureNameComponent implements OnInit, OnDestroy {
+  // Public properties first
+  public data$ = new BehaviorSubject<any[]>([]);
+  public loading = false;
+  public error: string | null = null;
+
+  // Form properties
+  public form: FormGroup;
+
+  // Private destruction subject
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private fb: FormBuilder,
+    private service: FeatureService,
+    private errorService: ErrorService
+  ) {}
+
+  ngOnInit(): void {
+    this.initializeForm();
+    this.loadData();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initializeForm(): void {
+    // Form initialization
+  }
+
+  private loadData(): void {
+    // Data loading with error handling
+  }
+}
+```
+
+### Firebase Integration
+```typescript
+// Always use typed Firebase services
+@Injectable({ providedIn: 'root' })
+export class MenuService {
+  constructor(private firestore: AngularFirestore) {}
+
+  getMenus(restaurantId: string): Observable<Menu[]> {
+    return this.firestore
+      .collection<Menu>('menus', ref => 
+        ref.where('restaurantId', '==', restaurantId)
+      )
+      .valueChanges({ idField: 'id' })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  private handleError = (error: any): Observable<never> => {
+    console.error('MenuService error:', error);
+    return throwError(() => error);
+  };
+}
+```
+
+## Security Requirements
+
+### Environment Management
+```typescript
+// NEVER commit API keys - use environment variables
+export const environment = {
+  production: false,
+  firebase: {
+    apiKey: process.env['NG_APP_FIREBASE_API_KEY'],
+    authDomain: process.env['NG_APP_FIREBASE_AUTH_DOMAIN'],
+    projectId: process.env['NG_APP_FIREBASE_PROJECT_ID']
+  }
+};
+```
+
+### Authentication Guards
+```typescript
+// Implement proper route guards
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(private auth: AuthService, private router: Router) {}
+
+  canActivate(): Observable<boolean> {
+    return this.auth.user$.pipe(
+      map(user => {
+        if (user) return true;
+        this.router.navigate(['/sign-in']);
+        return false;
+      })
+    );
+  }
+}
+```
+
+## UI/UX Standards
+
+### Loading States
+```typescript
+// Always disable buttons during loading
+<button 
+  mat-raised-button 
+  color="primary"
+  [disabled]="loading || form.invalid"
+  (click)="onSubmit()">
+  <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+  {{ loading ? 'Saving...' : 'Save' }}
+</button>
+```
+
+### Form Validation
+```html
+<!-- Always show validation errors -->
+<mat-form-field>
+  <mat-label>Restaurant Name</mat-label>
+  <input matInput formControlName="name" required>
+  <mat-error *ngIf="form.get('name')?.hasError('required')">
+    Restaurant name is required
+  </mat-error>
+  <mat-error *ngIf="form.get('name')?.hasError('minlength')">
+    Name must be at least 2 characters
+  </mat-error>
+</mat-form-field>
+```
+
+### Confirmation Dialogs
+```typescript
+// Always confirm destructive actions
+confirmDelete(item: any): void {
+  const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+    data: { 
+      title: 'Delete Menu Item',
+      message: 'This action cannot be undone.',
+      itemName: item.name
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(confirmed => {
+    if (confirmed) this.deleteItem(item.id);
+  });
+}
+```
+
+## Performance Standards
+
+### Data Loading
+```typescript
+// Use trackBy functions for *ngFor
+trackByFn(index: number, item: any): any {
+  return item.id || index;
+}
+
+// Implement pagination for large datasets
+loadMore(): void {
+  this.service.getMenus(this.lastDoc, this.pageSize)
+    .subscribe(menus => {
+      this.menus = [...this.menus, ...menus];
+    });
+}
+```
+
+### Image Handling
+```typescript
+// Always optimize images before upload
+async uploadImage(file: File): Promise<string> {
+  const resized = await this.imageService.resizeImage(file, 800, 600);
+  return this.storage.upload(`images/${Date.now()}`, resized);
+}
+```
+
+## Testing Requirements
+
+### Unit Testing
+```typescript
+describe('MenuService', () => {
+  let service: MenuService;
+  let firestore: jasmine.SpyObj<AngularFirestore>;
+
+  beforeEach(() => {
+    const spy = jasmine.createSpyObj('AngularFirestore', ['collection']);
+    
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: AngularFirestore, useValue: spy }
+      ]
+    });
+    
+    service = TestBed.inject(MenuService);
+    firestore = TestBed.inject(AngularFirestore) as jasmine.SpyObj<AngularFirestore>;
+  });
+
+  it('should get menus for restaurant', () => {
+    // Test implementation
+  });
+});
+```
+
+## Critical Implementation Notes
+
+### Analytics Dashboard
+- **Charts**: Use FusionCharts or ECharts with real Firebase data
+- **Real-time updates**: Implement WebSocket connections for live data
+- **Date filtering**: Add comprehensive date range filtering
+- **Export functionality**: Enable PDF/CSV export of reports
+
+### Specials Management
+- **Multi-step creation**: Fix navigation between steps
+- **Date validation**: Ensure proper start/end date validation
+- **Time-based activation**: Implement automatic special activation/deactivation
+- **Visual feedback**: Add clear progress indicators
+
+### User Management
+- **Role-based access**: Implement Admin/Manager/Staff roles
+- **Multi-restaurant support**: Allow users to manage multiple restaurants
+- **Invitation system**: Email-based user invitations
+- **Activity logging**: Track user actions for audit purposes
+
+## File Organization
+```
+src/app/
+├── components/           # Feature components
+│   ├── dashboard/
+│   ├── menus/
+│   ├── specials/
+│   ├── users/
+│   └── settings/
+├── shared/              # Reusable components
+│   ├── components/
+│   ├── services/
+│   ├── guards/
+│   └── validators/
+├── environments/        # Environment configs
+└── assets/             # Static assets
+```
+
+## Common Pitfalls to Avoid
+
+1. **Never expose API keys** in source code
+2. **Always validate user input** before Firebase operations
+3. **Implement loading states** for all async operations
+4. **Use confirmations** for all destructive actions
+5. **Handle offline scenarios** gracefully
+6. **Test on mobile devices** regularly
+7. **Implement proper error boundaries** for component failures
+8. **Use lazy loading** for large feature modules
+
+## Development Workflow
+
+1. **Start with critical bugs** - Fix date validation and security issues first
+2. **Build reusable components** - Create shared UI components early
+3. **Implement Firebase Functions** - Build backend logic for email/data management
+4. **Complete analytics** - Fix charts and implement real data display
+5. **Test thoroughly** - Verify all user flows work correctly
+6. **Optimize performance** - Address any performance bottlenecks
+
+Remember: This is a production application used by real restaurants. Prioritize reliability, security, and user experience over feature quantity. 

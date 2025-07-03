@@ -3,11 +3,15 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { catchError, finalize } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
+import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @Component({
   selector: 'app-add-special',
@@ -31,9 +35,9 @@ export class AddSpecialComponent implements OnInit {
   selectedMenu: Menu | null = null;
   addedItems: { name: string; amount: string }[] = [];
   imageUploadProgress: number = 0;
-  showImageUploadModal: boolean = false;
   uploadedImageUrl: string | null = null;
   owner: string = '';
+  hasUnsavedChanges: boolean = false;
 
   showSuccessPopup: boolean = false;
   successPopupMessage: string = '';
@@ -42,22 +46,24 @@ export class AddSpecialComponent implements OnInit {
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private dialog: MatDialog,
+    private router: Router
   ) {
     this.specialForm = this.fb.group(
       {
         menu: [null, Validators.required],
         specialTitle: ['', Validators.required],
-        dateFrom: [{ value: '' }, Validators.required],
-        dateTo: [{ value: '' }, Validators.required],
-        typeSpecial: [{ value: '' }, Validators.required],
+        dateFrom: ['', Validators.required],
+        dateTo: ['', Validators.required],
+        typeSpecial: ['', Validators.required],
         typeSpecialDetails: [[]],
         comboPrice: [''],
         percentage: [''],
         amount: ['', Validators.required],
-        featureSpecialUnder: [{ value: '' }],
-        timeFrom: [{ value: '' }, Validators.required],
-        timeTo: [{ value: '', disabled: true }, Validators.required],
+        featureSpecialUnder: [''],
+        timeFrom: ['', Validators.required],
+        timeTo: ['', Validators.required],
       },
       {
         validators: [dateRangeValidator(), timeRangeValidator()],
@@ -67,6 +73,39 @@ export class AddSpecialComponent implements OnInit {
 
   ngOnInit() {
     this.fetchMenus();
+    this.trackFormChanges();
+    console.log('Component initialized, hasUnsavedChanges:', this.hasUnsavedChanges);
+  }
+
+  private trackFormChanges() {
+    this.specialForm.valueChanges.subscribe(() => {
+      this.hasUnsavedChanges = true;
+    });
+  }
+
+  private markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          this.router.navigate([route]);
+        }
+      });
+    } else {
+      this.router.navigate([route]);
+    }
   }
   addItem(): void {
     const selectedType = this.selectedSpecialType;
@@ -110,6 +149,7 @@ export class AddSpecialComponent implements OnInit {
         this.specialForm.get('comboPrice')?.reset();
       }
     }
+    this.markAsChanged();
   }
   getSpecialTypeLabel(type: number): string {
     switch (type) {
@@ -125,23 +165,10 @@ export class AddSpecialComponent implements OnInit {
   }
   removeItem(index: number): void {
     this.addedItems.splice(index, 1); // Remove the item at the specified index
+    this.markAsChanged();
   }
-  addPrefixIfNeeded() {
-    const amountControl = this.specialForm.get('amount');
-    if (amountControl && !amountControl.value.startsWith('R')) {
-      amountControl.setValue('R' + amountControl.value);
-    }
-  }
-
-  preventDeletion(event: any) {
-    const inputElement = event.target;
-    const currentValue = inputElement.value;
-
-    if (!currentValue.startsWith('R')) {
-      inputElement.value = 'R' + currentValue.replace(/R/g, '');
-      this.specialForm.get('amount')?.setValue(inputElement.value);
-    }
-  }
+  // Price formatting is now handled by PriceInputComponent
+  // Removed addPrefixIfNeeded() and preventDeletion() methods
 
   private fetchMenus() {
     const user = JSON.parse(localStorage.getItem('user')!);
@@ -176,6 +203,7 @@ export class AddSpecialComponent implements OnInit {
     } else {
       this.selectedDays.push(day);
     }
+    this.markAsChanged();
   }
 
   isSelected(day: string): boolean {
@@ -183,21 +211,33 @@ export class AddSpecialComponent implements OnInit {
   }
 
   openImageUploadModal() {
-    this.showImageUploadModal = true;
-  }
+    const config: ImageUploadConfig = {
+      title: 'Upload Special Image',
+      formats: ['PNG', 'JPG'],
+      maxFileSize: 5000, // 5MB as per original requirement
+      dimensions: '1080x1080',
+      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
+      allowMultiple: false,
+      maxFiles: 1
+    };
 
-  closeImageUploadModal() {
-    this.showImageUploadModal = false;
-  }
+    const dialogRef = this.dialog.open(ImageUploadModalComponent, {
+      width: '600px',
+      panelClass: 'image-upload-modal-panel',
+      data: {
+        config: config,
+        currentImageUrl: this.uploadedImageUrl
+      }
+    });
 
-  onFileSelected(event: any) {
-    this.isSaving = true;
-    const file: File = event.target.files[0];
-    if (file) {
-      this.uploadImageToFirebase(file);
-    } else {
-      this.isSaving = false;
-    }
+    dialogRef.afterClosed().subscribe((result: ImageUploadResult) => {
+      if (result?.action === 'save' && result.files && result.files.length > 0) {
+        this.isSaving = true;
+        this.uploadImageToFirebase(result.files[0]);
+      } else if (result?.action === 'remove') {
+        this.uploadedImageUrl = null;
+      }
+    });
   }
 
   uploadImageToFirebase(file: File) {
@@ -216,9 +256,10 @@ export class AddSpecialComponent implements OnInit {
           fileRef.getDownloadURL().subscribe({
             next: (url) => {
               this.uploadedImageUrl = url;
-              console.log('Uploaded Image URL:', url);
+
               this.uploadDone = true;
               this.isSaving = false;
+              this.markAsChanged();
             },
             error: (err) => {
               console.error('Failed to get download URL:', err);
@@ -238,7 +279,6 @@ export class AddSpecialComponent implements OnInit {
   onSubmit() {
     this.isSaving = true;
     const formValue = this.specialForm.getRawValue();
-    console.log(formValue);
     const data = {
       ...formValue,
       addedItems: this.addedItems,
@@ -247,6 +287,7 @@ export class AddSpecialComponent implements OnInit {
       OwnerID: this.owner,
       specialID: '1',
       active: true,
+      isDraft: false,
     };
 
     this.firestore
@@ -259,6 +300,7 @@ export class AddSpecialComponent implements OnInit {
         };
         this.firestore.collection('specials').doc(results.id).update(newData);
         this.isSaving = false;
+        this.markAsSaved();
         this.showSuccess('Special saved successfully!');
       })
       .catch((error) => {
@@ -267,10 +309,7 @@ export class AddSpecialComponent implements OnInit {
       });
   }
 
-  cancelUpload() {
-    this.uploadedImageUrl = '';
-    this.closeImageUploadModal();
-  }
+  // Removed cancelUpload() method - handled by ImageUploadModalComponent
 
   onDraftSave() {
     this.isSaving = true;
@@ -284,6 +323,7 @@ export class AddSpecialComponent implements OnInit {
       specialID: '1',
       OwnerID: this.owner,
       active: false,
+      isDraft: true,
     };
 
     this.firestore
@@ -301,6 +341,7 @@ export class AddSpecialComponent implements OnInit {
       })
       .then(() => {
         this.isSaving = false;
+        this.markAsSaved();
         this.toastr.success('Draft saved successfully.');
       })
       .catch((error) => {
@@ -316,6 +357,7 @@ export class AddSpecialComponent implements OnInit {
   }
   nextStep() {
     if (this.currentStep === 1) {
+      // Mark all required fields as touched to show validation errors
       const controlsToCheck = [
         'specialTitle',
         'menu',
@@ -333,9 +375,38 @@ export class AddSpecialComponent implements OnInit {
         }
       });
 
-      if (hasErrors || this.specialForm.errors?.['dateRangeInvalid']) {
+      // Explicitly check that date fields have actual values (not empty strings)
+      const dateFrom = this.specialForm.get('dateFrom')?.value;
+      const dateTo = this.specialForm.get('dateTo')?.value;
+      
+      // Enhanced validation: check for null, undefined, empty string, or whitespace
+      if (!dateFrom || !dateTo || 
+          dateFrom.toString().trim() === '' || 
+          dateTo.toString().trim() === '') {
+        // Mark date fields as touched and invalid to show error messages
+        this.specialForm.get('dateFrom')?.markAsTouched();
+        this.specialForm.get('dateTo')?.markAsTouched();
+        this.specialForm.get('dateFrom')?.setErrors({ 'required': true });
+        this.specialForm.get('dateTo')?.setErrors({ 'required': true });
+        hasErrors = true;
+        
+        // Show user feedback
+        this.toastr.error('Please fill in both start date and end date before proceeding.');
+      }
+
+      // Check for form-level validation errors (like date range)
+      if (this.specialForm.errors?.['dateRangeInvalid']) {
+        hasErrors = true;
+        this.toastr.error('Start date must be before end date.');
+      }
+
+      // Prevent navigation if there are any errors
+      if (hasErrors) {
+        console.log('Form validation failed, preventing navigation to step 2');
         return;
       }
+
+      console.log('Form validation passed, proceeding to step 2');
     }
 
     if (this.currentStep < 5) this.currentStep++;
@@ -353,5 +424,26 @@ export class AddSpecialComponent implements OnInit {
 
   onSpecialTypeChange() {
     this.selectedSpecialType = this.specialForm.get('typeSpecial')?.value;
+  }
+
+  onBackButtonClick() {
+    this.navigateWithUnsavedChangesCheck('/specials');
+  }
+
+  // Method to check if Step 1 form is invalid
+  isStep1Invalid(): boolean {
+    const dateFrom = this.specialForm.get('dateFrom')?.value;
+    const dateTo = this.specialForm.get('dateTo')?.value;
+    
+    return (
+      this.specialForm.get('specialTitle')?.invalid || 
+      this.specialForm.get('menu')?.invalid || 
+      this.specialForm.get('typeSpecial')?.invalid || 
+      !dateFrom || 
+      !dateTo ||
+      dateFrom.toString().trim() === '' ||
+      dateTo.toString().trim() === '' ||
+      this.specialForm.errors?.['dateRangeInvalid']
+    );
   }
 }

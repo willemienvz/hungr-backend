@@ -2,7 +2,7 @@
   <form #userForm="ngForm" (ngSubmit)="addRestaurant()">
     <div class="row" style="align-items: unset; justify-content: unset">
       <div class="block" style="height: 100%">
-        <a class="backLink" routerLink="/restaurants"
+        <a class="backLink" (click)="navigateWithUnsavedChangesCheck('/restaurants')"
           ><i class="material-icons">chevron_left</i> Back</a
         >
         <h6>Add Restaurant Details</h6>
@@ -177,7 +177,7 @@
       </div>
     </div>
     <div class="formGroup btnHolder">
-      <a routerLink="/settings/general" class="btn btnTertiary">Cancel</a>
+      <a (click)="navigateWithUnsavedChangesCheck('/settings/general')" class="btn btnTertiary">Cancel</a>
       <button type="button" (click)="saveDraft()" class="btn btnSecondary">
         Save as draft
       </button>

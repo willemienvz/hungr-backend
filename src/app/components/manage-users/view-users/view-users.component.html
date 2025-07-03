@@ -1,8 +1,75 @@
 <div class="popup" *ngIf="showPopup">
-  <div class="popup-content">
-    <i class="material-icons popup-close" (click)="closePopup()">close</i>
+  <div class="popup-content user-detail-modal">
+    <div class="modal-header">
+      <h3>User Details</h3>
+      <i class="material-icons popup-close" (click)="closePopup()">close</i>
+    </div>
+    
+    <div class="user-profile-section">
+      <div class="user-avatar">
+        <i class="material-icons">account_circle</i>
+      </div>
+      <div class="user-basic-info">
+        <h4>{{ user.firstName }} {{ user.Surname }}</h4>
+        <span class="user-role-badge">Editor</span>
+        <span class="status-indicator" [class.active]="true">
+          <i class="material-icons">check_circle</i>
+          Active
+        </span>
+      </div>
+    </div>
+
+    <div class="user-details-grid">
+      <div class="detail-item">
+        <label>First Name</label>
+        <span>{{ user.firstName }}</span>
+      </div>
+      
+      <div class="detail-item">
+        <label>Last Name</label>
+        <span>{{ user.Surname }}</span>
+      </div>
+      
+      <div class="detail-item">
+        <label>Email Address</label>
+        <span>{{ user.email }}</span>
+      </div>
+      
+      <div class="detail-item">
+        <label>Phone Number</label>
+        <span>{{ user.cellphoneNumber || 'Not provided' }}</span>
+      </div>
+      
+      <div class="detail-item">
+        <label>Role</label>
+        <span>Editor</span>
+      </div>
+      
+      <div class="detail-item">
+        <label>Access Level</label>
+        <span>Full Access</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btnTertiary" (click)="closePopup()" [disabled]="isSaving">
+        Close
+      </button>
+      <button class="btn btnSecondary" (click)="switchToEditMode()" [disabled]="isSaving">
+        <i class="material-icons">edit</i>
+        Edit User
+      </button>
+    </div>
+  </div>
+
+  <!-- Edit Mode -->
+  <div class="popup-content edit-mode" *ngIf="isEditMode">
+    <div class="modal-header">
+      <h3>Edit User</h3>
+      <i class="material-icons popup-close" (click)="closePopup()">close</i>
+    </div>
+    
     <div class="authBlock">
-      <h3>{{ user.firstName }} {{ user.Surname }}</h3>
       <form #editForm="ngForm" (ngSubmit)="updateUser(user)">
         <div class="row">
           <div class="formGroup">
@@ -54,12 +121,13 @@
             class="btn btnTertiary"
             type="button"
             value="Cancel"
-            (click)="closePopup()"
+            (click)="switchToViewMode()"
+            [disabled]="isSaving"
           />
           <input
             type="submit"
             class="btn btnPrimary"
-            [disabled]="!editForm.valid"
+            [disabled]="!editForm.valid || isSaving"
             value="Save Changes"
           />
         </div>

@@ -10,6 +10,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { MenuService, MenuItemInterface } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatDialog } from '@angular/material/dialog';
+import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 
 @Component({
   selector: 'app-edit-menu',
@@ -48,6 +51,10 @@ export class EditMenuComponent implements OnInit {
   selectedCategoryFilter: number | null = null;
   searchTerm: string = '';
   filteredMenuItems: MenuItemInterface[] = [];
+  
+  // Navigation safety properties
+  hasUnsavedChanges: boolean = false;
+  
   constructor(
     private readonly firestore: AngularFirestore,
     private readonly storage: AngularFireStorage,
@@ -55,7 +62,8 @@ export class EditMenuComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly toastr: ToastrService,
-    private readonly menuService: MenuService
+    private readonly menuService: MenuService,
+    private readonly dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -82,58 +90,107 @@ export class EditMenuComponent implements OnInit {
     this.fetchRestaurants();
   }
 
+  // Navigation safety methods
+  private markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string | any[]) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          if (Array.isArray(route)) {
+            this.router.navigate(route);
+          } else {
+            this.router.navigate([route]);
+          }
+        }
+      });
+    } else {
+      if (Array.isArray(route)) {
+        this.router.navigate(route);
+      } else {
+        this.router.navigate([route]);
+      }
+    }
+  }
+
+  onBackButtonClick() {
+    this.navigateWithUnsavedChangesCheck(['/menus']);
+  }
+
   addPreparation(itemIndex: number): void {
-    
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'preparations', this.newPreparation);
     this.newPreparation = '';
+    this.markAsChanged();
   }
 
   removePreparation(itemIndex: number, prepIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'preparations', prepIndex);
+    this.markAsChanged();
   }
 
   addVariation(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'variations', this.newVariation);
     this.newVariation = '';
+    this.markAsChanged();
   }
 
   removeVariation(itemIndex: number, variationIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'variations', variationIndex);
+    this.markAsChanged();
   }
 
   addPairing(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'pairings', this.newPairing);
     this.newPairing = '';
+    this.markAsChanged();
   }
 
   removePairing(itemIndex: number, pairingIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'pairings', pairingIndex);
+    this.markAsChanged();
   }
 
   addMenuItemPairing(data: {itemIndex: number, pairingId: string}): void {
     this.menuItems = this.menuService.addMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
+    this.markAsChanged();
   }
 
   removeMenuItemPairing(data: {itemIndex: number, pairingId: string}): void {
     this.menuItems = this.menuService.removeMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
+    this.markAsChanged();
   }
 
   addSide(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'sides', this.newSide);
     this.newSide = '';
+    this.markAsChanged();
   }
 
   addLabel(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'labels', this.newLabel);
     this.newLabel = '';
+    this.markAsChanged();
   }
 
   removeSide(itemIndex: number, sideIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'sides', sideIndex);
+    this.markAsChanged();
   }
 
   removeLabel(itemIndex: number, labelIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'labels', labelIndex);
+    this.markAsChanged();
   }
 
   loadMenuData() {
@@ -141,12 +198,36 @@ export class EditMenuComponent implements OnInit {
       if (menu) {
         this.menuName = menu.menuName;
         this.selectedRestaurant = menu.restaurantID;
-        this.categories = menu.categories || [];
+        
+        // Check for ID conflicts in the original data
+        const originalCategories = menu.categories || [];
+        const conflictCheck = this.menuService.checkCategoryIdConflicts(originalCategories);
+        
+        if (conflictCheck.hasConflicts) {
+          console.warn('Category ID conflicts detected in loaded menu data:', conflictCheck.conflicts);
+          console.log('Applying fix for category IDs...');
+        }
+        
+        // Fix any duplicate category IDs that may exist in older data
+        this.categories = this.menuService.fixCategoryIds(originalCategories);
+        
+        // Verify the fix worked
+        const fixedConflictCheck = this.menuService.checkCategoryIdConflicts(this.categories);
+        if (!fixedConflictCheck.hasConflicts) {
+          console.log('Category ID conflicts resolved successfully');
+        } else {
+          console.error('Category ID conflicts still exist after fix:', fixedConflictCheck.conflicts);
+        }
+        
+        // Display the final category structure for debugging
+        this.menuService.displayCategoryStructure(this.categories);
+        
         this.menuItems = menu.items || [];
         this.addRestaurantLater = menu.addRestaurantLater || false;
         this.initializeArrays();
         this.applyFilters(); // Initialize filters
-        console.log(menu);
+        console.log('Loaded menu data:', menu);
+        console.log('Fixed categories:', this.categories);
       }
     });
   }
@@ -162,11 +243,8 @@ export class EditMenuComponent implements OnInit {
     this.fileInput.nativeElement.click();
   }
 
-  onPriceInput(event: any, menuItem: any): void {
-    const formattedPrice = this.menuService.formatPriceInput(event.target.value);
-    menuItem.price = formattedPrice;
-    event.target.value = formattedPrice;
-  }
+  // Price input handling is now managed by PriceInputComponent
+  // Removed onPriceInput() method
 
   fetchRestaurants() {
     const user = JSON.parse(localStorage.getItem('user')!);
@@ -249,6 +327,13 @@ export class EditMenuComponent implements OnInit {
   saveMenu() {
     this.isSaving = true;
 
+    // Double-check that category IDs are still unique before saving
+    const conflictCheck = this.menuService.checkCategoryIdConflicts(this.categories);
+    if (conflictCheck.hasConflicts) {
+      console.warn('Category ID conflicts detected before saving, re-applying fix...');
+      this.categories = this.menuService.fixCategoryIds(this.categories);
+    }
+
     const updatedMenu = {
       menuName: this.menuName,
       restaurantID: this.addRestaurantLater ? '' : this.selectedRestaurant,
@@ -257,10 +342,13 @@ export class EditMenuComponent implements OnInit {
       addRestaurantLater: this.addRestaurantLater
     };
 
+    console.log('Saving menu with fixed categories:', this.categories);
+
     this.menuService.updateMenu(this.menuID, updatedMenu)
       .then(() => {
         this.isSaving = false;
-        console.log('Menu updated successfully!');
+        this.markAsSaved();
+        console.log('Menu updated successfully with fixed category IDs!');
       })
       .catch((error) => {
         console.error('Error updating menu:', error);
@@ -272,20 +360,66 @@ export class EditMenuComponent implements OnInit {
     this.categories = this.menuService.addCategory(this.categories, this.newCategoryName);
     this.newCategoryName = '';
     this.initializeArrays();
+    this.markAsChanged();
   }
 
   addSubCategory(categoryIndex: number) {
     this.categories = this.menuService.addSubCategory(this.categories, categoryIndex, this.newSubcategoryName[categoryIndex]);
     this.newSubcategoryName[categoryIndex] = '';
+    this.markAsChanged();
   }
 
   deleteCategory(index: number) {
-    this.categories = this.menuService.deleteCategory(this.categories, index);
-    this.initializeArrays();
+    const categoryName = this.categories[index]?.name || 'Category';
+    
+    const data: DeleteConfirmationData = {
+      title: 'Delete Category',
+      itemName: categoryName,
+      itemType: 'category',
+      message: `Are you sure you want to delete the category "${categoryName}"? This action will also remove all subcategories and cannot be undone.`,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.categories = this.menuService.deleteCategory(this.categories, index);
+        this.initializeArrays();
+        this.markAsChanged();
+      }
+    });
   }
 
   deleteSubCategory(categoryIndex: number, subcategoryIndex: number) {
-    this.categories = this.menuService.deleteSubCategory(this.categories, categoryIndex, subcategoryIndex);
+    const subcategoryName = this.categories[categoryIndex]?.subcategories?.[subcategoryIndex]?.name || 'Subcategory';
+    
+    const data: DeleteConfirmationData = {
+      title: 'Delete Subcategory',
+      itemName: subcategoryName,
+      itemType: 'subcategory',
+      message: `Are you sure you want to delete the subcategory "${subcategoryName}"? This action cannot be undone.`,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.categories = this.menuService.deleteSubCategory(this.categories, categoryIndex, subcategoryIndex);
+        this.markAsChanged();
+      }
+    });
   }
 
   togglePopupMenu(index: number) {
@@ -303,6 +437,7 @@ export class EditMenuComponent implements OnInit {
       addRestaurantLater: this.addRestaurantLater
     };
     this.menuService.updateMenu(this.menuID, updatedMenu);
+    this.markAsSaved();
   }
 
   setAsPublished() {
@@ -316,16 +451,19 @@ export class EditMenuComponent implements OnInit {
       addRestaurantLater: this.addRestaurantLater
     };
     this.menuService.updateMenu(this.menuID, updatedMenu);
+    this.markAsSaved();
   }
 
   addMenuItem() {
     this.menuItems = this.menuService.addMenuItem(this.menuItems);
     this.applyFilters();
+    this.markAsChanged();
   }
 
   removeMenuItem(index: number) {
     this.menuItems = this.menuService.removeMenuItem(this.menuItems, index);
     this.applyFilters();
+    this.markAsChanged();
   }
 
   toggleDetail(
@@ -333,6 +471,7 @@ export class EditMenuComponent implements OnInit {
     itemIndex: number
   ) {
     this.menuItems = this.menuService.toggleDetail(this.menuItems, detailType, itemIndex);
+    this.markAsChanged();
   }
 
   onFileSelected(event: Event, itemIndex: number): void {
@@ -341,6 +480,7 @@ export class EditMenuComponent implements OnInit {
     if (file) {
       this.menuService.uploadMenuItemImage(file).then(url => {
         this.menuItems = this.menuService.updateMenuItemImage(this.menuItems, itemIndex, url);
+        this.markAsChanged();
       }).catch(error => {
         console.error('Error uploading image:', error);
         this.toastr.error('Error uploading image');
@@ -362,6 +502,7 @@ export class EditMenuComponent implements OnInit {
       moveItemInArray(this.menuItems, event.previousIndex, event.currentIndex);
       this.applyFilters();
     }
+    this.markAsChanged();
   }
 
   /* KB - Handle bulk uploaded menu items */
@@ -381,6 +522,7 @@ export class EditMenuComponent implements OnInit {
     this.navigateToStep(4);
     
     this.toastr.success(`${event.items.length} menu items ${event.replaceExisting ? 'replaced' : 'added'} successfully!`);
+    this.markAsChanged();
   }
 
   // Filter methods

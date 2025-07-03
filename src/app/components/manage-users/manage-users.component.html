@@ -15,7 +15,7 @@
           />
         </div>
       </div>
-      <a class="btnSecondary" (click)="addUser.openPopup()">+ Add user</a>
+      <a class="btnSecondary" (click)="addUser.openPopup()" [class.disabled]="isSaving">+ Add user</a>
     </div>
 
     <h6>Editors</h6>
@@ -26,24 +26,39 @@
             <th></th>
             <th>User</th>
             <th>Email Address</th>
-            <th></th>
+            <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let user of users; let i = index">
             <td>{{ i + 1 }}</td>
-            <td>{{ user.firstName }} {{ user.Surname }}</td>
+            <td>
+              <div class="user-info">
+                <div class="user-details">
+                  <span class="user-name">{{ user.firstName }} {{ user.Surname }}</span>
+                  <span class="user-role">Editor</span>
+                </div>
+              </div>
+            </td>
             <td>{{ user.email }}</td>
-            <td style="text-align: right">
-              <i class="material-icons" (click)="togglePopupMenu(i)"
-                >more_vert</i
-              >
-              <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-                <a (click)="editUser(user, i)">Edit</a>
-                <a (click)="confirmDeleteUser(user.uid, i)">Delete</a>
-                <i class="material-icons closeBtn" (click)="togglePopupMenu(i)"
-                  >close</i
-                >
+            <td>
+              <span class="status-badge" [class.active]="getUserStatus(user)" [class.inactive]="!getUserStatus(user)">
+                <i class="material-icons status-icon">{{ getUserStatus(user) ? 'check_circle' : 'cancel' }}</i>
+                {{ getUserStatus(user) ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <div class="action-buttons">
+                <button mat-icon-button class="view-btn" (click)="viewUser(user)" title="View User" [disabled]="isSaving">
+                  <i class="material-icons">visibility</i>
+                </button>
+                <button mat-icon-button class="edit-btn" (click)="editUser(user, i)" title="Edit User" [disabled]="isSaving">
+                  <i class="material-icons">edit</i>
+                </button>
+                <button mat-icon-button class="delete-btn" (click)="confirmDeleteUser(user.uid, i)" title="Delete User" [disabled]="isSaving">
+                  <i class="material-icons">delete</i>
+                </button>
               </div>
             </td>
           </tr>
@@ -56,14 +71,3 @@
 <app-add-user-dialog #addUser></app-add-user-dialog>
 <app-loading [isLoading]="isSaving"></app-loading>
 <app-view-users #editDialog></app-view-users>
-
-<div class="modal-overlay" *ngIf="showConfirmDelete">
-  <div class="modal">
-    <h3>Confirm Deletion</h3>
-    <p>Are you sure you want to delete this user?</p>
-    <div class="modal-buttons">
-      <button class="btn btnTertiary" (click)="cancelDelete()">Cancel</button>
-      <button class="btn btnSecondary" (click)="proceedDelete()">Delete</button>
-    </div>
-  </div>
-</div>

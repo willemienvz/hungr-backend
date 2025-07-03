@@ -2,9 +2,9 @@ import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { ViewComponent } from './view/view.component';
 import { ToastrService } from 'ngx-toastr';
+import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 @Component({
   selector: 'app-restaurant',
   templateUrl: './restaurant.component.html',
@@ -37,15 +37,24 @@ export class RestaurantComponent {
   }
 
   openDialog(id: string, index: number, name: string): void {
-    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
-      width: '400px',
-      data: { name: name },
+    const data: DeleteConfirmationData = {
+      title: 'Delete Restaurant',
+      itemName: name,
+      itemType: 'restaurant',
+      message: `Are you sure you want to delete "${name}"? This will permanently remove the restaurant and all associated data.`,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.deleteRestaurant(id, index);
-      } else {
       }
     });
   }

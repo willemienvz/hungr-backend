@@ -1,0 +1,134 @@
+.delete-confirmation-modal {
+  max-width: 90vw;
+  width: 450px;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+  font-family: var(--hungr-font-family);
+  position: relative;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .modal-title {
+      font-family: "Poppins", sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+      flex: 1;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 24px;
+      top: 24px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      i {
+        font-size: 20px;
+        color: #aaa;
+        transition: color 0.2s ease;
+      }
+
+      &:hover i {
+        color: #333;
+      }
+    }
+  }
+
+  .modal-content {
+    text-align: center;
+    margin-bottom: 32px;
+
+    .warning-icon {
+      margin-bottom: 16px;
+
+      i {
+        font-size: 48px;
+        color: #ff6b6b;
+        background: #fff3f3;
+        border-radius: 50%;
+        padding: 16px;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+      }
+    }
+
+    .confirmation-message {
+      font-family: "Poppins", sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #555;
+      margin: 0;
+      max-width: 350px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+
+    button {
+      min-width: 120px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+
+      &.btnTertiary {
+        background-color: #f5f5f5;
+        color: #333;
+
+        &:hover {
+          background-color: #e8e8e8;
+        }
+      }
+
+      &.btnDanger {
+        background-color: #ff6b6b;
+        color: white;
+
+        &:hover {
+          background-color: #ff5252;
+        }
+      }
+    }
+  }
+}
+
+// Override Material Dialog panel styles specifically for delete confirmation modal
+::ng-deep .delete-confirmation-modal-panel .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+}
+
+::ng-deep .delete-confirmation-modal-panel .mat-mdc-dialog-surface {
+  border-radius: 16px !important;
+} 

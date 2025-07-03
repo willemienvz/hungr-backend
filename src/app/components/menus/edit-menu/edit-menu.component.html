@@ -1,7 +1,7 @@
 <div class="container">
   <div *ngIf="currentStep === 1">
     <div class="headerBlock">
-    <app-progress-bar [showBackButton]="true" [backRoute]="'/menus'" [progress]="currentStep"></app-progress-bar>
+    <app-progress-bar [showBackButton]="true" [backRoute]="'/menus'" [progress]="currentStep" (backButtonClick)="onBackButtonClick()"></app-progress-bar>
     <app-step-header
       [stepNumber]="1"
       [stepTitle]="'General Details'"
@@ -39,7 +39,7 @@
   <div *ngIf="currentStep === 2">
     <div class="headerBlock">
       <app-progress-bar [progress]="currentStep" [backRoute]="'/menus'"
-      (stepClick)="navigateToStep($event)">></app-progress-bar>
+      (stepClick)="navigateToStep($event)" (backButtonClick)="onBackButtonClick()"></app-progress-bar>
       <app-step-header
         [stepNumber]="2"
         [stepTitle]="'Edit your menu categories'"
@@ -79,7 +79,8 @@
       <app-progress-bar 
         [progress]="currentStep" 
         [backRoute]="'/menus'"
-        (stepClick)="navigateToStep($event)">
+        (stepClick)="navigateToStep($event)"
+        (backButtonClick)="onBackButtonClick()">
       </app-progress-bar>
       
       <app-step-header
@@ -105,7 +106,8 @@
       <app-progress-bar 
         [progress]="currentStep" 
         [backRoute]="'/menus'"
-        (stepClick)="navigateToStep($event)">
+        (stepClick)="navigateToStep($event)"
+        (backButtonClick)="onBackButtonClick()">
       </app-progress-bar>
     
       <app-step-header
@@ -237,7 +239,7 @@
           (addLabel)="addLabel($event)"
           (removeLabel)="removeLabel($event.itemIndex, $event.labelIndex)"
           (fileSelected)="onFileSelected($event.event, $event.itemIndex)"
-          (priceInput)="onPriceInput($event.event, $event.menuItem)"
+
           (getFile)="getFile($event)"
           (newPreparationChange)="newPreparation = $event"
           (newVariationChange)="newVariation = $event"

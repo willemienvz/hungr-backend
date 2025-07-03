@@ -4,6 +4,7 @@ import { Category } from '../../../shared/services/category';
 import { DetailConfig } from '../menu-item-detail/menu-item-detail.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../image-upload-modal/image-upload-modal.component';
+import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../delete-confirmation-modal/delete-confirmation-modal.component';
 
 type DetailType = 'preparation' | 'variation' | 'pairing' | 'side';
 
@@ -39,7 +40,7 @@ export class MenuItemFormComponent implements OnInit {
   @Output() addLabel = new EventEmitter<number>();
   @Output() removeLabel = new EventEmitter<{itemIndex: number, labelIndex: number}>();
   @Output() fileSelected = new EventEmitter<{event: Event, itemIndex: number}>();
-  @Output() priceInput = new EventEmitter<{event: any, menuItem: MenuItemInterface}>();
+  // Removed @Output() priceInput - handled by PriceInputComponent directly
   @Output() getFile = new EventEmitter<number>();
   @Output() newPreparationChange = new EventEmitter<string>();
   @Output() newVariationChange = new EventEmitter<string>();
@@ -105,6 +106,46 @@ export class MenuItemFormComponent implements OnInit {
                      !this.menuItem.imageUrl;
     
     this.isCollapsed = !isNewItem;
+    
+    // Debug: Log current category assignment if it exists
+    if (this.menuItem.categoryId) {
+      this.logCategoryAssignment();
+    }
+  }
+
+  /* KB: Debug method to log category assignment details */
+  private logCategoryAssignment() {
+    const categoryInfo = this.menuService.findCategoryById(this.categories, this.menuItem.categoryId!);
+    if (categoryInfo) {
+      if (categoryInfo.subcategory) {
+        console.log(`Menu item "${this.menuItem.name}" assigned to subcategory: ${categoryInfo.subcategory.name} (ID: ${categoryInfo.subcategory.id}) under ${categoryInfo.category.name}`);
+      } else {
+        console.log(`Menu item "${this.menuItem.name}" assigned to main category: ${categoryInfo.category.name} (ID: ${categoryInfo.category.id})`);
+      }
+    } else {
+      console.warn(`Menu item "${this.menuItem.name}" has categoryId ${this.menuItem.categoryId} but no matching category found`);
+    }
+  }
+
+  /* KB: Handle category selection change for debugging */
+  onCategorySelectionChange(event: any) {
+    const selectedCategoryId = event.value;
+    console.log(`Category selection changed for "${this.menuItem.name}" to ID: ${selectedCategoryId}`);
+    
+    if (selectedCategoryId) {
+      const categoryInfo = this.menuService.findCategoryById(this.categories, selectedCategoryId);
+      if (categoryInfo) {
+        if (categoryInfo.subcategory) {
+          console.log(`✅ Successfully assigned to subcategory: ${categoryInfo.subcategory.name} (ID: ${categoryInfo.subcategory.id}) under ${categoryInfo.category.name}`);
+        } else {
+          console.log(`✅ Successfully assigned to main category: ${categoryInfo.category.name} (ID: ${categoryInfo.category.id})`);
+        }
+      } else {
+        console.error(`❌ Selected category ID ${selectedCategoryId} not found in category structure`);
+      }
+    } else {
+      console.log(`Category cleared for "${this.menuItem.name}"`);
+    }
   }
 
   private initializeImageUrls() {
@@ -124,7 +165,26 @@ export class MenuItemFormComponent implements OnInit {
   }
 
   onRemoveMenuItem() {
-    this.removeMenuItem.emit(this.itemIndex);
+    const data: DeleteConfirmationData = {
+      title: 'Remove Menu Item',
+      itemName: this.menuItem.name || 'Unnamed Menu Item',
+      itemType: 'menu item',
+      message: `Are you sure you want to remove "${this.menuItem.name || 'this menu item'}" from the menu? This action cannot be undone.`,
+      confirmButtonText: 'Yes, Remove',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.removeMenuItem.emit(this.itemIndex);
+      }
+    });
   }
 
   onToggleDetail(detailType: DetailType) {
@@ -184,32 +244,8 @@ export class MenuItemFormComponent implements OnInit {
     this.fileSelected.emit({event, itemIndex: this.itemIndex});
   }
 
-  onPriceInput(event: any) {
-    this.priceInput.emit({event, menuItem: this.menuItem});
-  }
-
-  onPriceKeypress(event: KeyboardEvent) {
-    // Allow: backspace, delete, tab, escape, enter, home, end, left, right arrows
-    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
-    
-    // Allow decimal point (only one)
-    if (event.key === '.' && !(event.target as HTMLInputElement).value.includes('.')) {
-      return;
-    }
-    
-    // Allow allowed keys
-    if (allowedKeys.includes(event.key)) {
-      return;
-    }
-    
-    // Allow numbers 0-9
-    if (event.key >= '0' && event.key <= '9') {
-      return;
-    }
-    
-    // Block everything else
-    event.preventDefault();
-  }
+  // Price input handling is now managed by PriceInputComponent
+  // Removed onPriceInput() and onPriceKeypress() methods
 
   onGetFile() {
     /* KB: Open image upload modal for multiple image upload */
@@ -281,7 +317,32 @@ export class MenuItemFormComponent implements OnInit {
   }
 
   /* KB: Delete specific image from Firebase Storage and remove from array */
-  onRemoveImage(index: number) {
+  confirmRemoveImage(index: number) {
+    if (!this.menuItem.imageUrls || index >= this.menuItem.imageUrls.length) return;
+
+    const data: DeleteConfirmationData = {
+      title: 'Delete Image',
+      itemName: `Image ${index + 1}`,
+      itemType: 'image',
+      message: 'Are you sure you want to delete this image? This action cannot be undone.',
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.onRemoveImage(index);
+      }
+    });
+  }
+
+  private onRemoveImage(index: number) {
     if (!this.menuItem.imageUrls || index >= this.menuItem.imageUrls.length) return;
 
     const imageUrl = this.menuItem.imageUrls[index];

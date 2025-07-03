@@ -32,11 +32,16 @@ import { ConfirmEmailComponent } from './components/sign-up/confirm-email/confir
 import { NewPasswordComponent } from './components/forgot-password/new-password/new-password.component';
 import { CancelPaymentComponent } from './components/cancel-payment/cancel-payment.component';
 import { ActionLandingComponent } from './components/action-landing/action-landing.component';
+import { Step1Component } from './components/sign-up/step1/step1.component';
+import { Step2Component } from './components/sign-up/step2/step2.component';
+import { Step3Component } from './components/sign-up/step3/step3.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
   { path: 'sign-in', component: SignInComponent },
-  { path: 'register-user', component: SignUpComponent },
+  { path: 'register-user', redirectTo: 'register-user/step1', pathMatch: 'full' },
+  { path: 'register-user/step1', component: Step1Component },
+  { path: 'register-user/step2', component: Step2Component },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'confirm-user', component: ConfirmUserComponent },
   { path: 'verify-email-address', component: VerifyEmailComponent },

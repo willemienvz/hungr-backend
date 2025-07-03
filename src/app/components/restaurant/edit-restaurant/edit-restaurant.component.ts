@@ -4,10 +4,11 @@ import { Restaurant } from '../../../shared/services/restaurant';
 import { User } from '../../../shared/services/user';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ConfigService } from '../../../config.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SuccessAddRestaurantDialogComponent } from '../add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @Component({
   selector: 'app-edit-restaurant',
@@ -35,6 +36,7 @@ export class EditRestaurantComponent {
   selectedUserName: string = '';
   isSaving: boolean = false;
   userChanged: boolean = false;
+  hasUnsavedChanges: boolean = false;
 
   saProvinces: string[] = [
     'Eastern Cape',
@@ -56,8 +58,59 @@ export class EditRestaurantComponent {
     });
     this.fetchMenus();
     this.fetchUsers();
-
     this.fetchRestaurant(this.currentRestaurantID);
+    this.setupFormTracking();
+  }
+
+  private setupFormTracking() {
+    // Track changes to detect unsaved modifications
+    const inputs = ['name', 'street', 'city', 'province', 'zip'];
+    inputs.forEach(input => {
+      const originalValue = this.restaurant[input];
+      Object.defineProperty(this.restaurant, `_${input}`, { value: originalValue, writable: true });
+      Object.defineProperty(this.restaurant, input, {
+        get: () => this.restaurant[`_${input}`],
+        set: (value) => {
+          this.restaurant[`_${input}`] = value;
+          this.markAsChanged();
+        },
+        enumerable: true,
+        configurable: true
+      });
+    });
+  }
+
+  private markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string | any[]) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          if (Array.isArray(route)) {
+            this.router.navigate(route);
+          } else {
+            this.router.navigate([route]);
+          }
+        }
+      });
+    } else {
+      if (Array.isArray(route)) {
+        this.router.navigate(route);
+      } else {
+        this.router.navigate([route]);
+      }
+    }
   }
 
   constructor(
@@ -65,7 +118,8 @@ export class EditRestaurantComponent {
     private snackBar: MatSnackBar,
     private firestore: AngularFirestore,
     private configService: ConfigService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     for (let i = 1; i <= this.configService.numberOfTables; i++) {
       this.tableNums.push(i);
@@ -233,6 +287,7 @@ export class EditRestaurantComponent {
 
   selectMenu(menuID: string) {
     this.selectedMenuID = menuID;
+    this.markAsChanged();
   }
 
   selectUser(user: User) {

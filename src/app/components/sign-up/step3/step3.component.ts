@@ -2,6 +2,8 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-step3',
   templateUrl: './step3.component.html',
@@ -12,7 +14,7 @@ export class Step3Component implements OnInit {
   @Output() finish: EventEmitter<any> = new EventEmitter<any>();
   @Output() skip: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(private fb: FormBuilder, private toastr: ToastrService) {
+  constructor(private router: Router, private fb: FormBuilder, private toastr: ToastrService) {
     this.step3Form = this.fb.group({
       cardHolderName: [''],
       cardNumber: ['', Validators.pattern(/^\d{4} \d{4} \d{4} \d{4}$/)],
@@ -49,5 +51,9 @@ export class Step3Component implements OnInit {
 
   onSkip(): void {
     this.skip.emit();
+  }
+
+  onPrevious(): void {
+    this.router.navigate(['/register-user/step2']);
   }
 }

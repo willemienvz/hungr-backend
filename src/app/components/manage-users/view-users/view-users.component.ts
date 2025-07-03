@@ -15,6 +15,7 @@ export class ViewUsersComponent {
 
   showPopup: boolean = false;
   isSaving: boolean = false;
+  isEditMode: boolean = false;
 
   constructor(
     private readonly toastr: ToastrService,
@@ -24,10 +25,20 @@ export class ViewUsersComponent {
   openPopup(user: any) {
     this.user = { ...user };
     this.showPopup = true;
+    this.isEditMode = false; // Start in view mode
   }
 
   closePopup() {
     this.showPopup = false;
+    this.isEditMode = false;
+  }
+
+  switchToEditMode() {
+    this.isEditMode = true;
+  }
+
+  switchToViewMode() {
+    this.isEditMode = false;
   }
 
   updateUser(updatedUser: User) {
@@ -47,7 +58,7 @@ export class ViewUsersComponent {
       .then(() => {
         this.toastr.success('User updated successfully!');
         this.isSaving = false;
-        this.closePopup();
+        this.switchToViewMode(); // Switch back to view mode after successful update
       })
       .catch((error) => {
         this.toastr.error('Error updating user');

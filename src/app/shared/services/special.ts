@@ -7,6 +7,7 @@ export interface Special {
     featureSpecialUnder:number;
     menu:string;
     isDraft:boolean;
+    active:boolean;
     addedItems: { name: string; amount: number }[];
     selectedDays: string[];
     specialTitle:string;

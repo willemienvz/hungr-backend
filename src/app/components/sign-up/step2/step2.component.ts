@@ -4,6 +4,10 @@ import { FormDataService } from '../../../shared/services/signup/form-data.servi
 import { AuthService } from '../../../shared/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 
+import { Router } from '@angular/router';
+import { PayflexService } from '../../../shared/services/payflex.service';
+import { BehaviorSubject } from 'rxjs';
+
 @Component({
   selector: 'app-step2',
   templateUrl: './step2.component.html',
@@ -12,16 +16,29 @@ import { HttpClient } from '@angular/common/http';
 export class Step2Component {
   step2Form: FormGroup;
   showAnnual: boolean = true;
-  @Output() previous: EventEmitter<void> = new EventEmitter<void>();
-  @Output() next: EventEmitter<void> = new EventEmitter<void>();
+  isSaving: boolean = false;
+  private formData = new BehaviorSubject<any>({});
 
-
-  constructor( private readonly http: HttpClient, private readonly fb: FormBuilder, private readonly formDataService: FormDataService, private readonly authService: AuthService) {
+  constructor(
+    private router: Router,
+    private readonly http: HttpClient,
+    private readonly fb: FormBuilder,
+    private readonly formDataService: FormDataService,
+    private readonly authService: AuthService,
+    private readonly payflexService: PayflexService
+  ) {
     this.step2Form = this.fb.group({
-      billingOption: [null, Validators.required],
-      agreeToTerms: [false, Validators.requiredTrue],  
-      receiveMarketingInfo: [false]  
+      billingOption: ['annual1', Validators.required],
+      agreeToTerms: [false, Validators.requiredTrue],
+      receiveMarketingInfo: [false],
     });
+  }
+
+  ngOnInit(): void {
+    const existingData = this.formDataService.getFormData();
+    if (existingData) {
+      this.step2Form.patchValue(existingData);
+    }
   }
 
   get billingOption() {
@@ -33,12 +50,27 @@ export class Step2Component {
       this.billingOption.setValue(option);
     }
   }
- 
+
   onPrevious() {
-    this.previous.emit();
+    this.router.navigate(['/register-user/step1']);
   }
+
   onComplete() {
     const formData = this.step2Form.value;
-    this.next.emit(formData);
+    this.formDataService.updateFormData(formData);
+    this.onCheckout();
+  }
+
+  async onCheckout() {
+    this.isSaving = true;
+    this.formData.next(this.formDataService.getFormData());
+    localStorage.setItem('formData', JSON.stringify(this.formData.getValue()));
+    try {
+      await this.payflexService.createOrder(120, this.formData.getValue());
+    } catch (error) {
+      console.error('Error during checkout:', error);
+    } finally {
+      this.isSaving = false;
+    }
   }
 }

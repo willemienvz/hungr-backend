@@ -9,6 +9,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { User } from '../../../shared/services/user';
 import { map } from 'rxjs/operators';
 
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-step1',
   templateUrl: './step1.component.html',
@@ -22,19 +24,24 @@ export class Step1Component  implements OnInit, OnDestroy{
   showPasswordConf: boolean = false;
   private confirmPwdSubscription!: Subscription;
   @Output() next: EventEmitter<any> = new EventEmitter<any>();
-  constructor(private firestore: AngularFirestore, public authService: AuthService,private fb: FormBuilder, private formDataService: FormDataService,  private toastr: ToastrService) {
+  constructor(private router: Router, private firestore: AngularFirestore, public authService: AuthService,private fb: FormBuilder, private formDataService: FormDataService,  private toastr: ToastrService) {
     this.step1Form = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(10)]],
       userPwdConfrim: ['', Validators.required],
       userEmail: ['', [Validators.required, Validators.email, this.emailInUseValidator.bind(this)]],
-      cellphone: ['', [Validators.required, this.cellphoneValidator]],
+      cellphone: ['+27', [Validators.required, this.cellphoneValidator.bind(this)]],
   }, {
       validator: this.passwordMatchValidator 
   });
   }
   ngOnInit(): void {
+    const existingData = this.formDataService.getFormData();
+    if (existingData) {
+      this.step1Form.patchValue(existingData);
+    }
+
     this.getUsers();
     this.confirmPwdSubscription = this.step1Form.get('userPwdConfrim')!.valueChanges.subscribe(() => {
       this.passwordMatchValidator(this.step1Form);
@@ -51,6 +58,37 @@ export class Step1Component  implements OnInit, OnDestroy{
       this.emailInUse = false;
      }
     });
+
+    this.step1Form.get('cellphone')!.valueChanges.subscribe((value) => {
+      this.step1Form.get('cellphone')!.setValue(this.formatCellphone(value), { emitEvent: false });
+    });
+  }
+
+  formatCellphone(value: string): string {
+    if (!value) {
+      return '+27';
+    }
+    const number = value.replace(/\D/g, '').substring(2);
+    let formatted = '+27';
+    if (number.length > 0) {
+      formatted += ' ' + number.substring(0, 2);
+    }
+    if (number.length > 2) {
+      formatted += ' ' + number.substring(2, 5);
+    }
+    if (number.length > 5) {
+      formatted += ' ' + number.substring(5, 9);
+    }
+    return formatted;
+  }
+
+  cellphoneValidator(control: AbstractControl): { [key: string]: any } | null {
+    const value = (control.value || '').replace(/\s/g, '');
+    const validCellphonePattern = /^\+27\d{9}$/;
+    if (!validCellphonePattern.test(value)) {
+      return { invalidCellphone: true };
+    }
+    return null;
   }
   checkEmailInUse(email: string): boolean {
     return this.emailList.includes(email);
@@ -107,14 +145,7 @@ getUsers(){
     }
     return null;
   }
-  cellphoneValidator(control: AbstractControl): { [key: string]: any } | null {
-    const value = control.value || '';
-    const validCellphonePattern = /^\+27\s?\(?\d{2}\)?\s?\d{3}\s?\d{4}$/; // South Africa format: +27 (XX) XXX XXXX
-    if (!validCellphonePattern.test(value)) {
-      return { invalidCellphone: true };
-    }
-    return null;
-  }
+  
 
 
 isLengthValid(): boolean {
@@ -160,8 +191,8 @@ togglePasswordConfirmVisibility(): void {
       return;
   }
   const formData = this.step1Form.value;
-
-  this.next.emit(formData);
-
+  formData.cellphone = formData.cellphone.replace(/\s/g, '');
+  this.formDataService.updateFormData(formData);
+  this.router.navigate(['/register-user/step2']);
   }
 }

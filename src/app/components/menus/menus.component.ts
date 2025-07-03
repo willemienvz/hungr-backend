@@ -3,6 +3,8 @@ import { Menu } from '../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 
 @Component({
   selector: 'app-menus',
@@ -17,7 +19,11 @@ export class MenusComponent implements OnInit{
   isPopupMenuOpenDraft: boolean[] = [];
   selectedMenuId: string = ''; 
   tempRestaurant:Restaurant = {} as Restaurant;
-  constructor(private firestore: AngularFirestore, private toastr: ToastrService ) {
+  constructor(
+    private firestore: AngularFirestore, 
+    private toastr: ToastrService,
+    private dialog: MatDialog
+  ) {
   }
 
   
@@ -26,7 +32,30 @@ export class MenusComponent implements OnInit{
     this.fetchMenus();
   }
 
-  deleteQR(id:string, index:number){
+  deleteQR(id:string, index:number, menuName: string){
+    const data: DeleteConfirmationData = {
+      title: 'Remove QR Code',
+      itemName: menuName,
+      itemType: 'QR code assignment',
+      message: `Are you sure you want to remove the QR code assignment from "${menuName}"? This will disable QR code access for this menu.`,
+      confirmButtonText: 'Yes, Remove',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.performQRDeletion(id, index);
+      }
+    });
+  }
+
+  private performQRDeletion(id: string, index: number) {
     const dataToUpdate = {
       qrAssigned: false,
       qrUrl: ''
@@ -36,6 +65,7 @@ export class MenusComponent implements OnInit{
       .then(() => {
         this.isPopupMenuOpenActive[index] = false;
         this.isPopupMenuOpenDraft[index] = false;
+        this.toastr.success('QR code assignment removed!');
       })
       .catch((error) => {
         console.log(error);
@@ -67,12 +97,37 @@ export class MenusComponent implements OnInit{
     this.isPopupMenuOpenDraft = new Array(this.draftMenus.length).fill(false);
   }
 
-  deleteMenu(id: string) {
+  deleteMenu(id: string, menuName: string) {
+    const data: DeleteConfirmationData = {
+      title: 'Delete Menu',
+      itemName: menuName,
+      itemType: 'menu',
+      message: `Are you sure you want to permanently delete the menu "${menuName}"? This action cannot be undone and will remove all menu items, categories, and associated data.`,
+      confirmButtonText: 'Yes, Delete Menu',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.performMenuDeletion(id);
+      }
+    });
+  }
+
+  private performMenuDeletion(id: string) {
+    this.isSaving = true;
     this.firestore.doc(`menus/${id}`).delete()
       .then(() => {
         this.fetchMenus();
         this.closeAllPopups();
         this.toastr.success('Menu has been deleted!');
+        this.isSaving = false;
       })
       .catch((error) => {
         console.log(error);

@@ -14,6 +14,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { MenuService, MenuItemInterface } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 
 @Component({
   selector: 'app-add-menu',
@@ -78,6 +79,9 @@ export class AddMenuComponent implements OnInit {
   steps: string[] = ['Menu Details', 'Categories', 'Add Items', 'Done'];
   addRestaurantLater: boolean = false;
 
+  // Navigation safety properties
+  hasUnsavedChanges: boolean = false;
+
   constructor(
     private storage: AngularFireStorage,
     private firestore: AngularFirestore,
@@ -118,6 +122,44 @@ export class AddMenuComponent implements OnInit {
         this.router.navigate(['/menus/add-menu/1'], { replaceUrl: true });
       }
     });
+  }
+
+  // Navigation safety methods
+  private markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string | any[]) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          if (Array.isArray(route)) {
+            this.router.navigate(route);
+          } else {
+            this.router.navigate([route]);
+          }
+        }
+      });
+    } else {
+      if (Array.isArray(route)) {
+        this.router.navigate(route);
+      } else {
+        this.router.navigate([route]);
+      }
+    }
+  }
+
+  onBackButtonClick() {
+    this.navigateWithUnsavedChangesCheck(['/menus']);
   }
 
   async onAddRestaurantClick(event: Event) {
@@ -241,11 +283,8 @@ export class AddMenuComponent implements OnInit {
     }
   }
 
-  onPriceInput(event: any, menuItem: any): void {
-    const formattedPrice = this.menuService.formatPriceInput(event.target.value);
-    menuItem.price = formattedPrice;
-    event.target.value = formattedPrice;
-  }
+  // Price input handling is now managed by PriceInputComponent
+  // Removed onPriceInput() method
 
   addMenu(userForm: NgForm) {}
 
@@ -277,12 +316,14 @@ export class AddMenuComponent implements OnInit {
     this.categories = this.menuService.addCategory(this.categories, this.newCategoryName);
     this.newCategoryName = '';
     this.initializeArrays();
+    this.markAsChanged();
   }
 
   addSubCategory(index: number): void {
     this.categories = this.menuService.addSubCategory(this.categories, index, this.newSubcategoryName[index]);
     this.newSubcategoryName[index] = '';
     this.isAddInputVisible[index] = false;
+    this.markAsChanged();
   }
 
   togglePopupMenu(index: number) {
@@ -290,12 +331,56 @@ export class AddMenuComponent implements OnInit {
   }
 
   deleteCategory(index: number): void {
-    this.categories = this.menuService.deleteCategory(this.categories, index);
-    this.initializeArrays();
+    const categoryName = this.categories[index]?.name || 'Category';
+    
+    const data: DeleteConfirmationData = {
+      title: 'Delete Category',
+      itemName: categoryName,
+      itemType: 'category',
+      message: `Are you sure you want to delete the category "${categoryName}"? This action will also remove all subcategories and cannot be undone.`,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.categories = this.menuService.deleteCategory(this.categories, index);
+        this.initializeArrays();
+        this.markAsChanged();
+      }
+    });
   }
 
   deleteSubCategory(categoryIndex: number, subcategoryIndex: number): void {
-    this.categories = this.menuService.deleteSubCategory(this.categories, categoryIndex, subcategoryIndex);
+    const subcategoryName = this.categories[categoryIndex]?.subcategories?.[subcategoryIndex]?.name || 'Subcategory';
+    
+    const data: DeleteConfirmationData = {
+      title: 'Delete Subcategory',
+      itemName: subcategoryName,
+      itemType: 'subcategory',
+      message: `Are you sure you want to delete the subcategory "${subcategoryName}"? This action cannot be undone.`,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.categories = this.menuService.deleteSubCategory(this.categories, categoryIndex, subcategoryIndex);
+        this.markAsChanged();
+      }
+    });
   }
 
   saveImageUrl(imageUrl: string, itemIndex: number): void {
@@ -322,10 +407,12 @@ export class AddMenuComponent implements OnInit {
 
   addMenuItemMore(): void {
     this.menuItems = this.menuService.addMenuItem(this.menuItems);
+    this.markAsChanged();
   }
 
   removeMenuItem(index: number): void {
     this.menuItems = this.menuService.removeMenuItem(this.menuItems, index);
+    this.markAsChanged();
   }
 
   addPreparation(itemIndex: number): void {
@@ -419,6 +506,7 @@ export class AddMenuComponent implements OnInit {
         });
         this.isSaving = false;
         this.menuSaved = true;
+        this.markAsSaved();
         this.doneSaveSubject.next(true);
       })
       .catch((error) => {
@@ -469,6 +557,7 @@ export class AddMenuComponent implements OnInit {
         });
         this.isSaving = false;
         this.setAsDraftSaved = true;
+        this.markAsSaved();
       })
       .catch((error) => {
         this.isSaving = false;

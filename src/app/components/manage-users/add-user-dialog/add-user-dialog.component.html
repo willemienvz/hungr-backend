@@ -26,8 +26,8 @@
             </div>
           </div>
           <div class="formGroup btnHolder">
-            <input class="btn btnTertiary" type="button" value="Cancel" (click)="closePopup()">
-            <input type="submit" class="btn btnPrimary" [disabled]="!userForm.valid" value="Add User">
+            <input class="btn btnTertiary" type="button" value="Cancel" (click)="closePopup()" [disabled]="isSaving">
+            <input type="submit" class="btn btnPrimary" [disabled]="!userForm.valid || isSaving" value="Add User">
           </div>
         </form>
       </div>

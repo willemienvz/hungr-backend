@@ -3,7 +3,7 @@
   <div class="form-container-inner">
     <h1>Sign Up</h1>
     <h6>Select your Option</h6>
-    <a class="backLink" routerLink="/sign-in"
+    <a class="backLink" (click)="onPrevious()"
       ><span class="material-symbols-outlined"> arrow_back </span>Back</a
     >
     <form [formGroup]="step2Form">
@@ -232,3 +232,5 @@
     </form>
   </div>
 </div>
+<app-loading [isLoading]="isSaving"></app-loading>
+

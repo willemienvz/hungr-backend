@@ -87,6 +87,7 @@ import { ActionLandingComponent } from './components/action-landing/action-landi
 import { SaveProgressDialogComponent } from './components/save-progress-dialog/save-progress-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from './components/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { DeleteConfirmationModalComponent } from './components/shared/delete-confirmation-modal/delete-confirmation-modal.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ViewUsersComponent } from './components/manage-users/view-users/view-users.component';
 import { MenuFormStepComponent } from './components/shared/menu-form-step/menu-form-step.component';
@@ -100,6 +101,7 @@ import { MenuItemDetailComponent } from './components/shared/menu-item-detail/me
 import { MenuItemPairingComponent } from './components/shared/menu-item-pairing/menu-item-pairing.component';
 import { ImageUploadModalComponent } from './components/shared/image-upload-modal/image-upload-modal.component';
 import { MenuCompletionSuccessComponent } from './components/shared/menu-completion-success/menu-completion-success.component';
+import { PriceInputComponent } from './shared/components/price-input/price-input.component';
 
 @NgModule({
   declarations: [
@@ -161,6 +163,7 @@ import { MenuCompletionSuccessComponent } from './components/shared/menu-complet
     ActionLandingComponent,
     SaveProgressDialogComponent,
     UnsavedChangesDialogComponent,
+    DeleteConfirmationModalComponent,
     ViewUsersComponent,
     MenuFormStepComponent,
     CategoryManagementComponent,
@@ -173,6 +176,7 @@ import { MenuCompletionSuccessComponent } from './components/shared/menu-complet
     MenuItemPairingComponent,
     ImageUploadModalComponent,
     MenuCompletionSuccessComponent,
+    PriceInputComponent,
   ],
   imports: [
     BrowserModule,

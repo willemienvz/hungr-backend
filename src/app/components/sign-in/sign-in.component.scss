@@ -68,6 +68,10 @@
           align-items: flex-start;
           margin-bottom: 25px;
 
+          label {
+            margin-bottom:0;
+          }
+
           .password-toggle {
             width: 100%;
             display: flex;

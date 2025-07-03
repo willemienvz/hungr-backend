@@ -8,6 +8,9 @@ import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
+import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @Component({
   selector: 'app-edit-special',
@@ -18,7 +21,6 @@ export class EditSpecialComponent implements OnInit {
   isSaving: boolean = false;
   currentStep = 1;
   selectedSpecialType: number = 1;
-  uploadDone: boolean = false;
   specialForm: FormGroup;
   specialTypes = [
     { id: 1, name: 'Weekly Special' },
@@ -30,11 +32,10 @@ export class EditSpecialComponent implements OnInit {
   menus: Menu[] = [];
   selectedMenu: Menu | null = null;
   addedItems: { name: string; amount: string }[] = [];
-  imageUploadProgress: number = 0;
-  showImageUploadModal: boolean = false;
   uploadedImageUrl: string | null = null;
   owner: string = '';
   specialId: string = '';
+  hasUnsavedChanges: boolean = false;
   showSuccessPopup: boolean = false;
   successPopupMessage: string = '';
   specialData: any = null;
@@ -44,7 +45,8 @@ export class EditSpecialComponent implements OnInit {
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private dialog: MatDialog
   ) {
     this.specialForm = this.fb.group(
       {
@@ -71,6 +73,38 @@ export class EditSpecialComponent implements OnInit {
     this.specialId = this.route.snapshot.paramMap.get('id') || '';
     this.fetchSpecialData();
     this.fetchMenus();
+    this.trackFormChanges();
+  }
+
+  private trackFormChanges() {
+    this.specialForm.valueChanges.subscribe(() => {
+      this.hasUnsavedChanges = true;
+    });
+  }
+
+  private markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          this.router.navigate([route]);
+        }
+      });
+    } else {
+      this.router.navigate([route]);
+    }
   }
   onDraftSave() {
     this.isSaving = true;
@@ -83,6 +117,7 @@ export class EditSpecialComponent implements OnInit {
       imageUrl: this.uploadedImageUrl,
       OwnerID: this.owner,
       active: false,
+      isDraft: true,
     };
 
     this.firestore
@@ -91,6 +126,7 @@ export class EditSpecialComponent implements OnInit {
       .update(data)
       .then(() => {
         this.isSaving = false;
+        this.markAsSaved();
         this.toastr.success('Draft saved successfully.');
       })
       .catch((error) => {
@@ -151,6 +187,8 @@ export class EditSpecialComponent implements OnInit {
       selectedDays: this.selectedDays,
       imageUrl: this.uploadedImageUrl,
       OwnerID: this.owner,
+      active: true,
+      isDraft: false,
     };
 
     this.firestore
@@ -159,6 +197,7 @@ export class EditSpecialComponent implements OnInit {
       .update(data)
       .then(() => {
         this.isSaving = false;
+        this.markAsSaved();
         this.showSuccess('Special updated successfully!');
         this.router.navigate(['/specials']);
       })
@@ -188,6 +227,7 @@ export class EditSpecialComponent implements OnInit {
     } else {
       this.selectedDays.push(day);
     }
+    this.markAsChanged();
   }
   addItem(): void {
     const selectedType = this.selectedSpecialType;
@@ -231,6 +271,7 @@ export class EditSpecialComponent implements OnInit {
         this.specialForm.get('comboPrice')?.reset();
       }
     }
+    this.markAsChanged();
   }
 
   isSelected(day: string): boolean {
@@ -239,56 +280,69 @@ export class EditSpecialComponent implements OnInit {
 
   removeItem(index: number): void {
     this.addedItems.splice(index, 1);
+    this.markAsChanged();
   }
 
   openImageUploadModal() {
-    this.showImageUploadModal = true;
+    const config: ImageUploadConfig = {
+      title: 'Upload Special Image',
+      maxFileSize: 5000, // 5MB in KB
+      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
+      allowMultiple: false,
+      maxFiles: 1
+    };
+
+    const data: ImageUploadData = {
+      config: config,
+      currentImageUrl: this.uploadedImageUrl || undefined
+    };
+
+    const dialogRef = this.dialog.open(ImageUploadModalComponent, {
+      width: '500px',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe((result: ImageUploadResult | undefined) => {
+      if (result && result.action === 'save') {
+        if (result.imageUrl) {
+          this.uploadedImageUrl = result.imageUrl;
+          this.toastr.success('Image uploaded successfully!');
+        } else if (result.files && result.files.length > 0) {
+          // If we get new files, we need to upload them to Firebase
+          this.uploadFileToFirebase(result.files[0]);
+        }
+      } else if (result && result.action === 'remove') {
+        this.uploadedImageUrl = null;
+        this.toastr.info('Image removed');
+      }
+    });
   }
 
-  closeImageUploadModal() {
-    this.showImageUploadModal = false;
-  }
-
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.isSaving = true; // Show loading
-      this.uploadImageToFirebase(file);
-    }
-  }
-
-  uploadImageToFirebase(file: File) {
-    const filePath = `images/${file.name}`;
+  private uploadFileToFirebase(file: File) {
+    const filePath = `specials/${Date.now()}_${file.name}`;
     const fileRef = this.storage.ref(filePath);
     const uploadTask = this.storage.upload(filePath, file);
 
-    uploadTask.percentageChanges().subscribe((progress) => {
-      this.imageUploadProgress = progress || 0;
+    uploadTask.snapshotChanges().pipe(
+      finalize(() => {
+        fileRef.getDownloadURL().subscribe({
+                     next: (url) => {
+             this.uploadedImageUrl = url;
+             this.markAsChanged();
+             this.toastr.success('Image uploaded successfully!');
+           },
+          error: (err) => {
+            console.error('Failed to get download URL:', err);
+            this.toastr.error('Failed to upload image');
+          }
+        });
+      })
+    ).subscribe({
+      error: (err) => {
+        console.error('Upload failed:', err);
+        this.toastr.error('Failed to upload image');
+      }
     });
-
-    uploadTask
-      .snapshotChanges()
-      .pipe(
-        finalize(() => {
-          fileRef.getDownloadURL().subscribe({
-            next: (url) => {
-              this.uploadedImageUrl = url;
-              this.uploadDone = true;
-              this.isSaving = false;
-            },
-            error: (err) => {
-              console.error('Failed to get download URL:', err);
-              this.isSaving = false;
-            },
-          });
-        })
-      )
-      .subscribe({
-        error: (err) => {
-          console.error('Upload failed:', err);
-          this.isSaving = false;
-        },
-      });
   }
 
   showSuccess(message: string) {
@@ -297,7 +351,77 @@ export class EditSpecialComponent implements OnInit {
   }
 
   nextStep() {
+    if (this.currentStep === 1) {
+      // Mark all required fields as touched to show validation errors
+      const controlsToCheck = [
+        'specialTitle',
+        'menu',
+        'typeSpecial',
+        'dateFrom',
+        'dateTo',
+      ];
+
+      let hasErrors = false;
+      controlsToCheck.forEach((controlName) => {
+        const control = this.specialForm.get(controlName);
+        control?.markAsTouched();
+        if (control?.invalid) {
+          hasErrors = true;
+        }
+      });
+
+      // Explicitly check that date fields have actual values (not empty strings)
+      const dateFrom = this.specialForm.get('dateFrom')?.value;
+      const dateTo = this.specialForm.get('dateTo')?.value;
+      
+      // Enhanced validation: check for null, undefined, empty string, or whitespace
+      if (!dateFrom || !dateTo || 
+          dateFrom.toString().trim() === '' || 
+          dateTo.toString().trim() === '') {
+        // Mark date fields as touched and invalid to show error messages
+        this.specialForm.get('dateFrom')?.markAsTouched();
+        this.specialForm.get('dateTo')?.markAsTouched();
+        this.specialForm.get('dateFrom')?.setErrors({ 'required': true });
+        this.specialForm.get('dateTo')?.setErrors({ 'required': true });
+        hasErrors = true;
+        
+        // Show user feedback
+        this.toastr.error('Please fill in both start date and end date before proceeding.');
+      }
+
+      // Check for form-level validation errors (like date range)
+      if (this.specialForm.errors?.['dateRangeInvalid']) {
+        hasErrors = true;
+        this.toastr.error('Start date must be before end date.');
+      }
+
+      // Prevent navigation if there are any errors
+      if (hasErrors) {
+        console.log('Form validation failed, preventing navigation to step 2');
+        return;
+      }
+
+      console.log('Form validation passed, proceeding to step 2');
+    }
+
     if (this.currentStep < 5) this.currentStep++;
+  }
+
+  // Method to check if Step 1 form is invalid
+  isStep1Invalid(): boolean {
+    const dateFrom = this.specialForm.get('dateFrom')?.value;
+    const dateTo = this.specialForm.get('dateTo')?.value;
+    
+    return (
+      this.specialForm.get('specialTitle')?.invalid || 
+      this.specialForm.get('menu')?.invalid || 
+      this.specialForm.get('typeSpecial')?.invalid || 
+      !dateFrom || 
+      !dateTo ||
+      dateFrom.toString().trim() === '' ||
+      dateTo.toString().trim() === '' ||
+      this.specialForm.errors?.['dateRangeInvalid']
+    );
   }
 
   previousStep() {
@@ -325,5 +449,9 @@ export class EditSpecialComponent implements OnInit {
       default:
         return 'Special Type';
     }
+  }
+
+  onBackButtonClick() {
+    this.navigateWithUnsavedChangesCheck('/specials');
   }
 }

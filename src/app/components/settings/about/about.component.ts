@@ -5,6 +5,10 @@ import { AuthService } from '../../../shared/services/auth.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
 import { User } from '../../../shared/services/user';
+import { MatDialog } from '@angular/material/dialog';
+import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
+import { ToastrService } from 'ngx-toastr';
+import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @Component({
   selector: 'app-about',
@@ -25,6 +29,8 @@ export class AboutComponent {
   additionalImageUrl: string = '';
   userData$!: Observable<any>;
   about: any;
+  hasUnsavedChanges: boolean = false;
+  private originalValues: any = {};
 
   users: User[] = [];
   mainUserName: string = '';
@@ -32,7 +38,9 @@ export class AboutComponent {
     private storage: AngularFireStorage,
     private router: Router,
     public authService: AuthService,
-    private firestore: AngularFirestore
+    private firestore: AngularFirestore,
+    private dialog: MatDialog,
+    private toastr: ToastrService
   ) {
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
@@ -65,49 +73,117 @@ export class AboutComponent {
             result[0].about.isContactDetailsVisible ?? true;
           this.mainImageUrl = result[0].about.mainImageUrl || '';
           this.additionalImageUrl = result[0].about.additionalImageUrl || '';
+          this.setupChangeTracking(); // Store initial values as original
         }
       });
   }
 
-  onFileSelected(event: Event): void {
-    const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files[0]) {
-      const file = fileInput.files[0];
-      const filePath = `menu-images/${Date.now()}_${file.name}`;
-      const fileRef = this.storage.ref(filePath);
-      const task = this.storage.upload(filePath, file);
+  openMainImageUpload(): void {
+    const config: ImageUploadConfig = {
+      title: 'Upload Main Image',
+      formats: ['PNG', 'JPG'],
+      maxFileSize: 1000, // 1MB
+      dimensions: '1080x720',
+      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
+      allowMultiple: false,
+      maxFiles: 1
+    };
 
-      task
-        .snapshotChanges()
-        .pipe(
-          finalize(() => {
-            fileRef.getDownloadURL().subscribe((url) => {
-              this.mainImageUrl = url;
-            });
-          })
-        )
-        .subscribe();
-    }
+    const data: ImageUploadData = {
+      config: config,
+      currentImageUrl: this.mainImageUrl || undefined
+    };
+
+    const dialogRef = this.dialog.open(ImageUploadModalComponent, {
+      width: '600px',
+      panelClass: 'image-upload-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe((result: ImageUploadResult) => {
+      if (result?.action === 'save') {
+        if (result.files && result.files.length > 0) {
+          this.uploadImageToFirebase(result.files[0], 'main');
+        } else if (result.imageUrls && result.imageUrls.length > 0) {
+          this.mainImageUrl = result.imageUrls[0];
+        }
+      } else if (result?.action === 'remove') {
+        this.mainImageUrl = '';
+      }
+    });
   }
-  onFileSelected1(event: Event): void {
-    const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files[0]) {
-      const file = fileInput.files[0];
-      const filePath = `menu-images/${Date.now()}_${file.name}`;
-      const fileRef = this.storage.ref(filePath);
-      const task = this.storage.upload(filePath, file);
 
-      task
-        .snapshotChanges()
-        .pipe(
-          finalize(() => {
-            fileRef.getDownloadURL().subscribe((url) => {
-              this.additionalImageUrl = url;
-            });
-          })
-        )
-        .subscribe();
-    }
+  openAdditionalImageUpload(): void {
+    const config: ImageUploadConfig = {
+      title: 'Upload Additional Image',
+      formats: ['PNG', 'JPG'],
+      maxFileSize: 1000, // 1MB
+      dimensions: '1080x720',
+      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
+      allowMultiple: false,
+      maxFiles: 1
+    };
+
+    const data: ImageUploadData = {
+      config: config,
+      currentImageUrl: this.additionalImageUrl || undefined
+    };
+
+    const dialogRef = this.dialog.open(ImageUploadModalComponent, {
+      width: '600px',
+      panelClass: 'image-upload-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe((result: ImageUploadResult) => {
+      if (result?.action === 'save') {
+        if (result.files && result.files.length > 0) {
+          this.uploadImageToFirebase(result.files[0], 'additional');
+        } else if (result.imageUrls && result.imageUrls.length > 0) {
+          this.additionalImageUrl = result.imageUrls[0];
+        }
+      } else if (result?.action === 'remove') {
+        this.additionalImageUrl = '';
+      }
+    });
+  }
+
+  private uploadImageToFirebase(file: File, type: 'main' | 'additional'): void {
+    this.isSaving = true;
+    const filePath = `about-images/${Date.now()}_${file.name}`;
+    const fileRef = this.storage.ref(filePath);
+    const task = this.storage.upload(filePath, file);
+
+    task
+      .snapshotChanges()
+      .pipe(
+        finalize(() => {
+          fileRef.getDownloadURL().subscribe({
+            next: (url) => {
+              if (type === 'main') {
+                this.mainImageUrl = url;
+                this.toastr.success('Main image uploaded successfully!');
+              } else {
+                this.additionalImageUrl = url;
+                this.toastr.success('Additional image uploaded successfully!');
+              }
+              this.isSaving = false;
+            },
+            error: (error) => {
+              console.error('Error getting download URL:', error);
+              this.toastr.error('Error uploading image');
+              this.isSaving = false;
+            }
+          });
+        })
+      )
+      .subscribe({
+        error: (error) => {
+          console.error('Error uploading file:', error);
+          this.toastr.error('Error uploading image');
+          this.isSaving = false;
+        }
+      });
   }
 
   update() {
@@ -130,6 +206,8 @@ export class AboutComponent {
       .update(data)
       .then(() => {
         this.isSaving = false;
+        this.markAsSaved();
+        this.toastr.success('About section updated successfully');
       })
       .catch((error) => {
         this.isSaving = false;
@@ -139,9 +217,49 @@ export class AboutComponent {
 
   removeMainImg() {
     this.mainImageUrl = '';
+    this.markAsChanged();
   }
 
   removeSecImg() {
     this.additionalImageUrl = '';
+    this.markAsChanged();
+  }
+
+  private setupChangeTracking() {
+    // Store original values for comparison
+    this.originalValues = {
+      aboutText: this.aboutText,
+      businessHours: this.businessHours,
+      cellphone: this.cellphone,
+      email: this.email,
+      isContactDetailsVisible: this.isContactDetailsVisible,
+      isBusinessHoursVisible: this.isBusinessHoursVisible
+    };
+  }
+
+  markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+    this.setupChangeTracking(); // Update original values
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          this.router.navigate([route]);
+        }
+      });
+    } else {
+      this.router.navigate([route]);
+    }
   }
 }

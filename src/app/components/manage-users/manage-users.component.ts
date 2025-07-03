@@ -5,7 +5,9 @@ import {
 } from '@angular/fire/compat/firestore';
 import { User } from '../../shared/services/user';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
 import { ViewUsersComponent } from './view-users/view-users.component';
+import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 @Component({
   selector: 'app-manage-users',
   templateUrl: './manage-users.component.html',
@@ -15,16 +17,12 @@ export class ManageUsersComponent implements OnInit {
   @ViewChild('editDialog') editDialog: ViewUsersComponent;
   users: User[] = [];
   isSaving: boolean = false;
-  isPopupMenuOpen: boolean[] = [];
   mainUserName: string = '';
-
-  showConfirmDelete: boolean = false;
-  pendingDeleteUid: string = '';
-  popupMenuIndexToClose: number = -1;
 
   constructor(
     private readonly firestore: AngularFirestore,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -45,37 +43,13 @@ export class ManageUsersComponent implements OnInit {
       });
   }
 
-  togglePopupMenu(index: number) {
-    this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
+  getUserStatus(user: User): boolean {
+    // For now, consider all users active. In a real implementation,
+    // this would check user.isActive or user.status or similar field
+    return true;
   }
 
-  confirmDeleteUser(uid: string, index: number) {
-    this.pendingDeleteUid = uid;
-    this.popupMenuIndexToClose = index;
-    this.showConfirmDelete = true;
-  }
-
-  cancelDelete() {
-    this.showConfirmDelete = false;
-    this.pendingDeleteUid = '';
-    this.popupMenuIndexToClose = -1;
-  }
-
-  proceedDelete() {
-    const userRef: AngularFirestoreDocument<any> = this.firestore.doc(
-      `users/${this.pendingDeleteUid}`
-    );
-    userRef.delete().then(() => {
-      this.closeAllPopupMenu();
-      this.showConfirmDelete = false;
-      this.pendingDeleteUid = '';
-      this.popupMenuIndexToClose = -1;
-      this.toastr.success('User deleted successfully!');
-    });
-  }
-
-  editUser(user: User, index: number) {
-    this.togglePopupMenu(index);
+  viewUser(user: User) {
     if (this.editDialog) {
       this.editDialog.openPopup(user);
     } else {
@@ -83,7 +57,49 @@ export class ManageUsersComponent implements OnInit {
     }
   }
 
-  private closeAllPopupMenu() {
-    this.isPopupMenuOpen.fill(false);
+  confirmDeleteUser(uid: string, index: number) {
+    const user = this.users.find(u => u.uid === uid);
+    const userName = user ? `${user.firstName} ${user.Surname}` : 'this user';
+    
+    const data: DeleteConfirmationData = {
+      title: 'Delete User',
+      itemName: userName,
+      itemType: 'user',
+      message: `Are you sure you want to delete ${userName}? This will remove their access to the system and cannot be undone.`,
+      confirmButtonText: 'Yes, Delete User',
+      cancelButtonText: 'Cancel'
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '450px',
+      panelClass: 'delete-confirmation-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteUser(uid, index);
+      }
+    });
+  }
+
+  private deleteUser(uid: string, index: number) {
+    const userRef: AngularFirestoreDocument<any> = this.firestore.doc(
+      `users/${uid}`
+    );
+    userRef.delete().then(() => {
+      this.toastr.success('User deleted successfully!');
+    }).catch(error => {
+      console.error('Error deleting user:', error);
+      this.toastr.error('Error deleting user');
+    });
+  }
+
+  editUser(user: User, index: number) {
+    if (this.editDialog) {
+      this.editDialog.openPopup(user);
+    } else {
+      console.error('editDialog not available');
+    }
   }
 }

@@ -1,8 +1,11 @@
 <div class="inner-page">
+  <!-- Preview Mode Indicator -->
+
+  
   <div class="all-other">
     <div class="row">
       <div class="block logoBlock">
-        <h6>Logo</h6>
+        <h5>Logo</h5>
         <p>Please upload your logo.</p>
 
         <div class="row" style="margin-top: 20px">
@@ -13,6 +16,7 @@
           >
             Upload Logo
           </a>
+          <!-- Debug: Current imageUrl = {{ imageUrl }} -->
           <div *ngIf="imageUrl" class="imagePreview">
             <i
               *ngIf="imageUrl"
@@ -27,28 +31,82 @@
 
       <div class="block">
         <div class="row">
-          <h6 class="heading">Background Colour</h6>
+          <h5 class="heading">Brand Colours</h5>
           <i
             class="material-icons"
-            (mouseenter)="tooltipOpen['bgColor'] = true"
-            (mouseleave)="tooltipOpen['bgColor'] = false"
+            (mouseenter)="tooltipOpen['brandColors'] = true"
+            (mouseleave)="tooltipOpen['brandColors'] = false"
             >information
             <app-tooltip
-              [text]="'This sets the general background color for branding.'"
-              *ngIf="tooltipOpen['bgColor']"
-              [isVisible]="tooltipOpen['bgColor']"
+              [text]="'These are your brand colors used throughout the interface.'"
+              *ngIf="tooltipOpen['brandColors']"
+              [isVisible]="tooltipOpen['brandColors']"
             ></app-tooltip
           ></i>
         </div>
+        
         <div class="row inputRow">
+          <p>Background Colour</p>
           <div class="colorPicker">
             <input
               [(colorPicker)]="backgroundColor"
               [style.background]="backgroundColor"
               class="colourPicker"
+              (ngModelChange)="applyChanges('Background Color', $event)"
+              (colorPickerChange)="applyChanges('Background Color', $event)"
+              (cpColorChange)="applyChanges('Background Color', $event)"
             />
           </div>
-          <p>Background colour</p>
+          <span class="hex-code">{{backgroundColor}}</span>
+       
+        </div>
+        
+        <div class="row inputRow">
+          <p>Primary Colour</p>
+          <div class="colorPicker">
+            <input
+              [(colorPicker)]="primaryColor"
+              [style.background]="primaryColor"
+              class="colourPicker"
+              (ngModelChange)="applyChanges('Primary Color', $event)"
+              (colorPickerChange)="applyChanges('Primary Color', $event)"
+              (cpColorChange)="applyChanges('Primary Color', $event)"
+            />
+          </div>
+          <span class="hex-code">{{primaryColor}}</span>
+     
+        </div>
+        
+        <div class="row inputRow">
+          <p>Secondary Colour</p>
+          <div class="colorPicker">
+            <input
+              [(colorPicker)]="secondaryColor"
+              [style.background]="secondaryColor"
+              class="colourPicker"
+              (ngModelChange)="applyChanges('Secondary Color', $event)"
+              (colorPickerChange)="applyChanges('Secondary Color', $event)"
+              (cpColorChange)="applyChanges('Secondary Color', $event)"
+            />
+          </div>
+          <span class="hex-code">{{secondaryColor}}</span>
+       
+        </div>
+        
+        <div class="row inputRow">
+          <p>Accent Colour</p>
+          <div class="colorPicker">
+            <input
+              [(colorPicker)]="accentColor"
+              [style.background]="accentColor"
+              class="colourPicker"
+              (ngModelChange)="applyChanges('Accent Color', $event)"
+              (colorPickerChange)="applyChanges('Accent Color', $event)"
+              (cpColorChange)="applyChanges('Accent Color', $event)"
+            />
+          </div>
+          <span class="hex-code">{{accentColor}}</span>
+         
         </div>
       </div>
     </div>
@@ -58,191 +116,12 @@
         <div class="row">
           <div class="block">
             <div class="row">
-              <h6 class="heading">Button Styles</h6>
-            </div>
-            <div class="row">
-              <p class="subheading">Primary Button</p>
-            </div>
-
-            <!-- Primary Settings -->
-            <div class="row buttonRos">
-              <div class="col">
-                <label>Typeface</label>
-                <div class="selectField">
-                  <mat-select
-                    [(value)]="buttonTypeface"
-                    (selectionChange)="
-                      applyChanges('Button Typeface', $event.value)
-                    "
-                  >
-                    <mat-option
-                      *ngFor="let typeface of typefaces"
-                      [value]="typeface"
-                    >
-                      {{ typeface }}
-                    </mat-option>
-                  </mat-select>
-                </div>
-                <label
-                  >Letter Case
-                  <p>Debug: {{ buttonCase }}</p></label
-                >
-                <div class="selectField">
-                  <mat-select
-                    [(value)]="buttonCase"
-                    (selectionChange)="
-                      applyChanges('Button Case', $event.value)
-                    "
-                  >
-                    <mat-option
-                      *ngFor="let caseOption of letterCases"
-                      [value]="caseOption.value"
-                    >
-                      {{ caseOption.display }}
-                    </mat-option>
-                  </mat-select>
-                </div>
-              </div>
-              <div class="col">
-                <label>Colours</label>
-                <div class="blockInnerColours">
-                  <div class="col">
-                    <div class="rowCol">
-                      <div class="colorPicker">
-                        <input
-                          [(colorPicker)]="buttonColor"
-                          [style.background]="buttonColor"
-                          class="colourPicker"
-                          (ngModelChange)="applyChanges('Button Color', $event)"
-                        />
-                      </div>
-                      <label>Main Colour</label>
-                    </div>
-                    <div class="rowCol">
-                      <div class="colorPicker">
-                        <input
-                          [(colorPicker)]="buttonTextColor"
-                          [style.background]="buttonTextColor"
-                          class="colourPicker"
-                          (ngModelChange)="
-                            applyChanges('Button Text Color', $event)
-                          "
-                        />
-                      </div>
-                      <label>Text Colour</label>
-                    </div>
-                  </div>
-                  <div class="col buttonExample">
-                    <label>Example</label>
-                    <a
-                      [ngStyle]="{
-                        'background-color': buttonColor,
-                        color: buttonTextColor,
-                        'font-family': buttonTypeface,
-                        'text-transform': buttonCase
-                      }"
-                      >save</a
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <p style="font-weight: 600">Secondary Button</p>
-            </div>
-            <div class="row buttonRos">
-              <div class="col">
-                <label>Typeface</label>
-                <div class="selectField">
-                  <mat-select
-                    [(value)]="buttonSecondaryTypeface"
-                    (selectionChange)="
-                      applyChanges('Button Secondary Typeface', $event.value)
-                    "
-                  >
-                    <mat-option
-                      *ngFor="let typeface of typefaces"
-                      [value]="typeface"
-                    >
-                      {{ typeface }}
-                    </mat-option>
-                  </mat-select>
-                </div>
-                <label>Letter Case</label>
-                <div class="selectField">
-                  <mat-select
-                    [(value)]="buttonSecondaryCase"
-                    (selectionChange)="
-                      applyChanges('Button Secondary Case', $event.value)
-                    "
-                  >
-                    <mat-option
-                      *ngFor="let caseOption of letterCases"
-                      [value]="caseOption.value"
-                    >
-                      {{ caseOption.display }}
-                    </mat-option>
-                  </mat-select>
-                </div>
-              </div>
-              <div class="col">
-                <label>Colours</label>
-                <div class="blockInnerColours">
-                  <div class="col">
-                    <div class="rowCol">
-                      <div class="colorPicker">
-                        <input
-                          [(colorPicker)]="buttonSecondaryColor"
-                          [style.background]="buttonSecondaryColor"
-                          class="colourPicker"
-                          (ngModelChange)="
-                            applyChanges('Button Secondary Color', $event)
-                          "
-                        />
-                      </div>
-                      <label>Main Colour</label>
-                    </div>
-
-                    <div class="rowCol">
-                      <div class="colorPicker">
-                        <input
-                          [(colorPicker)]="buttonSecondaryTextColor"
-                          [style.background]="buttonSecondaryTextColor"
-                          class="colourPicker"
-                          (ngModelChange)="
-                            applyChanges('Button Secondary Text Color', $event)
-                          "
-                        />
-                      </div>
-                      <label>Text Colour</label>
-                    </div>
-                  </div>
-                  <div class="col buttonExample">
-                    <label>Example</label>
-                    <a
-                      [ngStyle]="{
-                        'background-color': buttonSecondaryColor,
-                        color: buttonSecondaryTextColor,
-                        'font-family': buttonSecondaryTypeface,
-                        'text-transform': buttonSecondaryCase
-                      }"
-                      >save</a
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="block">
-            <div class="row">
-              <h6 class="heading">Text Styles</h6>
+              <h5 class="heading">Text Styles</h5>
             </div>
             <div class="conTextHold">
               <div class="colText" style="flex: 1">
                 <div class="row">
-                  <p style="font-weight: 600">Main Headings</p>
+                  <h6>Main Headings</h6>
                 </div>
                 <div class="row">
                   <label class="label">Typeface</label>
@@ -288,10 +167,13 @@
                     class="colourPicker"
                     [cpPosition]="'right'"
                     (ngModelChange)="applyChanges('Main Heading Color', $event)"
+                    (colorPickerChange)="applyChanges('Main Heading Color', $event)"
+                    (cpColorChange)="applyChanges('Main Heading Color', $event)"
                   />
+                  <span class="hex-code">{{mainHeadingColor}}</span>
                 </div>
                 <div class="row">
-                  <p style="font-weight: 600">Sub-Headings Style</p>
+                  <h6>Sub-Headings Style</h6>
                 </div>
                 <div class="row">
                   <label class="label">Typeface</label>
@@ -337,10 +219,13 @@
                     class="colourPicker"
                     [cpPosition]="'right'"
                     (ngModelChange)="applyChanges('Sub Heading Color', $event)"
+                    (colorPickerChange)="applyChanges('Sub Heading Color', $event)"
+                    (cpColorChange)="applyChanges('Sub Heading Color', $event)"
                   />
+                  <span class="hex-code">{{subHeadingColor}}</span>
                 </div>
                 <div class="row">
-                  <p style="font-weight: 600">Body</p>
+                  <h6>Body</h6>
                 </div>
                 <div class="row">
                   <label class="label">Typeface</label>
@@ -386,7 +271,10 @@
                     class="colourPicker"
                     [cpPosition]="'right'"
                     (ngModelChange)="applyChanges('Body Color', $event)"
+                    (colorPickerChange)="applyChanges('Body Color', $event)"
+                    (cpColorChange)="applyChanges('Body Color', $event)"
                   />
+                  <span class="hex-code">{{bodyColor}}</span>
                 </div>
               </div>
               <div class="colText previewTexrt">
@@ -428,117 +316,60 @@
     </div>
   </div>
 
-  <div class="sidebar block">
+  <div class="sidebar">
     <div class="outerLive">
-      <div class="blockPreview" style="height: 100%">
+      <div class="blockPreview">
         <div class="row">
-          <h6 class="heading" style="margin-bottom: 0">Real-time Preview</h6>
+          <h5 class="heading">Real-time Preview</h5>
         </div>
-        <div
-          class="preview"
-          [ngStyle]="{ 'background-color': backgroundColor }"
-        >
-          <img
-            class="previewImg"
-            src="../../../../assets/images/branding/phone1.png"
-            alt=""
-          />
-          <div *ngIf="imageUrl" class="imagePreviewSmall">
-            <img [src]="imageUrl" alt="Uploaded logo" />
+        <div class="row">
+          <div class="select-container">
+            <mat-form-field appearance="outline">
+              <mat-label>Select Menu to Preview</mat-label>
+              <mat-select [(value)]="selectedMenuId" (selectionChange)="logSelection($event)">
+                <mat-option *ngIf="menus.length === 0" [disabled]="true">No active menus available</mat-option>
+                <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
+                  {{ menu.menuName }}
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="menus.length === 0">Please create and activate a menu first</mat-hint>
+            </mat-form-field>
           </div>
-          <h1
-            [ngStyle]="{
-              color: mainHeadingColor,
-              'font-family': mainHeadingTypeface,
-              'font-size': mainHeadingSize,
-              'text-transform': mainHeadingCase
-            }"
-          >
-            Main Heading
-          </h1>
-          <h2
-            [ngStyle]="{
-              color: subHeadingColor,
-              'font-family': subHeadingTypeface,
-              'font-size': subHeadingSize,
-              'text-transform': subHeadingCase
-            }"
-          >
-            Sub Heading
-          </h2>
-          <p
-            [ngStyle]="{
-              color: bodyColor,
-              'font-family': bodyTypeface,
-              'font-size': bodySize,
-              'text-transform': bodyCase
-            }"
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-          <a
-            [ngStyle]="{
-              'background-color': buttonColor,
-              color: buttonTextColor,
-              'font-family': buttonTypeface,
-              'text-transform': buttonCase
-            }"
-            >Primary Button</a
-          >
-          <a
-            [ngStyle]="{
-              'background-color': buttonSecondaryColor,
-              color: buttonSecondaryTextColor,
-              'font-family': buttonSecondaryTypeface,
-              'text-transform': buttonSecondaryCase
-            }"
-            >Secondary Button</a
-          >
+        </div>
+        <div class="preview">
+          <div class="phonePreviewContainer">
+            <iframe
+              #previewIframe
+              [src]="getPreviewUrl()"
+              frameborder="0"
+              class="previewIframe"
+              [style.backgroundColor]="backgroundColor || '#ffffff'"
+              [attr.data-menu-id]="selectedMenuId"
+            ></iframe>
+          </div>
         </div>
       </div>
     </div>
     <div class="btnBlock">
+      <p *ngIf="isPreviewMode && hasUnsavedChanges">You have unsaved changes in preview mode</p>
       <div class="row">
-        <a class="btnTertiary" (click)="discardChanges()" style="width: 130px"
-          >Discard</a
+        <a 
+          class="btnTertiary" 
+          (click)="discardChanges()" 
+          style="width: 130px"
+          [title]="isPreviewMode ? 'Revert to original settings' : 'Discard current changes'"
         >
-        <a class="btnSecondary" (click)="updateBrandingDetails()"
-          >Save Changes</a
+          {{ isPreviewMode ? 'Revert' : 'Discard' }}
+        </a>
+        <a 
+          class="btnSecondary" 
+          (click)="updateBrandingDetails()"
+          [class.disabled]="isSaving"
+          [title]="isPreviewMode ? 'Save preview as default' : 'Save changes'"
         >
+          {{ isSaving ? 'Saving...' : (isPreviewMode ? 'Save Preview' : 'Save Changes') }}
+        </a>
       </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal" [class.open]="showImageUploadModal">
-  <div class="modal-content">
-    <span class="close" (click)="closeImageUploadModal()">&times;</span>
-    <h6>Upload Logo</h6>
-    <div class="dataHold">
-      <div class="rowData">
-        <p>File formats:</p>
-        <p>PNG / JPG</p>
-      </div>
-      <div class="rowData">
-        <p>Size:</p>
-        <p>1080x1080</p>
-      </div>
-      <div class="rowData">
-        <p>Max file size:</p>
-        <p>500kb</p>
-      </div>
-    </div>
-    <input type="file" (change)="onFileSelected($event)" accept="image/*" />
-
-    <div class="row" style="margin-top: 15px">
-      <a
-        class="btnSecondary"
-        [class.disabled]="!selectedFile"
-        (click)="selectedFile && onUpload()"
-      >
-        Upload</a
-      >
-      <a class="btnTertiary" (click)="closeImageUploadModal()">Cancel</a>
     </div>
   </div>
 </div>

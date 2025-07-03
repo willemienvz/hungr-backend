@@ -13,7 +13,6 @@ import { BehaviorSubject } from 'rxjs';
   styleUrls: ['./sign-up.component.scss']
 })
 export class SignUpComponent {
-  currentStep: number = 1;
   formDataStep1: any;
   formDataStep2: any;
   formDataStep3: any;
@@ -34,7 +33,6 @@ export class SignUpComponent {
   onNextStep(formData: any) {
     this.formDataStep1 = formData;
     this.formDataService.updateFormData(formData);
-    this.currentStep++;
   }
 
   onNextStepStep2(formData: any) {
@@ -44,9 +42,6 @@ export class SignUpComponent {
   }
 
   onPreviousStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
   }
 
 

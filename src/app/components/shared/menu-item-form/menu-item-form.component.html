@@ -81,6 +81,7 @@
               class="select-arrow-fix"
               [(value)]="menuItem.categoryId"
               placeholder="Select Category"
+              (selectionChange)="onCategorySelectionChange($event)"
             >
               <mat-optgroup
                 *ngFor="let category of categories"
@@ -115,18 +116,16 @@
         </div>
         
         <div class="col priceContainer third">
-          <div class="fieldHolder">
-            <label>Item Price</label>
-            <input
-              type="text"
-              [(ngModel)]="menuItem.price"
-              placeholder="R 00.00"
-              class="smallerInput"
-              [ngModelOptions]="{ standalone: true }"
-              (input)="onPriceInput($event)"
-              (keypress)="onPriceKeypress($event)"
-            />
-          </div>
+          <app-price-input
+            label="Item Price"
+            placeholder="R 0.00"
+            [required]="true"
+            [(ngModel)]="menuItem.price"
+            [ngModelOptions]="{ standalone: true }"
+            [showError]="!menuItem.price && !!menuItem.name"
+            errorMessage="Item price is required"
+            class="compact">
+          </app-price-input>
         </div>
         <div class="col fourth">
           <div class="image-upload">
@@ -194,7 +193,7 @@
                 <button 
                   type="button" 
                   class="remove-btn" 
-                  (click)="onRemoveImage(i)"
+                  (click)="confirmRemoveImage(i)"
                   [disabled]="isUploadingImage"
                   [title]="isUploadingImage ? 'Processing...' : 'Remove image'"
                 >
@@ -208,7 +207,7 @@
               <button 
                 type="button" 
                 class="remove-btn" 
-                (click)="onRemoveImage(0)"
+                (click)="confirmRemoveImage(0)"
                 [disabled]="isUploadingImage"
                 [title]="isUploadingImage ? 'Processing...' : 'Remove image'"
               >

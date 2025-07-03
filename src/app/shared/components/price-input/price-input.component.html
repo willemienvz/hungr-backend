@@ -1,0 +1,27 @@
+<div class="price-input-container">
+  <div class="field-holder">
+    <label *ngIf="label" class="price-input-label">
+      {{ label }}
+      <span *ngIf="required" class="required-asterisk">*</span>
+    </label>
+    
+    <div class="input-wrapper" [class.error]="showError" [class.disabled]="disabled">
+      <input
+        type="text"
+        class="price-input"
+        [placeholder]="placeholder"
+        [value]="value"
+        [disabled]="disabled"
+        (input)="onInput($event)"
+        (blur)="onBlur()"
+        (keypress)="onKeypress($event)"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+    
+    <div *ngIf="showError && errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+  </div>
+</div> 

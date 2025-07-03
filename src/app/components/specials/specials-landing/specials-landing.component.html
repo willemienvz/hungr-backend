@@ -1,82 +1,274 @@
 <div class="container">
-  <!--  <div class="row">
-    <app-stats-overview-block heading="Sales" tooltiptext="Tooltip Text" timeText="from current specials"
-      stat="R 10 000,00" movement=""></app-stats-overview-block>
-    <app-stats-overview-block heading="Special Views" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="1000"
-      movement="+3%"></app-stats-overview-block>
-    <app-stats-overview-block heading="Top Performing Special" tooltiptext="Tooltip Text" timeText="Last 7 days"
-      stat="Special Name" movement=""></app-stats-overview-block>
-    <app-stats-overview-block heading="Specials Ordered" tooltiptext="Tooltip Text" timeText="Last 7 days" stat="2 345"
-      movement=""></app-stats-overview-block>
-  </div> -->
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <h6 class="add-special-text">Add a special</h6>
+      <a class="btnSecondary add-special-btn" routerLink="/specials/add-new-special">
+        + ADD SPECIAL
+      </a>
+    </div>
+  </div>
 
-  <div class="row">
-    <div class="block">
-      <div class="row">
-        <div class="col">
-          <h6>Add a special</h6>
-        </div>
-        <div class="col">
-          <a class="btnSecondary" routerLink="/specials/add-new-special"
-            >+ Add special</a
-          >
-        </div>
+  <!-- Key Metrics Dashboard -->
+  <div class="metrics-dashboard" *ngIf="metrics">
+    <div class="metric-card">
+      <div class="metric-content">
+        <h3 class="metric-title">Total Special Sales</h3>
+        <div class="metric-value">{{ formatCurrency(metrics.totalSpecialSales.amount) }}</div>
+        <div class="metric-movement positive">{{ metrics.totalSpecialSales.percentage }}</div>
+      </div>
+      <div class="metric-info">
+        <mat-icon>info_outline</mat-icon>
+      </div>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-content">
+        <h3 class="metric-title">Special Views</h3>
+        <div class="metric-value">{{ metrics.specialViews.count.toLocaleString() }}</div>
+        <div class="metric-movement positive">{{ metrics.specialViews.percentage }}</div>
+      </div>
+      <div class="metric-info">
+        <mat-icon>info_outline</mat-icon>
+      </div>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-content">
+        <h3 class="metric-title">Top Performing Special</h3>
+        <div class="metric-value">{{ metrics.topPerformingSpecial.name }}</div>
+        <div class="metric-subtitle">{{ metrics.topPerformingSpecial.performance }}</div>
+      </div>
+      <div class="metric-info">
+        <mat-icon>info_outline</mat-icon>
+      </div>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-content">
+        <h3 class="metric-title">Specials Ordered</h3>
+        <div class="metric-value">{{ metrics.specialsOrdered.count.toLocaleString() }}</div>
+        <div class="metric-movement positive">{{ metrics.specialsOrdered.percentage }}</div>
+      </div>
+      <div class="metric-info">
+        <mat-icon>info_outline</mat-icon>
       </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="block">
-      <h6>Active Specials</h6>
-      <div class="row rowSpecials">
-        <table class="specialTable" *ngIf="specials.length > 0">
-          <thead>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th></th>
-          </thead>
-          <tbody>
-            <tr *ngFor="let special of specials; let i = index">
-              <td>
-                <div>
-                  <img
-                    [src]="special.imageUrl"
-                    alt=""
-                    class="imageSpecial"
-                    style="max-width: 80px"
-                  />
-                  <p>{{ special.specialTitle }}</p>
-                </div>
-              </td>
-              <td>
-                <div>
-                  @if (special.selectedDays.length > 0) {
-                  <p *ngFor="let day of special.selectedDays; let i = index">
-                    {{ day }}
-                  </p>
-                  <p>{{ special?.timeFrom }} - {{ special?.timeTo }}</p>
-                  }
-                </div>
-              </td>
-              <td>
-                {{ getSpecialTypeLabel(special.typeSpecial) }}
-              </td>
-              <td>
-                <a [routerLink]="['/specials/edit-special', special.specialID]">
-                  <i class="material-icons">edit</i>
-                </a>
-                <a (click)="deleteSpecial(special.specialID, i)">
-                  <i class="material-icons">delete</i>
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="noSpecials" *ngIf="specials.length === 0">
-          <p>No specials have been added</p>
-        </div>
+  <!-- Active Specials Section -->
+  <div class="specials-section">
+    <div class="section-header">
+      <h6 class="section-title">Active Specials</h6>
+      <div class="filter-dropdown">
+        <mat-select placeholder="Filter by" (selectionChange)="onFilterChange($event.value)">
+          <mat-option value="all">All</mat-option>
+          <mat-option value="weekly">Weekly Special</mat-option>
+          <mat-option value="category">Category Special</mat-option>
+          <mat-option value="combo">Combo Special</mat-option>
+        </mat-select>
+        <mat-icon class="filter-icon">filter_list</mat-icon>
       </div>
+    </div>
+    
+    <table class="specials-table" *ngIf="activeSpecials.length > 0">
+      <thead>
+        <tr>
+          <th class="name-column">Name</th>
+          <th class="description-column">Description</th>
+          <th class="type-column">Type</th>
+          <th class="status-column">Status</th>
+          <th class="actions-column">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let special of activeSpecials; let i = index">
+          <td class="name-cell">
+            <div class="name-content">
+              <img [src]="special.imageUrl" alt="" class="special-image" />
+              <span class="special-name">{{ special.specialTitle }}</span>
+            </div>
+          </td>
+          <td class="description-cell">
+            <div class="description-content">
+              <div class="days-list" *ngIf="special.selectedDays.length > 0">
+                <span *ngFor="let day of special.selectedDays; let isLast = last">
+                  {{ day }}<span *ngIf="!isLast">, </span>
+                </span>
+              </div>
+              <div class="time-range" *ngIf="special.timeFrom && special.timeTo">
+                {{ special.timeFrom }} - {{ special.timeTo }}
+              </div>
+            </div>
+          </td>
+          <td class="type-cell">
+            {{ getSpecialTypeLabel(special.typeSpecial) }}
+          </td>
+          <td class="status-cell">
+            <span class="status-badge active">{{ getSpecialStatus(special) }}</span>
+          </td>
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <mat-slide-toggle 
+                [checked]="special.active" 
+                (change)="toggleSpecialStatus(special, i)"
+                class="toggle-switch">
+              </mat-slide-toggle>
+              <button mat-icon-button class="view-btn" title="View">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button class="edit-btn" [routerLink]="['/specials/edit-special', special.specialID]" title="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button class="delete-btn" (click)="deleteSpecial(special.specialID, i)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="no-specials" *ngIf="activeSpecials.length === 0">
+      <p>No active specials found</p>
+    </div>
+  </div>
+
+  <!-- Inactive Specials Section -->
+  <div class="specials-section">
+    <div class="section-header">
+      <h6 class="section-title">Inactive Specials</h6>
+    </div>
+    
+    <table class="specials-table" *ngIf="inactiveSpecials.length > 0">
+      <thead>
+        <tr>
+          <th class="name-column">Name</th>
+          <th class="description-column">Description</th>
+          <th class="type-column">Type</th>
+          <th class="status-column">Status</th>
+          <th class="actions-column">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let special of inactiveSpecials; let i = index">
+          <td class="name-cell">
+            <div class="name-content">
+              <img [src]="special.imageUrl" alt="" class="special-image" />
+              <span class="special-name">{{ special.specialTitle }}</span>
+            </div>
+          </td>
+          <td class="description-cell">
+            <div class="description-content">
+              <div class="days-list" *ngIf="special.selectedDays.length > 0">
+                <span *ngFor="let day of special.selectedDays; let isLast = last">
+                  {{ day }}<span *ngIf="!isLast">, </span>
+                </span>
+              </div>
+              <div class="time-range" *ngIf="special.timeFrom && special.timeTo">
+                {{ special.timeFrom }} - {{ special.timeTo }}
+              </div>
+            </div>
+          </td>
+          <td class="type-cell">
+            {{ getSpecialTypeLabel(special.typeSpecial) }}
+          </td>
+          <td class="status-cell">
+            <span class="status-badge inactive">{{ getSpecialStatus(special) }}</span>
+          </td>
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <mat-slide-toggle 
+                [checked]="special.active" 
+                (change)="toggleSpecialStatus(special, i)"
+                class="toggle-switch">
+              </mat-slide-toggle>
+              <button mat-icon-button class="view-btn" title="View">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button class="edit-btn" [routerLink]="['/specials/edit-special', special.specialID]" title="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button class="delete-btn" (click)="deleteSpecial(special.specialID, i)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="no-specials" *ngIf="inactiveSpecials.length === 0">
+      <p>No inactive specials found</p>
+    </div>
+  </div>
+
+  <!-- Drafts Section -->
+  <div class="specials-section">
+    <div class="section-header">
+      <h6 class="section-title">Drafts</h6>
+    </div>
+    
+    <table class="specials-table" *ngIf="draftSpecials.length > 0">
+      <thead>
+        <tr>
+          <th class="name-column">Name</th>
+          <th class="description-column">Description</th>
+          <th class="type-column">Type</th>
+          <th class="status-column">Status</th>
+          <th class="actions-column">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let special of draftSpecials; let i = index">
+          <td class="name-cell">
+            <div class="name-content">
+              <img [src]="special.imageUrl" alt="" class="special-image" />
+              <span class="special-name">{{ special.specialTitle }}</span>
+            </div>
+          </td>
+          <td class="description-cell">
+            <div class="description-content">
+              <div class="days-list" *ngIf="special.selectedDays.length > 0">
+                <span *ngFor="let day of special.selectedDays; let isLast = last">
+                  {{ day }}<span *ngIf="!isLast">, </span>
+                </span>
+              </div>
+              <div class="time-range" *ngIf="special.timeFrom && special.timeTo">
+                {{ special.timeFrom }} - {{ special.timeTo }}
+              </div>
+            </div>
+          </td>
+          <td class="type-cell">
+            {{ getSpecialTypeLabel(special.typeSpecial) }}
+          </td>
+          <td class="status-cell">
+            <span class="status-badge draft">{{ getSpecialStatus(special) }}</span>
+          </td>
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <mat-slide-toggle 
+                [checked]="false" 
+                disabled
+                class="toggle-switch disabled">
+              </mat-slide-toggle>
+              <button mat-icon-button class="view-btn" title="View">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button class="edit-btn" [routerLink]="['/specials/edit-special', special.specialID]" title="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button class="delete-btn" (click)="deleteSpecial(special.specialID, i)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="no-specials" *ngIf="draftSpecials.length === 0">
+      <p>No draft specials found</p>
     </div>
   </div>
 </div>

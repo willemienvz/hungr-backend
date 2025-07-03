@@ -42,7 +42,7 @@
               <a [routerLink]="['/menus/edit-menu', menu.menuID, 1]">
                 <i class="material-icons">edit</i>
               </a>
-              <a (click)="deleteMenu(menu.menuID)">
+              <a (click)="deleteMenu(menu.menuID, menu.menuName)">
                 <i class="material-icons">delete</i>
               </a>
             </td>
@@ -73,7 +73,7 @@
               <a [routerLink]="['/menus/edit-menu', menu.menuID, 1]">
                 <i class="material-icons">edit</i>
               </a>
-              <a (click)="deleteMenu(menu.menuID)">
+              <a (click)="deleteMenu(menu.menuID, menu.menuName)">
                 <i class="material-icons">delete</i>
               </a>
             </td>

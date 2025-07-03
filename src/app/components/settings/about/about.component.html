@@ -7,6 +7,7 @@
           matInput
           [(ngModel)]="aboutText"
           placeholder="Please add a description of your restaurant here"
+          (input)="markAsChanged()"
         ></textarea>
       </div>
     </div>
@@ -17,13 +18,19 @@
           <p class="text">Main Image</p>
         </div>
         <div class="hold">
-          <button class="add-image-button">
-            <input type="file" (change)="onFileSelected($event)" />
+          <button 
+            class="add-image-button" 
+            type="button"
+            (click)="openMainImageUpload()"
+            [disabled]="isSaving">
+            <i class="material-symbols-outlined">{{ isSaving ? 'hourglass_empty' : 'upload' }}</i>
+            <span>{{ mainImageUrl ? 'Change Image' : 'Upload Image' }}</span>
           </button>
           <i
             class="material-symbols-outlined deleteIcon"
             (click)="removeMainImg()"
-            >Delete</i
+            [style.display]="mainImageUrl ? 'inline' : 'none'"
+            >delete</i
           >
         </div>
       </section>
@@ -32,13 +39,19 @@
           <p class="text">Additional Images</p>
         </div>
         <div class="hold">
-          <button class="add-image-button">
-            <input type="file" (change)="onFileSelected1($event)" />
+          <button 
+            class="add-image-button" 
+            type="button"
+            (click)="openAdditionalImageUpload()"
+            [disabled]="isSaving">
+            <i class="material-symbols-outlined">{{ isSaving ? 'hourglass_empty' : 'upload' }}</i>
+            <span>{{ additionalImageUrl ? 'Change Image' : 'Upload Image' }}</span>
           </button>
           <i
             class="material-symbols-outlined deleteIcon"
             (click)="removeSecImg()"
-            >Delete</i
+            [style.display]="additionalImageUrl ? 'inline' : 'none'"
+            >delete</i
           >
         </div>
       </section>
@@ -62,7 +75,7 @@
       </div>
       <div class="row">
         <div class="formGroup">
-          <textarea matInput [(ngModel)]="businessHours"></textarea>
+          <textarea matInput [(ngModel)]="businessHours" (input)="markAsChanged()"></textarea>
         </div>
       </div>
     </div>
@@ -92,6 +105,7 @@
               class="formControl"
               placeholder="email@address.co.za"
               [(ngModel)]="email"
+              (input)="markAsChanged()"
             />
           </div>
         </div>
@@ -103,6 +117,7 @@
               class="formControl"
               placeholder="+27 (0)12 345 6789"
               [(ngModel)]="cellphone"
+              (input)="markAsChanged()"
             />
           </div>
         </div>

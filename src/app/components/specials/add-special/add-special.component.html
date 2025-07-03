@@ -4,17 +4,21 @@
   <!-- Step 1: Special Basics -->
   <div *ngIf="currentStep === 1">
     <div class="block rowSpecial">
-      <div class="row navRow">
+      <div class="headerBlock">
         <app-progress-bar 
+          [showBackButton]="true"
           [progress]="currentStep" 
           [backRoute]="'/specials'"
           [backText]="'Back'"
-          (stepClick)="navigateToStep($event)">
+          (stepClick)="navigateToStep($event)"
+          (backButtonClick)="onBackButtonClick()">
         </app-progress-bar>
+        <app-step-header
+          [stepNumber]="1"
+          [stepTitle]="'Special Basics'"
+          [showDescription]="false">
+        </app-step-header>
       </div>
-      <h6 class="mainTitle">
-        <span style="color: #16d3d2">Step 1:</span> Special Basics
-      </h6>
       <form [formGroup]="specialForm">
         <div class="formGroup">
           <p class="label">Special Title</p>
@@ -89,7 +93,7 @@
                 class="error-message"
                 *ngIf="
                   specialForm.get('dateFrom')?.touched &&
-                  specialForm.get('dateFrom')?.invalid
+                  (specialForm.get('dateFrom')?.invalid || !specialForm.get('dateFrom')?.value)
                 "
               >
                 Start date is required.
@@ -109,7 +113,7 @@
                 class="error-message"
                 *ngIf="
                   specialForm.get('dateTo')?.touched &&
-                  specialForm.get('dateTo')?.invalid
+                  (specialForm.get('dateTo')?.invalid || !specialForm.get('dateTo')?.value)
                 "
               >
                 End date is required.
@@ -126,25 +130,30 @@
         </div>
       </form>
     </div>
-    <div class="navRow">
-      <button (click)="nextStep()" class="btnSecondary">Next</button>
-    </div>
+    <app-step-navigation
+      [nextDisabled]="isStep1Invalid()"
+      [isSaving]="isSaving"
+      (next)="nextStep()"
+    ></app-step-navigation>
   </div>
 
   <!-- Step 2: Days and Times -->
   <div *ngIf="currentStep === 2">
     <div class="block rowSpecial">
-      <div class="row navRow">
+      <div class="headerBlock">
         <app-progress-bar 
           [progress]="currentStep" 
           [backRoute]="'/specials'"
           [backText]="'Back'"
-          (stepClick)="navigateToStep($event)">
+          (stepClick)="navigateToStep($event)"
+          (backButtonClick)="onBackButtonClick()">
         </app-progress-bar>
+        <app-step-header
+          [stepNumber]="2"
+          [stepTitle]="'Days and Times'"
+          [showDescription]="false">
+        </app-step-header>
       </div>
-      <h6 class="mainTitle">
-        <span style="color: #16d3d2">Step 2:</span> Days and Times
-      </h6>
       <form [formGroup]="specialForm">
         <div class="formGroup">
           <p>What day(s) of the week should this special be valid?</p>
@@ -194,28 +203,32 @@
         </div>
       </form>
     </div>
-    <div class="navRow">
-      <button (click)="previousStep()" class="btnTertiary">Back</button>
-      <button type="button" (click)="onDraftSave()" class="btnTertiary">
-        Save as Draft
-      </button>
-      <button (click)="nextStep()" class="btnSecondary">Next</button>
-    </div>
+    <app-step-navigation
+      [showPrevious]="true"
+      [showDraft]="true"
+      [isSaving]="isSaving"
+      (previous)="previousStep()"
+      (draft)="onDraftSave()"
+      (next)="nextStep()"
+    ></app-step-navigation>
   </div>
 
   <div *ngIf="currentStep === 3" class="bigBlock">
-    <div class="row navRow">
-      <app-progress-bar 
-        [progress]="currentStep" 
-        [backRoute]="'/specials'"
-        [backText]="'Back'"
-        (stepClick)="navigateToStep($event)">
-      </app-progress-bar>
-    </div>
     <div class="block rowSpecial">
-      <h6 class="mainTitle">
-        <span style="color: #16d3d2">Step 3:</span> Special Details
-      </h6>
+      <div class="headerBlock">
+        <app-progress-bar 
+          [progress]="currentStep" 
+          [backRoute]="'/specials'"
+          [backText]="'Back'"
+          (stepClick)="navigateToStep($event)"
+          (backButtonClick)="onBackButtonClick()">
+        </app-progress-bar>
+        <app-step-header
+          [stepNumber]="3"
+          [stepTitle]="'Special Details'"
+          [showDescription]="false">
+        </app-step-header>
+      </div>
       <form [formGroup]="specialForm">
         <!-- 3.c.1 Weekly Special -->
         <div *ngIf="selectedSpecialType === 1">
@@ -229,13 +242,13 @@
                 {{ item.name }}
               </mat-option>
             </mat-select>
-            <input
-              type="text"
+            <app-price-input
               formControlName="amount"
-              placeholder="Promotional price"
-              (keydown.enter)="addItem()"
-              #amountInput
-            />
+              placeholder="R 0.00"
+              label=""
+              [required]="true"
+              (keydown.enter)="addItem()">
+            </app-price-input>
           </div>
         </div>
 
@@ -272,12 +285,13 @@
                 {{ item.name }}
               </mat-option>
             </mat-select>
-            <input
-              type="text"
+            <app-price-input
               formControlName="comboPrice"
-              placeholder="Enter combo price"
-              (keydown.enter)="addItem()"
-            />
+              placeholder="R 0.00"
+              label=""
+              [required]="true"
+              (keydown.enter)="addItem()">
+            </app-price-input>
           </div>
         </div>
         <p style="text-align: right; width: 100%">Press enter to add an item</p>
@@ -299,58 +313,71 @@
         </div>
       </form>
     </div>
-    <div class="navRow">
-      <button (click)="previousStep()" class="btnTertiary">Back</button>
-      <button type="button" (click)="onDraftSave()" class="btnTertiary">
-        Save as Draft
-      </button>
-      <button (click)="nextStep()" class="btnSecondary">Next</button>
-    </div>
+    <app-step-navigation
+      [showPrevious]="true"
+      [showDraft]="true"
+      [isSaving]="isSaving"
+      (previous)="previousStep()"
+      (draft)="onDraftSave()"
+      (next)="nextStep()"
+    ></app-step-navigation>
   </div>
 
   <!-- Step 4: Add Media -->
   <div *ngIf="currentStep === 4">
     <div class="block rowSpecial">
-      <div class="row navRow">
+      <div class="headerBlock">
         <app-progress-bar 
           [progress]="currentStep" 
           [backRoute]="'/specials'"
           [backText]="'Back'"
-          (stepClick)="navigateToStep($event)">
+          (stepClick)="navigateToStep($event)"
+          (backButtonClick)="onBackButtonClick()">
         </app-progress-bar>
+        <app-step-header
+          [stepNumber]="4"
+          [stepTitle]="'Add Media'"
+          [description]="'Uploading media helps to raise awareness of the special.'"
+          [showDescription]="true">
+        </app-step-header>
       </div>
-      <h6 class="mainTitle">Step 4: Add Media</h6>
-      <p style="margin-bottom: 30px">
-        Uploading media helps to raise awareness of the special.
-      </p>
-      <a class="btnSecondary" (click)="openImageUploadModal()"
-        ><mat-icon>upload</mat-icon> Add Image</a
-      >
+      <button type="button" class="btnSecondary" (click)="openImageUploadModal()">
+        <mat-icon>upload</mat-icon> Add Image
+      </button>
       <img
+        *ngIf="uploadedImageUrl"
         style="margin-top: 30px; max-width: 80%"
         [src]="uploadedImageUrl"
-        alt=""
+        alt="Special preview image"
       />
     </div>
-    <div class="navRow">
-      <button (click)="previousStep()" class="btnTertiary">Back</button>
-      <button type="button" (click)="onDraftSave()" class="btnTertiary">
-        Save as Draft
-      </button>
-      <button (click)="nextStep()" class="btnSecondary">Next</button>
-    </div>
+    <app-step-navigation
+      [showPrevious]="true"
+      [showDraft]="true"
+      [isSaving]="isSaving"
+      (previous)="previousStep()"
+      (draft)="onDraftSave()"
+      (next)="nextStep()"
+    ></app-step-navigation>
   </div>
 
   <!-- Step 5: Overview -->
   <div *ngIf="currentStep === 5">
     <div class="block rowSpecial">
-      <app-progress-bar 
-        [progress]="currentStep" 
-        [backRoute]="'/specials'"
-        [allowStepNavigation]="false">
-      </app-progress-bar>
-      <h6 class="mainTitle">Step 5: Overview</h6>
-      <p>Review all the information you have entered before submission.</p>
+      <div class="headerBlock">
+        <app-progress-bar 
+          [progress]="currentStep" 
+          [backRoute]="'/specials'"
+          [allowStepNavigation]="false"
+          (backButtonClick)="onBackButtonClick()">
+        </app-progress-bar>
+        <app-step-header
+          [stepNumber]="5"
+          [stepTitle]="'Overview'"
+          [description]="'Review all the information you have entered before submission.'"
+          [showDescription]="true">
+        </app-step-header>
+      </div>
       <div class="summary-container">
         <h3 class="summary-title">
           {{ specialForm.value.specialTitle || "Special Name" }}
@@ -392,34 +419,18 @@
         </div>
       </div>
     </div>
-    <div class="navRow">
-      <button (click)="previousStep()" class="btnTertiary">Back</button>
-      <button (click)="onSubmit()" class="btnSecondary">Save & Publish</button>
-    </div>
+    <app-step-navigation
+      [showPrevious]="true"
+      [showNext]="true"
+      [nextText]="'Save & Publish'"
+      [isSaving]="isSaving"
+      (previous)="previousStep()"
+      (next)="onSubmit()"
+    ></app-step-navigation>
   </div>
 </div>
 
-<div class="modal" [class.open]="showImageUploadModal">
-  <div class="modal-content">
-    <span class="close" (click)="closeImageUploadModal()">&times;</span>
-    <h6>Upload Image</h6>
-    <input type="file" (change)="onFileSelected($event)" accept="image/*" />
-    <p>
-      Acceptable file formats: PNG, JPG<br />File sizes: Files that are less
-      than 5 MB.
-    </p>
-    <div class="row">
-      <a
-        class="btnSecondary"
-        [class.disabled]="!uploadDone"
-        (click)="uploadDone && closeImageUploadModal()"
-      >
-        Done</a
-      >
-      <a class="btnTertiary" (click)="cancelUpload()">Cancel</a>
-    </div>
-  </div>
-</div>
+<!-- Image upload modal replaced with standardized ImageUploadModalComponent -->
 
 <div class="popup" *ngIf="showSuccessPopup">
   <div class="popup-content">

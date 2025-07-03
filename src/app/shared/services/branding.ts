@@ -1,26 +1,33 @@
 export interface Branding {
     parentID: string;
-    btnSecondaryColour:string;
-    btnSecondaryLettercase:string;
-    btnSecondaryTextColour:string;
-    btnSecondaryTypeface:string;
-    logo:string;
-    mainHeadingColour:string;
-    mainHeadingLettercase:string;
-    mainHeadingSize:string;
-    mainHeadingTypeface:string;
-    subHeadingColour:string;
-    subHeadingLettercase:string;
-    subHeadingSize:string;
-    subHeadingTypeface:string;
-    backgroundColour:string;
-    bodyColour:string;
-    bodyLettercase:string;
-    bodySize:string;
-    bodyTypeface:string;
-    brandingID:string;
-    btnPrimaryColour:string;
-    btnPrimaryLettercase:string;
-    btnPrimaryTextColour:string;
-    btnPrimaryTypeface:string;
- }
+    backgroundColor: string;
+    primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
+    
+    // Logo
+    imageUrl: string;
+    
+    // Text styling
+    mainHeadingColor: string;
+    mainHeadingTypeface: string;
+    mainHeadingCase: string;
+    mainHeadingSize: string;
+    
+    subHeadingColor: string;
+    subHeadingTypeface: string;
+    subHeadingCase: string;
+    subHeadingSize: string;
+    
+    bodyColor: string;
+    bodyTypeface: string;
+    bodyCase: string;
+    bodySize: string;
+    
+    brandingID?: string;
+    
+    // Preview mode support
+    isPreview?: boolean;
+    originalDocId?: string;
+    previewTimestamp?: number;
+}

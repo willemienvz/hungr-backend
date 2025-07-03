@@ -9,6 +9,7 @@ import { SuccessAddRestaurantDialogComponent } from './success-add-restaurant-di
 import { SaveProgressDialogComponent } from '../../save-progress-dialog/save-progress-dialog.component';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @Component({
   selector: 'app-add',
@@ -44,6 +45,7 @@ export class AddComponent implements OnInit {
   selectedUserName: string = '';
   isSaving: boolean = false;
   userChanged: boolean = false;
+  hasUnsavedChanges: boolean = false;
   constructor(
     private firestore: AngularFirestore,
     private configService: ConfigService,
@@ -61,6 +63,58 @@ export class AddComponent implements OnInit {
     this.OwnerID = this.user.uid;
     this.fetchMenus();
     this.fetchUsers();
+    this.setupFormTracking();
+  }
+
+  private setupFormTracking() {
+    // Track changes to detect unsaved modifications
+    const inputs = ['name', 'street', 'city', 'province', 'zip'];
+    inputs.forEach(input => {
+      const originalValue = this.restaurant[input];
+      Object.defineProperty(this.restaurant, `_${input}`, { value: originalValue, writable: true });
+      Object.defineProperty(this.restaurant, input, {
+        get: () => this.restaurant[`_${input}`],
+        set: (value) => {
+          this.restaurant[`_${input}`] = value;
+          this.markAsChanged();
+        },
+        enumerable: true,
+        configurable: true
+      });
+    });
+  }
+
+  private markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string | any[]) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          if (Array.isArray(route)) {
+            this.router.navigate(route);
+          } else {
+            this.router.navigate([route]);
+          }
+        }
+      });
+    } else {
+      if (Array.isArray(route)) {
+        this.router.navigate(route);
+      } else {
+        this.router.navigate([route]);
+      }
+    }
   }
 
   private fetchMenus() {
@@ -94,6 +148,7 @@ export class AddComponent implements OnInit {
 
   selectMenu(menu: Menu) {
     this.selectedMenu = menu;
+    this.markAsChanged();
   }
 
   async onAddUserClick(event: Event) {
@@ -252,6 +307,7 @@ export class AddComponent implements OnInit {
     this.selectedUserName = user.firstName;
     this.selectedUserSurname = user.Surname;
     this.userChanged = true;
+    this.markAsChanged();
   }
 
   removeUser() {
@@ -259,5 +315,6 @@ export class AddComponent implements OnInit {
     this.selectedUserName = '';
     this.selectedUserSurname = '';
     this.userChanged = true;
+    this.markAsChanged();
   }
 }
