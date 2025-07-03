@@ -1,5 +1,5 @@
 export const environment = {
-    menuUrl: 'https://main.d1t6shduhanlnl.amplifyapp.com/',
+    menuUrl: 'http://localhost:5173/menu/',
     production: false,
     firebase: {
         apiKey: 'AIzaSyBVj2pm0X0eCulSfAF7WYC_EFEJNK7_35M',

@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
 import { ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { environment } from '../../../../environments/environment';
 
 import { BrandingPreviewMessage } from '../../../types/branding-preview';
 
@@ -80,7 +81,7 @@ export class BrandingComponent implements OnInit {
   subHeadingCase: string = 'capitalize';
   bodyCase: string = 'lowercase';
 
-  private readonly previewUrlBase = 'http://localhost:5173/menu/';
+  private readonly previewUrlBase = environment.menuUrl;
   private cachedPreviewUrl: SafeResourceUrl | null = null;
   private lastSelectedMenuId: string | null = null;
 
