@@ -56,20 +56,30 @@ export class Step2Component {
   }
 
   onComplete() {
-    const formData = this.step2Form.value;
-    this.formDataService.updateFormData(formData);
+    const step2Data = this.step2Form.value;
+    
+    // Get existing data from step 1
+    const existingData = this.formDataService.getFormData();
+    
+    // Merge step 2 data with existing data
+    const combinedData = { ...existingData, ...step2Data };
+    
+    // Update form data service with merged data
+    this.formDataService.updateFormData(combinedData);
+    
+    // Store complete form data in localStorage
+    localStorage.setItem('formData', JSON.stringify(combinedData));
+    
     this.onCheckout();
   }
 
   async onCheckout() {
     this.isSaving = true;
-    this.formData.next(this.formDataService.getFormData());
-    localStorage.setItem('formData', JSON.stringify(this.formData.getValue()));
     try {
-      await this.payflexService.createOrder(120, this.formData.getValue());
+      const formData = this.formDataService.getFormData();
+      await this.payflexService.createOrder(120, formData);
     } catch (error) {
       console.error('Error during checkout:', error);
-    } finally {
       this.isSaving = false;
     }
   }
