@@ -1,21 +1,13 @@
-<div class="displayTable verify-email-container">
-  <div class="displayTableCell">
-    <div class="authBlock">
-      <h2>Email Verification Required</h2>
-      <div class="formGroup">
-        <p class="text-center">Please verify your email address to complete your account setup.</p>
-        <p class="text-center">If you haven't received the verification email, click the button below to resend it.</p>
-      </div>
-      <div class="formGroup">
-        <button type="button" class="btn btnPrimary" (click)="verifyAndCreate()">
-          Resend Verification Email
-        </button>
-      </div>
+<div class="displayTable">
+    <div class="displayTableCell">
+        <div class="authBlock">
+            <h2>Verifying your account</h2>
+            <div class="formGroup">
+                <p class="text-center" *ngIf="isSaving">Please wait while we set up your account...</p>
+                <p class="text-center" *ngIf="!isSaving">Your account has been created! Please check your email for verification.</p>
+            </div>
+        </div>
     </div>
-    <div class="redirectToLogin">
-      <p>You can close this window after verifying your email</p>
-    </div>
-  </div>
 </div>
 
 <app-loading [isLoading]="isSaving"></app-loading>

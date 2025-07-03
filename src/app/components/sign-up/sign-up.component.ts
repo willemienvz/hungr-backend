@@ -33,10 +33,24 @@ export class SignUpComponent {
     this.formDataService.updateFormData(formData);
   }
 
-  onNextStepStep2(formData: any) {
-    this.formDataStep2 = formData;
-    this.formDataService.updateFormData({ ...this.formDataStep1, ...formData });
-    this.onCheckout();
+  async onNextStepStep2(formData: any) {
+    this.isSaving = true;
+    try {
+      this.formDataStep2 = formData;
+      const combinedFormData = { ...this.formDataStep1, ...formData };
+      this.formDataService.updateFormData(combinedFormData);
+      
+      // Store form data for after payment
+      localStorage.setItem('formData', JSON.stringify(combinedFormData));
+      
+      // Proceed with payment
+      await this.onCheckout();
+    } catch (error: any) {
+      console.error('Error during signup:', error);
+      this.toastr.error(error.message || 'Failed to complete signup');
+    } finally {
+      this.isSaving = false;
+    }
   }
 
   onPreviousStep() {
@@ -44,17 +58,14 @@ export class SignUpComponent {
   }
 
   async onCheckout() {
-    this.isSaving = true;
     const formData = this.formDataService.getFormData();
-    localStorage.setItem('formData', JSON.stringify(formData));
     
     try {
       await this.payflexService.createOrder(120, formData);
     } catch (error) {
       console.error('Error during checkout:', error);
       this.toastr.error('Failed to initiate payment. Please try again.');
-    } finally {
-      this.isSaving = false;
+      throw error;
     }
   }
 }

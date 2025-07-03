@@ -73,6 +73,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { TestAuthComponent } from './components/test-auth/test-auth.component';
 
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
@@ -177,6 +178,7 @@ import { PriceInputComponent } from './shared/components/price-input/price-input
     ImageUploadModalComponent,
     MenuCompletionSuccessComponent,
     PriceInputComponent,
+    TestAuthComponent,
   ],
   imports: [
     BrowserModule,
@@ -199,23 +201,20 @@ import { PriceInputComponent } from './shared/components/price-input/price-input
     MatFormFieldModule,
     MatAutocompleteModule,
     BrowserAnimationsModule,
-    MatRadioModule,
+    NgxColorsModule,
     MatIconModule,
     MatChipsModule,
     MatCheckboxModule,
+    MatRadioModule,
     MatTabsModule,
-    NgxColorsModule,
-    ColorPickerModule,
     DragDropModule,
+    ColorPickerModule,
     NgxEchartsModule.forRoot({
-      echarts: () => import('echarts')
+      echarts: () => import('echarts'),
     }),
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
   ],
-  providers: [
-    FormDataService,
-    DatePipe
-  ],
-  bootstrap: [AppComponent]
+  providers: [FormDataService, DatePipe],
+  bootstrap: [AppComponent],
 })
 export class AppModule { }
