@@ -17,6 +17,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class AuthService {
+  private readonly verificationRedirectUrl = 'https://main.d9ek0iheftizq.amplifyapp.com/verify-email-address';
   userData: any; // Save logged in user data
   constructor(
     public afs: AngularFirestore, // Inject Firestore service
@@ -81,33 +82,38 @@ export class AuthService {
   }
 
   // Sign up with email/password
-  SignUp(
+  async SignUp(
     email: string,
     password: string,
     formDataStep1: any,
     formDataStep2: any,
     formDataStep3: any
   ) {
-    return this.afAuth
-      .createUserWithEmailAndPassword(email, password)
-      .then((result) => {
-        // Send verification email
-        this.SendVerificationMail();
-        
-        // Update user profile
-        if (result.user) {
-          result.user.updateProfile({
-            displayName: formDataStep1.firstName
-          });
-          
-          // Store user data
-          this.SetUserData(result.user, formDataStep1);
-        }
-      })
-      .catch((error) => {
-        this.toastr.error(error.message);
-        throw error;
+    try {
+      const result = await this.afAuth.createUserWithEmailAndPassword(email, password);
+      
+      if (!result.user) {
+        throw new Error('User creation failed');
+      }
+
+      // Update user profile
+      await result.user.updateProfile({
+        displayName: formDataStep1.firstName
       });
+      
+      // Store user data
+      await this.SetUserData(result.user, formDataStep1);
+      
+      // Send verification email with custom redirect URL
+      await result.user.sendEmailVerification({
+        url: this.verificationRedirectUrl
+      });
+      
+      return result;
+    } catch (error) {
+      this.toastr.error(error.message);
+      throw error;
+    }
   }
 
   SignUpEditor(email: string, data: any): Promise<void> {
@@ -151,13 +157,20 @@ export class AuthService {
     });
   }
 
-  // Send email verfificaiton when new user sign up
-  SendVerificationMail() {
-    return this.afAuth.currentUser
-      .then((u: any) => u.sendEmailVerification())
-      .then(() => {
+  // Send email verification when new user sign up
+  async SendVerificationMail() {
+    try {
+      const user = await this.afAuth.currentUser;
+      if (user) {
+        await user.sendEmailVerification({
+          url: this.verificationRedirectUrl
+        });
         this.router.navigate(['verify-email-address']);
-      });
+      }
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      throw error;
+    }
   }
 
   // Send email verfificaiton when new editor sign up

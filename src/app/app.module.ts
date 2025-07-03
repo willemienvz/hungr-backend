@@ -71,12 +71,13 @@ import { VisitorDashboardComponent } from './components/dashboard/visitor-dashbo
 import { FusionChartsModule } from 'angular-fusioncharts';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { RouterModule } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
 import { ConfirmDeleteDialogComponent } from './components/restaurant/confirm-delete-dialog/confirm-delete-dialog.component';
 import { SuccessAddRestaurantDialogComponent } from './components/restaurant/add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
-import { Step3Component } from './components/sign-up/step3/step3.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ViewComponent } from './components/restaurant/view/view.component';
 import { ResetSuccessComponent } from './components/forgot-password/reset-success/reset-success.component';
@@ -154,7 +155,6 @@ import { PriceInputComponent } from './shared/components/price-input/price-input
     SalesInsightsComponent,
     ConfirmDeleteDialogComponent,
     SuccessAddRestaurantDialogComponent,
-    Step3Component,
     ViewComponent,
     ResetSuccessComponent,
     ConfirmEmailComponent,
@@ -182,9 +182,11 @@ import { PriceInputComponent } from './shared/components/price-input/price-input
     BrowserModule,
     FusionChartsModule,
     AppRoutingModule,
+    RouterModule,
     AngularFireModule.initializeApp(environment.firebase, 'hungr-firebase-app'),
     AngularFirestoreModule,
     AngularFireAuthModule,
+    AngularFireStorageModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -198,25 +200,22 @@ import { PriceInputComponent } from './shared/components/price-input/price-input
     MatAutocompleteModule,
     BrowserAnimationsModule,
     MatRadioModule,
-    AngularFireStorageModule,
-    NgxColorsModule,
     MatIconModule,
     MatChipsModule,
-    MatTabsModule,
     MatCheckboxModule,
+    MatTabsModule,
+    NgxColorsModule,
     ColorPickerModule,
-    ToastrModule.forRoot({
-      timeOut: 3000,
-      positionClass: 'toast-bottom-center',
-      preventDuplicates: true,
-
-    }),
-    NgxEchartsModule.forRoot({
-      echarts: () => import('echarts'),
-    }),
     DragDropModule,
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts')
+    }),
+    ToastrModule.forRoot()
   ],
-  providers: [FormDataService],
-  bootstrap: [AppComponent],
+  providers: [
+    FormDataService,
+    DatePipe
+  ],
+  bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

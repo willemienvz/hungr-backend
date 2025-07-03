@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PayflexService {
   private readonly apiGatewayUrl = 'https://1o6ucfn6n2.execute-api.us-east-1.amazonaws.com/prod1/create-order';
+  private paymentSuccessSubject = new Subject<void>();
 
   constructor(private readonly http: HttpClient) {}
 
@@ -48,5 +50,13 @@ export class PayflexService {
       console.error('Error creating order:', error);
       throw error;
     }
+  }
+
+  onPaymentSuccess() {
+    return this.paymentSuccessSubject.asObservable();
+  }
+
+  notifyPaymentSuccess() {
+    this.paymentSuccessSubject.next();
   }
 }

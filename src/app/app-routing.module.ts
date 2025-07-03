@@ -34,7 +34,6 @@ import { CancelPaymentComponent } from './components/cancel-payment/cancel-payme
 import { ActionLandingComponent } from './components/action-landing/action-landing.component';
 import { Step1Component } from './components/sign-up/step1/step1.component';
 import { Step2Component } from './components/sign-up/step2/step2.component';
-import { Step3Component } from './components/sign-up/step3/step3.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
