@@ -8,7 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
 import { ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { BrandingService } from '../../../shared/services/branding.service';
+
 import { BrandingPreviewMessage } from '../../../types/branding-preview';
 
 @Component({
@@ -91,7 +91,7 @@ export class BrandingComponent implements OnInit {
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
-    private brandingService: BrandingService
+ 
   ) {}
 
   ngOnInit() {

@@ -88,18 +88,26 @@ export class AuthService {
     formDataStep2: any,
     formDataStep3: any
   ) {
-    /*   return this.afAuth
+    return this.afAuth
       .createUserWithEmailAndPassword(email, password)
       .then((result) => {
+        // Send verification email
         this.SendVerificationMail();
-        result.user.updateProfile({
-          displayName: formDataStep1.firstName
-        });
-        this.SetUserData(result.user, formDataStep1, formDataStep2, formDataStep3);
+        
+        // Update user profile
+        if (result.user) {
+          result.user.updateProfile({
+            displayName: formDataStep1.firstName
+          });
+          
+          // Store user data
+          this.SetUserData(result.user, formDataStep1);
+        }
       })
       .catch((error) => {
-        this.toastr.error(error.message)
-      }); */
+        this.toastr.error(error.message);
+        throw error;
+      });
   }
 
   SignUpEditor(email: string, data: any): Promise<void> {
