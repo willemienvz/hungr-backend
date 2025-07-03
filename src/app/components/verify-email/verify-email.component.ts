@@ -42,36 +42,45 @@ export class VerifyEmailComponent implements OnInit {
 
   private async createUserAccount(formData: any) {
     try {
-      await this.authService.SignUp(
+      // Create the user with email and password first
+      const userCredential = await this.auth.createUserWithEmailAndPassword(
         formData.userEmail,
-        formData.password,
-        formData,
-        formData,
-        null // step3 is no longer used
+        formData.password
       );
 
-      // Clear stored form data
-      localStorage.removeItem('formData');
+      if (userCredential.user) {
+        // Send verification email
+        await userCredential.user.sendEmailVerification();
+        
+        // Update user profile with additional data
+        await this.authService.SetUserData(userCredential.user, formData);
 
-      this.toastr.success('Account created successfully! Please check your email for verification.');
-    } catch (error) {
+        // Clear stored form data
+        localStorage.removeItem('formData');
+
+        this.toastr.success('Account created successfully! Please check your email for verification.');
+      }
+    } catch (error: any) {
       console.error('Error creating account:', error);
-      this.toastr.error('Failed to create account. Please contact support.');
+      this.toastr.error(error.message || 'Failed to create account. Please contact support.');
     }
   }
 
-  verifyAndCreate() {
+  async verifyAndCreate() {
     this.isSaving = true;
-    this.authService.SendVerificationMail()
-      .then(() => {
+    try {
+      const user = await this.auth.currentUser;
+      if (user) {
+        await user.sendEmailVerification();
         this.toastr.success('Verification email sent! Please check your inbox.');
-      })
-      .catch((error) => {
-        this.toastr.error('Error sending verification email. Please try again.');
-        console.error('Error:', error);
-      })
-      .finally(() => {
-        this.isSaving = false;
-      });
+      } else {
+        this.toastr.error('No user found. Please try signing in again.');
+      }
+    } catch (error: any) {
+      this.toastr.error(error.message || 'Error sending verification email. Please try again.');
+      console.error('Error:', error);
+    } finally {
+      this.isSaving = false;
+    }
   }
 }
