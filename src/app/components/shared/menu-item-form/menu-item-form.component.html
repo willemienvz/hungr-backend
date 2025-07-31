@@ -56,6 +56,9 @@
             <button *ngIf="!menuItem.displayDetails.allergen" type="button" class="toggle-btn" (click)="onToggleDetail('allergen')">
               + add allergen
             </button>
+            <button *ngIf="!menuItem.displayDetails.sauce" type="button" class="toggle-btn" (click)="onToggleDetail('sauce')">
+              + add sauce
+            </button>
           </div>
 
           <div class="header-actions">
@@ -281,6 +284,18 @@
         (removeAllergen)="onRemoveAllergen($event)"
         (newAllergenChange)="onNewAllergenChange($event)">
       </app-allergen-detail>
+
+      <!-- KB: Use reusable detail component for sauces -->
+      <app-menu-item-detail
+        *ngIf="menuItem.displayDetails.sauce"
+        [config]="saucesConfig"
+        [items]="menuItem.sauces"
+        [newItemValue]="newSauce"
+        (closeDetail)="onToggleDetail('sauce')"
+        (addItem)="onAddSauce(newSauce)"
+        (removeItem)="onRemoveSauce($event)"
+        (newItemValueChange)="onNewSauceChange($event)">
+      </app-menu-item-detail>
 
     
     </div>

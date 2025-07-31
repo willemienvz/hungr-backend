@@ -45,6 +45,7 @@ export class AddMenuComponent implements OnInit {
   newSideName: string = '';
   newSidePrice: string = 'R 0.00';
   newAllergen: string = '';
+  newSauce: string = '';
   categories: Category[] = [];
   restaurants: Restaurant[] = [];
   selectedRestaurant: string = '';
@@ -64,6 +65,7 @@ export class AddMenuComponent implements OnInit {
     pairing: false,
     side: false,
     allergen: false,
+    sauce: false,
   };
   tempNum: number = 0;
   preparations: string[] = [];
@@ -233,6 +235,7 @@ export class AddMenuComponent implements OnInit {
         pairingIds: [],
         sides: item.sides ? item.sides.split('|') : [],
         allergens: item.allergens ? item.allergens.split('|') : [],
+        sauces: item.sauces ? item.sauces.split('|') : [],
         labels: item.labels ? item.labels.split('|') : [],
         showLabelInput: false,
         displayDetails: {
@@ -241,6 +244,7 @@ export class AddMenuComponent implements OnInit {
           pairing: false,
           side: false,
           allergen: false,
+          sauce: false,
         },
       };
       this.menuItems.push(newItem);
@@ -487,8 +491,18 @@ export class AddMenuComponent implements OnInit {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'allergens', allergenIndex);
   }
 
+  addSauce(data: {itemIndex: number, sauceName: string}): void {
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, data.itemIndex, 'sauces', data.sauceName);
+    this.markAsChanged();
+  }
+
+  removeSauce(itemIndex: number, sauceIndex: number): void {
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'sauces', sauceIndex);
+    this.markAsChanged();
+  }
+
   toggleDetail(
-    detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen',
+    detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen' | 'sauce',
     itemIndex: number
   ): void {
     this.menuItems = this.menuService.toggleDetail(this.menuItems, detailType, itemIndex);

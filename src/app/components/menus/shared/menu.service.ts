@@ -38,7 +38,9 @@ export interface MenuItemInterface {
     pairing: boolean;
     side: boolean;
     allergen: boolean;
+    sauce: boolean;
   };
+  sauces: string[];
 }
 
 @Injectable({
@@ -196,7 +198,9 @@ export class MenuService {
         pairing: false,
         side: false,
         allergen: false,
+        sauce: false,
       },
+      sauces: [],
     };
   }
 
@@ -253,7 +257,7 @@ export class MenuService {
     return updatedItems;
   }
 
-  toggleDetail(menuItems: MenuItemInterface[], detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen', itemIndex: number): MenuItemInterface[] {
+  toggleDetail(menuItems: MenuItemInterface[], detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen' | 'sauce', itemIndex: number): MenuItemInterface[] {
     const updatedItems = [...menuItems];
     updatedItems[itemIndex].displayDetails[detailType] = !updatedItems[itemIndex].displayDetails[detailType];
     return updatedItems;
@@ -639,6 +643,7 @@ export class MenuService {
       const pairings = parseArray(row.pairings);
       const sides = parseArray(row.sides);
       const labels = parseArray(row.labels);
+      const sauces = parseArray(row.sauces);
 
       const menuItem: MenuItemInterface = {
         itemId: uuidv4(),
@@ -662,7 +667,9 @@ export class MenuService {
           pairing: pairings.length > 0,
           side: sides.length > 0,
           allergen: false,
+          sauce: sauces.length > 0,
         },
+        sauces: sauces,
       };
 
       menuItems.push(menuItem);

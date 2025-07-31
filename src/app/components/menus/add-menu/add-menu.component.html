@@ -138,6 +138,7 @@
           [newSideName]="newSideName"
           [newSidePrice]="newSidePrice"
           [newAllergen]="newAllergen"
+          [newSauce]="newSauce"
           [newLabel]="newLabel"
           (removeMenuItem)="removeMenuItem($event)"
           (toggleDetail)="toggleDetail($event.detailType, $event.itemIndex)"
@@ -153,6 +154,8 @@
           (removeSide)="removeSide($event.itemIndex, $event.sideIndex)"
           (addAllergen)="addAllergen($event)"
           (removeAllergen)="removeAllergen($event.itemIndex, $event.allergenIndex)"
+          (addSauce)="addSauce($event)"
+          (removeSauce)="removeSauce($event.itemIndex, $event.sauceIndex)"
           (addLabel)="addLabel($event)"
           (removeLabel)="removeLabel($event.itemIndex, $event.labelIndex)"
           (fileSelected)="onFileSelected($event.event, $event.itemIndex)"
@@ -164,6 +167,7 @@
           (newSideNameChange)="newSideName = $event"
           (newSidePriceChange)="newSidePrice = $event"
           (newAllergenChange)="newAllergen = $event"
+          (newSauceChange)="newSauce = $event"
           (newLabelChange)="newLabel = $event"
         ></app-menu-item-form>
       </div>

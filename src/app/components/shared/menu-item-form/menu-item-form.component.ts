@@ -26,6 +26,7 @@ export class MenuItemFormComponent implements OnInit {
   @Input() newSidePrice: string = 'R 0.00';
   @Input() newAllergen: string = '';
   @Input() newLabel: string = '';
+  @Input() newSauce: string = '';
 
   @Output() removeMenuItem = new EventEmitter<number>();
   @Output() toggleDetail = new EventEmitter<{detailType: DetailType, itemIndex: number}>();
@@ -41,6 +42,8 @@ export class MenuItemFormComponent implements OnInit {
   @Output() removeSide = new EventEmitter<{itemIndex: number, sideIndex: number}>();
   @Output() addAllergen = new EventEmitter<{itemIndex: number, allergenName: string}>();
   @Output() removeAllergen = new EventEmitter<{itemIndex: number, allergenIndex: number}>();
+  @Output() addSauce = new EventEmitter<{itemIndex: number, sauceName: string}>();
+  @Output() removeSauce = new EventEmitter<{itemIndex: number, sauceIndex: number}>();
   @Output() addLabel = new EventEmitter<number>();
   @Output() removeLabel = new EventEmitter<{itemIndex: number, labelIndex: number}>();
   @Output() fileSelected = new EventEmitter<{event: Event, itemIndex: number}>();
@@ -53,6 +56,7 @@ export class MenuItemFormComponent implements OnInit {
   @Output() newSidePriceChange = new EventEmitter<string>();
   @Output() newAllergenChange = new EventEmitter<string>();
   @Output() newLabelChange = new EventEmitter<string>();
+  @Output() newSauceChange = new EventEmitter<string>();
 
   /* KB: Add loading state for image operations */
   isUploadingImage = false;
@@ -100,6 +104,13 @@ export class MenuItemFormComponent implements OnInit {
     placeholder: 'Add a label',
     description: 'Add labels to categorize your menu items.',
     propertyName: 'labels'
+  };
+
+  saucesConfig: DetailConfig = {
+    title: 'Sauces',
+    placeholder: 'Add a sauce',
+    description: 'Add sauce options for this menu item, e.g., tartar, aioli, peri-peri.',
+    propertyName: 'sauces'
   };
 
   constructor(
@@ -250,6 +261,14 @@ export class MenuItemFormComponent implements OnInit {
 
   onRemoveAllergen(allergenIndex: number) {
     this.removeAllergen.emit({itemIndex: this.itemIndex, allergenIndex});
+  }
+
+  onAddSauce(sauceName: string) {
+    this.addSauce.emit({itemIndex: this.itemIndex, sauceName});
+  }
+
+  onRemoveSauce(sauceIndex: number) {
+    this.removeSauce.emit({itemIndex: this.itemIndex, sauceIndex});
   }
 
   onAddLabel() {
@@ -433,5 +452,9 @@ export class MenuItemFormComponent implements OnInit {
 
   onNewLabelChange(value: string) {
     this.newLabelChange.emit(value);
+  }
+
+  onNewSauceChange(value: string) {
+    this.newSauceChange.emit(value);
   }
 } 

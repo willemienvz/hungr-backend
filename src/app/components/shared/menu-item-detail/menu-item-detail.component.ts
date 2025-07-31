@@ -5,11 +5,11 @@ export interface DetailConfig {
   title: string;
   placeholder: string;
   description?: string;
-  propertyName: 'preparations' | 'variations' | 'pairings' | 'sides' | 'labels' | 'allergens';
+  propertyName: 'preparations' | 'variations' | 'pairings' | 'sides' | 'labels' | 'allergens' | 'sauces';
 }
 
 /* KB: Union type for detail types including allergens */
-export type DetailType = 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen';
+export type DetailType = 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen' | 'sauce';
 
 @Component({
   selector: 'app-menu-item-detail',

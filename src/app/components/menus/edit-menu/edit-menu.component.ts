@@ -41,6 +41,7 @@ export class EditMenuComponent implements OnInit {
   newSideName: string = '';
   newSidePrice: string = 'R 0.00';
   newAllergen: string = '';
+  newSauce: string = '';
   newLabel: string = '';
   isSaving: boolean = false;
   tempNum: number = 0;
@@ -223,7 +224,16 @@ export class EditMenuComponent implements OnInit {
 
   removeAllergen(itemIndex: number, allergenIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'allergens', allergenIndex);
-    this.applyFilters(); // Update filtered view to reflect changes
+    this.markAsChanged();
+  }
+
+  addSauce(data: {itemIndex: number, sauceName: string}): void {
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, data.itemIndex, 'sauces', data.sauceName);
+    this.markAsChanged();
+  }
+
+  removeSauce(itemIndex: number, sauceIndex: number): void {
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'sauces', sauceIndex);
     this.markAsChanged();
   }
 
@@ -507,7 +517,7 @@ export class EditMenuComponent implements OnInit {
   }
 
   toggleDetail(
-    detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen',
+    detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen' | 'sauce',
     itemIndex: number
   ) {
     this.menuItems = this.menuService.toggleDetail(this.menuItems, detailType, itemIndex);
