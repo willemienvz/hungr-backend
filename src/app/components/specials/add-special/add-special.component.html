@@ -3,135 +3,37 @@
 
   <!-- Step 1: Special Basics -->
   <div *ngIf="currentStep === 1">
-    <div class="block rowSpecial">
-      <div class="headerBlock">
-        <app-progress-bar 
-          [showBackButton]="true"
-          [progress]="currentStep" 
-          [backRoute]="'/specials'"
-          [backText]="'Back'"
-          (stepClick)="navigateToStep($event)"
-          (backButtonClick)="onBackButtonClick()">
-        </app-progress-bar>
-        <app-step-header
-          [stepNumber]="1"
-          [stepTitle]="'Special Basics'"
-          [showDescription]="false">
-        </app-step-header>
-      </div>
-      <form [formGroup]="specialForm">
-        <div class="formGroup">
-          <p class="label">Special Title</p>
-          <input
-            type="text"
-            class="formControl"
-            formControlName="specialTitle"
-            placeholder="Enter special title"
-            required
-          />
-          <div
-            class="error-message"
-            *ngIf="
-              specialForm.get('specialTitle')?.touched &&
-              specialForm.get('specialTitle')?.invalid
-            "
-          >
-            Special Title is required.
-          </div>
+    <app-step1-special-basics
+      [specialForm]="specialForm"
+      [menus]="menus"
+      [specialTypes]="specialTypes"
+      [selectedMenu]="selectedMenu"
+      [isSaving]="isSaving"
+      (menuChange)="onMenuChange()"
+      (specialTypeChange)="onSpecialTypeChange()"
+    >
+      <ng-container header>
+        <div class="headerBlock">
+          <app-progress-bar 
+            [showBackButton]="true"
+            [progress]="currentStep" 
+            [tooltipInfo]="'This is a tooltip'"
+            [backRoute]="'/specials'"
+            [backText]="'Back'"
+            (stepClick)="navigateToStep($event)"
+            (backButtonClick)="onBackButtonClick()">
+          </app-progress-bar>
+          <app-step-header
+            [stepNumber]="1"
+            [stepTitle]="'Special Basics'"
+            [showDescription]="false">
+          </app-step-header>
         </div>
-        <div class="formGroup">
-          <p class="label">Select Menu</p>
-          <mat-select formControlName="menu" (selectionChange)="onMenuChange()">
-            <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
-              {{ menu.menuName }}
-            </mat-option>
-          </mat-select>
-          <div
-            class="error-message"
-            *ngIf="
-              specialForm.get('menu')?.touched &&
-              specialForm.get('menu')?.invalid
-            "
-          >
-            Menu selection is required.
-          </div>
-        </div>
-
-        <div class="formGroup">
-          <p class="label">Type of Special</p>
-          <mat-select
-            formControlName="typeSpecial"
-            (selectionChange)="onSpecialTypeChange()"
-          >
-            <mat-option *ngFor="let type of specialTypes" [value]="type.id">
-              {{ type.name }}
-            </mat-option>
-          </mat-select>
-          <div
-            class="error-message"
-            *ngIf="
-              specialForm.get('typeSpecial')?.touched &&
-              specialForm.get('typeSpecial')?.invalid
-            "
-          >
-            Type of special is required.
-          </div>
-        </div>
-
-        <div class="formGroup dateRow">
-          <div class="row">
-            <div class="col">
-              <p class="label">Start Date</p>
-              <input
-                type="date"
-                class="formControl"
-                formControlName="dateFrom"
-                placeholder="Start date"
-                required
-              />
-              <div
-                class="error-message"
-                *ngIf="
-                  specialForm.get('dateFrom')?.touched &&
-                  (specialForm.get('dateFrom')?.invalid || !specialForm.get('dateFrom')?.value)
-                "
-              >
-                Start date is required.
-              </div>
-            </div>
-
-            <div class="col">
-              <p class="label">End Date</p>
-              <input
-                type="date"
-                class="formControl"
-                formControlName="dateTo"
-                placeholder="End date"
-                required
-              />
-              <div
-                class="error-message"
-                *ngIf="
-                  specialForm.get('dateTo')?.touched &&
-                  (specialForm.get('dateTo')?.invalid || !specialForm.get('dateTo')?.value)
-                "
-              >
-                End date is required.
-              </div>
-            </div>
-          </div>
-
-          <div
-            *ngIf="specialForm.errors?.['dateRangeInvalid']"
-            class="error-message"
-          >
-            Start date must be before end date.
-          </div>
-        </div>
-      </form>
-    </div>
+      </ng-container>
+    </app-step1-special-basics>
     <app-step-navigation
       [nextDisabled]="isStep1Invalid()"
+      [cancelRoute]="'/specials'"
       [isSaving]="isSaving"
       (next)="nextStep()"
     ></app-step-navigation>
@@ -139,180 +41,97 @@
 
   <!-- Step 2: Days and Times -->
   <div *ngIf="currentStep === 2">
-    <div class="block rowSpecial">
-      <div class="headerBlock">
-        <app-progress-bar 
-          [progress]="currentStep" 
-          [backRoute]="'/specials'"
-          [backText]="'Back'"
-          (stepClick)="navigateToStep($event)"
-          (backButtonClick)="onBackButtonClick()">
-        </app-progress-bar>
-        <app-step-header
-          [stepNumber]="2"
-          [stepTitle]="'Days and Times'"
-          [showDescription]="false">
-        </app-step-header>
-      </div>
-      <form [formGroup]="specialForm">
-        <div class="formGroup">
-          <p>What day(s) of the week should this special be valid?</p>
-          <div class="weekday-selector">
-            <span
-              *ngFor="let day of weekdays"
-              class="weekday"
-              [class.selected]="isSelected(day)"
-              (click)="toggleSelection(day)"
-            >
-              {{ day }}
-            </span>
-          </div>
+    <app-step2-days-times
+      [specialForm]="specialForm"
+      [weekdays]="weekdays"
+      [selectedDays]="selectedDays"
+      [isSaving]="isSaving"
+      (toggleSelection)="toggleSelection($event)"
+      (previous)="previousStep()"
+      (draft)="onDraftSave()"
+      (next)="nextStep()"
+    >
+      <ng-container header>
+        <div class="headerBlock">
+          <app-progress-bar 
+            [progress]="currentStep" 
+            [backRoute]="'/specials'"
+            [backText]="'Back'"
+            (stepClick)="navigateToStep($event)"
+            (backButtonClick)="onBackButtonClick()">
+          </app-progress-bar>
+          <app-special-summary
+            [specialTitle]="specialForm.get('specialTitle')?.value"
+            [specialType]="specialForm.get('typeSpecial')?.value"
+            [dateFrom]="specialForm.get('dateFrom')?.value"
+            [dateTo]="specialForm.get('dateTo')?.value"
+            [timeFrom]="specialForm.get('timeFrom')?.value"
+            [timeTo]="specialForm.get('timeTo')?.value"
+            [selectedDays]="selectedDays"
+            [currentStep]="currentStep"
+            [specialTypes]="specialTypes">
+          </app-special-summary>
+          <app-step-header
+            [stepNumber]="2"
+            [stepTitle]="'Days and Times'"
+            [showDescription]="false">
+          </app-step-header>
         </div>
-        <div class="formGroup">
-          <p>What times should this special be valid?</p>
-          <div class="dateRow">
-            <div class="row">
-              <div class="col">
-                <p>Start time</p>
-                <input
-                  type="time"
-                  class="formControl"
-                  formControlName="timeFrom"
-                  placeholder="Start time"
-                  required
-                />
-              </div>
-              <div class="col">
-                <p>End time</p>
-                <input
-                  type="time"
-                  class="formControl"
-                  formControlName="timeTo"
-                  placeholder="End time"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <div
-            *ngIf="specialForm.errors?.['timeRangeInvalid']"
-            class="error-message"
-          >
-            Start time must be before end time.
-          </div>
-        </div>
-      </form>
-    </div>
+      </ng-container>
+    </app-step2-days-times>
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
       [isSaving]="isSaving"
+      [nextDisabled]="isStep2Invalid()"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
       (next)="nextStep()"
     ></app-step-navigation>
   </div>
 
-  <div *ngIf="currentStep === 3" class="bigBlock">
-    <div class="block rowSpecial">
-      <div class="headerBlock">
-        <app-progress-bar 
-          [progress]="currentStep" 
-          [backRoute]="'/specials'"
-          [backText]="'Back'"
-          (stepClick)="navigateToStep($event)"
-          (backButtonClick)="onBackButtonClick()">
-        </app-progress-bar>
-        <app-step-header
-          [stepNumber]="3"
-          [stepTitle]="'Special Details'"
-          [showDescription]="false">
-        </app-step-header>
-      </div>
-      <form [formGroup]="specialForm">
-        <!-- 3.c.1 Weekly Special -->
-        <div *ngIf="selectedSpecialType === 1">
-          <p>Select Items and Prices</p>
-          <div class="row">
-            <mat-select formControlName="typeSpecialDetails">
-              <mat-option
-                *ngFor="let item of selectedMenu?.items"
-                [value]="item.name"
-              >
-                {{ item.name }}
-              </mat-option>
-            </mat-select>
-            <app-price-input
-              formControlName="amount"
-              placeholder="R 0.00"
-              label=""
-              [required]="true"
-              (keydown.enter)="addItem()">
-            </app-price-input>
-          </div>
+  <!-- Step 3: Special Details -->
+  <div *ngIf="currentStep === 3">
+    <app-step3-special-details
+      [specialForm]="specialForm"
+      [selectedMenu]="selectedMenu"
+      [selectedSpecialType]="selectedSpecialType"
+      [addedItems]="addedItems"
+      [menuItemAutocompleteControl]="menuItemAutocompleteControl"
+      [filteredMenuItems]="filteredMenuItems"
+      [isSaving]="isSaving"
+      (menuItemSelected)="onMenuItemSelected($event)"
+      (addItem)="addItem()"
+      (removeItem)="removeItem($event)"
+    >
+      <ng-container header>
+        <div class="headerBlock">
+          <app-progress-bar 
+            [progress]="currentStep" 
+            [backRoute]="'/specials'"
+            [backText]="'Back'"
+            (stepClick)="navigateToStep($event)"
+            (backButtonClick)="onBackButtonClick()">
+          </app-progress-bar>
+          <app-special-summary
+            [specialTitle]="specialForm.get('specialTitle')?.value"
+            [specialType]="specialForm.get('typeSpecial')?.value"
+            [dateFrom]="specialForm.get('dateFrom')?.value"
+            [dateTo]="specialForm.get('dateTo')?.value"
+            [timeFrom]="specialForm.get('timeFrom')?.value"
+            [timeTo]="specialForm.get('timeTo')?.value"
+            [selectedDays]="selectedDays"
+            [currentStep]="currentStep"
+            [specialTypes]="specialTypes">
+          </app-special-summary>
+          <app-step-header
+            [stepNumber]="3"
+            [stepTitle]="'Special Details'"
+            [showDescription]="false">
+          </app-step-header>
         </div>
-
-        <!-- 3.c.2 Category Special -->
-        <div *ngIf="selectedSpecialType === 2">
-          <p>Select Category</p>
-          <div class="row">
-            <mat-select formControlName="featureSpecialUnder">
-              <mat-option
-                *ngFor="let category of selectedMenu?.categories"
-                [value]="category.id"
-              >
-                {{ category.name }}
-              </mat-option>
-            </mat-select>
-            <input
-              type="number"
-              formControlName="percentage"
-              placeholder="Enter percentage discount"
-              (keydown.enter)="addItem()"
-            />
-          </div>
-        </div>
-
-        <!-- 3.c.3 Combo Special -->
-        <div *ngIf="selectedSpecialType === 3">
-          <h6>Combo Details</h6>
-          <div class="row">
-            <mat-select formControlName="typeSpecialDetails" multiple>
-              <mat-option
-                *ngFor="let item of selectedMenu?.items"
-                [value]="item.name"
-              >
-                {{ item.name }}
-              </mat-option>
-            </mat-select>
-            <app-price-input
-              formControlName="comboPrice"
-              placeholder="R 0.00"
-              label=""
-              [required]="true"
-              (keydown.enter)="addItem()">
-            </app-price-input>
-          </div>
-        </div>
-        <p style="text-align: right; width: 100%">Press enter to add an item</p>
-        <!-- Display List of Added Items -->
-        <div *ngIf="addedItems.length > 0" class="item-list">
-          <h6>Items</h6>
-          <div class="list" *ngFor="let item of addedItems; let i = index">
-            <div>
-              <a class="btnRemove" (click)="removeItem(i)">X</a>
-              <p>
-                {{ item.name }}
-              </p>
-            </div>
-
-            <p>
-              {{ item.amount }}
-            </p>
-          </div>
-        </div>
-      </form>
-    </div>
+      </ng-container>
+    </app-step3-special-details>
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
@@ -325,32 +144,40 @@
 
   <!-- Step 4: Add Media -->
   <div *ngIf="currentStep === 4">
-    <div class="block rowSpecial">
-      <div class="headerBlock">
-        <app-progress-bar 
-          [progress]="currentStep" 
-          [backRoute]="'/specials'"
-          [backText]="'Back'"
-          (stepClick)="navigateToStep($event)"
-          (backButtonClick)="onBackButtonClick()">
-        </app-progress-bar>
-        <app-step-header
-          [stepNumber]="4"
-          [stepTitle]="'Add Media'"
-          [description]="'Uploading media helps to raise awareness of the special.'"
-          [showDescription]="true">
-        </app-step-header>
-      </div>
-      <button type="button" class="btnSecondary" (click)="openImageUploadModal()">
-        <mat-icon>upload</mat-icon> Add Image
-      </button>
-      <img
-        *ngIf="uploadedImageUrl"
-        style="margin-top: 30px; max-width: 80%"
-        [src]="uploadedImageUrl"
-        alt="Special preview image"
-      />
-    </div>
+    <app-step4-add-media
+      [uploadedImageUrl]="uploadedImageUrl"
+      [isSaving]="isSaving"
+      (openImageUploadModal)="openImageUploadModal()"
+    >
+      <ng-container header>
+        <div class="headerBlock">
+          <app-progress-bar 
+            [progress]="currentStep" 
+            [backRoute]="'/specials'"
+            [backText]="'Back'"
+            (stepClick)="navigateToStep($event)"
+            (backButtonClick)="onBackButtonClick()">
+          </app-progress-bar>
+          <app-special-summary
+            [specialTitle]="specialForm.get('specialTitle')?.value"
+            [specialType]="specialForm.get('typeSpecial')?.value"
+            [dateFrom]="specialForm.get('dateFrom')?.value"
+            [dateTo]="specialForm.get('dateTo')?.value"
+            [timeFrom]="specialForm.get('timeFrom')?.value"
+            [timeTo]="specialForm.get('timeTo')?.value"
+            [selectedDays]="selectedDays"
+            [currentStep]="currentStep"
+            [specialTypes]="specialTypes">
+          </app-special-summary>
+          <app-step-header
+            [stepNumber]="4"
+            [stepTitle]="'Add Media'"
+            [description]="'Uploading media helps to raise awareness of the special.'"
+            [showDescription]="true">
+          </app-step-header>
+        </div>
+      </ng-container>
+    </app-step4-add-media>
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
@@ -363,69 +190,41 @@
 
   <!-- Step 5: Overview -->
   <div *ngIf="currentStep === 5">
-    <div class="block rowSpecial">
+    <div class="step1-container openTop">
       <div class="headerBlock">
         <app-progress-bar 
           [progress]="currentStep" 
           [backRoute]="'/specials'"
-          [allowStepNavigation]="false"
+          [backText]="'Back'"
+          (stepClick)="navigateToStep($event)"
           (backButtonClick)="onBackButtonClick()">
         </app-progress-bar>
         <app-step-header
           [stepNumber]="5"
           [stepTitle]="'Overview'"
-          [description]="'Review all the information you have entered before submission.'"
-          [showDescription]="true">
+          [showDescription]="false">
         </app-step-header>
       </div>
-      <div class="summary-container">
-        <h3 class="summary-title">
-          {{ specialForm.value.specialTitle || "Special Name" }}
-        </h3>
-
-        <div class="summary-card">
-          <!-- Special Type -->
-          <p class="summary-info">
-            {{ getSpecialTypeLabel(selectedSpecialType) }}
-          </p>
-
-          <!-- Date Range -->
-          <p class="summary-info">
-            Valid from {{ specialForm.value.dateFrom | date : "d MMMM" }} -
-            {{ specialForm.value.dateTo | date : "d MMMM" }}
-          </p>
-
-          <!-- Days -->
-          <p class="summary-info">
-            Every {{ selectedDays.join(", ") || "No days selected" }}
-          </p>
-
-          <!-- Time Range -->
-          <p class="summary-info">
-            From {{ specialForm.value.timeFrom || "00:00" }} to
-            {{ specialForm.value.timeTo || "00:00" }}
-          </p>
-        </div>
-
-        <!-- Promotional Items Section -->
-        <div class="promo-section">
-          <p>Promotional Items</p>
-          <div *ngFor="let item of addedItems" class="promo-item">
-            <span class="item-name">{{ item.name }}</span>
-            <span class="item-price"
-              >Promotional Price: R {{ item.amount }}</span
-            >
+      <div class="row">
+        <div class="col">
+          <div class="block">
+            <h3>Special Details</h3>
+            <p><strong>Title:</strong> {{ specialForm.get('specialTitle')?.value }}</p>
+            <p><strong>Type:</strong> {{ getSpecialTypeLabel(specialForm.get('typeSpecial')?.value) }}</p>
+            <p><strong>Date Range:</strong> {{ specialForm.get('dateFrom')?.value }} - {{ specialForm.get('dateTo')?.value }}</p>
+            <p><strong>Time Range:</strong> {{ specialForm.get('timeFrom')?.value }} - {{ specialForm.get('timeTo')?.value }}</p>
+            <p><strong>Days:</strong> {{ selectedDays.join(', ') }}</p>
           </div>
         </div>
       </div>
     </div>
     <app-step-navigation
       [showPrevious]="true"
-      [showNext]="true"
-      [nextText]="'Save & Publish'"
+      [showDraft]="true"
       [isSaving]="isSaving"
       (previous)="previousStep()"
-      (next)="onSubmit()"
+      (draft)="onDraftSave()"
+      (submit)="onSubmit()"
     ></app-step-navigation>
   </div>
 </div>

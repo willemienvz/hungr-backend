@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Special } from '../../../shared/services/special';
+import { Special } from '../../../types/special';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { SpecialsAnalyticsService, SpecialsMetrics } from '../../../shared/services/specials-analytics.service';
@@ -107,9 +107,10 @@ export class SpecialsLandingComponent implements OnInit{
 
   getSpecialTypeLabel(type: number): string {
     switch (type) {
-      case 1: return 'Weekly Special';
-      case 2: return 'Category Special';
-      case 3: return 'Combo Special';
+      case 1: return 'Percentage Discount';
+      case 2: return 'Price Discount';
+      case 3: return 'Combo Deal';
+      case 4: return 'Category Special';
       default: return 'Special Type';
     }
   }

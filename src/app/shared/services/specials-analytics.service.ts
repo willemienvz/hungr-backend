@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Special } from './special';
+import { Special } from '../../types/special';
 
 export interface SpecialsMetrics {
   totalSpecialSales: {

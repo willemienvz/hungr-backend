@@ -156,27 +156,6 @@ a.btnSecondary.disabled {
     text-decoration: underline;
   }
 }
-.dateRow {
-  width: 100%;
-  .row {
-    gap: 0;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .col {
-    gap: 5px !important;
-  }
-  input {
-    width: 100%;
-    border: 1px solid #dedede;
-    height: 38px;
-    border-radius: 5px;
-    padding: 12px;
-    line-height: 38px;
-    font-family: "Poppins", sans-serif;
-  }
-}
 
 .modal {
   display: none; /* Hidden by default */

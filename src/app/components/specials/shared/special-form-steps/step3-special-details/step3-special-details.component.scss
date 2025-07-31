@@ -1,0 +1,84 @@
+.step3-container {
+  .headerBlock {
+    margin-bottom: 20px;
+  }
+  .block {
+    width: 100%;
+    position: relative;
+  }
+  .rowSpecial {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    form {
+      width: 40%;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      .formGroup {
+        margin-bottom: 20px;
+        gap: 8px;
+      }
+    }
+  }
+}
+
+.row {
+  display: flex;
+  gap: 1em;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  
+  // First element (item selection) takes 2/3 of the width
+  > *:first-child {
+    flex: 2;
+  }
+  
+  // Second element (price/percentage) takes 1/3 of the width
+  > *:last-child {
+    flex: 1;
+  }
+}
+
+.inputBox {
+  flex: 1;
+  input {
+    width: 100%;
+    border: 1px solid var(--hungr-dark-grey);
+    height: 38px;
+    border-radius: 5px;
+    padding: 5px 12px;
+    line-height: 38px;
+    font-family: "Poppins", sans-serif;
+  }
+}
+
+.item-list {
+  width: 100%;
+  margin-top: 20px;
+  
+  .list {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid var(--hungr-dark-grey);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    
+    .btnRemove {
+      color: red;
+      cursor: pointer;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+  }
+}
+
+.no-results-option {
+  color: #9a9a9a;
+  font-style: italic;
+} 

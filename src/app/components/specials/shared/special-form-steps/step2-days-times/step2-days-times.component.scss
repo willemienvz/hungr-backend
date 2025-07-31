@@ -1,0 +1,93 @@
+.step2-container {
+  .headerBlock {
+    margin-bottom: 20px;
+  }
+  .block {
+    width: 100%;
+    position: relative;
+  }
+  .rowSpecial {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    form {
+      width: 40%;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      .formGroup {
+        margin-bottom: 20px;
+        gap: 8px;
+      }
+    }
+  }
+}
+
+
+.label {
+  color: #9a9a9a;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 20.25px;
+  letter-spacing: -0.1%;
+}
+
+.error-message {
+  color: red;
+}
+
+.weekday-selector {
+  display: flex;
+  gap: 10px;
+  flex-direction: row;
+  border: 1px solid rgba(222, 222, 222, 1);
+  padding: 15px 50px;
+  border-radius: 2px;
+  justify-content: center;
+}
+
+.weekday {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s, border-color 0.3s;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: -0.1%;
+  vertical-align: middle;
+  font-family: "Poppins", sans-serif;
+}
+
+.weekday.selected {
+  font-weight: 800;
+}
+
+.timeRow {
+  width: 100%;
+  display:flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: center;
+  align-items: center;
+  input {
+    width:100%;
+    border: 1px solid var(--hungr-dark-grey);
+    height: 38px;
+    padding: 3px 12px;
+    border-radius: 5px;
+    line-height: 38px;
+    text-align:center;
+  }
+  .col {
+    width:140px;
+  }
+  .toCol {
+    width:30px;
+    justify-content: center;
+    align-items: center;
+    text-align:center;
+    padding-top:1.35em;
+  }
+} 

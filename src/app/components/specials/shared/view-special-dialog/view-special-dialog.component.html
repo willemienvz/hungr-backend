@@ -1,0 +1,47 @@
+<div class="special-view-dialog">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">{{ special.specialTitle }}</h2>
+    <button type="button" class="close-btn" (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="dialog-content">
+    <div class="content-grid">
+      <!-- Left Column - Image -->
+      <div class="image-column">
+        <img [src]="special.imageUrl" [alt]="special.specialTitle" class="special-image">
+      </div>
+
+      <!-- Right Column - Information -->
+      <div class="info-column">
+        <div class="info-section">
+          <h3 class="section-title">Type of special</h3>
+          <p class="section-content">{{ getSpecialTypeLabel(special.typeSpecial) }}</p>
+        </div>
+
+        <div class="info-section">
+          <h3 class="section-title">Valid Dates & Times</h3>
+          <div class="section-content">
+            <div class="days-list" *ngIf="special.selectedDays.length > 0">
+              <span *ngFor="let day of special.selectedDays; let isLast = last">
+                {{ day }}<span *ngIf="!isLast">, </span>
+              </span>
+            </div>
+            <div class="time-range" *ngIf="special.timeFrom && special.timeTo">
+              from {{ special.timeFrom }} to {{ special.timeTo }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="dialog-footer">
+    <button class="btnTertiary" (click)="onClose()">CLOSE</button>
+    <button class="btnSecondary" (click)="onEdit()">EDIT</button>
+  </div>
+</div> 

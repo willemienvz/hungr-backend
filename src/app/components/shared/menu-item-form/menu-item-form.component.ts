@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { MenuItemInterface, MenuService } from '../../menus/shared/menu.service';
+import { MenuItemInterface, MenuService, SideItem } from '../../menus/shared/menu.service';
 import { Category } from '../../../shared/services/category';
-import { DetailConfig } from '../menu-item-detail/menu-item-detail.component';
+import { DetailConfig, DetailType } from '../menu-item-detail/menu-item-detail.component';
+import { SideDetailConfig } from '../side-detail/side-detail.component';
+import { AllergenDetailConfig } from '../allergen-detail/allergen-detail.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../image-upload-modal/image-upload-modal.component';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../delete-confirmation-modal/delete-confirmation-modal.component';
-
-type DetailType = 'preparation' | 'variation' | 'pairing' | 'side';
 
 @Component({
   selector: 'app-menu-item-form',
@@ -22,7 +22,9 @@ export class MenuItemFormComponent implements OnInit {
   @Input() newPreparation: string = '';
   @Input() newVariation: string = '';
   @Input() newPairing: string = '';
-  @Input() newSide: string = '';
+  @Input() newSideName: string = '';
+  @Input() newSidePrice: string = 'R 0.00';
+  @Input() newAllergen: string = '';
   @Input() newLabel: string = '';
 
   @Output() removeMenuItem = new EventEmitter<number>();
@@ -35,8 +37,10 @@ export class MenuItemFormComponent implements OnInit {
   @Output() removePairing = new EventEmitter<{itemIndex: number, pairingIndex: number}>();
   @Output() addMenuItemPairing = new EventEmitter<{itemIndex: number, pairingId: string}>();
   @Output() removeMenuItemPairing = new EventEmitter<{itemIndex: number, pairingId: string}>();
-  @Output() addSide = new EventEmitter<number>();
+  @Output() addSide = new EventEmitter<{itemIndex: number, sideData: {name: string, price?: string}}>();
   @Output() removeSide = new EventEmitter<{itemIndex: number, sideIndex: number}>();
+  @Output() addAllergen = new EventEmitter<{itemIndex: number, allergenName: string}>();
+  @Output() removeAllergen = new EventEmitter<{itemIndex: number, allergenIndex: number}>();
   @Output() addLabel = new EventEmitter<number>();
   @Output() removeLabel = new EventEmitter<{itemIndex: number, labelIndex: number}>();
   @Output() fileSelected = new EventEmitter<{event: Event, itemIndex: number}>();
@@ -45,7 +49,9 @@ export class MenuItemFormComponent implements OnInit {
   @Output() newPreparationChange = new EventEmitter<string>();
   @Output() newVariationChange = new EventEmitter<string>();
   @Output() newPairingChange = new EventEmitter<string>();
-  @Output() newSideChange = new EventEmitter<string>();
+  @Output() newSideNameChange = new EventEmitter<string>();
+  @Output() newSidePriceChange = new EventEmitter<string>();
+  @Output() newAllergenChange = new EventEmitter<string>();
   @Output() newLabelChange = new EventEmitter<string>();
 
   /* KB: Add loading state for image operations */
@@ -76,10 +82,17 @@ export class MenuItemFormComponent implements OnInit {
     propertyName: 'pairings'
   };
 
-  sideConfig: DetailConfig = {
+  sideConfig: SideDetailConfig = {
     title: 'Sides',
     placeholder: 'Add a side',
-    propertyName: 'sides'
+    description: 'Add side options with optional pricing.',
+    showPricing: true
+  };
+
+  allergenConfig: AllergenDetailConfig = {
+    title: 'Allergens',
+    placeholder: 'Add an allergen',
+    description: 'Add allergen information for food safety and compliance.'
   };
 
   labelConfig: DetailConfig = {
@@ -223,12 +236,20 @@ export class MenuItemFormComponent implements OnInit {
     this.removeMenuItemPairing.emit({itemIndex: this.itemIndex, pairingId});
   }
 
-  onAddSide() {
-    this.addSide.emit(this.itemIndex);
+  onAddSide(sideData: {name: string, price?: string}) {
+    this.addSide.emit({itemIndex: this.itemIndex, sideData});
   }
 
   onRemoveSide(sideIndex: number) {
     this.removeSide.emit({itemIndex: this.itemIndex, sideIndex});
+  }
+
+  onAddAllergen(allergenName: string) {
+    this.addAllergen.emit({itemIndex: this.itemIndex, allergenName});
+  }
+
+  onRemoveAllergen(allergenIndex: number) {
+    this.removeAllergen.emit({itemIndex: this.itemIndex, allergenIndex});
   }
 
   onAddLabel() {
@@ -398,8 +419,16 @@ export class MenuItemFormComponent implements OnInit {
     this.newPairingChange.emit(value);
   }
 
-  onNewSideChange(value: string) {
-    this.newSideChange.emit(value);
+  onNewSideNameChange(value: string) {
+    this.newSideNameChange.emit(value);
+  }
+
+  onNewSidePriceChange(value: string) {
+    this.newSidePriceChange.emit(value);
+  }
+
+  onNewAllergenChange(value: string) {
+    this.newAllergenChange.emit(value);
   }
 
   onNewLabelChange(value: string) {

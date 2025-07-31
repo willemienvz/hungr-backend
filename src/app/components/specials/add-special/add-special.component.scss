@@ -23,10 +23,7 @@
       display: flex;
       flex-direction: column;
 
-      ::ng-deep .mat-mdc-select {
-        border: 1px solid black;
-      }
-
+  
       .formGroup {
         margin-bottom: 20px;
         gap: 8px;
@@ -40,7 +37,7 @@
     gap: 50px;
     align-items: flex-start;
     .col {
-      width: calc(50% - 10px);
+      width:100%;
       display: flex;
       flex-direction: column;
       gap: 30px;
@@ -50,6 +47,7 @@
   .block {
     width: 100%;
     position: relative;
+ 
   }
 }
 a.btnSecondary.disabled {
@@ -64,6 +62,11 @@ a.btnSecondary.disabled {
   justify-content: flex-start;
   align-items: flex-start;
   gap: 15px;
+
+  &.centered {
+    justify-content: center;
+    align-items: center;
+  }
 }
 .weekday-selector {
   display: flex;
@@ -72,7 +75,7 @@ a.btnSecondary.disabled {
   border: 1px solid rgba(222, 222, 222, 1);
   padding: 15px 50px;
   border-radius: 2px;
-  width: 100%;
+
   justify-content: center;
 }
 
@@ -133,15 +136,28 @@ a.btnSecondary.disabled {
 
 .container .timeRow {
   gap: 0;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   input {
-    width: 47%;
-    border: 1px solid #dedede;
+    width:100%;
+    border: 1px solid var(--hungr-dark-grey);
     height: 38px;
-    padding: 12px;
+    padding: 3px 12px;
     border-radius: 5px;
     line-height: 38px;
+    text-align:center;
+  }
+
+  .col {
+    width:140px;
+  }
+
+  .toCol {
+    width:30px;
+    justify-content: center;
+    align-items: center;
+    text-align:center;
+    padding-top:1.35em;
   }
 }
 .error-message {
@@ -156,27 +172,7 @@ a.btnSecondary.disabled {
     text-decoration: underline;
   }
 }
-.dateRow {
-  width: 100%;
-  .row {
-    gap: 0;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .col {
-    gap: 5px !important;
-  }
-  input {
-    width: 100%;
-    border: 1px solid #dedede;
-    height: 38px;
-    border-radius: 5px;
-    padding: 12px;
-    line-height: 38px;
-    font-family: "Poppins", sans-serif;
-  }
-}
+
 
 .modal {
   display: none; /* Hidden by default */
@@ -333,9 +329,7 @@ a.btnSecondary.disabled {
 .bigBlock .block form div {
   width: 700px;
   margin-bottom: 10px;
-  .mat-mdc-select {
-    height: 38px;
-  }
+
 }
 
 .summary-container {
@@ -419,9 +413,27 @@ a.btnSecondary.disabled {
   letter-spacing: -0.1%;
 }
 
-::ng-deep .mat-mdc-select {
-  height: 38px;
-  display: flex !important;
-  justify-content: center;
-  align-items: center;
+.inputBox {
+  width: 100%;
+  position: relative;
+  
+  input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+  }
 }
+
+/* Autocomplete dropdown styles */
+::ng-deep .mat-autocomplete-panel {
+  .no-results-option {
+    .no-results-text {
+      color: #999;
+      font-style: italic;
+    }
+  }
+}
+

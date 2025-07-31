@@ -1,0 +1,15 @@
+<div class="step4-container openTop">
+  <ng-content select="[header]"></ng-content>
+
+  <div class="block rowSpecial openTop">
+    <button type="button" class="btnSecondary" (click)="onOpenImageUploadModal()">
+      <mat-icon>upload</mat-icon> Add Image
+    </button>
+    <img
+      *ngIf="uploadedImageUrl"
+      style="margin-top: 30px; max-width: 80%"
+      [src]="uploadedImageUrl"
+      alt="Special preview image"
+    />
+  </div>
+</div> 

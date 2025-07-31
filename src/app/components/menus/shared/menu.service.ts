@@ -9,6 +9,13 @@ import { Papa } from 'ngx-papaparse';
 import { Category } from '../../../shared/services/category';
 import { Restaurant } from '../../../shared/services/restaurant';
 
+/* KB: New interface for enhanced side management with optional pricing and allergens */
+export interface SideItem {
+  name: string;
+  price?: string; // Optional price in same format as main item price (R 0.00)
+  allergens?: string[]; // Optional allergen list for this specific side
+}
+
 export interface MenuItemInterface {
   itemId: string;
   categoryId: number | null;
@@ -21,7 +28,8 @@ export interface MenuItemInterface {
   variations: string[];
   pairings: string[]; // Keep for backward compatibility
   pairingIds: string[]; // New array for menu item references
-  sides: string[];
+  sides: (string | SideItem)[]; // Backward compatible - supports both formats
+  allergens: string[]; // New field for item-level allergens
   labels: string[];
   showLabelInput: boolean;
   displayDetails: {
@@ -29,6 +37,7 @@ export interface MenuItemInterface {
     variation: boolean;
     pairing: boolean;
     side: boolean;
+    allergen: boolean;
   };
 }
 
@@ -178,6 +187,7 @@ export class MenuService {
       pairings: [],
       pairingIds: [],
       sides: [],
+      allergens: [],
       labels: [],
       showLabelInput: false,
       displayDetails: {
@@ -185,6 +195,7 @@ export class MenuService {
         variation: false,
         pairing: false,
         side: false,
+        allergen: false,
       },
     };
   }
@@ -203,6 +214,10 @@ export class MenuService {
   addToItemArray(menuItems: MenuItemInterface[], itemIndex: number, arrayType: string, newValue: string): MenuItemInterface[] {
     if (newValue.trim()) {
       const updatedItems = [...menuItems];
+      // Initialize array if it doesn't exist (for backward compatibility with older menu items)
+      if (!(updatedItems[itemIndex] as any)[arrayType]) {
+        (updatedItems[itemIndex] as any)[arrayType] = [];
+      }
       (updatedItems[itemIndex] as any)[arrayType].push(newValue.trim());
       return updatedItems;
     }
@@ -211,7 +226,10 @@ export class MenuService {
 
   removeFromItemArray(menuItems: MenuItemInterface[], itemIndex: number, arrayType: string, arrayIndex: number): MenuItemInterface[] {
     const updatedItems = [...menuItems];
-    (updatedItems[itemIndex] as any)[arrayType].splice(arrayIndex, 1);
+    // Check if array exists before trying to remove from it
+    if ((updatedItems[itemIndex] as any)[arrayType] && Array.isArray((updatedItems[itemIndex] as any)[arrayType])) {
+      (updatedItems[itemIndex] as any)[arrayType].splice(arrayIndex, 1);
+    }
     return updatedItems;
   }
 
@@ -235,7 +253,7 @@ export class MenuService {
     return updatedItems;
   }
 
-  toggleDetail(menuItems: MenuItemInterface[], detailType: 'preparation' | 'variation' | 'pairing' | 'side', itemIndex: number): MenuItemInterface[] {
+  toggleDetail(menuItems: MenuItemInterface[], detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen', itemIndex: number): MenuItemInterface[] {
     const updatedItems = [...menuItems];
     updatedItems[itemIndex].displayDetails[detailType] = !updatedItems[itemIndex].displayDetails[detailType];
     return updatedItems;
@@ -635,6 +653,7 @@ export class MenuService {
         pairings: pairings,
         pairingIds: [],
         sides: sides,
+        allergens: [], // Initialize allergens as empty array
         labels: labels,
         showLabelInput: false,
         displayDetails: {
@@ -642,6 +661,7 @@ export class MenuService {
           variation: variations.length > 0,
           pairing: pairings.length > 0,
           side: sides.length > 0,
+          allergen: false,
         },
       };
 

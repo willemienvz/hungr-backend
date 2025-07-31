@@ -156,6 +156,7 @@ h6 {
 .mat-mdc-text-field-wrapper {
   border: 1px solid #9A9A9A;
   border-radius: 5px;
+  padding: 0 12px;
 }
 
 p {
@@ -625,6 +626,10 @@ mat-select {
   background-color: white !important;
 }
 
+.mdc-text-field {
+  padding: 0 12px !important;
+}
+
 .mat-mdc-radio-button.mat-accent {
   --mdc-radio-disabled-selected-icon-color: black;
   --mdc-radio-disabled-unselected-icon-color: black;
@@ -744,6 +749,9 @@ input[type="submit"]:disabled {
 
   
 }
+.mat-mdc-select {
+  padding:0;
+}
 
 .select-arrow-fix {
   .mat-mdc-select-arrow-wrapper {
@@ -779,6 +787,9 @@ input[type="submit"]:disabled {
   border-radius: 10px;
   border: 1px solid var(--hungr-light-grey);
   background-color: #fff;
+
+
+  position:relative;
 
   display: flex;
   flex-direction: column;
@@ -834,6 +845,14 @@ input[type="submit"]:disabled {
   justify-content: flex-start;
   align-items: flex-start;
   gap: 10px;
+
+  &.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
 /* Block styling for content sections */
@@ -865,4 +884,25 @@ input[type="submit"]:disabled {
   &:hover {
     color: var(--hungr-tertiary-color);
   }
+}
+
+/* Utility classes */
+
+.mb-1 {
+  margin-bottom: 1em;
+}
+
+.mb-2 {
+  margin-bottom: 2em;
+}
+
+.mt-1 {
+  margin-top: 1em;
+}
+
+.mt-2 {
+  margin-top: 2em;
+}
+.align-center {
+  text-align: center;
 }

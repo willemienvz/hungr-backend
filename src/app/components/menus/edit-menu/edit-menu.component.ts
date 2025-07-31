@@ -8,7 +8,7 @@ import { Category } from '../../../shared/services/category';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { MenuService, MenuItemInterface } from '../shared/menu.service';
+import { MenuService, MenuItemInterface, SideItem } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
@@ -38,7 +38,9 @@ export class EditMenuComponent implements OnInit {
   newPreparation: string = '';
   newVariation: string = '';
   newPairing: string = '';
-  newSide: string = '';
+  newSideName: string = '';
+  newSidePrice: string = 'R 0.00';
+  newAllergen: string = '';
   newLabel: string = '';
   isSaving: boolean = false;
   tempNum: number = 0;
@@ -131,65 +133,103 @@ export class EditMenuComponent implements OnInit {
   addPreparation(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'preparations', this.newPreparation);
     this.newPreparation = '';
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   removePreparation(itemIndex: number, prepIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'preparations', prepIndex);
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   addVariation(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'variations', this.newVariation);
     this.newVariation = '';
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   removeVariation(itemIndex: number, variationIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'variations', variationIndex);
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   addPairing(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'pairings', this.newPairing);
     this.newPairing = '';
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   removePairing(itemIndex: number, pairingIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'pairings', pairingIndex);
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   addMenuItemPairing(data: {itemIndex: number, pairingId: string}): void {
     this.menuItems = this.menuService.addMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   removeMenuItemPairing(data: {itemIndex: number, pairingId: string}): void {
     this.menuItems = this.menuService.removeMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
-  addSide(itemIndex: number): void {
-    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'sides', this.newSide);
-    this.newSide = '';
+  addSide(data: {itemIndex: number, sideData: {name: string, price?: string}}): void {
+    const { itemIndex, sideData } = data;
+    
+    // Create side item - either string or SideItem object based on whether price is provided
+    let sideItem: string | SideItem;
+    if (sideData.price && sideData.price !== 'R 0.00') {
+      sideItem = {
+        name: sideData.name,
+        price: sideData.price
+      };
+    } else {
+      sideItem = sideData.name; // Backward compatibility - store as string
+    }
+    
+    // Add to sides array
+    this.menuItems[itemIndex].sides.push(sideItem);
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   addLabel(itemIndex: number): void {
     this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'labels', this.newLabel);
     this.newLabel = '';
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   removeSide(itemIndex: number, sideIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'sides', sideIndex);
+    this.applyFilters(); // Update filtered view to reflect changes
+    this.markAsChanged();
+  }
+
+  addAllergen(data: {itemIndex: number, allergenName: string}): void {
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, data.itemIndex, 'allergens', data.allergenName);
+    this.newAllergen = '';
+    this.applyFilters(); // Update filtered view to reflect changes
+    this.markAsChanged();
+  }
+
+  removeAllergen(itemIndex: number, allergenIndex: number): void {
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'allergens', allergenIndex);
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
   removeLabel(itemIndex: number, labelIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'labels', labelIndex);
+    this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
 
@@ -467,7 +507,7 @@ export class EditMenuComponent implements OnInit {
   }
 
   toggleDetail(
-    detailType: 'preparation' | 'variation' | 'pairing' | 'side',
+    detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen',
     itemIndex: number
   ) {
     this.menuItems = this.menuService.toggleDetail(this.menuItems, detailType, itemIndex);
@@ -552,10 +592,14 @@ export class EditMenuComponent implements OnInit {
         pairing.toLowerCase().includes(searchLower)
       );
       
-      // Search in sides
-      const matchesSides = item.sides?.some(side => 
-        side.toLowerCase().includes(searchLower)
-      );
+      // Search in sides (handle both string and SideItem formats)
+      const matchesSides = item.sides?.some(side => {
+        if (typeof side === 'string') {
+          return side.toLowerCase().includes(searchLower);
+        } else {
+          return side.name.toLowerCase().includes(searchLower);
+        }
+      });
       
       // Search in variations
       const matchesVariations = item.variations?.some(variation => 

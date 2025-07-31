@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
-import { MenuService, MenuItemInterface } from '../shared/menu.service';
+import { MenuService, MenuItemInterface, SideItem } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 
@@ -42,7 +42,9 @@ export class AddMenuComponent implements OnInit {
   newPreparation: string = '';
   newVariation: string = '';
   newPairing: string = '';
-  newSide: string = '';
+  newSideName: string = '';
+  newSidePrice: string = 'R 0.00';
+  newAllergen: string = '';
   categories: Category[] = [];
   restaurants: Restaurant[] = [];
   selectedRestaurant: string = '';
@@ -61,6 +63,7 @@ export class AddMenuComponent implements OnInit {
     variation: false,
     pairing: false,
     side: false,
+    allergen: false,
   };
   tempNum: number = 0;
   preparations: string[] = [];
@@ -229,6 +232,7 @@ export class AddMenuComponent implements OnInit {
         pairings: item.pairings ? item.pairings.split('|') : [],
         pairingIds: [],
         sides: item.sides ? item.sides.split('|') : [],
+        allergens: item.allergens ? item.allergens.split('|') : [],
         labels: item.labels ? item.labels.split('|') : [],
         showLabelInput: false,
         displayDetails: {
@@ -236,6 +240,7 @@ export class AddMenuComponent implements OnInit {
           variation: false,
           pairing: false,
           side: false,
+          allergen: false,
         },
       };
       this.menuItems.push(newItem);
@@ -450,17 +455,40 @@ export class AddMenuComponent implements OnInit {
     this.menuItems = this.menuService.removeMenuItemPairing(this.menuItems, data.itemIndex, data.pairingId);
   }
 
-  addSide(itemIndex: number): void {
-    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'sides', this.newSide);
-    this.newSide = '';
+  addSide(data: {itemIndex: number, sideData: {name: string, price?: string}}): void {
+    const { itemIndex, sideData } = data;
+    
+    // Create side item - either string or SideItem object based on whether price is provided
+    let sideItem: string | SideItem;
+    if (sideData.price && sideData.price !== 'R 0.00') {
+      sideItem = {
+        name: sideData.name,
+        price: sideData.price
+      };
+    } else {
+      sideItem = sideData.name; // Backward compatibility - store as string
+    }
+    
+    // Add to sides array
+    this.menuItems[itemIndex].sides.push(sideItem);
+    this.markAsChanged();
   }
 
   removeSide(itemIndex: number, sideIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'sides', sideIndex);
   }
 
+  addAllergen(data: {itemIndex: number, allergenName: string}): void {
+    this.menuItems = this.menuService.addToItemArray(this.menuItems, data.itemIndex, 'allergens', data.allergenName);
+    this.newAllergen = '';
+  }
+
+  removeAllergen(itemIndex: number, allergenIndex: number): void {
+    this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'allergens', allergenIndex);
+  }
+
   toggleDetail(
-    detailType: 'preparation' | 'variation' | 'pairing' | 'side',
+    detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen',
     itemIndex: number
   ): void {
     this.menuItems = this.menuService.toggleDetail(this.menuItems, detailType, itemIndex);

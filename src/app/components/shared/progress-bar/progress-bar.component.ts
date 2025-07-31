@@ -12,6 +12,7 @@ export class ProgressBarComponent {
   @Input() backRoute: string = '/menus';
   @Input() backText: string = 'Back';
   @Input() allowStepNavigation: boolean = true;
+  @Input() tooltipInfo?: string;
   
   @Output() stepClick = new EventEmitter<number>();
   @Output() backButtonClick = new EventEmitter<void>();

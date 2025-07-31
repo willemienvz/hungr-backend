@@ -1,0 +1,27 @@
+.special-summary {
+  position: absolute;
+  left: 15px; // match headerBlock padding
+  right: 15px; // match headerBlock padding
+  top: 70px; // adjust to sit below progress bar and step header
+  color: var(--hungr-dark-grey, #9A9A9A);
+  font-size: 14px;
+  line-height: 1.4;
+  z-index: 2;
+  padding: 8px 0;
+  pointer-events: none;
+  font-family: var(--hungr-font-family);
+  
+  @media (max-width: 768px) {
+    font-size: 13px;
+    padding: 6px 0;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 12px;
+    padding: 4px 0;
+  }
+  
+  div {
+    margin-bottom: 2px;
+  }
+} 

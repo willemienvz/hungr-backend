@@ -2,6 +2,25 @@
   position: relative;
 }
 
+/* Info icon container styles */
+.info-icon-container {
+  position: absolute;
+  right: 0;
+  top: 2px;
+  z-index: 1000;
+  
+  i {
+    color: var(--hungr-dark-grey );
+    font-size: 20px;
+    cursor: help;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: var(--hungr-tertiary-color);
+    }
+  }
+}
+
 .progress-main-container {
   border: 1px solid rgba(235, 237, 238, 1);
   background-color: #fff;

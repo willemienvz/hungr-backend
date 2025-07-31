@@ -1,0 +1,61 @@
+.step5-container {
+  width: 100%;
+  position: relative;
+}
+
+.summary-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.summary-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.summary-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.summary-info {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.promo-section {
+  margin-top: 20px;
+}
+
+.promo-section p {
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.promo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.promo-item:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.item-price {
+  color: #666;
+  font-size: 14px;
+} 

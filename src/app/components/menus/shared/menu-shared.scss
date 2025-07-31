@@ -391,6 +391,8 @@ mat-form-field {
   border: 1px solid var(--hungr-light-grey);
   background-color: #fff;
 
+  position:relative;
+
   display:flex;
   flex-direction: column;
   gap: 20px;

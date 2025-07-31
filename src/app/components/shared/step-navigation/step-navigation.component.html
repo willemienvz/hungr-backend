@@ -10,8 +10,7 @@
       <button *ngIf="showPublish" class="btnPrimary" (click)="onPublish()" [disabled]="isDisabled">
         PUBLISH MENU
       </button>
-      <button *ngIf="showPrevious" class="btn btn-outline" (click)="onPrevious()" [disabled]="isDisabled">
-        <i class="material-icons">chevron_left</i>
+      <button *ngIf="showPrevious" class="btnPrimary" (click)="onPrevious()" [disabled]="isDisabled">
         Previous
       </button>
       <button *ngIf="showNext" class="btnPrimary" (click)="onNext()" [disabled]="nextDisabled || isDisabled">

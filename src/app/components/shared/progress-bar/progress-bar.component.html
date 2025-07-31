@@ -5,6 +5,11 @@
   </a>
 </div>
 
+<!-- Info icon with tooltip -->
+<div *ngIf="tooltipInfo" class="info-icon-container">
+  <i class="material-icons" [matTooltip]="tooltipInfo">info_outline</i>
+</div>
+
 <div class="row">
   <div class="inner">
     <div

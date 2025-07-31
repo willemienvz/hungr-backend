@@ -166,6 +166,14 @@ const routes: Routes = [
         },
       },
       {
+        path: 'specials/add-new-special/:step',
+        component: AddSpecialComponent,
+        data: {
+          title:
+            'Add Specials<span class="submenuHeading">/Add A New special</span>',
+        },
+      },
+      {
         path: 'specials/edit-special/:id',
         component: EditSpecialComponent,
         data: {

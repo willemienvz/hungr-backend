@@ -1,35 +1,18 @@
-export interface Special {
-    specialID: string;
-    menuName:string;
-    OwnerID:string;
-    dateFrom:string;
-    dateTo:boolean;
-    featureSpecialUnder:number;
-    menu:string;
-    isDraft:boolean;
-    active:boolean;
-    addedItems: { name: string; amount: number }[];
-    selectedDays: string[];
-    specialTitle:string;
-    timeFrom:string;
-    timeTo:string;
-    typeSpecial:number;
-    typeSpecialDetails:string;
-    imageUrl:string;
- }
+import { Special } from '../../types/special';
 
- export function isSpecial(data: any): data is Special {
-    return (
-      typeof data.menu === 'string' &&
-      typeof data.specialTitle === 'string' &&
-      typeof data.dateFrom === 'string' &&
-      typeof data.dateTo === 'string' &&
-      typeof data.typeSpecial === 'string' &&
-      typeof data.timeFrom === 'string' &&
-      typeof data.timeTo === 'string' &&
-      Array.isArray(data.addedItems) &&
-      Array.isArray(data.selectedDays) &&
-      typeof data.imageUrl === 'string' &&
-      typeof data.OwnerID === 'string'
-    );
-  }
+export function isSpecial(data: any): data is Special {
+  return (
+    typeof data.specialID === 'string' &&
+    typeof data.specialTitle === 'string' &&
+    typeof data.imageUrl === 'string' &&
+    Array.isArray(data.selectedDays) &&
+    (typeof data.timeFrom === 'string' || typeof data.timeFrom === 'undefined') &&
+    (typeof data.timeTo === 'string' || typeof data.timeTo === 'undefined') &&
+    typeof data.typeSpecial === 'number' &&
+    typeof data.active === 'boolean' &&
+    typeof data.isDraft === 'boolean' &&
+    typeof data.OwnerID === 'string' &&
+    Array.isArray(data.addedItems) &&
+    data.addedItems.every((item: any) => typeof item.name === 'string' && typeof item.amount === 'string')
+  );
+}

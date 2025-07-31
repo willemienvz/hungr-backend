@@ -74,6 +74,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TestAuthComponent } from './components/test-auth/test-auth.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
@@ -101,9 +102,19 @@ import { MenuItemSelectionComponent } from './components/shared/menu-item-select
 import { StepHeaderComponent } from './components/shared/step-header/step-header.component';
 import { MenuItemDetailComponent } from './components/shared/menu-item-detail/menu-item-detail.component';
 import { MenuItemPairingComponent } from './components/shared/menu-item-pairing/menu-item-pairing.component';
+import { SideDetailComponent } from './components/shared/side-detail/side-detail.component';
+import { AllergenDetailComponent } from './components/shared/allergen-detail/allergen-detail.component';
 import { ImageUploadModalComponent } from './components/shared/image-upload-modal/image-upload-modal.component';
 import { MenuCompletionSuccessComponent } from './components/shared/menu-completion-success/menu-completion-success.component';
 import { PriceInputComponent } from './shared/components/price-input/price-input.component';
+import { SpecialsTableComponent } from './components/specials/shared/specials-table/specials-table.component';
+import { ViewSpecialDialogComponent } from './components/specials/shared/view-special-dialog/view-special-dialog.component';
+import { Step1SpecialBasicsComponent } from './components/specials/shared/special-form-steps/step1-special-basics/step1-special-basics.component';
+import { Step2DaysTimesComponent } from './components/specials/shared/special-form-steps/step2-days-times/step2-days-times.component';
+import { Step3SpecialDetailsComponent } from './components/specials/shared/special-form-steps/step3-special-details/step3-special-details.component';
+import { Step4AddMediaComponent } from './components/specials/shared/special-form-steps/step4-add-media/step4-add-media.component';
+import { Step5OverviewComponent } from './components/specials/shared/special-form-steps/step5-overview/step5-overview.component';
+import { SpecialSummaryComponent } from './components/specials/shared/special-summary/special-summary.component';
 
 @NgModule({
   declarations: [
@@ -175,10 +186,20 @@ import { PriceInputComponent } from './shared/components/price-input/price-input
     StepHeaderComponent,
     MenuItemDetailComponent,
     MenuItemPairingComponent,
+    SideDetailComponent,
+    AllergenDetailComponent,
     ImageUploadModalComponent,
     MenuCompletionSuccessComponent,
     PriceInputComponent,
     TestAuthComponent,
+    SpecialsTableComponent,
+    ViewSpecialDialogComponent,
+    Step1SpecialBasicsComponent,
+    Step2DaysTimesComponent,
+    Step3SpecialDetailsComponent,
+    Step4AddMediaComponent,
+    Step5OverviewComponent,
+    SpecialSummaryComponent,
   ],
   imports: [
     BrowserModule,
@@ -209,6 +230,7 @@ import { PriceInputComponent } from './shared/components/price-input/price-input
     MatTabsModule,
     DragDropModule,
     ColorPickerModule,
+    MatTooltipModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),
     }),

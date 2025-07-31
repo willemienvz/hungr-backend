@@ -1,0 +1,72 @@
+<table class="specials-table" *ngIf="specials.length > 0">
+  <thead>
+    <tr>
+      <th class="name-column">Name</th>
+      <th class="description-column">Description</th>
+      <th class="type-column">Type</th>
+      <th class="status-column">Status</th>
+      <th class="actions-column">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let special of specials; let i = index">
+      <td class="name-cell">
+        <div class="name-content">
+          <img [src]="special.imageUrl" alt="" class="special-image" />
+          <span class="special-name">{{ special.specialTitle }}</span>
+        </div>
+      </td>
+      <td class="description-cell">
+        <div class="description-content">
+          <div class="days-list" *ngIf="special.selectedDays.length > 0">
+            <span *ngFor="let day of special.selectedDays; let isLast = last">
+              {{ day }}<span *ngIf="!isLast">, </span>
+            </span>
+          </div>
+          <div class="time-range" *ngIf="special.timeFrom && special.timeTo">
+            {{ special.timeFrom }} - {{ special.timeTo }}
+          </div>
+        </div>
+      </td>
+      <td class="type-cell">
+        {{ getSpecialTypeLabel(special.typeSpecial) }}
+      </td>
+      <td class="status-cell">
+        <ng-container [ngSwitch]="tableType">
+          <mat-slide-toggle 
+            *ngSwitchCase="'active'"
+            [checked]="special.active" 
+            (change)="toggleStatus.emit({special, index: i})"
+            class="toggle-switch">
+          </mat-slide-toggle>
+          <span *ngSwitchCase="'inactive'" class="status-badge inactive">{{ getSpecialStatus(special) }}</span>
+          <span *ngSwitchCase="'draft'" class="status-badge draft">{{ getSpecialStatus(special) }}</span>
+        </ng-container>
+      </td>
+      <td class="actions-cell">
+        <div class="action-buttons">
+          <mat-slide-toggle 
+            *ngIf="tableType !== 'active' && showToggle"
+            [checked]="special.active" 
+            [disabled]="tableType === 'draft'"
+            (change)="toggleStatus.emit({special, index: i})"
+            class="toggle-switch">
+          </mat-slide-toggle>
+          <button mat-icon-button class="view-btn" title="View" (click)="openViewDialog(special)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+          <button mat-icon-button class="edit-btn" [routerLink]="['/specials/edit-special', special.specialID]" title="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button class="delete-btn" (click)="deleteSpecial.emit({specialId: special.specialID, index: i})" title="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="no-specials" *ngIf="specials.length === 0">
+  <p>No {{ tableType }} specials found</p>
+</div> 

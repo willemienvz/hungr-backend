@@ -1,0 +1,46 @@
+<div class="step5-container openTop">
+  <ng-content select="[header]"></ng-content>
+
+  <div class="block rowSpecial openTop">
+    <div class="summary-container">
+      <h3 class="summary-title">
+        {{ specialForm.value.specialTitle || "Special Name" }}
+      </h3>
+
+      <div class="summary-card">
+        <!-- Special Type -->
+        <p class="summary-info">
+          {{ getSpecialTypeLabel(selectedSpecialType) }}
+        </p>
+
+        <!-- Date Range -->
+        <p class="summary-info">
+          Valid from {{ specialForm.value.dateFrom | date : "d MMMM" }} -
+          {{ specialForm.value.dateTo | date : "d MMMM" }}
+        </p>
+
+        <!-- Days -->
+        <p class="summary-info">
+          Every {{ selectedDays.join(", ") || "No days selected" }}
+        </p>
+
+        <!-- Time Range -->
+        <p class="summary-info">
+          From {{ specialForm.value.timeFrom || "00:00" }} to
+          {{ specialForm.value.timeTo || "00:00" }}
+        </p>
+      </div>
+
+      <!-- Promotional Items Section -->
+      <div class="promo-section">
+        <p>Promotional Items</p>
+        <div *ngFor="let item of addedItems" class="promo-item">
+          <span class="item-name">{{ item.name }}</span>
+          <span class="item-price"
+            >Promotional Price: R {{ item.amount }}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

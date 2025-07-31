@@ -1,17 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { catchError, finalize } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { catchError, finalize, startWith, map } from 'rxjs/operators';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
 import { ToastrService } from 'ngx-toastr';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption } from '../shared/special-types.constants';
 
 @Component({
   selector: 'app-add-special',
@@ -24,13 +26,9 @@ export class AddSpecialComponent implements OnInit {
   selectedSpecialType: number = 1;
   uploadDone: boolean = false;
   specialForm: FormGroup;
-  specialTypes = [
-    { id: 1, name: 'Weekly Special' },
-    { id: 2, name: 'Category special' },
-    { id: 3, name: 'Combo special' },
-  ];
+  specialTypes: SpecialTypeOption[] = SPECIAL_TYPE_OPTIONS;
   weekdays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  selectedDays: string[] = [];
+  selectedDays: string[] = ['Mon'];
   menus: Menu[] = [];
   selectedMenu: Menu | null = null;
   addedItems: { name: string; amount: string }[] = [];
@@ -42,13 +40,19 @@ export class AddSpecialComponent implements OnInit {
   showSuccessPopup: boolean = false;
   successPopupMessage: string = '';
 
+  // Add new properties for autocomplete
+  menuItemAutocompleteControl = new FormControl('');
+  filteredMenuItems: Observable<any[]> = new Observable();
+  selectedMenuItem: any = null;
+
   constructor(
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private fb: FormBuilder,
     private toastr: ToastrService,
     private dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.specialForm = this.fb.group(
       {
@@ -57,13 +61,13 @@ export class AddSpecialComponent implements OnInit {
         dateFrom: ['', Validators.required],
         dateTo: ['', Validators.required],
         typeSpecial: ['', Validators.required],
-        typeSpecialDetails: [[]],
+        typeSpecialDetails: [''],
         comboPrice: [''],
         percentage: [''],
         amount: ['', Validators.required],
         featureSpecialUnder: [''],
-        timeFrom: ['', Validators.required],
-        timeTo: ['', Validators.required],
+        timeFrom: ['00:00', Validators.required],
+        timeTo: ['00:00', Validators.required],
       },
       {
         validators: [dateRangeValidator(), timeRangeValidator()],
@@ -72,9 +76,36 @@ export class AddSpecialComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Read step from route parameter
+    this.route.params.subscribe((params) => {
+      const step = params['step'];
+      if (step) {
+        const stepNumber = parseInt(step, 10);
+        if (stepNumber >= 1 && stepNumber <= 5) {
+          this.currentStep = stepNumber;
+        } else {
+          // Invalid step, redirect to step 1
+          this.router.navigate(['/specials/add-new-special/1'], { replaceUrl: true });
+        }
+      } else {
+        // No step specified, default to step 1
+        this.currentStep = 1;
+        this.router.navigate(['/specials/add-new-special/1'], { replaceUrl: true });
+      }
+    });
+
     this.fetchMenus();
     this.trackFormChanges();
+    // Auto-select first special type
+    if (this.specialTypes.length > 0) {
+      this.specialForm.patchValue({
+        typeSpecial: this.specialTypes[0].id
+      });
+      this.selectedSpecialType = this.specialTypes[0].id;
+      this.onSpecialTypeChange();
+    }
     console.log('Component initialized, hasUnsavedChanges:', this.hasUnsavedChanges);
+    this.setupMenuItemAutocomplete();
   }
 
   private trackFormChanges() {
@@ -111,57 +142,62 @@ export class AddSpecialComponent implements OnInit {
     const selectedType = this.selectedSpecialType;
 
     if (selectedType === 1) {
-      // Weekly Special
-      const selectedItemName =
-        this.specialForm.get('typeSpecialDetails')?.value;
-      const amount = this.specialForm.get('amount')?.value;
-
-      if (selectedItemName && amount) {
-        this.addedItems.push({ name: selectedItemName, amount });
-        this.specialForm.get('typeSpecialDetails')?.reset();
-        this.specialForm.get('amount')?.reset();
+      // Percentage Discount
+      const percentage = this.specialForm.get('percentage')?.value;
+      if (this.selectedMenuItem && percentage) {
+        this.addedItems.push({ 
+          name: this.selectedMenuItem.name, 
+          amount: `${percentage}%` 
+        });
+        this.specialForm.get('percentage')?.reset();
+        this.menuItemAutocompleteControl.setValue('');
+        this.selectedMenuItem = null;
       }
     } else if (selectedType === 2) {
+      // Price Discount
+      const amount = this.specialForm.get('amount')?.value;
+      if (this.selectedMenuItem && amount) {
+        this.addedItems.push({ 
+          name: this.selectedMenuItem.name, 
+          amount: amount
+        });
+        this.specialForm.get('amount')?.reset();
+        this.menuItemAutocompleteControl.setValue('');
+        this.selectedMenuItem = null;
+      }
+    } else if (selectedType === 4) {
       // Category Special
       const categoryName = this.specialForm.get('featureSpecialUnder')?.value;
-      const percentage = this.specialForm.get('percentage')?.value;
+      const amount = this.specialForm.get('amount')?.value;
 
-      if (categoryName && percentage) {
+      if (categoryName && amount) {
         this.addedItems.push({
           name: `Category: ${categoryName}`,
-          amount: `${percentage}%`,
+          amount: amount,
         });
         this.specialForm.get('featureSpecialUnder')?.reset();
-        this.specialForm.get('percentage')?.reset();
+        this.specialForm.get('amount')?.reset();
       }
     } else if (selectedType === 3) {
       // Combo Special
-      const comboItems = this.specialForm.get('typeSpecialDetails')?.value; // Array of items
-      const comboPrice = this.specialForm.get('comboPrice')?.value;
+      const comboItems = this.specialForm.get('typeSpecialDetails')?.value;
+      const percentage = this.specialForm.get('percentage')?.value;
 
-      if (Array.isArray(comboItems) && comboItems.length > 0 && comboPrice) {
+      if (Array.isArray(comboItems) && comboItems.length > 0 && percentage) {
         const comboItemNames = comboItems.join(', ');
         this.addedItems.push({
           name: `Combo: ${comboItemNames}`,
-          amount: comboPrice,
+          amount: `${percentage}%`,
         });
         this.specialForm.get('typeSpecialDetails')?.reset();
-        this.specialForm.get('comboPrice')?.reset();
+        this.specialForm.get('percentage')?.reset();
       }
     }
     this.markAsChanged();
   }
   getSpecialTypeLabel(type: number): string {
-    switch (type) {
-      case 1:
-        return 'Weekly Special';
-      case 2:
-        return 'Category Special';
-      case 3:
-        return 'Combo Special';
-      default:
-        return 'Special Type';
-    }
+    const typeOption = this.specialTypes.find(t => t.id === type);
+    return typeOption ? typeOption.name : 'Special Type';
   }
   removeItem(index: number): void {
     this.addedItems.splice(index, 1); // Remove the item at the specified index
@@ -179,7 +215,13 @@ export class AddSpecialComponent implements OnInit {
       .valueChanges()
       .subscribe((menus) => {
         this.menus = menus;
-        console.log(menus);
+        // Auto-select first menu if available
+        if (menus.length > 0) {
+          this.specialForm.patchValue({
+            menu: menus[0].menuID
+          });
+          this.onMenuChange();
+        }
       });
   }
 
@@ -187,8 +229,12 @@ export class AddSpecialComponent implements OnInit {
     const menuControl = this.specialForm.get('menu');
     if (menuControl?.value) {
       this.specialForm.enable();
-      this.selectedMenu =
-        this.menus.find((menu) => menu.menuID === menuControl.value) || null;
+      this.selectedMenu = this.menus.find((menu) => menu.menuID === menuControl.value) || null;
+      
+      // Reset the autocomplete and selected item when menu changes
+      this.menuItemAutocompleteControl.setValue('');
+      this.selectedMenuItem = null;
+      this.setupMenuItemAutocomplete();
     } else {
       this.specialForm.disable();
       menuControl?.enable();
@@ -356,78 +402,32 @@ export class AddSpecialComponent implements OnInit {
     this.showSuccessPopup = true;
   }
   nextStep() {
-    if (this.currentStep === 1) {
-      // Mark all required fields as touched to show validation errors
-      const controlsToCheck = [
-        'specialTitle',
-        'menu',
-        'typeSpecial',
-        'dateFrom',
-        'dateTo',
-      ];
-
-      let hasErrors = false;
-      controlsToCheck.forEach((controlName) => {
-        const control = this.specialForm.get(controlName);
-        control?.markAsTouched();
-        if (control?.invalid) {
-          hasErrors = true;
-        }
-      });
-
-      // Explicitly check that date fields have actual values (not empty strings)
-      const dateFrom = this.specialForm.get('dateFrom')?.value;
-      const dateTo = this.specialForm.get('dateTo')?.value;
-      
-      // Enhanced validation: check for null, undefined, empty string, or whitespace
-      if (!dateFrom || !dateTo || 
-          dateFrom.toString().trim() === '' || 
-          dateTo.toString().trim() === '') {
-        // Mark date fields as touched and invalid to show error messages
-        this.specialForm.get('dateFrom')?.markAsTouched();
-        this.specialForm.get('dateTo')?.markAsTouched();
-        this.specialForm.get('dateFrom')?.setErrors({ 'required': true });
-        this.specialForm.get('dateTo')?.setErrors({ 'required': true });
-        hasErrors = true;
-        
-        // Show user feedback
-        this.toastr.error('Please fill in both start date and end date before proceeding.');
-      }
-
-      // Check for form-level validation errors (like date range)
-      if (this.specialForm.errors?.['dateRangeInvalid']) {
-        hasErrors = true;
-        this.toastr.error('Start date must be before end date.');
-      }
-
-      // Prevent navigation if there are any errors
-      if (hasErrors) {
-        console.log('Form validation failed, preventing navigation to step 2');
-        return;
-      }
-
-      console.log('Form validation passed, proceeding to step 2');
+    if (this.currentStep < 5) {
+      this.currentStep++;
+      this.router.navigate([`/specials/add-new-special/${this.currentStep}`], { replaceUrl: true });
     }
-
-    if (this.currentStep < 5) this.currentStep++;
   }
 
   previousStep() {
-    if (this.currentStep > 1) this.currentStep--;
-  }
-
-  navigateToStep(step: number): void {
-    if (step < this.currentStep && step >= 1) {
-      this.currentStep = step;
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      this.router.navigate([`/specials/add-new-special/${this.currentStep}`], { replaceUrl: true });
     }
   }
 
-  onSpecialTypeChange() {
-    this.selectedSpecialType = this.specialForm.get('typeSpecial')?.value;
+  navigateToStep(step: number): void {
+    if (step >= 1 && step <= 5) {
+      this.currentStep = step;
+      this.router.navigate([`/specials/add-new-special/${step}`], { replaceUrl: true });
+    }
   }
 
   onBackButtonClick() {
-    this.navigateWithUnsavedChangesCheck('/specials');
+    if (this.currentStep > 1) {
+      this.previousStep();
+    } else {
+      this.router.navigate(['/specials']);
+    }
   }
 
   // Method to check if Step 1 form is invalid
@@ -445,5 +445,87 @@ export class AddSpecialComponent implements OnInit {
       dateTo.toString().trim() === '' ||
       this.specialForm.errors?.['dateRangeInvalid']
     );
+  }
+
+  isStep2Invalid(): boolean {
+    const timeFrom = this.specialForm.get('timeFrom')?.value;
+    const timeTo = this.specialForm.get('timeTo')?.value;
+    
+    return (
+      this.selectedDays.length === 0 ||
+      !timeFrom ||
+      !timeTo ||
+      timeFrom.toString().trim() === '' ||
+      timeTo.toString().trim() === '' ||
+      this.specialForm.errors?.['timeRangeInvalid']
+    );
+  }
+
+  onSpecialTypeChange() {
+    const typeControl = this.specialForm.get('typeSpecial');
+    if (typeControl?.value) {
+      this.selectedSpecialType = typeControl.value;
+      
+      // Reset/clear all type-specific form controls when special type changes
+      this.specialForm.patchValue({
+        typeSpecialDetails: '',
+        comboPrice: '',
+        percentage: '',
+        amount: '',
+        featureSpecialUnder: ''
+      });
+      
+      // Clear autocomplete control
+      this.menuItemAutocompleteControl.setValue('');
+      this.selectedMenuItem = null;
+      
+      // Clear added items from previous type
+      this.addedItems = [];
+      
+      // Auto-select first item/category when special type changes
+      if (this.selectedMenu) {
+        if (this.selectedSpecialType === 1 && this.selectedMenu.items?.length > 0) {
+          this.specialForm.patchValue({
+            typeSpecialDetails: this.selectedMenu.items[0].name
+          });
+        } else if (this.selectedSpecialType === 4 && this.selectedMenu.categories?.length > 0) {
+          this.specialForm.patchValue({
+            featureSpecialUnder: this.selectedMenu.categories[0].id
+          });
+        }
+      }
+    }
+  }
+
+  private setupMenuItemAutocomplete() {
+    this.filteredMenuItems = this.menuItemAutocompleteControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filterMenuItems(value || ''))
+    );
+  }
+
+  private filterMenuItems(value: string): any[] {
+    if (!this.selectedMenu?.items) return [];
+    
+    const filterValue = typeof value === 'string' ? value.toLowerCase() : '';
+    return this.selectedMenu.items.filter(item =>
+      item.name.toLowerCase().includes(filterValue)
+    );
+  }
+
+  displayFn = (menuItem: any): string => {
+    return menuItem?.name || '';
+  }
+
+  onMenuItemSelected(event: MatAutocompleteSelectedEvent) {
+    const selectedItem = event.option.value;
+    if (selectedItem) {
+      this.selectedMenuItem = selectedItem;
+      this.specialForm.patchValue({
+        typeSpecialDetails: selectedItem.name
+      });
+      // Keep the selected item's name in the input
+      this.menuItemAutocompleteControl.setValue(selectedItem);
+    }
   }
 }

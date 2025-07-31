@@ -1,0 +1,55 @@
+<!-- KB: Enhanced side detail section component that handles side objects with optional pricing -->
+<div class="details-section">
+  <div class="detail-header grid">
+    <div class="header-title">
+      <h6>{{ config.title }}</h6>
+    </div>
+    <div class="header-actions">
+      <p *ngIf="config.description">{{ config.description }}</p>
+      <button type="button" class="toggle-btn" (click)="onCloseDetail()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+  </div>
+
+  <div class="detail-content grid">
+    <div class="add-input-group">
+      <div class="inputBox">
+        <input
+          [placeholder]="config.placeholder"
+          type="text"
+          [ngModel]="newSideName"
+          (ngModelChange)="onNewSideNameChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          (keyup.enter)="onAddSide()"
+        />
+        <label>press enter to add</label>
+      </div>
+      
+      <!-- KB: Optional price input for sides -->
+      <div *ngIf="config.showPricing" class="price-input-container">
+        <app-price-input
+          label=""
+          placeholder="R 0.00"
+          [required]="false"
+          [(ngModel)]="newSidePrice"
+          [ngModelOptions]="{ standalone: true }"
+          class="compact">
+        </app-price-input>
+      </div>
+    </div>
+    
+    <div class="item-list">
+      <div
+        class="item-tag"
+        *ngFor="let side of sides; let i = index"
+      >
+        <span>{{ getSideDisplayName(side) }}</span>
+        <span *ngIf="hasSidePrice(side)" class="side-price">{{ getSideDisplayPrice(side) }}</span>
+        <button type="button" class="remove-btn" (click)="onRemoveSide(i)">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

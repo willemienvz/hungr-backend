@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { finalize, startWith, map } from 'rxjs/operators';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
@@ -11,6 +11,9 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption } from '../shared/special-types.constants';
+import { Observable } from 'rxjs';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-edit-special',
@@ -22,11 +25,7 @@ export class EditSpecialComponent implements OnInit {
   currentStep = 1;
   selectedSpecialType: number = 1;
   specialForm: FormGroup;
-  specialTypes = [
-    { id: 1, name: 'Weekly Special' },
-    { id: 2, name: 'Category special' },
-    { id: 3, name: 'Combo special' },
-  ];
+  specialTypes: SpecialTypeOption[] = SPECIAL_TYPE_OPTIONS;
   weekdays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   selectedDays: string[] = [];
   menus: Menu[] = [];
@@ -39,6 +38,12 @@ export class EditSpecialComponent implements OnInit {
   showSuccessPopup: boolean = false;
   successPopupMessage: string = '';
   specialData: any = null;
+
+  // Add new properties for autocomplete
+  menuItemAutocompleteControl = new FormControl('');
+  filteredMenuItems: Observable<any[]> = new Observable();
+  selectedMenuItem: any = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -60,8 +65,8 @@ export class EditSpecialComponent implements OnInit {
         percentage: [''],
         amount: ['', Validators.required],
         featureSpecialUnder: [''],
-        timeFrom: ['', Validators.required],
-        timeTo: ['', Validators.required],
+        timeFrom: ['00:00', Validators.required],
+        timeTo: ['00:00', Validators.required],
       },
       {
         validators: [dateRangeValidator(), timeRangeValidator()],
@@ -74,6 +79,7 @@ export class EditSpecialComponent implements OnInit {
     this.fetchSpecialData();
     this.fetchMenus();
     this.trackFormChanges();
+    this.setupMenuItemAutocomplete();
   }
 
   private trackFormChanges() {
@@ -233,42 +239,59 @@ export class EditSpecialComponent implements OnInit {
     const selectedType = this.selectedSpecialType;
 
     if (selectedType === 1) {
-      // Weekly Special
+      // Percentage Discount
+      const selectedItemName =
+        this.specialForm.get('typeSpecialDetails')?.value;
+      const percentage = this.specialForm.get('percentage')?.value;
+
+      if (selectedItemName && percentage) {
+        this.addedItems.push({ 
+          name: selectedItemName, 
+          amount: `${percentage}%` 
+        });
+        this.specialForm.get('typeSpecialDetails')?.reset();
+        this.specialForm.get('percentage')?.reset();
+      }
+    } else if (selectedType === 2) {
+      // Price Discount
       const selectedItemName =
         this.specialForm.get('typeSpecialDetails')?.value;
       const amount = this.specialForm.get('amount')?.value;
 
       if (selectedItemName && amount) {
-        this.addedItems.push({ name: selectedItemName, amount });
+        this.addedItems.push({ 
+          name: selectedItemName, 
+          amount: amount
+        });
         this.specialForm.get('typeSpecialDetails')?.reset();
         this.specialForm.get('amount')?.reset();
       }
-    } else if (selectedType === 2) {
+    } else if (selectedType === 4) {
       // Category Special
       const categoryName = this.specialForm.get('featureSpecialUnder')?.value;
-      const percentage = this.specialForm.get('percentage')?.value;
+      const amount = this.specialForm.get('amount')?.value;
 
-      if (categoryName && percentage) {
+      if (categoryName && amount) {
         this.addedItems.push({
           name: `Category: ${categoryName}`,
-          amount: `${percentage}%`,
+          amount: amount,
         });
         this.specialForm.get('featureSpecialUnder')?.reset();
-        this.specialForm.get('percentage')?.reset();
+        this.specialForm.get('amount')?.reset();
       }
     } else if (selectedType === 3) {
       // Combo Special
       const comboItems = this.specialForm.get('typeSpecialDetails')?.value; // Array of items
-      const comboPrice = this.specialForm.get('comboPrice')?.value;
+      const percentage = this.specialForm.get('percentage')?.value;
 
-      if (Array.isArray(comboItems) && comboItems.length > 0 && comboPrice) {
+      if (Array.isArray(comboItems) && comboItems.length > 0 && percentage) {
         const comboItemNames = comboItems.join(', ');
         this.addedItems.push({
           name: `Combo: ${comboItemNames}`,
-          amount: comboPrice,
+          amount: `${percentage}%`,
         });
         this.specialForm.get('typeSpecialDetails')?.reset();
-        this.specialForm.get('comboPrice')?.reset();
+        this.specialForm.get('percentage')?.reset();
       }
     }
     this.markAsChanged();
@@ -351,60 +374,10 @@ export class EditSpecialComponent implements OnInit {
   }
 
   nextStep() {
-    if (this.currentStep === 1) {
-      // Mark all required fields as touched to show validation errors
-      const controlsToCheck = [
-        'specialTitle',
-        'menu',
-        'typeSpecial',
-        'dateFrom',
-        'dateTo',
-      ];
-
-      let hasErrors = false;
-      controlsToCheck.forEach((controlName) => {
-        const control = this.specialForm.get(controlName);
-        control?.markAsTouched();
-        if (control?.invalid) {
-          hasErrors = true;
-        }
-      });
-
-      // Explicitly check that date fields have actual values (not empty strings)
-      const dateFrom = this.specialForm.get('dateFrom')?.value;
-      const dateTo = this.specialForm.get('dateTo')?.value;
-      
-      // Enhanced validation: check for null, undefined, empty string, or whitespace
-      if (!dateFrom || !dateTo || 
-          dateFrom.toString().trim() === '' || 
-          dateTo.toString().trim() === '') {
-        // Mark date fields as touched and invalid to show error messages
-        this.specialForm.get('dateFrom')?.markAsTouched();
-        this.specialForm.get('dateTo')?.markAsTouched();
-        this.specialForm.get('dateFrom')?.setErrors({ 'required': true });
-        this.specialForm.get('dateTo')?.setErrors({ 'required': true });
-        hasErrors = true;
-        
-        // Show user feedback
-        this.toastr.error('Please fill in both start date and end date before proceeding.');
-      }
-
-      // Check for form-level validation errors (like date range)
-      if (this.specialForm.errors?.['dateRangeInvalid']) {
-        hasErrors = true;
-        this.toastr.error('Start date must be before end date.');
-      }
-
-      // Prevent navigation if there are any errors
-      if (hasErrors) {
-        console.log('Form validation failed, preventing navigation to step 2');
-        return;
-      }
-
-      console.log('Form validation passed, proceeding to step 2');
+    if (this.currentStep < 5) {
+      this.currentStep++;
+      this.router.navigate([`/specials/edit-special/${this.specialId}/${this.currentStep}`], { replaceUrl: true });
     }
-
-    if (this.currentStep < 5) this.currentStep++;
   }
 
   // Method to check if Step 1 form is invalid
@@ -425,33 +398,96 @@ export class EditSpecialComponent implements OnInit {
   }
 
   previousStep() {
-    if (this.currentStep > 1) this.currentStep--;
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      this.router.navigate([`/specials/edit-special/${this.specialId}/${this.currentStep}`], { replaceUrl: true });
+    }
   }
 
   navigateToStep(step: number): void {
-    if (step < this.currentStep && step >= 1) {
+    if (step >= 1 && step <= 5) {
       this.currentStep = step;
+      this.router.navigate([`/specials/edit-special/${this.specialId}/${step}`], { replaceUrl: true });
     }
   }
 
   onSpecialTypeChange() {
     this.selectedSpecialType = this.specialForm.get('typeSpecial')?.value;
-  }
-
-  getSpecialTypeLabel(type: number): string {
-    switch (type) {
-      case 1:
-        return 'Weekly Special';
-      case 2:
-        return 'Category Special';
-      case 3:
-        return 'Combo Special';
-      default:
-        return 'Special Type';
-    }
+    
+    // Reset/clear all type-specific form controls when special type changes
+    this.specialForm.patchValue({
+      typeSpecialDetails: [],
+      comboPrice: '',
+      percentage: '',
+      amount: '',
+      featureSpecialUnder: ''
+    });
+    
+    // Clear autocomplete control
+    this.menuItemAutocompleteControl.setValue('');
+    this.selectedMenuItem = null;
+    
+    // Clear added items from previous type
+    this.addedItems = [];
   }
 
   onBackButtonClick() {
     this.navigateWithUnsavedChangesCheck('/specials');
+  }
+
+  isStep2Invalid(): boolean {
+    const timeFrom = this.specialForm.get('timeFrom')?.value;
+    const timeTo = this.specialForm.get('timeTo')?.value;
+    return (
+      this.selectedDays.length === 0 ||
+      !timeFrom ||
+      !timeTo ||
+      timeFrom.toString().trim() === '' ||
+      timeTo.toString().trim() === '' ||
+      this.specialForm.errors?.['timeRangeInvalid']
+    );
+  }
+
+  getSpecialTypeLabel(typeId: number): string {
+    const type = this.specialTypes.find(t => t.id === typeId);
+    return type ? type.name : 'Unknown Type';
+  }
+
+  private setupMenuItemAutocomplete() {
+    this.filteredMenuItems = this.menuItemAutocompleteControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filterMenuItems(value || ''))
+    );
+  }
+
+  private filterMenuItems(value: string): any[] {
+    if (!this.selectedMenu?.items) return [];
+    
+    const filterValue = typeof value === 'string' ? value.toLowerCase() : '';
+    return this.selectedMenu.items.filter(item =>
+      item.name.toLowerCase().includes(filterValue)
+    );
+  }
+
+  displayFn = (menuItem: any): string => {
+    return menuItem?.name || '';
+  }
+
+  onMenuItemSelected(event: MatAutocompleteSelectedEvent) {
+    const selectedItem = event.option.value;
+    if (selectedItem) {
+      this.selectedMenuItem = selectedItem;
+      this.specialForm.patchValue({
+        typeSpecialDetails: selectedItem.name
+      });
+      // Keep the selected item's name in the input
+      this.menuItemAutocompleteControl.setValue(selectedItem);
+    }
+  }
+
+  onMenuItemRemove() {
+    this.selectedMenuItem = null;
+    this.specialForm.get('typeSpecialDetails')?.setValue(null);
+    this.markAsChanged();
   }
 }

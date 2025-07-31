@@ -53,6 +53,9 @@
             <button *ngIf="!menuItem.displayDetails.side" type="button" class="toggle-btn" (click)="onToggleDetail('side')">
               + add side
             </button>
+            <button *ngIf="!menuItem.displayDetails.allergen" type="button" class="toggle-btn" (click)="onToggleDetail('allergen')">
+              + add allergen
+            </button>
           </div>
 
           <div class="header-actions">
@@ -253,17 +256,31 @@
         (removePairing)="onRemoveMenuItemPairing($event)">
       </app-menu-item-pairing>
 
-      <!-- KB: Use reusable detail component for side -->
-      <app-menu-item-detail
+      <!-- KB: Use enhanced side detail component with pricing support -->
+      <app-side-detail
         *ngIf="menuItem.displayDetails.side"
         [config]="sideConfig"
-        [items]="menuItem.sides"
-        [newItemValue]="newSide"
+        [sides]="menuItem.sides"
+        [newSideName]="newSideName"
+        [newSidePrice]="newSidePrice"
         (closeDetail)="onToggleDetail('side')"
-        (addItem)="onAddSide()"
-        (removeItem)="onRemoveSide($event)"
-        (newItemValueChange)="onNewSideChange($event)">
-      </app-menu-item-detail>
+        (addSide)="onAddSide($event)"
+        (removeSide)="onRemoveSide($event)"
+        (newSideNameChange)="onNewSideNameChange($event)"
+        (newSidePriceChange)="onNewSidePriceChange($event)">
+      </app-side-detail>
+
+      <!-- KB: Use allergen detail component -->
+      <app-allergen-detail
+        *ngIf="menuItem.displayDetails.allergen"
+        [config]="allergenConfig"
+        [allergens]="menuItem.allergens"
+        [newAllergen]="newAllergen"
+        (closeDetail)="onToggleDetail('allergen')"
+        (addAllergen)="onAddAllergen($event)"
+        (removeAllergen)="onRemoveAllergen($event)"
+        (newAllergenChange)="onNewAllergenChange($event)">
+      </app-allergen-detail>
 
     
     </div>

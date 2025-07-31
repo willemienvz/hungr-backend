@@ -1,0 +1,105 @@
+<div class="step1-container openTop">
+ 
+    <ng-content select="[header]"></ng-content>
+
+  <div class="block rowSpecial openTop">
+    <form [formGroup]="specialForm">
+      <div class="formGroup">
+        <p class="label">Special Title</p>
+        <input
+          type="text"
+          class="formControl"
+          formControlName="specialTitle"
+          placeholder="Enter special title"
+          required
+        />
+        <div
+          class="error-message"
+          *ngIf="specialForm.get('specialTitle')?.touched && specialForm.get('specialTitle')?.invalid"
+        >
+          Special Title is required.
+        </div>
+      </div>
+      <div class="formGroup">
+        <p class="label">Select Menu</p>
+        <mat-form-field subscriptSizing="dynamic" style="width: 100%;">
+          <mat-select
+            class="select-arrow-fix"
+            formControlName="menu"
+            (selectionChange)="onMenuChange()">
+            <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
+              {{ menu.menuName }}
+            </mat-option>
+          </mat-select>
+          <div
+            class="error-message"
+            *ngIf="specialForm.get('menu')?.touched && specialForm.get('menu')?.invalid"
+          >
+            Menu selection is required.
+          </div>
+        </mat-form-field>
+      </div>
+      <div class="formGroup">
+        <p class="label">Type of Special</p>
+        <mat-form-field subscriptSizing="dynamic" style="width: 100%;">
+          <mat-select
+            class="select-arrow-fix"
+            formControlName="typeSpecial"
+            (selectionChange)="onSpecialTypeChange()">
+            <mat-option *ngFor="let type of specialTypes" [value]="type.id">
+              {{ type.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div
+          class="error-message"
+          *ngIf="specialForm.get('typeSpecial')?.touched && specialForm.get('typeSpecial')?.invalid"
+        >
+          Type of special is required.
+        </div>
+      </div>
+      <div class="formGroup dateRow">
+       
+          <div class="col">
+            <p class="label">Start Date</p>
+            <input
+              type="date"
+              class="formControl"
+              formControlName="dateFrom"
+              placeholder="Start date"
+              required
+            />
+            <div
+              class="error-message"
+              *ngIf="specialForm.get('dateFrom')?.touched && (specialForm.get('dateFrom')?.invalid || !specialForm.get('dateFrom')?.value)"
+            >
+              Start date is required.
+            </div>
+          </div>
+          <div class="col">
+            <p class="label">End Date</p>
+            <input
+              type="date"
+              class="formControl"
+              formControlName="dateTo"
+              placeholder="End date"
+              required
+            />
+            <div
+              class="error-message"
+              *ngIf="specialForm.get('dateTo')?.touched && (specialForm.get('dateTo')?.invalid || !specialForm.get('dateTo')?.value)"
+            >
+              End date is required.
+            </div>
+ 
+        </div>
+        <div
+          *ngIf="specialForm.errors?.['dateRangeInvalid']"
+          class="error-message"
+        >
+          Start date must be before end date.
+        </div>
+      </div>
+    </form>
+  </div>
+</div> 
