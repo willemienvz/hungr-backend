@@ -1,0 +1,186 @@
+<div class="media-library-container">
+  <!-- Header Section -->
+  <app-content-block 
+    title="Media Library"
+    [showActions]="true"
+    [actions]="[{ label: '+ UPLOAD MEDIA', class: 'btnSecondary' }]"
+    (actionClick)="openUploadModal()">
+  </app-content-block>
+
+  <!-- Error Display -->
+  <div *ngIf="error" class="error-message">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Filters and Controls Section -->
+  <div class="controls-section">
+    <div class="controls-row">
+      <!-- Search Bar -->
+      <div class="search-container">
+        <div class="field-holder">
+          <label>Search media</label>
+          <input 
+            type="text" 
+            [formControl]="searchControl" 
+            placeholder="Search by name or description"
+            class="search-input">
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <!-- Category Filter -->
+        <div class="field-holder">
+          <label>Category</label>
+          <select [(value)]="selectedCategory" (change)="onCategoryChange($event)" class="filter-select">
+            <option value="">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category">
+              {{ category }}
+            </option>
+          </select>
+        </div>
+
+
+
+        <!-- Sort Options -->
+        <div class="field-holder">
+          <label>Sort By</label>
+          <select [(value)]="sortBy" (change)="onSortChange($event)" class="filter-select">
+            <option *ngFor="let option of sortOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Sort Order -->
+        <button mat-icon-button (click)="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; onSortChanged()" 
+                class="sort-order-btn" [attr.aria-label]="'Sort ' + (sortOrder === 'asc' ? 'descending' : 'ascending')">
+          <mat-icon>{{ sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+        </button>
+
+        <!-- Clear Filters -->
+        <button *ngIf="hasActiveFilters" mat-button (click)="clearFilters()" class="clear-filters-btn">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- View Toggle -->
+      <div class="view-controls">
+        <mat-button-toggle-group [(value)]="viewMode" (change)="changeViewMode($event)" class="view-toggle">
+          <mat-button-toggle value="grid" aria-label="Grid view">
+            <mat-icon>grid_view</mat-icon>
+            <span class="toggle-label">Grid</span>
+          </mat-button-toggle>
+          <mat-button-toggle value="list" aria-label="List view">
+            <mat-icon>view_list</mat-icon>
+            <span class="toggle-label">List</span>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media Display Section -->
+  <div class="media-content">
+    <ng-container *ngIf="!loading; else loadingTemplate">
+      <ng-container *ngIf="filteredMedia.length > 0; else emptyTemplate">
+        <!-- Grid View -->
+        <div *ngIf="viewMode === 'grid'" class="media-grid">
+          <div *ngFor="let media of filteredMedia" class="media-item">
+            <div class="media-thumbnail">
+              <img [src]="media.thumbnailUrl || media.url" [alt]="media.originalName" 
+                   (error)="onImageError($event)">
+              <div class="media-overlay">
+                <button mat-icon-button (click)="onMediaSelect(media)" 
+                        class="view-btn" aria-label="View media">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button (click)="onMediaDelete(media)" 
+                        class="delete-btn" aria-label="Delete media">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="media-info">
+              <h4 class="media-title" [title]="media.originalName">{{ media.originalName }}</h4>
+              <p class="media-meta">
+                <span class="file-size">{{ media.fileSize | fileSize }}</span>
+                <span class="upload-date">{{ media.uploadedAt | date:'short' }}</span>
+              </p>
+
+            </div>
+          </div>
+        </div>
+        
+        <!-- List View -->
+        <div *ngIf="viewMode === 'list'" class="media-list">
+          <div *ngFor="let media of filteredMedia" class="media-list-item">
+            <div class="list-thumbnail">
+              <img [src]="media.thumbnailUrl || media.url" [alt]="media.originalName" 
+                   (error)="onImageError($event)">
+            </div>
+            <div class="list-info">
+              <h4 class="list-title" [title]="media.originalName">{{ media.originalName }}</h4>
+              <p class="list-description" *ngIf="media.description">{{ media.description }}</p>
+              <div class="list-meta">
+                <span class="file-size">{{ media.fileSize | fileSize }}</span>
+                <span class="upload-date">{{ media.uploadedAt | date:'short' }}</span>
+                <span class="category" *ngIf="media.category">{{ media.category }}</span>
+              </div>
+
+            </div>
+            <div class="list-actions">
+              <button mat-icon-button (click)="onMediaSelect(media)" 
+                      class="view-btn" aria-label="View media">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button (click)="onMediaDelete(media)" 
+                      class="delete-btn" aria-label="Delete media">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container" *ngIf="totalItems > itemsPerPage">
+    <mat-paginator
+      [length]="totalItems"
+      [pageSize]="itemsPerPage"
+      [pageIndex]="currentPage - 1"
+      [pageSizeOptions]="[10, 20, 50, 100]"
+      (page)="onPageChange($event)"
+      aria-label="Select page">
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading media library...</p>
+  </div>
+</ng-template>
+
+<!-- Empty Template -->
+<ng-template #emptyTemplate>
+  <div class="empty-container">
+    <mat-icon class="empty-icon">image</mat-icon>
+    <h3>No media found</h3>
+    <p *ngIf="hasActiveFilters">
+      No media items match your current filters. 
+      <button mat-button color="primary" (click)="clearFilters()">Clear filters</button>
+    </p>
+    <p *ngIf="!hasActiveFilters">Upload your first image to get started</p>
+    <button mat-raised-button color="primary" (click)="openUploadModal()" class="upload-btn">
+      <mat-icon>add</mat-icon>
+      Upload Media
+    </button>
+  </div>
+</ng-template> 

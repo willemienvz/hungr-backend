@@ -1,0 +1,128 @@
+.menu-details-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      color: #666;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: #333;
+      }
+
+      i {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .status-section {
+    text-align: center;
+    margin-bottom: 24px;
+
+    .status-label {
+      font-size: 14px;
+      color: #666;
+      margin-right: 8px;
+    }
+
+    .status-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+
+  .modal-content {
+    margin-bottom: 24px;
+
+    .info-section {
+      margin-bottom: 20px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 12px 0;
+      }
+
+      .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .tag {
+          background-color: #f5f5f5;
+          color: #333;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 12px;
+          font-weight: 500;
+          border: 1px solid #e0e0e0;
+        }
+      }
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+
+    button {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+
+      &.btnTertiary {
+        background-color: #f5f5f5;
+        color: #333;
+        border: 1px solid #e0e0e0;
+
+        &:hover {
+          background-color: #e8e8e8;
+        }
+      }
+
+      &.btnPrimary {
+        background-color: #16D3D2;
+        color: white;
+
+        &:hover {
+          background-color: #14b8b7;
+        }
+      }
+    }
+  }
+} 

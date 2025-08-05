@@ -4,7 +4,9 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../shared/delete-confirmation-modal/delete-confirmation-modal.component';
+import { MenuDetailsModalComponent, MenuDetailsData } from '../shared/menu-details-modal/menu-details-modal.component';
 
 @Component({
   selector: 'app-menus',
@@ -22,7 +24,8 @@ export class MenusComponent implements OnInit{
   constructor(
     private firestore: AngularFirestore, 
     private toastr: ToastrService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {
   }
 
@@ -146,5 +149,28 @@ export class MenusComponent implements OnInit{
         console.log(error);
         this.isSaving = false;
       });
+  }
+
+  viewMenuDetails(menu: Menu) {
+    const data: MenuDetailsData = {
+      menu: menu
+    };
+
+    const dialogRef = this.dialog.open(MenuDetailsModalComponent, {
+      width: '500px',
+      panelClass: 'menu-details-modal-panel',
+      data: data
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'edit') {
+        // Navigate to edit page
+        this.router.navigate(['/menus/edit-menu', menu.menuID, 1]);
+      }
+    });
+  }
+
+  navigateToAddMenu() {
+    this.router.navigate(['/menus/add-menu/1']);
   }
 }

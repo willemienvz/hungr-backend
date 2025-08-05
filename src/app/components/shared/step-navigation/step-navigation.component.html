@@ -10,6 +10,9 @@
       <button *ngIf="showPublish" class="btnPrimary" (click)="onPublish()" [disabled]="isDisabled">
         PUBLISH MENU
       </button>
+      <button *ngIf="showSubmit" class="btnPrimary" (click)="onSubmit()" [disabled]="isDisabled">
+        {{ submitText }}
+      </button>
       <button *ngIf="showPrevious" class="btnPrimary" (click)="onPrevious()" [disabled]="isDisabled">
         Previous
       </button>

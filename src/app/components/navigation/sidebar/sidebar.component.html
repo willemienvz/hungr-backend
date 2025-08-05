@@ -38,6 +38,11 @@
     <a routerLink="/specials" routerLinkActive="activeMenu"
       ><i class="material-icons">sell</i>Specials</a
     >
+    <a routerLink="/media-library" routerLinkActive="activeMenu"
+      [routerLinkActiveOptions]="{ exact: false }"
+      [class.activeMenu]="isMediaLibraryRouteActive()"
+      ><i class="material-icons">photo_library</i>Media Library</a
+    >
     <a routerLink="/settings/branding" routerLinkActive="activeMenu"
       ><i class="material-icons">brush</i>Branding</a
     >

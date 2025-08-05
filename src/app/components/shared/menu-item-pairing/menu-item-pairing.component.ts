@@ -9,12 +9,24 @@ export interface PairingReference {
   name: string;
 }
 
+export interface PairingConfig {
+  title: string;
+  placeholder: string;
+  description?: string;
+  customHeading?: string; // Optional custom heading override
+}
+
 @Component({
   selector: 'app-menu-item-pairing',
   templateUrl: './menu-item-pairing.component.html',
   styleUrls: ['./menu-item-pairing.component.scss']
 })
 export class MenuItemPairingComponent implements OnInit, OnChanges {
+  @Input() config: PairingConfig = {
+    title: 'Pairings',
+    placeholder: 'Search and select menu items...',
+    description: 'Add menu items that pair well with this one.'
+  };
   @Input() availableMenuItems: MenuItemInterface[] = [];
   @Input() selectedPairingIds: string[] = [];
   @Input() currentMenuItemId: string = '';
@@ -22,6 +34,7 @@ export class MenuItemPairingComponent implements OnInit, OnChanges {
   @Output() closeDetail = new EventEmitter<void>();
   @Output() addPairing = new EventEmitter<string>();
   @Output() removePairing = new EventEmitter<string>();
+  @Output() customHeadingChange = new EventEmitter<string>();
 
   autocompleteControl = new FormControl('');
   filteredMenuItems: Observable<MenuItemInterface[]> = new Observable();
@@ -97,5 +110,9 @@ export class MenuItemPairingComponent implements OnInit, OnChanges {
 
   displayFn(menuItem: MenuItemInterface): string {
     return menuItem ? menuItem.name : '';
+  }
+
+  onCustomHeadingChange(value: string) {
+    this.customHeadingChange.emit(value);
   }
 } 

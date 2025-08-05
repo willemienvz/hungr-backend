@@ -1,0 +1,79 @@
+<div class="media-preview-dialog">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">Media Preview</h2>
+    <button type="button" class="close-btn" (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="dialog-content">
+    <!-- Image at the top -->
+    <div class="image-section">
+      <div class="image-container">
+        <img [src]="data.media.url" [alt]="data.media.originalName" class="media-image">
+      </div>
+    </div>
+
+    <!-- Information below -->
+    <div class="info-section">
+      <div class="info-grid">
+        <div class="info-item">
+          <label>File Name:</label>
+          <span>{{ data.media.originalName }}</span>
+        </div>
+        <div class="info-item">
+          <label>File Type:</label>
+          <span>{{ getFileTypeLabel() }}</span>
+        </div>
+        <div class="info-item">
+          <label>File Size:</label>
+          <span>{{ data.media.fileSize | fileSize }}</span>
+        </div>
+        <div class="info-item">
+          <label>Dimensions:</label>
+          <span>{{ getImageDimensions() }}</span>
+        </div>
+        <div class="info-item">
+          <label>Upload Date:</label>
+          <span>{{ data.media.uploadedAt | date:'medium' }}</span>
+        </div>
+        <div class="info-item" *ngIf="data.media.category">
+          <label>Category:</label>
+          <span>{{ data.media.category }}</span>
+        </div>
+      </div>
+
+      <div class="description-section" *ngIf="data.media.description">
+        <h3 class="section-title">Description</h3>
+        <p class="description">{{ data.media.description }}</p>
+      </div>
+
+      <div class="usage-section" *ngIf="data.media.usage.length > 0">
+        <h3 class="section-title">Currently Used In</h3>
+        <div class="usage-container">
+          <div *ngFor="let usage of data.media.usage" class="usage-item">
+            <span class="usage-component">{{ usage.componentName }}</span>
+            <span class="usage-type">{{ usage.componentType }}</span>
+          </div>
+        </div>
+        <p class="usage-warning">
+          <mat-icon>warning</mat-icon>
+          This media item is currently being used by other components. Deleting it will remove it from all components where it's being used.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="dialog-footer">
+    <button class="btnTertiary" (click)="onClose()">CLOSE</button>
+    <button 
+      class="btnDanger" 
+      (click)="onDelete()"
+      title="Delete this media item">
+      DELETE
+    </button>
+  </div>
+</div> 

@@ -8,5 +8,51 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if true;
     }
+    
+    // Reviews collection - specific rules for review data protection
+    match /reviews/{reviewId} {
+      allow read: if true; // Anyone can read reviews
+      allow create: if request.auth != null 
+        && request.auth.uid == resource.data.userId
+        && request.resource.data.rating >= 1 
+        && request.resource.data.rating <= 5
+        && (request.resource.data.comment == null || request.resource.data.comment.size() >= 10);
+      allow update: if request.auth != null 
+        && request.auth.uid == resource.data.userId
+        && request.resource.data.userId == resource.data.userId;
+      allow delete: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
+    }
+    
+    // Review stats collection
+    match /reviewStats/{menuItemId} {
+      allow read: if true;
+      allow write: if false; // Only updated by Cloud Functions
+    }
+    
+    // Media collection - rules for media library
+    match /media/{mediaId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.uploadedBy
+        && request.resource.data.fileName.size() > 0
+        && request.resource.data.originalName.size() > 0
+        && request.resource.data.fileSize > 0
+        && request.resource.data.fileSize <= 10485760 // 10MB max
+        && request.resource.data.mimeType.matches('image/.*');
+      allow update: if request.auth != null 
+        && request.auth.uid == resource.data.uploadedBy;
+      allow delete: if request.auth != null 
+        && request.auth.uid == resource.data.uploadedBy
+        && resource.data.usage.size() == 0; // Only allow deletion if not in use
+    }
+    
+    // Media usage collection - tracks where media is used
+    match /media_usage/{usageId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
   }
 } 

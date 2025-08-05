@@ -1,9 +1,10 @@
 <div class="inner-page">
-  <div class="block">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h6>QR Codes</h6>
-      <button class="btnSecondary" (click)="newQR.openPopup()">+ Create QR Code</button>
-    </div>
+  <app-content-block 
+    title="QR Codes"
+    [showActions]="true"
+    [actions]="[{ label: '+ Create QR Code', class: 'btnSecondary' }]"
+    (actionClick)="openAddQrModal()">
+    
     <p style="margin: 0 0 40px 0">
       QR codes allow customers to access your menus. Menus must be assigned QR
       codes to be accessible.
@@ -36,7 +37,7 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </app-content-block>
 </div>
 <app-add-qr #newQR [menus]="menus"></app-add-qr>
 <app-view-qr #viewQR></app-view-qr>

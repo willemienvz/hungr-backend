@@ -107,42 +107,7 @@
   }
 }
 
-// Specials Sections
-.specials-section {
-  width: 100%;
-  margin-bottom: 30px;
-  
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    
-    .section-title {
-      color: #181818;
-      font-family: "Poppins", sans-serif;
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-    }
-    
-    .filter-dropdown {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      
-      mat-select {
-        width: 150px;
-        font-family: "Poppins", sans-serif;
-      }
-      
-      .filter-icon {
-        color: #9a9a9a;
-        font-size: 20px;
-      }
-    }
-  }
-}
+
 // No Specials Message
 .no-specials {
   width: 100%;

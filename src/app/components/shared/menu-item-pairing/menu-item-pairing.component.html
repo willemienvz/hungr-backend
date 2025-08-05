@@ -2,10 +2,10 @@
 <div class="details-section">
   <div class="detail-header grid">
     <div class="header-title">
-      <h6>Pairings</h6>
+      <h6>{{ config.title }}</h6>
     </div>
     <div class="header-actions">
-      <p>Add menu items that pair well with this one.</p>
+      <p *ngIf="config.description">{{ config.description }}</p>
       <button type="button" class="toggle-btn" (click)="onCloseDetail()">
         <i class="material-icons">close</i>
       </button>
@@ -13,12 +13,26 @@
   </div>
 
     <div class="detail-content grid">
+    <!-- KB: Custom heading input field -->
+    <div class="custom-heading-input">
+      <div class="inputBox">
+        <input
+          placeholder="Custom heading (optional)"
+          type="text"
+          [ngModel]="config.customHeading"
+          (ngModelChange)="onCustomHeadingChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <label>Custom heading for this section</label>
+      </div>
+    </div>
+    
     <!-- Autocomplete input for selecting menu items -->
     <div class="add-input-group">
       <div class="inputBox">
         <input
           type="text"
-          placeholder="Search and select menu items..."
+          [placeholder]="config.placeholder"
           [formControl]="autocompleteControl"
           [matAutocomplete]="auto"
         />

@@ -1,5 +1,5 @@
 export const environment = {
-    menuUrl: 'http://localhost:5173/menu/',
+    menuUrl: 'http://localhost:5174/menu/',
     production: false,
     firebase: {
         apiKey: 'AIzaSyBVj2pm0X0eCulSfAF7WYC_EFEJNK7_35M',

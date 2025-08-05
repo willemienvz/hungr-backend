@@ -5,10 +5,12 @@ import { finalize } from 'rxjs';
 import { Branding } from '../../../shared/services/branding';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
-import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
 import { ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
+import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
+import { MediaLibraryService } from '../../../shared/services/media-library.service';
+import { MediaItem } from '../../../shared/types/media';
 
 import { BrandingPreviewMessage } from '../../../types/branding-preview';
 
@@ -25,6 +27,7 @@ export class BrandingComponent implements OnInit {
   user: any;
   OwnerID: string = '';
   brand: Branding[] = [];
+  brandingData: any = null; // Current branding data with media library integration
   menus: any[] = [];
   activeMenus: any[] = [];
   selectedMenuId: string = '';
@@ -92,7 +95,8 @@ export class BrandingComponent implements OnInit {
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
- 
+    private mediaUploadModalService: MediaUploadModalService,
+    private mediaLibraryService: MediaLibraryService
   ) {}
 
   ngOnInit() {
@@ -209,38 +213,25 @@ export class BrandingComponent implements OnInit {
   }
 
   openImageUploadModal() {
-    const config: ImageUploadConfig = {
-      title: 'Upload Logo',
-      formats: ['PNG', 'JPG'],
-      maxFileSize: 500, // 500KB
-      dimensions: '150x50',
-      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
-      allowMultiple: false,
-      maxFiles: 1
-    };
+    const dialogRef = this.mediaUploadModalService.openLogoUpload('branding');
 
-    console.log('Opening modal with imageUrl:', this.imageUrl);
-    const dialogRef = this.dialog.open(ImageUploadModalComponent, {
-      width: '600px',
-      panelClass: 'image-upload-modal-panel',
-      data: {
-        config: config,
-        currentImageUrl: this.imageUrl
-      }
-    });
-
-    dialogRef.afterClosed().subscribe((result: ImageUploadResult) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Modal result:', result);
       if (result) {
-        if (result.action === 'save') {
-          if (result.files && result.files.length > 0) {
-            // New file uploaded (take the first file since we only allow one)
-            console.log('Processing new file upload:', result.files[0]);
-            this.uploadImageToFirebase(result.files[0]);
-          } else if (result.imageUrls && result.imageUrls.length > 0) {
+        // Check if result is a MediaItem (direct result from media library)
+        if (result.id && result.url) {
+          // Direct MediaItem result from upload or selection
+          console.log('Processing MediaItem:', result);
+          this.onLogoUploaded(result);
+        } else if (result.action === 'save') {
+          if (result.mediaItem) {
+            // Legacy format with mediaItem property
+            console.log('Processing new media item:', result.mediaItem);
+            this.onLogoUploaded(result.mediaItem);
+          } else if (result.existingMediaUrl) {
             // Existing image kept (no new upload)
-            console.log('Keeping existing image:', result.imageUrls[0]);
-            this.imageUrl = result.imageUrls[0];
+            console.log('Keeping existing image:', result.existingMediaUrl);
+            this.imageUrl = result.existingMediaUrl;
             // Trigger preview mode for image changes
             this.triggerPreviewForImageChange();
           } else {
@@ -258,63 +249,38 @@ export class BrandingComponent implements OnInit {
     });
   }
 
-  private uploadImageToFirebase(file: File): void {
-    // Validate image dimensions before upload
-    const img = new Image();
-    const reader = new FileReader();
+  private async onLogoUploaded(mediaItem: MediaItem): Promise<void> {
+    try {
+      this.isSaving = true;
+      
+      // Update branding with media library reference
+      this.imageUrl = mediaItem.url;
+      
+      // Track usage in media library
+      await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
+        componentType: 'branding',
+        componentId: 'logo',
+        componentName: 'Branding',
+        usageDate: new Date(),
+        fieldName: 'logo'
+      });
 
-    reader.onload = (e: any) => {
-      img.src = e.target.result;
-
-      img.onload = () => {
-        const width = img.width;
-        const height = img.height;
-
-        const requiredWidth = 150;
-        const requiredHeight = 50;
-
-        if (width === requiredWidth && height === requiredHeight) {
-          this.performUpload(file);
-        } else {
-          this.toastr.error(
-            `Image must be exactly ${requiredWidth}px by ${requiredHeight}px. Your image is ${width}x${height}px.`
-          );
-        }
-      };
-    };
-
-    reader.readAsDataURL(file);
+      // Save the logo with media library integration
+      await this.saveLogoWithMediaLibrary(mediaItem);
+      
+      this.isSaving = false;
+      this.toastr.success('Logo uploaded successfully!');
+      
+      // Trigger preview mode for image changes
+      this.triggerPreviewForImageChange();
+    } catch (error) {
+      console.error('Error updating logo:', error);
+      this.isSaving = false;
+      this.toastr.error('Failed to update logo. Please try again.');
+    }
   }
 
-  private performUpload(file: File): void {
-    console.log('Starting upload for file:', file.name);
-    this.isSaving = true;
-    const filePath = `logos/${file.name}`;
-    const fileRef = this.storage.ref(filePath);
-    const uploadTask = this.storage.upload(filePath, file);
 
-    uploadTask
-      .snapshotChanges()
-      .pipe(
-        finalize(() => {
-          console.log('Upload completed, getting download URL...');
-          fileRef.getDownloadURL().subscribe((url) => {
-            if (url) {
-              console.log('Setting imageUrl to:', url);
-              this.imageUrl = url;
-              this.saveImageUrl(url);
-              this.isSaving = false;
-              this.toastr.success('Logo uploaded successfully!');
-            } else {
-              console.error('Failed to get download URL');
-              this.isSaving = false;
-              this.toastr.error('Failed to upload logo');
-            }
-          });
-        })
-      )
-      .subscribe();
-  }
 
   fetchBranding() {
     this.firestore
@@ -333,6 +299,39 @@ export class BrandingComponent implements OnInit {
 
   removeImg() {
     this.imageUrl = '';
+  }
+
+  // Enhanced method to remove logo with media library integration
+  async removeLogoWithMediaLibrary(): Promise<void> {
+    try {
+      this.isSaving = true;
+      
+      // Clear the image URL
+      this.imageUrl = '';
+      
+      // Update branding to remove media library reference
+      if (this.lastSavedDocId) {
+        await this.firestore
+          .collection('branding')
+          .doc(this.lastSavedDocId)
+          .update({
+            imageUrl: '',
+            logoMediaId: null,
+            parentID: this.OwnerID
+          });
+        console.log('Logo removed from branding with media library reference');
+      }
+      
+      this.isSaving = false;
+      this.toastr.success('Logo removed successfully!');
+      
+      // Trigger preview mode for image changes
+      this.triggerPreviewForImageChange();
+    } catch (error) {
+      console.error('Error removing logo:', error);
+      this.isSaving = false;
+      this.toastr.error('Failed to remove logo. Please try again.');
+    }
   }
 
   closeTooltip(tooltip: string) {
@@ -495,6 +494,51 @@ export class BrandingComponent implements OnInit {
     }
   }
 
+  // Enhanced method to save logo with media library integration
+  async saveLogoWithMediaLibrary(mediaItem: MediaItem): Promise<void> {
+    try {
+      const brandingData = { 
+        imageUrl: mediaItem.url, 
+        logoMediaId: mediaItem.id,
+        parentID: this.OwnerID 
+      };
+
+      if (this.lastSavedDocId) {
+        await this.firestore
+          .collection('branding')
+          .doc(this.lastSavedDocId)
+          .update(brandingData);
+        console.log('Logo with media library reference updated in Firestore');
+      } else {
+        const brandingRef = this.firestore.collection('branding', (ref) =>
+          ref.where('parentID', '==', this.OwnerID)
+        );
+        const querySnapshot = await brandingRef.get().toPromise();
+        
+        if (!querySnapshot || querySnapshot.empty) {
+          const docRef = await this.firestore
+            .collection('branding')
+            .add(brandingData);
+          console.log(
+            'Logo with media library reference saved to Firestore with new document ID:',
+            docRef.id
+          );
+          this.lastSavedDocId = docRef.id;
+        } else {
+          this.lastSavedDocId = querySnapshot.docs[0].id;
+          await this.firestore
+            .collection('branding')
+            .doc(this.lastSavedDocId)
+            .update(brandingData);
+          console.log('Logo with media library reference updated in existing Firestore document');
+        }
+      }
+    } catch (error) {
+      console.error('Error saving logo with media library:', error);
+      throw error;
+    }
+  }
+
   saveAll() {
     console.log('All changes saved');
   }
@@ -506,7 +550,7 @@ export class BrandingComponent implements OnInit {
     brandingRef
       .get()
       .toPromise()
-      .then((querySnapshot) => {
+      .then(async (querySnapshot) => {
         if (!querySnapshot || querySnapshot.empty) {
           // Handle the case where there is no existing branding data
           console.log('No existing branding data found.');
@@ -516,7 +560,23 @@ export class BrandingComponent implements OnInit {
           // Safely extract the first document, if it exists
           const brandingDoc = querySnapshot.docs[0];
           if (brandingDoc) {
-            const brandingData = brandingDoc.data();
+            const brandingData = brandingDoc.data() as any;
+            
+            // Handle media library integration for logo
+            if (brandingData.logoMediaId) {
+              try {
+                const mediaItem = await this.mediaLibraryService.getMediaById(brandingData.logoMediaId);
+                brandingData.logoMediaItem = mediaItem;
+                brandingData.imageUrl = mediaItem?.url; // Maintain backward compatibility
+              } catch (error) {
+                console.warn('Media item not found for branding logo:', error);
+                // Fallback to existing imageUrl if available
+                if (!brandingData.imageUrl) {
+                  brandingData.imageUrl = '';
+                }
+              }
+            }
+            
             this.loadBrandingSettings(brandingData);
             this.lastSavedDocId = brandingDoc.id; // Save the document ID for future updates
             console.log('Branding data loaded:', brandingData);
@@ -554,6 +614,10 @@ export class BrandingComponent implements OnInit {
 
   loadBrandingSettings(brandingData: any): void {
     console.log(brandingData);
+    
+    // Store the complete branding data for template access
+    this.brandingData = brandingData;
+    
     this.backgroundColor = brandingData?.backgroundColor ?? '#FFFFFF';
     this.primaryColor = brandingData?.primaryColor ?? '#000000';
     this.secondaryColor = brandingData?.secondaryColor ?? '#666666';

@@ -1,0 +1,45 @@
+<div class="menu-details-modal">
+  <!-- Header -->
+  <div class="modal-header">
+    <h6 class="modal-title">{{ data.menu.menuName }}</h6>
+    <button type="button" class="close-btn" (click)="onClose()">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
+
+  <!-- Status -->
+  <div class="status-section">
+    <span class="status-label">Status:</span>
+    <span class="status-value" [style.color]="getStatusColor()">{{ getStatusText() }}</span>
+  </div>
+
+  <!-- Content -->
+  <div class="modal-content">
+    <!-- Assigned to Restaurant(s) -->
+    <div class="info-section">
+      <h6 class="section-title">Assigned to Restaurant(s)</h6>
+      <div class="tags-container">
+        <span class="tag">{{ data.menu.location || 'Restaurant Name' }}</span>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="info-section">
+      <h6 class="section-title">Categories</h6>
+      <div class="tags-container">
+        <span class="tag" *ngFor="let category of data.menu.categories">{{ category.name }}</span>
+        <span class="tag" *ngIf="!data.menu.categories || data.menu.categories.length === 0">No categories</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="modal-actions">
+    <button type="button" class="btnTertiary" (click)="onClose()">
+      CLOSE
+    </button>
+    <button type="button" class="btnPrimary" (click)="onEdit()">
+      EDIT
+    </button>
+  </div>
+</div> 

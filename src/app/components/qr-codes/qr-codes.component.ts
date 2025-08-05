@@ -100,5 +100,8 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
 
+  openAddQrModal() {
+    this.addQrComponent.openPopup();
+  }
 
 }

@@ -121,36 +121,56 @@
 }
 .userTable{
     width: 100%;
-    margin-bottom: 25px;
     table{
         width: 100%;
-        table-layout: fixed;
         border-collapse: collapse;
-        thead {
-            border-bottom: 1px solid #444444;
-            tr{
-                border-bottom: 1px solid #444444;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-top: 1rem;
+
+        thead tr {
+            background: #f8f9fb;
+            th {
+                padding: 16px 20px;
+                text-align: left;
+                color: #9a9a9a;
+                font-family: "Poppins", sans-serif;
+                font-size: 13px;
+                font-weight: 400;
+                line-height: 140%;
+                letter-spacing: -0.013px;
+                border-bottom: 1px solid #e6e9ec;
             }
         }
-        td, th{
-            text-align: left;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            line-height: 1;
-            letter-spacing: -0.1%;
-            padding: 13px;
-        }
-        td{
-            color: #444444;
-            border-bottom: 1px solid #DEDEDE;
-        }
-        th{
-            color: #9A9A9A;
-            border-bottom: 1px solid #444444;
+
+        tbody {
+            tr {
+                border-bottom: 1px solid #e6e9ec;
+                transition: background-color 0.2s ease;
+                
+                &:hover { 
+                    background-color: #f8f9fb; 
+                }
+                
+                &:last-child { 
+                    border-bottom: none; 
+                }
+                
+                td {
+                    padding: 16px 20px;
+                    vertical-align: middle;
+                    color: #444444;
+                    font-family: "Poppins", sans-serif;
+                    font-size: 13px;
+                    font-weight: 500;
+                    line-height: 140%;
+                    letter-spacing: -0.013px;
+                }
+            }
         }
     } 
-
 }
 
 

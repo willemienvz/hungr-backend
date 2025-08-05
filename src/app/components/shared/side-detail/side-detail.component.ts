@@ -7,6 +7,7 @@ export interface SideDetailConfig {
   placeholder: string;
   description?: string;
   showPricing: boolean; // Whether to show price input for sides
+  customHeading?: string; // Optional custom heading override
 }
 
 @Component({
@@ -41,6 +42,9 @@ export class SideDetailComponent {
   
   /* KB: Event emitted when the new side price input value changes */
   @Output() newSidePriceChange = new EventEmitter<string>();
+  
+  /* KB: Event emitted when the custom heading changes */
+  @Output() customHeadingChange = new EventEmitter<string>();
 
   /* KB: Handle closing the detail section */
   onCloseDetail() {
@@ -80,6 +84,11 @@ export class SideDetailComponent {
   /* KB: Handle new side price input value changes */
   onNewSidePriceChange(value: string) {
     this.newSidePriceChange.emit(value);
+  }
+
+  /* KB: Handle custom heading changes */
+  onCustomHeadingChange(value: string) {
+    this.customHeadingChange.emit(value);
   }
 
   /* KB: Get display name for a side (handles both string and SideItem formats) */

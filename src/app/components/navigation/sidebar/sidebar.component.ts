@@ -45,6 +45,9 @@ private fetchUsers() {
     return this.currentRoute?.startsWith('/menus') || false;
   }
 
+  isMediaLibraryRouteActive(): boolean {
+    return this.currentRoute?.startsWith('/media-library') || false;
+  }
   
   isRestaurantRouteActive(): boolean {
     return this.currentRoute?.startsWith('/restaurants') || false;

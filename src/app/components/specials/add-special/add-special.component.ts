@@ -10,7 +10,10 @@ import { timeRangeValidator } from '../../../shared/validators/time-range-valida
 import { ToastrService } from 'ngx-toastr';
 import { of, Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
+import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
+import { MediaLibraryService } from '../../../shared/services/media-library.service';
+import { SpecialsService } from '../../../shared/services/specials.service';
+import { MediaItem } from '../../../shared/types/media';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption } from '../shared/special-types.constants';
@@ -45,6 +48,10 @@ export class AddSpecialComponent implements OnInit {
   filteredMenuItems: Observable<any[]> = new Observable();
   selectedMenuItem: any = null;
 
+  // Media library integration properties
+  selectedMediaItem: MediaItem | null = null;
+  mediaId: string | null = null;
+
   constructor(
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
@@ -52,7 +59,10 @@ export class AddSpecialComponent implements OnInit {
     private toastr: ToastrService,
     private dialog: MatDialog,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private mediaUploadModalService: MediaUploadModalService,
+    private mediaLibraryService: MediaLibraryService,
+    private specialsService: SpecialsService
   ) {
     this.specialForm = this.fb.group(
       {
@@ -257,70 +267,21 @@ export class AddSpecialComponent implements OnInit {
   }
 
   openImageUploadModal() {
-    const config: ImageUploadConfig = {
-      title: 'Upload Special Image',
-      formats: ['PNG', 'JPG'],
-      maxFileSize: 5000, // 5MB as per original requirement
-      dimensions: '1080x1080',
-      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
-      allowMultiple: false,
-      maxFiles: 1
-    };
+    const dialogRef = this.mediaUploadModalService.openSpecialImageUpload('new-special');
 
-    const dialogRef = this.dialog.open(ImageUploadModalComponent, {
-      width: '600px',
-      panelClass: 'image-upload-modal-panel',
-      data: {
-        config: config,
-        currentImageUrl: this.uploadedImageUrl
-      }
-    });
-
-    dialogRef.afterClosed().subscribe((result: ImageUploadResult) => {
-      if (result?.action === 'save' && result.files && result.files.length > 0) {
-        this.isSaving = true;
-        this.uploadImageToFirebase(result.files[0]);
-      } else if (result?.action === 'remove') {
-        this.uploadedImageUrl = null;
+    dialogRef.afterClosed().subscribe((result: MediaItem | undefined) => {
+      if (result) {
+        this.selectedMediaItem = result;
+        this.mediaId = result.id;
+        this.uploadedImageUrl = result.url;
+        this.uploadDone = true;
+        this.markAsChanged();
+        this.toastr.success('Image uploaded successfully!');
       }
     });
   }
 
-  uploadImageToFirebase(file: File) {
-    const filePath = `images/${file.name}`;
-    const fileRef = this.storage.ref(filePath);
-    const uploadTask = this.storage.upload(filePath, file);
-
-    uploadTask.percentageChanges().subscribe((progress) => {
-      this.imageUploadProgress = progress || 0;
-    });
-
-    uploadTask
-      .snapshotChanges()
-      .pipe(
-        finalize(() => {
-          fileRef.getDownloadURL().subscribe({
-            next: (url) => {
-              this.uploadedImageUrl = url;
-
-              this.uploadDone = true;
-              this.isSaving = false;
-              this.markAsChanged();
-            },
-            error: (err) => {
-              console.error('Failed to get download URL:', err);
-              this.isSaving = false;
-            },
-          });
-        }),
-        catchError((err) => {
-          console.error('Upload failed:', err);
-          this.isSaving = false;
-          return of();
-        })
-      )
-      .subscribe();
-  }
+  // Removed uploadImageToFirebase method - now handled by MediaLibraryService
 
   onSubmit() {
     this.isSaving = true;
@@ -331,28 +292,35 @@ export class AddSpecialComponent implements OnInit {
       selectedDays: this.selectedDays,
       imageUrl: this.uploadedImageUrl,
       OwnerID: this.owner,
-      specialID: '1',
       active: true,
       isDraft: false,
     };
 
-    this.firestore
-      .collection('specials')
-      .add(data)
-      .then((results) => {
-        const newData = {
-          ...data,
-          specialID: results.id,
-        };
-        this.firestore.collection('specials').doc(results.id).update(newData);
+    // Use the new SpecialsService with media library integration
+    this.specialsService.createSpecial(data, this.mediaId || undefined).subscribe({
+      next: (specialId) => {
+        // Track media usage if media was uploaded
+        if (this.mediaId) {
+          this.specialsService.trackMediaUsage(this.mediaId, specialId, 'image').subscribe({
+            next: () => {
+              console.log('Media usage tracked successfully');
+            },
+            error: (error) => {
+              console.warn('Failed to track media usage:', error);
+            }
+          });
+        }
+
         this.isSaving = false;
         this.markAsSaved();
         this.showSuccess('Special saved successfully!');
-      })
-      .catch((error) => {
-        console.error('Error saving to Firestore:', error);
+      },
+      error: (error) => {
+        console.error('Error saving special:', error);
         this.isSaving = false;
-      });
+        this.toastr.error('Failed to save special');
+      }
+    });
   }
 
   // Removed cancelUpload() method - handled by ImageUploadModalComponent

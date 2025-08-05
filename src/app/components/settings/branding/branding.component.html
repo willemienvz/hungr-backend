@@ -16,16 +16,36 @@
           >
             Upload Logo
           </a>
-          <!-- Debug: Current imageUrl = {{ imageUrl }} -->
+          
+          <!-- Logo Display with Media Library Integration -->
           <div *ngIf="imageUrl" class="imagePreview">
             <i
-              *ngIf="imageUrl"
               class="material-icons closeBtn"
-              (click)="removeImg()"
+              (click)="removeLogoWithMediaLibrary()"
+              title="Remove logo"
               >close</i
             >
             <img [src]="imageUrl" alt="Uploaded logo" />
+            
+            <!-- Media Library Info 
+            <div class="media-info" *ngIf="brandingData?.logoMediaItem">
+              <small class="media-source">From Media Library</small>
+              <div class="media-tags" *ngIf="brandingData.logoMediaItem.tags?.length">
+                <span class="tag" *ngFor="let tag of brandingData.logoMediaItem.tags">{{ tag }}</span>
+              </div>
+            </div>-->
           </div>
+        </div>
+
+        <!-- Logo Requirements -->
+        <div class="logo-requirements">
+          <p><strong>Logo Requirements:</strong></p>
+          <ul>
+            <li>Dimensions: Exactly 150x50 pixels</li>
+            <li>Format: PNG or JPG</li>
+            <li>Max size: 500KB</li>
+            <li>Transparent background recommended</li>
+          </ul>
         </div>
       </div>
 

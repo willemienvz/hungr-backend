@@ -35,6 +35,7 @@ import { ActionLandingComponent } from './components/action-landing/action-landi
 import { Step1Component } from './components/sign-up/step1/step1.component';
 import { Step2Component } from './components/sign-up/step2/step2.component';
 import { TestAuthComponent } from './components/test-auth/test-auth.component';
+import { MediaLibraryComponent } from './components/media-library/media-library.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -185,6 +186,11 @@ const routes: Routes = [
         path: 'specials',
         component: SpecialsLandingComponent,
         data: { title: 'Specials' },
+      },
+      {
+        path: 'media-library',
+        component: MediaLibraryComponent,
+        data: { title: 'Media Library' },
       },
       { path: 'help', component: HelpComponent, data: { title: 'Help' } },
       {

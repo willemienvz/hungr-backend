@@ -1,14 +1,12 @@
 <div class="inner-page">
-  <div class="block">
-    <div class="container">
-      <div class="row">
-        <h6 class="heading">Add a new menu</h6>
-        <a class="btnSecondary" routerLink="/menus/add-menu/1">+ add new menu</a>
-      </div>
-    </div>
-  </div>
-  <div class="block">
-    <h6>Menus</h6>
+  <app-content-block 
+    title="Add a new menu"
+    [showActions]="true"
+    [actions]="[{ label: '+ ADD NEW MENU', class: 'btnSecondary' }]"
+    (actionClick)="navigateToAddMenu()">
+  </app-content-block>
+  
+  <app-content-block title="Menus">
     <div class="userTable">
       <table>
         <thead>
@@ -39,10 +37,13 @@
               </div>
             </td>
             <td style="text-align: right" class="actionCol">
+              <a (click)="viewMenuDetails(menu)">
+                <i class="material-icons">visibility</i>
+              </a>
               <a [routerLink]="['/menus/edit-menu', menu.menuID, 1]">
                 <i class="material-icons">edit</i>
               </a>
-              <a (click)="deleteMenu(menu.menuID, menu.menuName)">
+              <a class="delete-link" (click)="deleteMenu(menu.menuID, menu.menuName)">
                 <i class="material-icons">delete</i>
               </a>
             </td>
@@ -50,8 +51,9 @@
         </tbody>
       </table>
     </div>
+  </app-content-block>
 
-    <h6>Menu Drafts</h6>
+  <app-content-block title="Menu Drafts">
     <div class="userTable">
       <table>
         <thead>
@@ -70,10 +72,13 @@
             <td>{{ menu.location }}</td>
             <td>Draft</td>
             <td style="text-align: right" class="actionCol">
+              <a (click)="viewMenuDetails(menu)">
+                <i class="material-icons">visibility</i>
+              </a>
               <a [routerLink]="['/menus/edit-menu', menu.menuID, 1]">
                 <i class="material-icons">edit</i>
               </a>
-              <a (click)="deleteMenu(menu.menuID, menu.menuName)">
+              <a class="delete-link" (click)="deleteMenu(menu.menuID, menu.menuName)">
                 <i class="material-icons">delete</i>
               </a>
             </td>
@@ -81,7 +86,7 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </app-content-block>
 </div>
 
 <app-loading [isLoading]="isSaving"></app-loading>

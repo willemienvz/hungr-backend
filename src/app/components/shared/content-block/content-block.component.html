@@ -1,0 +1,37 @@
+<div class="content-block" [ngClass]="customClass">
+  <div class="section-header" *ngIf="showHeader">
+    <h6 class="section-title">{{ title }}</h6>
+    
+    <div class="header-actions" *ngIf="showActions || showFilter">
+      <div class="filter-dropdown" *ngIf="showFilter && filterOptions.length > 0">
+        <mat-select 
+          [placeholder]="'Filter by'" 
+          [value]="selectedFilter"
+          (selectionChange)="onFilterChange($event.value)">
+          <mat-option 
+            *ngFor="let option of filterOptions" 
+            [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+        <mat-icon class="filter-icon">filter_list</mat-icon>
+      </div>
+      
+      <div class="action-buttons" *ngIf="showActions && actions.length > 0">
+        <a 
+          *ngFor="let action of actions"
+          class="action-btn"
+          [ngClass]="action.class"
+          [routerLink]="action.routerLink"
+          (click)="onActionClick(action)"
+          [style.cursor]="'pointer'">
+          {{ action.label }}
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="content-area">
+    <ng-content></ng-content>
+  </div>
+</div> 

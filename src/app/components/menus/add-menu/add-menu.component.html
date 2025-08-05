@@ -133,12 +133,15 @@
           [categories]="categories"
           [availableMenuItems]="menuItems"
           [newPreparation]="newPreparation"
+          [newPreparationPrice]="newPreparationPrice"
           [newVariation]="newVariation"
+          [newVariationPrice]="newVariationPrice"
           [newPairing]="newPairing"
           [newSideName]="newSideName"
           [newSidePrice]="newSidePrice"
           [newAllergen]="newAllergen"
           [newSauce]="newSauce"
+          [newSaucePrice]="newSaucePrice"
           [newLabel]="newLabel"
           (removeMenuItem)="removeMenuItem($event)"
           (toggleDetail)="toggleDetail($event.detailType, $event.itemIndex)"
@@ -162,13 +165,17 @@
 
           (getFile)="getFile($event)"
           (newPreparationChange)="newPreparation = $event"
+          (newPreparationPriceChange)="onNewPreparationPriceChange($event)"
           (newVariationChange)="newVariation = $event"
+          (newVariationPriceChange)="onNewVariationPriceChange($event)"
           (newPairingChange)="newPairing = $event"
           (newSideNameChange)="newSideName = $event"
           (newSidePriceChange)="newSidePrice = $event"
           (newAllergenChange)="newAllergen = $event"
           (newSauceChange)="newSauce = $event"
+          (newSaucePriceChange)="onNewSaucePriceChange($event)"
           (newLabelChange)="newLabel = $event"
+          (customHeadingChange)="onCustomHeadingChange($event)"
         ></app-menu-item-form>
       </div>
     </div>

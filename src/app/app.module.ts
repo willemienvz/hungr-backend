@@ -75,6 +75,12 @@ import { RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TestAuthComponent } from './components/test-auth/test-auth.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
@@ -105,6 +111,8 @@ import { MenuItemPairingComponent } from './components/shared/menu-item-pairing/
 import { SideDetailComponent } from './components/shared/side-detail/side-detail.component';
 import { AllergenDetailComponent } from './components/shared/allergen-detail/allergen-detail.component';
 import { ImageUploadModalComponent } from './components/shared/image-upload-modal/image-upload-modal.component';
+import { MediaUploadModalComponent } from './shared/components/media-upload-modal/media-upload-modal.component';
+import { MediaPreviewDialogComponent } from './shared/components/media-preview-dialog/media-preview-dialog.component';
 import { MenuCompletionSuccessComponent } from './components/shared/menu-completion-success/menu-completion-success.component';
 import { PriceInputComponent } from './shared/components/price-input/price-input.component';
 import { SpecialsTableComponent } from './components/specials/shared/specials-table/specials-table.component';
@@ -115,6 +123,10 @@ import { Step3SpecialDetailsComponent } from './components/specials/shared/speci
 import { Step4AddMediaComponent } from './components/specials/shared/special-form-steps/step4-add-media/step4-add-media.component';
 import { Step5OverviewComponent } from './components/specials/shared/special-form-steps/step5-overview/step5-overview.component';
 import { SpecialSummaryComponent } from './components/specials/shared/special-summary/special-summary.component';
+import { MenuDetailsModalComponent } from './components/shared/menu-details-modal/menu-details-modal.component';
+import { ContentBlockComponent } from './components/shared/content-block/content-block.component';
+import { MediaLibraryComponent } from './components/media-library/media-library.component';
+import { FileSizePipe } from './shared/pipes/file-size.pipe';
 
 @NgModule({
   declarations: [
@@ -200,6 +212,12 @@ import { SpecialSummaryComponent } from './components/specials/shared/special-su
     Step4AddMediaComponent,
     Step5OverviewComponent,
     SpecialSummaryComponent,
+    MenuDetailsModalComponent,
+    ContentBlockComponent,
+    MediaLibraryComponent,
+    FileSizePipe,
+    MediaUploadModalComponent,
+    MediaPreviewDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -228,6 +246,12 @@ import { SpecialSummaryComponent } from './components/specials/shared/special-su
     MatCheckboxModule,
     MatRadioModule,
     MatTabsModule,
+    MatButtonToggleModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatButtonModule,
+    MatMenuModule,
     DragDropModule,
     ColorPickerModule,
     MatTooltipModule,

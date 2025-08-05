@@ -13,30 +13,57 @@
   </div>
 
   <div class="detail-content grid">
+    <!-- KB: Custom heading input field -->
+    <div class="custom-heading-input">
+      <div class="inputBox">
+        <input
+          placeholder="Custom heading (optional)"
+          type="text"
+          [ngModel]="config.customHeading"
+          (ngModelChange)="onCustomHeadingChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <label>Custom heading for this section</label>
+      </div>
+    </div>
+    
     <!-- KB: Optional description text, only shown if provided in config -->
     
     <div class="add-input-group">
-
-        <div class="inputBox">
-            <input
-            [placeholder]="config.placeholder"
-            type="text"
-            [ngModel]="newItemValue"
-            (ngModelChange)="onNewItemValueChange($event)"
-            [ngModelOptions]="{ standalone: true }"
-            (keyup.enter)="onAddItem()"
-            />
-            <label>press enter to add</label>
-          </div>
-     
-
+      <div class="inputBox">
+        <input
+          [placeholder]="config.placeholder"
+          type="text"
+          [ngModel]="newItemValue"
+          (ngModelChange)="onNewItemValueChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          (keyup.enter)="onAddItem()"
+        />
+        <label>press enter to add</label>
+      </div>
+      
+      <!-- KB: Optional price input for items -->
+      <div *ngIf="config.showPricing" class="price-input-container">
+        <app-price-input
+          label=""
+          placeholder="R 0.00"
+          [required]="false"
+          [(ngModel)]="newItemPrice"
+          [ngModelOptions]="{ standalone: true }"
+          (keyup.enter)="onAddItem()"
+          class="compact">
+        </app-price-input>
+      </div>
     </div>
     <div class="item-list">
       <div
         class="item-tag"
         *ngFor="let item of items; let i = index"
       >
-        <span>{{ item }}</span>
+      <div class="item-tag-content">
+        <span>{{ getItemDisplayName(item) }}</span>
+        <span *ngIf="hasItemPrice(item)" class="item-price">+ {{ getItemDisplayPrice(item) }}</span>
+      </div>
         <button type="button" class="remove-btn" (click)="onRemoveItem(i)">
           <i class="material-icons">close</i>
         </button>

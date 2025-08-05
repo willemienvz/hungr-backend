@@ -1,0 +1,280 @@
+<div class="media-upload-modal-container" (click)="$event.stopPropagation()">
+  <!-- Header -->
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      {{ isLegacyMode ? 'Upload Images' : 'Media Library' }}
+    </h2>
+    <button mat-icon-button (click)="closeModal()" aria-label="Close modal">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="modal-content">
+    <!-- Tab Navigation -->
+    <mat-tab-group [(selectedIndex)]="activeTab" *ngIf="!isLegacyMode">
+      <!-- Upload New Tab -->
+      <mat-tab label="Upload New">
+        <div class="upload-section">
+          <!-- Drag and Drop Area -->
+          <div class="upload-area" 
+               [class.drag-over]="isDragOver"
+               [class.has-file]="selectedFile"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)"
+               (drop)="onFileDropped($event)">
+            
+            <div class="upload-prompt" *ngIf="!selectedFile">
+              <mat-icon>cloud_upload</mat-icon>
+              <h3>Drag and drop your image here</h3>
+              <p>or</p>
+              <button class="btnSecondary" (click)="fileInput.click()">
+                <mat-icon>add</mat-icon>
+                Choose File
+              </button>
+              <input #fileInput type="file" 
+                     accept="image/*" 
+                     (change)="onFileSelected($event)"
+                     style="display: none;">
+              
+              <!-- Validation Info -->
+              <div class="validation-info">
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                  <li>Formats: {{ formatString }}</li>
+                  <li>Max size: {{ validationConfig.maxFileSize / (1024*1024) }}MB</li>
+                  <li *ngIf="validationConfig.requiredDimensions">
+                    Dimensions: {{ validationConfig.requiredDimensions.width }}x{{ validationConfig.requiredDimensions.height }}px
+                  </li>
+                  <li *ngIf="!validationConfig.requiredDimensions">
+                    Max dimensions: {{ validationConfig.maxDimensions.width }}x{{ validationConfig.maxDimensions.height }}px
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- File Preview -->
+            <div class="file-preview" *ngIf="selectedFile">
+              <img [src]="previewUrl" [alt]="selectedFile.name" class="preview-image">
+              <div class="file-info">
+                <h4>{{ selectedFile.name }}</h4>
+                <p>{{ selectedFile.size | fileSize }}</p>
+                <p>{{ selectedFile.type }}</p>
+                <div class="dimension-info" *ngIf="imageDimensions">
+                  <p>Dimensions: {{ imageDimensions.width }}x{{ imageDimensions.height }}px</p>
+                </div>
+              </div>
+              <button mat-icon-button (click)="removeFile()" aria-label="Remove file">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Upload Form -->
+          <form [formGroup]="uploadForm" *ngIf="selectedFile" class="upload-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="category" (selectionChange)="onCategoryChange()">
+                <mat-option *ngFor="let category of categories" [value]="category">
+                  {{ category }}
+                </mat-option>
+                <mat-option value="custom">Custom Category</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" *ngIf="uploadForm.get('category')?.value === 'custom'">
+              <mat-label>Custom Category</mat-label>
+              <input matInput formControlName="customCategory">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+
+            <mat-slide-toggle formControlName="isPublic">
+              Make this media publicly accessible
+            </mat-slide-toggle>
+
+            <div class="form-actions">
+              <button class="btnTertiary" (click)="closeModal()">Cancel</button>
+              <button class="btnSecondary" 
+                      (click)="uploadMedia()"
+                      [disabled]="uploading || !uploadForm.valid">
+                <mat-spinner diameter="20" *ngIf="uploading"></mat-spinner>
+                {{ uploading ? 'Uploading...' : 'Upload' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Media Library Tab -->
+      <mat-tab label="Media Library">
+        <div class="media-library-section">
+          <!-- Search Bar -->
+          <div class="search-container">
+            <div class="field-holder">
+              <label>Search media library</label>
+              <input type="text" 
+                     [(ngModel)]="searchQuery"
+                     (input)="onSearchChange($any($event.target).value)"
+                     placeholder="Search by name or description..."
+                     class="search-input">
+            </div>
+          </div>
+
+          <!-- Media Grid -->
+          <div class="media-grid" *ngIf="!mediaLibraryLoading">
+            <div *ngFor="let media of mediaItems" 
+                 class="media-item"
+                 (click)="selectExistingMedia(media)">
+              <img [src]="media.thumbnailUrl || media.url" 
+                   [alt]="media.originalName"
+                   class="media-thumbnail">
+              <div class="media-info">
+                <h4>{{ media.originalName }}</h4>
+                <p>{{ media.fileSize | fileSize }}</p>
+                <p *ngIf="media.category">{{ media.category }}</p>
+              </div>
+              <div class="media-overlay">
+                <div class="overlay-content">
+                  <mat-icon class="overlay-icon">check_circle</mat-icon>
+                  <p class="overlay-text">Select Media</p>
+                  <p class="overlay-subtext">Click to use this media</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div class="loading-container" *ngIf="mediaLibraryLoading">
+            <mat-spinner></mat-spinner>
+            <p>Loading media library...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-container" *ngIf="!mediaLibraryLoading && mediaItems.length === 0">
+            <mat-icon>image</mat-icon>
+            <h3>No media found</h3>
+            <p>Upload your first image to get started</p>
+            <button class="btnSecondary" (click)="activeTab = 0">
+              Upload Media
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <!-- Legacy Mode Content -->
+    <div *ngIf="isLegacyMode" class="legacy-content">
+      <!-- Upload Info -->
+      <div class="upload-info">
+        <div class="info-row">
+          <span class="info-label">File formats:</span>
+          <span class="info-value">{{ formatString }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Size:</span>
+          <span class="info-value">{{ validationConfig.requiredDimensions ? 
+            validationConfig.requiredDimensions.width + 'x' + validationConfig.requiredDimensions.height : 
+            'Flexible' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Max file size:</span>
+          <span class="info-value">{{ validationConfig.maxFileSize / 1024 }}KB</span>
+        </div>
+      </div>
+
+      <!-- Upload Area -->
+      <div class="upload-area"
+           [class.drag-over]="isDragOver"
+           [class.has-images]="hasImages"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave($event)"
+           (drop)="onFileDropped($event)">
+        
+        <!-- Image Previews Grid -->
+        <div *ngIf="hasImages" class="images-grid">
+          <div *ngFor="let image of allImages" class="image-preview-item">
+            <img [src]="image.url" alt="Preview" />
+            <button type="button" 
+                    class="remove-image-btn" 
+                    (click)="onRemoveImage(image.index)"
+                    title="Remove image">
+              <mat-icon>close</mat-icon>
+            </button>
+            <div *ngIf="image.isNew" class="new-image-badge">New</div>
+          </div>
+          
+          <!-- Add More Button -->
+          <div class="add-more-item"
+               (click)="onUploadMedia()">
+            <mat-icon>add</mat-icon>
+            <p>Add Image</p>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!hasImages && !isDragOver" class="empty-state">
+          <div class="upload-placeholder">
+            <div class="placeholder-content">
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+              <p class="upload-text">Drag and drop your images here</p>
+              <p class="upload-subtext">or click upload media below</p>
+              <button type="button" 
+                      class="btnSecondary"
+                      (click)="onUploadMedia()"
+                      [disabled]="uploading">
+                <mat-icon>{{ uploading ? 'hourglass_empty' : 'add' }}</mat-icon>
+                {{ uploading ? 'Processing...' : 'UPLOAD MEDIA' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drag Overlay -->
+        <div *ngIf="isDragOver && !hasImages" class="drag-overlay">
+          <div class="drag-content">
+            <mat-icon>cloud_upload</mat-icon>
+            <p>Drop your images here</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden File Input -->
+      <input type="file"
+             #fileInput
+             style="display: none"
+             (change)="onFileSelected($event)"
+             [accept]="validationConfig.allowedTypes.join(',')"
+             [multiple]="false" />
+    </div>
+
+    <!-- Error Display -->
+    <div class="error-message" *ngIf="error">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Progress Bar -->
+    <mat-progress-bar 
+      *ngIf="uploading" 
+      [value]="uploadProgress" 
+      mode="determinate">
+    </mat-progress-bar>
+  </div>
+
+  <!-- Legacy Action Buttons -->
+  <div class="modal-buttons" *ngIf="isLegacyMode">
+    <button type="button" class="btnTertiary" (click)="closeModal()">
+      CANCEL
+    </button>
+    <button type="button" 
+            class="btnSecondary" 
+            (click)="uploadMedia()"
+            [disabled]="uploading || !selectedFile">
+      SAVE
+    </button>
+  </div>
+</div> 

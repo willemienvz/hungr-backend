@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
-import { MenuService, MenuItemInterface, SideItem } from '../shared/menu.service';
+import { MenuService, MenuItemInterface, SideItem, PreparationItem, VariationItem, SauceItem } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 
@@ -40,12 +40,15 @@ export class AddMenuComponent implements OnInit {
   draggedOver = false;
   fileToUpload: File | null = null;
   newPreparation: string = '';
+  newPreparationPrice: string = 'R 0.00';
   newVariation: string = '';
+  newVariationPrice: string = 'R 0.00';
   newPairing: string = '';
   newSideName: string = '';
   newSidePrice: string = 'R 0.00';
   newAllergen: string = '';
   newSauce: string = '';
+  newSaucePrice: string = 'R 0.00';
   categories: Category[] = [];
   restaurants: Restaurant[] = [];
   selectedRestaurant: string = '';
@@ -424,18 +427,46 @@ export class AddMenuComponent implements OnInit {
     this.markAsChanged();
   }
 
-  addPreparation(itemIndex: number): void {
-    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'preparations', this.newPreparation);
-    this.newPreparation = '';
+  addPreparation(data: {itemIndex: number, prepData: {name: string, price?: string}}): void {
+    const { itemIndex, prepData } = data;
+    
+    // Create preparation item - either string or PreparationItem object based on whether price is provided
+    let prepItem: string | PreparationItem;
+    if (prepData.price && prepData.price !== 'R 0.00') {
+      prepItem = {
+        name: prepData.name,
+        price: prepData.price
+      };
+    } else {
+      prepItem = prepData.name; // Backward compatibility - store as string
+    }
+    
+    // Add to preparations array
+    this.menuItems[itemIndex].preparations.push(prepItem);
+    this.markAsChanged();
   }
 
   removePreparation(itemIndex: number, prepIndex: number): void {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'preparations', prepIndex);
   }
 
-  addVariation(itemIndex: number): void {
-    this.menuItems = this.menuService.addToItemArray(this.menuItems, itemIndex, 'variations', this.newVariation);
-    this.newVariation = '';
+  addVariation(data: {itemIndex: number, variationData: {name: string, price?: string}}): void {
+    const { itemIndex, variationData } = data;
+    
+    // Create variation item - either string or VariationItem object based on whether price is provided
+    let variationItem: string | VariationItem;
+    if (variationData.price && variationData.price !== 'R 0.00') {
+      variationItem = {
+        name: variationData.name,
+        price: variationData.price
+      };
+    } else {
+      variationItem = variationData.name; // Backward compatibility - store as string
+    }
+    
+    // Add to variations array
+    this.menuItems[itemIndex].variations.push(variationItem);
+    this.markAsChanged();
   }
 
   removeVariation(itemIndex: number, variationIndex: number): void {
@@ -491,8 +522,22 @@ export class AddMenuComponent implements OnInit {
     this.menuItems = this.menuService.removeFromItemArray(this.menuItems, itemIndex, 'allergens', allergenIndex);
   }
 
-  addSauce(data: {itemIndex: number, sauceName: string}): void {
-    this.menuItems = this.menuService.addToItemArray(this.menuItems, data.itemIndex, 'sauces', data.sauceName);
+  addSauce(data: {itemIndex: number, sauceData: {name: string, price?: string}}): void {
+    const { itemIndex, sauceData } = data;
+    
+    // Create sauce item - either string or SauceItem object based on whether price is provided
+    let sauceItem: string | SauceItem;
+    if (sauceData.price && sauceData.price !== 'R 0.00') {
+      sauceItem = {
+        name: sauceData.name,
+        price: sauceData.price
+      };
+    } else {
+      sauceItem = sauceData.name; // Backward compatibility - store as string
+    }
+    
+    // Add to sauces array
+    this.menuItems[itemIndex].sauces.push(sauceItem);
     this.markAsChanged();
   }
 
@@ -678,5 +723,33 @@ export class AddMenuComponent implements OnInit {
 
   setAsPublished() {
     this.saveMenu();
+  }
+
+  // New price change methods for preparations, variations, and sauces
+  onNewPreparationPriceChange(value: string) {
+    this.newPreparationPrice = value;
+  }
+
+  onNewVariationPriceChange(value: string) {
+    this.newVariationPrice = value;
+  }
+
+  onNewSaucePriceChange(value: string) {
+    this.newSaucePrice = value;
+  }
+
+  onCustomHeadingChange(data: {detailType: 'preparation' | 'variation' | 'pairing' | 'side' | 'allergen' | 'sauce', itemIndex: number, heading: string}): void {
+    const { detailType, itemIndex, heading } = data;
+    
+    // Initialize customHeadings if it doesn't exist
+    if (!this.menuItems[itemIndex].customHeadings) {
+      this.menuItems[itemIndex].customHeadings = {};
+    }
+    
+    // Update the custom heading for the specific detail type
+    (this.menuItems[itemIndex].customHeadings as any)[detailType] = heading;
+    
+    // Mark as having unsaved changes
+    this.markAsChanged();
   }
 }

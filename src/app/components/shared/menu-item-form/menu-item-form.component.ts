@@ -5,8 +5,10 @@ import { DetailConfig, DetailType } from '../menu-item-detail/menu-item-detail.c
 import { SideDetailConfig } from '../side-detail/side-detail.component';
 import { AllergenDetailConfig } from '../allergen-detail/allergen-detail.component';
 import { MatDialog } from '@angular/material/dialog';
-import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../image-upload-modal/image-upload-modal.component';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../delete-confirmation-modal/delete-confirmation-modal.component';
+import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
+import { MediaLibraryService } from '../../../shared/services/media-library.service';
+import { MediaItem } from '../../../shared/types/media';
 
 @Component({
   selector: 'app-menu-item-form',
@@ -20,19 +22,22 @@ export class MenuItemFormComponent implements OnInit {
   @Input() categories: Category[] = [];
   @Input() availableMenuItems: MenuItemInterface[] = []; // All menu items for pairing selection
   @Input() newPreparation: string = '';
+  @Input() newPreparationPrice: string = 'R 0.00';
   @Input() newVariation: string = '';
+  @Input() newVariationPrice: string = 'R 0.00';
   @Input() newPairing: string = '';
   @Input() newSideName: string = '';
   @Input() newSidePrice: string = 'R 0.00';
   @Input() newAllergen: string = '';
   @Input() newLabel: string = '';
   @Input() newSauce: string = '';
+  @Input() newSaucePrice: string = 'R 0.00';
 
   @Output() removeMenuItem = new EventEmitter<number>();
   @Output() toggleDetail = new EventEmitter<{detailType: DetailType, itemIndex: number}>();
-  @Output() addPreparation = new EventEmitter<number>();
+  @Output() addPreparation = new EventEmitter<{itemIndex: number, prepData: {name: string, price?: string}}>();
   @Output() removePreparation = new EventEmitter<{itemIndex: number, prepIndex: number}>();
-  @Output() addVariation = new EventEmitter<number>();
+  @Output() addVariation = new EventEmitter<{itemIndex: number, variationData: {name: string, price?: string}}>();
   @Output() removeVariation = new EventEmitter<{itemIndex: number, variationIndex: number}>();
   @Output() addPairing = new EventEmitter<number>();
   @Output() removePairing = new EventEmitter<{itemIndex: number, pairingIndex: number}>();
@@ -42,7 +47,7 @@ export class MenuItemFormComponent implements OnInit {
   @Output() removeSide = new EventEmitter<{itemIndex: number, sideIndex: number}>();
   @Output() addAllergen = new EventEmitter<{itemIndex: number, allergenName: string}>();
   @Output() removeAllergen = new EventEmitter<{itemIndex: number, allergenIndex: number}>();
-  @Output() addSauce = new EventEmitter<{itemIndex: number, sauceName: string}>();
+  @Output() addSauce = new EventEmitter<{itemIndex: number, sauceData: {name: string, price?: string}}>();
   @Output() removeSauce = new EventEmitter<{itemIndex: number, sauceIndex: number}>();
   @Output() addLabel = new EventEmitter<number>();
   @Output() removeLabel = new EventEmitter<{itemIndex: number, labelIndex: number}>();
@@ -50,13 +55,19 @@ export class MenuItemFormComponent implements OnInit {
   // Removed @Output() priceInput - handled by PriceInputComponent directly
   @Output() getFile = new EventEmitter<number>();
   @Output() newPreparationChange = new EventEmitter<string>();
+  @Output() newPreparationPriceChange = new EventEmitter<string>();
   @Output() newVariationChange = new EventEmitter<string>();
+  @Output() newVariationPriceChange = new EventEmitter<string>();
   @Output() newPairingChange = new EventEmitter<string>();
   @Output() newSideNameChange = new EventEmitter<string>();
   @Output() newSidePriceChange = new EventEmitter<string>();
   @Output() newAllergenChange = new EventEmitter<string>();
   @Output() newLabelChange = new EventEmitter<string>();
   @Output() newSauceChange = new EventEmitter<string>();
+  @Output() newSaucePriceChange = new EventEmitter<string>();
+  
+  // Custom heading change events
+  @Output() customHeadingChange = new EventEmitter<{detailType: DetailType, itemIndex: number, heading: string}>();
 
   /* KB: Add loading state for image operations */
   isUploadingImage = false;
@@ -69,34 +80,41 @@ export class MenuItemFormComponent implements OnInit {
     title: 'Preparation',
     placeholder: 'Add a preparation',
     description: 'Add preparation options for patrons to choose from, for example grilled or fried fish.',
-    propertyName: 'preparations'
+    propertyName: 'preparations',
+    showPricing: true,
+    customHeading: ''
   };
 
   variationConfig: DetailConfig = {
     title: 'Variations',
     placeholder: 'Add a variation',
     description: 'Add variations of the menu item.',
-    propertyName: 'variations'
+    propertyName: 'variations',
+    showPricing: true,
+    customHeading: ''
   };
 
   pairingConfig: DetailConfig = {
     title: 'Pairings',
     placeholder: 'Add a pairing',
     description: 'Add menu items that will go well with this one.',
-    propertyName: 'pairings'
+    propertyName: 'pairings',
+    customHeading: ''
   };
 
   sideConfig: SideDetailConfig = {
     title: 'Sides',
     placeholder: 'Add a side',
     description: 'Add side options with optional pricing.',
-    showPricing: true
+    showPricing: true,
+    customHeading: ''
   };
 
   allergenConfig: AllergenDetailConfig = {
     title: 'Allergens',
     placeholder: 'Add an allergen',
-    description: 'Add allergen information for food safety and compliance.'
+    description: 'Add allergen information for food safety and compliance.',
+    customHeading: ''
   };
 
   labelConfig: DetailConfig = {
@@ -110,12 +128,16 @@ export class MenuItemFormComponent implements OnInit {
     title: 'Sauces',
     placeholder: 'Add a sauce',
     description: 'Add sauce options for this menu item, e.g., tartar, aioli, peri-peri.',
-    propertyName: 'sauces'
+    propertyName: 'sauces',
+    showPricing: true,
+    customHeading: ''
   };
 
   constructor(
     private menuService: MenuService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private mediaUploadModalService: MediaUploadModalService,
+    private mediaLibraryService: MediaLibraryService
   ) {}
 
   ngOnInit() {
@@ -130,6 +152,9 @@ export class MenuItemFormComponent implements OnInit {
                      !this.menuItem.imageUrl;
     
     this.isCollapsed = !isNewItem;
+    
+    // Initialize custom headings from menuItem
+    this.updateConfigCustomHeadings();
     
     // Debug: Log current category assignment if it exists
     if (this.menuItem.categoryId) {
@@ -215,16 +240,16 @@ export class MenuItemFormComponent implements OnInit {
     this.toggleDetail.emit({detailType, itemIndex: this.itemIndex});
   }
 
-  onAddPreparation() {
-    this.addPreparation.emit(this.itemIndex);
+  onAddPreparation(prepData: {name: string, price?: string}) {
+    this.addPreparation.emit({itemIndex: this.itemIndex, prepData});
   }
 
   onRemovePreparation(prepIndex: number) {
     this.removePreparation.emit({itemIndex: this.itemIndex, prepIndex});
   }
 
-  onAddVariation() {
-    this.addVariation.emit(this.itemIndex);
+  onAddVariation(variationData: {name: string, price?: string}) {
+    this.addVariation.emit({itemIndex: this.itemIndex, variationData});
   }
 
   onRemoveVariation(variationIndex: number) {
@@ -263,8 +288,8 @@ export class MenuItemFormComponent implements OnInit {
     this.removeAllergen.emit({itemIndex: this.itemIndex, allergenIndex});
   }
 
-  onAddSauce(sauceName: string) {
-    this.addSauce.emit({itemIndex: this.itemIndex, sauceName});
+  onAddSauce(sauceData: {name: string, price?: string}) {
+    this.addSauce.emit({itemIndex: this.itemIndex, sauceData});
   }
 
   onRemoveSauce(sauceIndex: number) {
@@ -289,69 +314,64 @@ export class MenuItemFormComponent implements OnInit {
 
   onGetFile() {
     /* KB: Open image upload modal for multiple image upload */
-    const config: ImageUploadConfig = {
-      title: 'Upload Images',
-      formats: ['PNG', 'JPG'],
-      maxFileSize: 500,
-      dimensions: '1080x1080',
-      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
-      allowMultiple: true,
-      maxFiles: 3
-    };
+    const dialogRef = this.mediaUploadModalService.openMenuItemImageUploadWithLibrary(
+      this.menuItem.itemId || 'new',
+      false // Start with upload tab, but media library tab is also available
+    );
 
     // Initialize imageUrls array if it doesn't exist (backward compatibility)
     if (!this.menuItem.imageUrls) {
       this.menuItem.imageUrls = this.menuItem.imageUrl ? [this.menuItem.imageUrl] : [];
     }
 
-    const data: ImageUploadData = {
-      config,
-      currentImageUrls: this.menuItem.imageUrls
-    };
-
-    const dialogRef = this.dialog.open(ImageUploadModalComponent, {
-      width: '650px',
-      data,
-      disableClose: true,
-      panelClass: 'image-upload-modal-panel'
-    });
-
-    dialogRef.afterClosed().subscribe((result: ImageUploadResult) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result?.action === 'save') {
         // Handle new files
-        if (result.files && result.files.length > 0) {
+        if (result.mediaItems && result.mediaItems.length > 0) {
           this.isUploadingImage = true;
-          this.uploadMultipleImages(result.files, result.imageUrls || []);
+          this.onMenuImagesUploaded(result.mediaItems);
         }
         // Handle existing images only
-        else if (result.imageUrls) {
-          this.menuItem.imageUrls = [...result.imageUrls];
+        else if (result.existingMediaUrls) {
+          this.menuItem.imageUrls = [...result.existingMediaUrls];
           // Update legacy imageUrl for backward compatibility
           this.menuItem.imageUrl = this.menuItem.imageUrls.length > 0 ? this.menuItem.imageUrls[0] : null;
         }
       } else if (result?.action === 'remove') {
         this.removeAllImages();
+      } else if (result && !result.action) {
+        // Handle single media item selection from library
+        if (result.id && result.url) {
+          this.isUploadingImage = true;
+          this.onMenuImagesUploaded([result]);
+        }
       }
     });
   }
 
-  private async uploadMultipleImages(files: File[], existingUrls: string[]) {
+  private async onMenuImagesUploaded(mediaItems: MediaItem[]): Promise<void> {
     try {
-      // Start with existing URLs
-      const newUrls = [...existingUrls];
-
-      // Upload each file
-      for (const file of files) {
-        const uploadedUrl = await this.menuService.uploadMenuItemImage(file);
-        newUrls.push(uploadedUrl);
+      this.isUploadingImage = true;
+      
+      // Update menu item with media library references
+      const newUrls = mediaItems.map(item => item.url);
+      this.menuItem.imageUrls = newUrls;
+      this.menuItem.imageUrl = newUrls.length > 0 ? newUrls[0] : null;
+      
+      // Track usage in media library
+      for (const mediaItem of mediaItems) {
+        await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
+          componentType: 'menuItem',
+          componentId: this.menuItem.itemId || 'new',
+          componentName: 'Menu Item',
+          usageDate: new Date(),
+          fieldName: 'images'
+        });
       }
 
-      this.menuItem.imageUrls = newUrls;
-      // Update legacy imageUrl for backward compatibility
-      this.menuItem.imageUrl = newUrls.length > 0 ? newUrls[0] : null;
       this.isUploadingImage = false;
     } catch (error) {
-      console.error('Error uploading multiple images:', error);
+      console.error('Error updating menu images:', error);
       this.isUploadingImage = false;
     }
   }
@@ -456,5 +476,38 @@ export class MenuItemFormComponent implements OnInit {
 
   onNewSauceChange(value: string) {
     this.newSauceChange.emit(value);
+  }
+
+  onNewPreparationPriceChange(value: string) {
+    this.newPreparationPriceChange.emit(value);
+  }
+
+  onNewVariationPriceChange(value: string) {
+    this.newVariationPriceChange.emit(value);
+  }
+
+  onNewSaucePriceChange(value: string) {
+    this.newSaucePriceChange.emit(value);
+  }
+
+  // Custom heading change handlers
+  onCustomHeadingChange(detailType: DetailType, heading: string) {
+    this.customHeadingChange.emit({
+      detailType,
+      itemIndex: this.itemIndex,
+      heading
+    });
+  }
+
+  // Update config custom headings from menuItem
+  private updateConfigCustomHeadings() {
+    if (this.menuItem?.customHeadings) {
+      this.preparationConfig.customHeading = this.menuItem.customHeadings.preparation || '';
+      this.variationConfig.customHeading = this.menuItem.customHeadings.variation || '';
+      this.pairingConfig.customHeading = this.menuItem.customHeadings.pairing || '';
+      this.sideConfig.customHeading = this.menuItem.customHeadings.side || '';
+      this.allergenConfig.customHeading = this.menuItem.customHeadings.allergen || '';
+      this.saucesConfig.customHeading = this.menuItem.customHeadings.sauce || '';
+    }
   }
 } 

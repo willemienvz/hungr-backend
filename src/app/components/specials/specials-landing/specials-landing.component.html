@@ -1,6 +1,6 @@
 <div class="container">
   <!-- Header Section -->
-  <div class="header-section">
+  <div class="header-section block">
     <div class="header-content">
       <h6 class="add-special-text">Add a special</h6>
       <a class="btnSecondary add-special-btn" routerLink="/specials/add-new-special">
@@ -8,6 +8,8 @@
       </a>
     </div>
   </div>
+
+
 
   <!-- Key Metrics Dashboard -->
   <div class="metrics-dashboard" *ngIf="metrics">
@@ -57,19 +59,16 @@
   </div>
 
   <!-- Active Specials Section -->
-  <div class="specials-section">
-    <div class="section-header">
-      <h6 class="section-title">Active Specials</h6>
-      <div class="filter-dropdown">
-        <mat-select placeholder="Filter by" (selectionChange)="onFilterChange($event.value)">
-          <mat-option value="all">All</mat-option>
-          <mat-option value="weekly">Weekly Special</mat-option>
-          <mat-option value="category">Category Special</mat-option>
-          <mat-option value="combo">Combo Special</mat-option>
-        </mat-select>
-        <mat-icon class="filter-icon">filter_list</mat-icon>
-      </div>
-    </div>
+  <app-content-block 
+    title="Active Specials"
+    [showFilter]="true"
+    [filterOptions]="[
+      { value: 'all', label: 'All' },
+      { value: 'weekly', label: 'Weekly Special' },
+      { value: 'category', label: 'Category Special' },
+      { value: 'combo', label: 'Combo Special' }
+    ]"
+    (filterChange)="onFilterChange($event)">
     
     <app-specials-table
       [specials]="activeSpecials"
@@ -77,33 +76,25 @@
       (toggleStatus)="toggleSpecialStatus($event.special, $event.index)"
       (deleteSpecial)="deleteSpecial($event.specialId, $event.index)">
     </app-specials-table>
-  </div>
+  </app-content-block>
 
   <!-- Inactive Specials Section -->
-  <div class="specials-section">
-    <div class="section-header">
-      <h6 class="section-title">Inactive Specials</h6>
-    </div>
-    
+  <app-content-block title="Inactive Specials">
     <app-specials-table
       [specials]="inactiveSpecials"
       tableType="inactive"
       (toggleStatus)="toggleSpecialStatus($event.special, $event.index)"
       (deleteSpecial)="deleteSpecial($event.specialId, $event.index)">
     </app-specials-table>
-  </div>
+  </app-content-block>
 
   <!-- Drafts Section -->
-  <div class="specials-section">
-    <div class="section-header">
-      <h6 class="section-title">Drafts</h6>
-    </div>
-    
+  <app-content-block title="Drafts">
     <app-specials-table
       [specials]="draftSpecials"
       tableType="draft"
       [showToggle]="false"
       (deleteSpecial)="deleteSpecial($event.specialId, $event.index)">
     </app-specials-table>
-  </div>
+  </app-content-block>
 </div>

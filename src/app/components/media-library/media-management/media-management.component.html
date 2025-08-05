@@ -1,0 +1,238 @@
+<div class="media-management-container">
+  <div class="header">
+    <h1>Media Management</h1>
+    <p>Manage your media library with advanced analytics, bulk operations, and cleanup tools.</p>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading media management data...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="error-container">
+    <mat-icon>error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="loadAnalytics()">
+      Retry
+    </button>
+  </div>
+
+  <!-- Main content -->
+  <div *ngIf="!loading && !error" class="content">
+    <!-- Tab navigation -->
+    <mat-tab-group [(selectedIndex)]="activeTab" (selectedIndexChange)="onTabChange($event)">
+      
+      <!-- Analytics Tab -->
+      <mat-tab label="Analytics">
+        <div class="tab-content">
+          <div *ngIf="analytics" class="analytics-grid">
+            
+            <!-- Overview Cards -->
+            <div class="overview-cards">
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <div class="stat-value">{{ analytics.totalFiles }}</div>
+                  <div class="stat-label">Total Files</div>
+                </mat-card-content>
+              </mat-card>
+
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <div class="stat-value">{{ formatFileSize(analytics.totalSize) }}</div>
+                  <div class="stat-label">Total Size</div>
+                </mat-card-content>
+              </mat-card>
+
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <div class="stat-value">{{ formatFileSize(analytics.averageFileSize) }}</div>
+                  <div class="stat-label">Average File Size</div>
+                </mat-card-content>
+              </mat-card>
+
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <div class="stat-value">{{ formatPercentage(analytics.storageUsage.usagePercentage) }}</div>
+                  <div class="stat-label">Storage Used</div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <!-- Usage Statistics -->
+            <div class="usage-statistics">
+              <h3>Usage Statistics</h3>
+              
+              <div class="stat-section">
+                <h4>Most Used Files</h4>
+                <div class="media-list">
+                  <div *ngFor="let media of analytics.usageStatistics.mostUsed" class="media-item">
+                    <img [src]="media.thumbnailUrl || media.url" [alt]="media.fileName" class="media-thumbnail">
+                    <div class="media-info">
+                      <div class="media-name">{{ media.fileName }}</div>
+                      <div class="media-size">{{ formatFileSize(media.fileSize) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stat-section">
+                <h4>Unused Files</h4>
+                <div class="media-list">
+                  <div *ngFor="let media of analytics.usageStatistics.unusedFiles" class="media-item">
+                    <img [src]="media.thumbnailUrl || media.url" [alt]="media.fileName" class="media-thumbnail">
+                    <div class="media-info">
+                      <div class="media-name">{{ media.fileName }}</div>
+                      <div class="media-size">{{ formatFileSize(media.fileSize) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- File Type Distribution -->
+            <div class="file-type-distribution">
+              <h3>File Type Distribution</h3>
+              <div class="distribution-chart">
+                <div *ngFor="let type of getFileTypes()" class="type-item">
+                  <div class="type-name">{{ type }}</div>
+                  <div class="type-count">{{ analytics.fileTypeDistribution[type] }}</div>
+                  <div class="type-bar">
+                    <div class="type-bar-fill" [style.width.%]="getTypePercentage(type)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Distribution -->
+            <div class="category-distribution">
+              <h3>Category Distribution</h3>
+              <div class="distribution-chart">
+                <div *ngFor="let category of getCategories()" class="category-item">
+                  <div class="category-name">{{ category }}</div>
+                  <div class="category-count">{{ analytics.categoryDistribution[category] }}</div>
+                  <div class="category-bar">
+                    <div class="category-bar-fill" [style.width.%]="getCategoryPercentage(category)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Bulk Operations Tab -->
+      <mat-tab label="Bulk Operations">
+        <div class="tab-content">
+          <div class="bulk-operations">
+            
+            <!-- Selection Controls -->
+            <div class="selection-controls">
+              <div class="selection-info">
+                <span *ngIf="selectedMedia.length > 0">
+                  {{ selectedMedia.length }} items selected
+                </span>
+                <span *ngIf="selectedMedia.length === 0">
+                  No items selected
+                </span>
+              </div>
+              
+              <div class="selection-actions">
+                <button mat-button (click)="onSelectAll()">
+                  Select All
+                </button>
+                <button mat-button (click)="onClearSelection()">
+                  Clear Selection
+                </button>
+              </div>
+            </div>
+
+            <!-- Bulk Operation Buttons -->
+            <div class="bulk-actions">
+              <button mat-raised-button color="warn" 
+                      [disabled]="selectedMedia.length === 0 || bulkOperationInProgress"
+                      (click)="onBulkDelete()">
+                <mat-icon>delete</mat-icon>
+                Delete Selected
+              </button>
+
+              <button mat-raised-button color="primary" 
+                      [disabled]="selectedMedia.length === 0 || bulkOperationInProgress"
+                      (click)="onBulkCategorize()">
+                <mat-icon>category</mat-icon>
+                Categorize Selected
+              </button>
+
+
+            </div>
+
+            <!-- Progress Bar -->
+            <div *ngIf="bulkOperationInProgress" class="progress-container">
+              <mat-progress-bar mode="determinate" [value]="bulkOperationProgress"></mat-progress-bar>
+              <p>Processing bulk operation...</p>
+            </div>
+
+            <!-- Selected Media List -->
+            <div *ngIf="selectedMedia.length > 0" class="selected-media">
+              <h3>Selected Media</h3>
+              <div class="media-grid">
+                <div *ngFor="let media of selectedMedia" class="media-card">
+                  <img [src]="media.thumbnailUrl || media.url" [alt]="media.fileName" class="media-image">
+                  <div class="media-details">
+                    <div class="media-name">{{ media.fileName }}</div>
+                    <div class="media-size">{{ formatFileSize(media.fileSize) }}</div>
+                    <div class="media-category" *ngIf="media.category">{{ media.category }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Cleanup Tab -->
+      <mat-tab label="Cleanup">
+        <div class="tab-content">
+          <div class="cleanup-tools">
+            
+            <div class="tool-section">
+              <h3>Storage Optimization</h3>
+              <p>Optimize your storage by compressing large files and generating better thumbnails.</p>
+              <button mat-raised-button color="primary" 
+                      [disabled]="loading"
+                      (click)="onOptimizeStorage()">
+                <mat-icon>storage</mat-icon>
+                Optimize Storage
+              </button>
+            </div>
+
+            <div class="tool-section">
+              <h3>Orphaned Files Cleanup</h3>
+              <p>Remove files that exist in storage but are not referenced in the database.</p>
+              <button mat-raised-button color="warn" 
+                      [disabled]="loading"
+                      (click)="onCleanupOrphanedFiles()">
+                <mat-icon>cleaning_services</mat-icon>
+                Cleanup Orphaned Files
+              </button>
+            </div>
+
+            <div class="tool-section">
+              <h3>Storage Analytics</h3>
+              <div *ngIf="analytics" class="storage-analytics">
+                <div class="storage-bar">
+                  <div class="storage-used" [style.width.%]="analytics.storageUsage.usagePercentage"></div>
+                </div>
+                <div class="storage-info">
+                  <span>{{ formatFileSize(analytics.storageUsage.totalUsed) }} used</span>
+                  <span>{{ formatFileSize(analytics.storageUsage.totalAvailable) }} available</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div> 

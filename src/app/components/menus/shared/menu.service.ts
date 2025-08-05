@@ -16,6 +16,24 @@ export interface SideItem {
   allergens?: string[]; // Optional allergen list for this specific side
 }
 
+/* KB: Interface for preparation items with optional pricing */
+export interface PreparationItem {
+  name: string;
+  price?: string; // Optional price in same format as main item price (R 0.00)
+}
+
+/* KB: Interface for variation items with optional pricing */
+export interface VariationItem {
+  name: string;
+  price?: string; // Optional price in same format as main item price (R 0.00)
+}
+
+/* KB: Interface for sauce items with optional pricing */
+export interface SauceItem {
+  name: string;
+  price?: string; // Optional price in same format as main item price (R 0.00)
+}
+
 export interface MenuItemInterface {
   itemId: string;
   categoryId: number | null;
@@ -24,8 +42,8 @@ export interface MenuItemInterface {
   price: string;
   imageUrl: string | null; // Keep for backward compatibility
   imageUrls: string[]; // New array for multiple images
-  preparations: string[];
-  variations: string[];
+  preparations: (string | PreparationItem)[]; // Backward compatible - supports both formats
+  variations: (string | VariationItem)[]; // Backward compatible - supports both formats
   pairings: string[]; // Keep for backward compatibility
   pairingIds: string[]; // New array for menu item references
   sides: (string | SideItem)[]; // Backward compatible - supports both formats
@@ -40,7 +58,16 @@ export interface MenuItemInterface {
     allergen: boolean;
     sauce: boolean;
   };
-  sauces: string[];
+  sauces: (string | SauceItem)[]; // Backward compatible - supports both formats
+  // Custom heading overrides for detail sections
+  customHeadings?: {
+    preparation?: string;
+    variation?: string;
+    pairing?: string;
+    side?: string;
+    allergen?: string;
+    sauce?: string;
+  };
 }
 
 @Injectable({
@@ -201,6 +228,7 @@ export class MenuService {
         sauce: false,
       },
       sauces: [],
+      customHeadings: {},
     };
   }
 

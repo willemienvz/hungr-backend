@@ -9,7 +9,10 @@ import { dateRangeValidator } from '../../../shared/validators/date-range-valida
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
-import { ImageUploadModalComponent, ImageUploadConfig, ImageUploadData, ImageUploadResult } from '../../shared/image-upload-modal/image-upload-modal.component';
+import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
+import { MediaLibraryService } from '../../../shared/services/media-library.service';
+import { SpecialsService } from '../../../shared/services/specials.service';
+import { MediaItem } from '../../../shared/types/media';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption } from '../shared/special-types.constants';
 import { Observable } from 'rxjs';
@@ -44,6 +47,10 @@ export class EditSpecialComponent implements OnInit {
   filteredMenuItems: Observable<any[]> = new Observable();
   selectedMenuItem: any = null;
 
+  // Media library integration properties
+  selectedMediaItem: MediaItem | null = null;
+  mediaId: string | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -51,7 +58,10 @@ export class EditSpecialComponent implements OnInit {
     private storage: AngularFireStorage,
     private fb: FormBuilder,
     private toastr: ToastrService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private mediaUploadModalService: MediaUploadModalService,
+    private mediaLibraryService: MediaLibraryService,
+    private specialsService: SpecialsService
   ) {
     this.specialForm = this.fb.group(
       {
@@ -143,25 +153,23 @@ export class EditSpecialComponent implements OnInit {
   }
 
   fetchSpecialData() {
-    this.firestore
-      .collection('specials')
-      .doc(this.specialId)
-      .valueChanges()
-      .subscribe((data: any) => {
-        if (data) {
-          this.specialData = data;
-          this.specialForm.patchValue(data);
-          this.addedItems = data.addedItems || [];
-          this.selectedDays = data.selectedDays || [];
-          this.uploadedImageUrl = data.imageUrl || null;
-          this.selectedSpecialType = data.typeSpecial || 1;
+    this.specialsService.getSpecialById(this.specialId).subscribe((special) => {
+      if (special) {
+        this.specialData = special;
+        this.specialForm.patchValue(special);
+        this.addedItems = special.addedItems || [];
+        this.selectedDays = special.selectedDays || [];
+        this.uploadedImageUrl = special.imageUrl || null;
+        this.selectedMediaItem = special.mediaItem || null;
+        this.mediaId = special.mediaId || null;
+        this.selectedSpecialType = special.typeSpecial || 1;
 
-          // Try setting selectedMenu after menus are loaded
-          if (this.menus.length > 0) {
-            this.setSelectedMenu(data.menu);
-          }
+        // Try setting selectedMenu after menus are loaded
+        if (this.menus.length > 0) {
+          this.setSelectedMenu((special as any).menu);
         }
-      });
+      }
+    });
   }
 
   fetchMenus() {
@@ -197,20 +205,32 @@ export class EditSpecialComponent implements OnInit {
       isDraft: false,
     };
 
-    this.firestore
-      .collection('specials')
-      .doc(this.specialId)
-      .update(data)
-      .then(() => {
+    // Use the new SpecialsService with media library integration
+    this.specialsService.updateSpecial(this.specialId, data).subscribe({
+      next: () => {
+        // Update media usage if media was changed
+        if (this.mediaId && this.mediaId !== this.specialData?.mediaId) {
+          this.specialsService.trackMediaUsage(this.mediaId, this.specialId, 'image').subscribe({
+            next: () => {
+              console.log('Media usage tracked successfully');
+            },
+            error: (error) => {
+              console.warn('Failed to track media usage:', error);
+            }
+          });
+        }
+
         this.isSaving = false;
         this.markAsSaved();
         this.showSuccess('Special updated successfully!');
         this.router.navigate(['/specials']);
-      })
-      .catch((error) => {
-        console.error('Error updating Firestore:', error);
+      },
+      error: (error) => {
+        console.error('Error updating special:', error);
         this.isSaving = false;
-      });
+        this.toastr.error('Failed to update special');
+      }
+    });
   }
 
   onMenuChange() {
@@ -307,66 +327,20 @@ export class EditSpecialComponent implements OnInit {
   }
 
   openImageUploadModal() {
-    const config: ImageUploadConfig = {
-      title: 'Upload Special Image',
-      maxFileSize: 5000, // 5MB in KB
-      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
-      allowMultiple: false,
-      maxFiles: 1
-    };
+    const dialogRef = this.mediaUploadModalService.openSpecialImageUpload(this.specialId);
 
-    const data: ImageUploadData = {
-      config: config,
-      currentImageUrl: this.uploadedImageUrl || undefined
-    };
-
-    const dialogRef = this.dialog.open(ImageUploadModalComponent, {
-      width: '500px',
-      data: data
-    });
-
-    dialogRef.afterClosed().subscribe((result: ImageUploadResult | undefined) => {
-      if (result && result.action === 'save') {
-        if (result.imageUrl) {
-          this.uploadedImageUrl = result.imageUrl;
-          this.toastr.success('Image uploaded successfully!');
-        } else if (result.files && result.files.length > 0) {
-          // If we get new files, we need to upload them to Firebase
-          this.uploadFileToFirebase(result.files[0]);
-        }
-      } else if (result && result.action === 'remove') {
-        this.uploadedImageUrl = null;
-        this.toastr.info('Image removed');
+    dialogRef.afterClosed().subscribe((result: MediaItem | undefined) => {
+      if (result) {
+        this.selectedMediaItem = result;
+        this.mediaId = result.id;
+        this.uploadedImageUrl = result.url;
+        this.markAsChanged();
+        this.toastr.success('Image uploaded successfully!');
       }
     });
   }
 
-  private uploadFileToFirebase(file: File) {
-    const filePath = `specials/${Date.now()}_${file.name}`;
-    const fileRef = this.storage.ref(filePath);
-    const uploadTask = this.storage.upload(filePath, file);
-
-    uploadTask.snapshotChanges().pipe(
-      finalize(() => {
-        fileRef.getDownloadURL().subscribe({
-                     next: (url) => {
-             this.uploadedImageUrl = url;
-             this.markAsChanged();
-             this.toastr.success('Image uploaded successfully!');
-           },
-          error: (err) => {
-            console.error('Failed to get download URL:', err);
-            this.toastr.error('Failed to upload image');
-          }
-        });
-      })
-    ).subscribe({
-      error: (err) => {
-        console.error('Upload failed:', err);
-        this.toastr.error('Failed to upload image');
-      }
-    });
-  }
+  // Removed uploadFileToFirebase method - now handled by MediaLibraryService
 
   showSuccess(message: string) {
     this.successPopupMessage = message;

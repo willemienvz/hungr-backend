@@ -5,6 +5,7 @@ export interface AllergenDetailConfig {
   title: string;
   placeholder: string;
   description?: string;
+  customHeading?: string; // Optional custom heading override
 }
 
 @Component({
@@ -33,6 +34,9 @@ export class AllergenDetailComponent {
   
   /* KB: Event emitted when the new allergen input value changes */
   @Output() newAllergenChange = new EventEmitter<string>();
+  
+  /* KB: Event emitted when the custom heading changes */
+  @Output() customHeadingChange = new EventEmitter<string>();
 
   /* KB: Handle closing the detail section */
   onCloseDetail() {
@@ -56,5 +60,10 @@ export class AllergenDetailComponent {
   /* KB: Handle new allergen input value changes */
   onNewAllergenChange(value: string) {
     this.newAllergenChange.emit(value);
+  }
+
+  /* KB: Handle custom heading changes */
+  onCustomHeadingChange(value: string) {
+    this.customHeadingChange.emit(value);
   }
 } 

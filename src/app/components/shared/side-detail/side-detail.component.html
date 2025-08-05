@@ -13,6 +13,20 @@
   </div>
 
   <div class="detail-content grid">
+    <!-- KB: Custom heading input field -->
+    <div class="custom-heading-input">
+      <div class="inputBox">
+        <input
+          placeholder="Custom heading (optional)"
+          type="text"
+          [ngModel]="config.customHeading"
+          (ngModelChange)="onCustomHeadingChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <label>Custom heading for this section</label>
+      </div>
+    </div>
+    
     <div class="add-input-group">
       <div class="inputBox">
         <input
@@ -34,6 +48,7 @@
           [required]="false"
           [(ngModel)]="newSidePrice"
           [ngModelOptions]="{ standalone: true }"
+          (keyup.enter)="onAddSide()"
           class="compact">
         </app-price-input>
       </div>
@@ -44,8 +59,10 @@
         class="item-tag"
         *ngFor="let side of sides; let i = index"
       >
+      <div class="item-tag-content">
         <span>{{ getSideDisplayName(side) }}</span>
-        <span *ngIf="hasSidePrice(side)" class="side-price">{{ getSideDisplayPrice(side) }}</span>
+        <span *ngIf="hasSidePrice(side)" class="item-price">+ {{ getSideDisplayPrice(side) }}</span>
+      </div>
         <button type="button" class="remove-btn" (click)="onRemoveSide(i)">
           <i class="material-icons">close</i>
         </button>

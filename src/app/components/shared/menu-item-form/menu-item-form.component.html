@@ -230,10 +230,13 @@
         [config]="preparationConfig"
         [items]="menuItem.preparations"
         [newItemValue]="newPreparation"
+        [newItemPrice]="newPreparationPrice"
         (closeDetail)="onToggleDetail('preparation')"
-        (addItem)="onAddPreparation()"
+        (addItem)="onAddPreparation($event)"
         (removeItem)="onRemovePreparation($event)"
-        (newItemValueChange)="onNewPreparationChange($event)">
+        (newItemValueChange)="onNewPreparationChange($event)"
+        (newItemPriceChange)="onNewPreparationPriceChange($event)"
+        (customHeadingChange)="onCustomHeadingChange('preparation', $event)">
       </app-menu-item-detail>
 
       <!-- KB: Use reusable detail component for variation -->
@@ -242,22 +245,15 @@
         [config]="variationConfig"
         [items]="menuItem.variations"
         [newItemValue]="newVariation"
+        [newItemPrice]="newVariationPrice"
         (closeDetail)="onToggleDetail('variation')"
-        (addItem)="onAddVariation()"
+        (addItem)="onAddVariation($event)"
         (removeItem)="onRemoveVariation($event)"
-        (newItemValueChange)="onNewVariationChange($event)">
+        (newItemValueChange)="onNewVariationChange($event)"
+        (newItemPriceChange)="onNewVariationPriceChange($event)"
+        (customHeadingChange)="onCustomHeadingChange('variation', $event)">
       </app-menu-item-detail>
 
-      <!-- KB: Use specialized menu item pairing component -->
-      <app-menu-item-pairing
-        *ngIf="menuItem.displayDetails.pairing"
-        [availableMenuItems]="availableMenuItems"
-        [selectedPairingIds]="menuItem.pairingIds || []"
-        [currentMenuItemId]="menuItem.itemId"
-        (closeDetail)="onToggleDetail('pairing')"
-        (addPairing)="onAddMenuItemPairing($event)"
-        (removePairing)="onRemoveMenuItemPairing($event)">
-      </app-menu-item-pairing>
 
       <!-- KB: Use enhanced side detail component with pricing support -->
       <app-side-detail
@@ -270,7 +266,8 @@
         (addSide)="onAddSide($event)"
         (removeSide)="onRemoveSide($event)"
         (newSideNameChange)="onNewSideNameChange($event)"
-        (newSidePriceChange)="onNewSidePriceChange($event)">
+        (newSidePriceChange)="onNewSidePriceChange($event)"
+        (customHeadingChange)="onCustomHeadingChange('side', $event)">
       </app-side-detail>
 
       <!-- KB: Use allergen detail component -->
@@ -282,7 +279,8 @@
         (closeDetail)="onToggleDetail('allergen')"
         (addAllergen)="onAddAllergen($event)"
         (removeAllergen)="onRemoveAllergen($event)"
-        (newAllergenChange)="onNewAllergenChange($event)">
+        (newAllergenChange)="onNewAllergenChange($event)"
+        (customHeadingChange)="onCustomHeadingChange('allergen', $event)">
       </app-allergen-detail>
 
       <!-- KB: Use reusable detail component for sauces -->
@@ -291,12 +289,28 @@
         [config]="saucesConfig"
         [items]="menuItem.sauces"
         [newItemValue]="newSauce"
+        [newItemPrice]="newSaucePrice"
         (closeDetail)="onToggleDetail('sauce')"
-        (addItem)="onAddSauce(newSauce)"
+        (addItem)="onAddSauce($event)"
         (removeItem)="onRemoveSauce($event)"
-        (newItemValueChange)="onNewSauceChange($event)">
+        (newItemValueChange)="onNewSauceChange($event)"
+        (newItemPriceChange)="onNewSaucePriceChange($event)"
+        (customHeadingChange)="onCustomHeadingChange('sauce', $event)">
       </app-menu-item-detail>
 
+
+      <!-- KB: Use specialized menu item pairing component -->
+      <app-menu-item-pairing
+        *ngIf="menuItem.displayDetails.pairing"
+        [config]="pairingConfig"
+        [availableMenuItems]="availableMenuItems"
+        [selectedPairingIds]="menuItem.pairingIds || []"
+        [currentMenuItemId]="menuItem.itemId"
+        (closeDetail)="onToggleDetail('pairing')"
+        (addPairing)="onAddMenuItemPairing($event)"
+        (removePairing)="onRemoveMenuItemPairing($event)"
+        (customHeadingChange)="onCustomHeadingChange('pairing', $event)">
+      </app-menu-item-pairing>
     
     </div>
 

@@ -1,7 +1,11 @@
+import { MediaItem } from '../shared/types/media';
+
 export interface Special {
   specialID: string;
   specialTitle: string;
-  imageUrl: string;
+  imageUrl: string; // Legacy field - maintained for backward compatibility
+  mediaId?: string; // New field - reference to media library item
+  mediaItem?: MediaItem; // New field - populated media item data
   selectedDays: string[];
   timeFrom?: string;
   timeTo?: string;

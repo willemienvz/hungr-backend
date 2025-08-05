@@ -9,11 +9,13 @@ export class StepNavigationComponent {
   @Input() showCancel: boolean = true;
   @Input() showDraft: boolean = false;
   @Input() showPublish: boolean = false;
+  @Input() showSubmit: boolean = false;
   @Input() showNext: boolean = true;
   @Input() showPrevious: boolean = false;
   @Input() showDone: boolean = false;
   @Input() nextDisabled: boolean = false;
   @Input() nextText: string = 'Next';
+  @Input() submitText: string = 'Submit';
   @Input() cancelRoute: string = '/menus';
   @Input() isSaving: boolean = false;
   @Input() isLoading: boolean = false;
@@ -21,6 +23,7 @@ export class StepNavigationComponent {
   @Output() cancel = new EventEmitter<void>();
   @Output() draft = new EventEmitter<void>();
   @Output() publish = new EventEmitter<void>();
+  @Output() submit = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
   @Output() previous = new EventEmitter<void>();
   @Output() done = new EventEmitter<void>();
@@ -39,6 +42,10 @@ export class StepNavigationComponent {
 
   onPublish() {
     this.publish.emit();
+  }
+
+  onSubmit() {
+    this.submit.emit();
   }
 
   onNext() {

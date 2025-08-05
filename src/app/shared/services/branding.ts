@@ -5,8 +5,12 @@ export interface Branding {
     secondaryColor: string;
     accentColor: string;
     
-    // Logo
+    // Logo - Legacy field for backward compatibility
     imageUrl: string;
+    
+    // Media library integration
+    logoMediaId?: string; // New field for media library reference
+    logoMediaItem?: any; // Enhanced media data (MediaItem type)
     
     // Text styling
     mainHeadingColor: string;
