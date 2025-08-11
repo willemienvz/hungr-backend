@@ -43,6 +43,12 @@
       [class.activeMenu]="isMediaLibraryRouteActive()"
       ><i class="material-icons">photo_library</i>Media Library</a
     >
+    <a routerLink="/reviews" routerLinkActive="activeMenu"
+      [routerLinkActiveOptions]="{ exact: false }"
+      [class.activeMenu]="isReviewsRouteActive()"
+      ><i class="material-icons">rate_review</i>Reviews
+      <span *ngIf="pendingReviewsCount > 0" class="badge">{{ pendingReviewsCount }}</span></a
+    >
     <a routerLink="/settings/branding" routerLinkActive="activeMenu"
       ><i class="material-icons">brush</i>Branding</a
     >

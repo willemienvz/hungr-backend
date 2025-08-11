@@ -2,16 +2,19 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
 export const getReviews = async (data: any, context: functions.https.CallableContext) => {
-  const { menuItemId, page = 1, limit = 10, sortBy = 'newest', rating } = data;
-  
-  if (!menuItemId) {
-    throw new functions.https.HttpsError('invalid-argument', 'menuItemId is required');
-  }
+  // Support two modes:
+  // - If menuItemId is provided: legacy menu-item reviews
+  // - Else: public restaurant reviews with optional status filter
+  const { menuItemId, page = 1, limit = 10, sortBy = 'newest', rating, status } = data || {};
   
   try {
-    let query = admin.firestore()
-      .collection('reviews')
-      .where('menuItemId', '==', menuItemId);
+    let query: FirebaseFirestore.Query = admin.firestore().collection('reviews');
+    if (menuItemId) {
+      query = query.where('menuItemId', '==', menuItemId);
+    }
+    if (status) {
+      query = query.where('status', '==', status);
+    }
     
     // Apply rating filter if specified
     if (rating && rating >= 1 && rating <= 5) {
@@ -33,14 +36,14 @@ export const getReviews = async (data: any, context: functions.https.CallableCon
     }
     
     // Get total count for pagination
-    const totalSnapshot = await query.get();
+    const totalSnapshot = await (query as FirebaseFirestore.Query).get();
     const total = totalSnapshot.size;
     
     // Apply pagination
     const offset = (page - 1) * limit;
-    query = query.limit(limit).offset(offset);
+    query = (query as FirebaseFirestore.Query).limit(limit).offset(offset);
     
-    const reviewsSnapshot = await query.get();
+    const reviewsSnapshot = await (query as FirebaseFirestore.Query).get();
     
     const reviews = reviewsSnapshot.docs.map(doc => ({
       id: doc.id,

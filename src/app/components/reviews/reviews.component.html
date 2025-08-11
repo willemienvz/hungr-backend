@@ -1,0 +1,133 @@
+<div class="reviews-container">
+  <div class="reviews-header">
+    <h1>Reviews Management</h1>
+    <p>Manage and moderate customer reviews</p>
+  </div>
+
+  <div class="reviews-controls">
+    <div class="reviews-filters">
+      <button 
+        class="filter-btn" 
+        [class.active]="currentFilter === 'all'"
+        (click)="setFilter('all')">
+        All Reviews
+      </button>
+      <button 
+        class="filter-btn" 
+        [class.active]="currentFilter === 'pending'"
+        (click)="setFilter('pending')">
+        Pending
+      </button>
+      <button 
+        class="filter-btn" 
+        [class.active]="currentFilter === 'approved'"
+        (click)="setFilter('approved')">
+        Approved
+      </button>
+      <button 
+        class="filter-btn" 
+        [class.active]="currentFilter === 'rejected'"
+        (click)="setFilter('rejected')">
+        Rejected
+      </button>
+    </div>
+
+    <div class="search-container">
+      <div class="search-input">
+        <i class="material-icons">search</i>
+        <input 
+          type="text" 
+          [value]="searchControl.value"
+          (input)="onSearchInput($event)"
+          placeholder="Search by customer name or message..."
+          class="search-field">
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-content">
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading reviews...</p>
+    </div>
+
+    <div *ngIf="!loading" class="reviews-list">
+      <ng-container *ngIf="filteredReviews$ | async as reviews; else noReviews">
+        <div *ngFor="let review of reviews" class="review-item">
+          <div class="review-header">
+            <div class="review-info">
+              <h3>{{ review.customerName }}</h3>
+              <div class="review-rating">
+                <span class="stars">
+                  <i *ngFor="let star of [1,2,3,4,5]" 
+                     class="material-icons"
+                     [class.filled]="star <= review.rating">
+                    {{ star <= review.rating ? 'star' : 'star_border' }}
+                  </i>
+                </span>
+                <span class="rating-text">{{ review.rating }}/5</span>
+              </div>
+            </div>
+            <div class="review-status">
+              <span class="status-badge" [class]="'status-' + review.status">
+                {{ review.status.charAt(0).toUpperCase() + review.status.slice(1) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="review-message">
+            <p>{{ review.message }}</p>
+          </div>
+          
+          <div class="review-meta">
+            <span class="review-date">
+              <i class="material-icons">schedule</i>
+              {{ review.createdAt.toLocaleString() }}
+            </span>
+            
+            <div *ngIf="review.moderatedBy" class="moderation-info">
+              <span class="moderated-by">
+                <i class="material-icons">admin_panel_settings</i>
+                Moderated by: {{ review.moderatedBy }}
+              </span>
+              <span *ngIf="review.moderatedAt" class="moderated-date">
+                {{ review.moderatedAt.toLocaleString() }}
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="review.moderationNotes" class="moderation-notes">
+            <strong>Moderation Notes:</strong>
+            <p>{{ review.moderationNotes }}</p>
+          </div>
+
+          <div *ngIf="review.status === 'pending'" class="review-actions">
+            <button class="action-btn approve-btn" (click)="approveReview(review)">
+              <i class="material-icons">check</i>
+              Approve
+            </button>
+            <button class="action-btn reject-btn" (click)="rejectReview(review)">
+              <i class="material-icons">close</i>
+              Reject
+            </button>
+          </div>
+
+          <div class="review-actions">
+            <button class="action-btn delete-btn" (click)="deleteReview(review)">
+              <i class="material-icons">delete</i>
+              Delete
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noReviews>
+        <div class="no-reviews">
+          <i class="material-icons">rate_review</i>
+          <h3>No reviews found</h3>
+          <p>There are no reviews matching the current filter.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div> 

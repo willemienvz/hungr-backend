@@ -2,23 +2,25 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
 export const createReview = async (data: any, context: functions.https.CallableContext) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
-  }
-  
-  const { menuItemId, rating, comment } = data;
-  const userId = context.auth.uid;
-  const userEmail = context.auth.token.email || '';
-  const userName = context.auth.token.name || 'Anonymous';
+  // Unified endpoint: supports authenticated menu-item reviews and anonymous restaurant reviews
+  const { menuItemId, rating, comment, customerName, message, reviewerIp, userAgent } = data || {};
+
+  // Branch A: legacy authenticated menu-item review
+  if (menuItemId) {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+    }
+    const userId = context.auth.uid;
+    const userEmail = (context.auth.token as any).email || '';
+    const userName = (context.auth.token as any).name || 'Anonymous';
   
   // Validate input
-  if (!menuItemId || rating < 1 || rating > 5) {
-    throw new functions.https.HttpsError('invalid-argument', 'Invalid review data');
-  }
-  
-  if (comment && comment.length < 10) {
-    throw new functions.https.HttpsError('invalid-argument', 'Comment must be at least 10 characters');
-  }
+    if (!menuItemId || rating < 1 || rating > 5) {
+      throw new functions.https.HttpsError('invalid-argument', 'Invalid review data');
+    }
+    if (comment && comment.length < 10) {
+      throw new functions.https.HttpsError('invalid-argument', 'Comment must be at least 10 characters');
+    }
   
   try {
     // Check if user already reviewed this item today
@@ -36,20 +38,20 @@ export const createReview = async (data: any, context: functions.https.CallableC
       throw new functions.https.HttpsError('already-exists', 'You can only review once per day');
     }
     
-    // Create review
-    const reviewData = {
-      menuItemId,
-      userId,
-      userName,
-      userEmail,
-      rating,
-      comment: comment?.trim() || null,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      isEdited: false
-    };
-    
-    const reviewRef = await admin.firestore().collection('reviews').add(reviewData);
+      // Create review
+      const reviewData = {
+        menuItemId,
+        userId,
+        userName: customerName?.trim() || userName,
+        userEmail,
+        rating,
+        comment: comment?.trim() || null,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        isEdited: false,
+        status: 'pending'
+      };
+      const reviewRef = await admin.firestore().collection('reviews').add(reviewData);
     
     // Update review stats
     await updateReviewStats(menuItemId);
@@ -58,9 +60,38 @@ export const createReview = async (data: any, context: functions.https.CallableC
       reviewId: reviewRef.id,
       success: true 
     };
+    } catch (error) {
+      console.error('Error creating review:', error);
+      throw new functions.https.HttpsError('internal', 'Failed to create review');
+    }
+  }
+
+  // Branch B: anonymous restaurant review (pending moderation)
+  if (!customerName || typeof customerName !== 'string' || customerName.trim().length < 2) {
+    throw new functions.https.HttpsError('invalid-argument', 'Customer name must be at least 2 characters');
+  }
+  if (!message || typeof message !== 'string' || message.trim().length < 10) {
+    throw new functions.https.HttpsError('invalid-argument', 'Review message must be at least 10 characters');
+  }
+  if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+    throw new functions.https.HttpsError('invalid-argument', 'Rating must be between 1 and 5');
+  }
+
+  try {
+    const review = {
+      customerName: String(customerName).trim(),
+      message: String(message).trim(),
+      rating: Number(rating),
+      status: 'pending',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      reviewerIp: reviewerIp || null,
+      userAgent: userAgent || null
+    };
+    const docRef = await admin.firestore().collection('reviews').add(review);
+    return { success: true, reviewId: docRef.id };
   } catch (error) {
-    console.error('Error creating review:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to create review');
+    console.error('Error creating anonymous review:', error);
+    throw new functions.https.HttpsError('internal', 'Failed to submit review');
   }
 };
 

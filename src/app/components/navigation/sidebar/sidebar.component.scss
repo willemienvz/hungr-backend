@@ -67,3 +67,18 @@
 .sidebar .subsidebarcontainer a:hover {
   font-weight: 600;
 }
+
+.sidebar .subsidebarcontainer a .badge {
+  background: #fe1b54;
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: auto;
+  padding: 0 6px;
+}

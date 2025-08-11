@@ -3,6 +3,7 @@ import { Router, NavigationEnd, Event } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { User } from '../../../shared/services/user';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { ReviewsService } from '../../../shared/services/reviews.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,9 +14,15 @@ export class SidebarComponent implements OnInit {
   accountType1: boolean;
   userProfile: User;
   currentRoute: string;
-  constructor(private firestore: AngularFirestore, private router: Router){
+  pendingReviewsCount: number = 0;
+
+  constructor(
+    private firestore: AngularFirestore, 
+    private router: Router,
+    private reviewsService: ReviewsService
+  ){
     this.fetchUsers();
-   
+    this.loadPendingReviewsCount();
   }
 
 private fetchUsers() {
@@ -51,6 +58,16 @@ private fetchUsers() {
   
   isRestaurantRouteActive(): boolean {
     return this.currentRoute?.startsWith('/restaurants') || false;
+  }
+
+  isReviewsRouteActive(): boolean {
+    return this.currentRoute?.startsWith('/reviews') || false;
+  }
+
+  loadPendingReviewsCount(): void {
+    this.reviewsService.getPendingReviews().subscribe(reviews => {
+      this.pendingReviewsCount = reviews.length;
+    });
   }
 
   setActiveMenu(url: string) {
