@@ -7,7 +7,7 @@
   </app-content-block>
   
   <app-content-block title="Menus">
-    <div class="userTable">
+    <div class="userTable" *ngIf="activeMenus.length > 0">
       <table>
         <thead>
           <tr>
@@ -51,10 +51,13 @@
         </tbody>
       </table>
     </div>
+    <div class="no-menus" *ngIf="activeMenus.length === 0">
+      <p>No menus available</p>
+    </div>
   </app-content-block>
 
   <app-content-block title="Menu Drafts">
-    <div class="userTable">
+    <div class="userTable" *ngIf="draftMenus.length > 0">
       <table>
         <thead>
           <tr>
@@ -85,6 +88,9 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class="no-menus" *ngIf="draftMenus.length === 0">
+      <p>No drafts available</p>
     </div>
   </app-content-block>
 </div>

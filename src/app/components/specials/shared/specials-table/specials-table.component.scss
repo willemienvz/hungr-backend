@@ -118,25 +118,24 @@
               ::ng-deep .mat-slide-toggle-thumb { background-color: #16d3d2; }
               ::ng-deep .mat-checked .mat-slide-toggle-bar { background-color: #16d3d2; }
             }
-            button {
+            a {
               width: 32px;
               height: 32px;
               display: flex;
               align-items: center;
               justify-content: center;
-              background:none;
-              border:none;
-              mat-icon {
+              text-decoration: none;
+              cursor: pointer;
+              transition: color 0.2s ease;
+              i.material-icons {
                 font-size: 18px;
                 width: 18px;
                 height: 18px;
+                color: #9a9a9a;
+                transition: color 0.2s ease;
               }
-              --icon-color: var(--hungr-darker-grey);
-              --hover-color: var(--hungr-primary-color);
-              &:hover { cursor:pointer; }
-              &.view-btn { color: var(--hungr-darker-grey); &:hover { color: var(--hungr-primary-color); } }
-              &.edit-btn { color: var(--hungr-darker-grey); &:hover { color: var(--hungr-primary-color); } }
-              &.delete-btn { color: var(--hungr-darker-grey); &:hover { color: var(--hungr-red); } }
+              &:hover i.material-icons { color: var(--hungr-primary-color); }
+              &.delete-link:hover i.material-icons { color: var(--hungr-red); }
             }
           }
         }

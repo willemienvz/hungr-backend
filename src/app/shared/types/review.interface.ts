@@ -13,6 +13,8 @@ import { Timestamp } from 'firebase/firestore';
 export interface Review {
   /** Unique identifier for the review */
   id: string;
+  /** Menu item being reviewed */
+  menuItemId: string;
   
   /** Customer's name as provided in the review */
   customerName: string;
@@ -55,6 +57,7 @@ export type ReviewStatus = 'pending' | 'approved' | 'rejected';
  */
 export interface ReviewDocument {
   id?: string;
+  menuItemId: string;
   customerName: string;
   message: string;
   rating: number;

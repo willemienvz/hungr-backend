@@ -76,22 +76,60 @@ export class DashboardComponent implements OnInit {
   }
 
   fetchMenus() {
+    // Read aggregated analytics for the last 14 days to compute current vs previous week
+    const today = new Date();
+    const dates: string[] = [];
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      dates.push(`${yyyy}-${mm}-${dd}`);
+    }
+
     this.menus$ = this.firestore
       .collection('menus', (ref) => ref.where('OwnerID', '==', this.userDataID))
       .snapshotChanges();
 
-    // Subscribe to menus and calculate the viewing total
     this.menus$.subscribe({
-      next: (menus) => {
-        const menuData = menus.map((menu) => menu.payload.doc.data());
-        const dailyVisits = this.countVisitsPerDay(menuData);
+      next: async (menus) => {
+        const menuIds = menus.map((m) => (m.payload.doc.data() as any).menuID).filter(Boolean);
+        if (menuIds.length === 0) return;
+
+        let currentWeek = 0;
+        let previousWeek = 0;
+        let last24h = 0;
+        let prev24h = 0;
+        let currentOrderValue = 0;
+        let previousOrderValue = 0;
+        const dailyVisits: { [date: string]: { [menuId: string]: number } } = {};
+
+        for (const [idx, dateKey] of dates.entries()) {
+          dailyVisits[dateKey] = {};
+          for (const menuId of menuIds) {
+            try {
+              const snap = await this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`).get();
+              const data: any = snap.exists ? (snap.data() as any) : null;
+              const views = data?.viewCount || 0;
+              dailyVisits[dateKey][menuId] = views;
+              if (idx < 7) currentWeek += views; else previousWeek += views;
+              if (idx === 0) last24h += views; if (idx === 1) prev24h += views;
+              if (data) {
+                const orderValueTotal = Number(data.orderValueTotal || 0);
+                if (idx < 7) currentOrderValue += orderValueTotal; else previousOrderValue += orderValueTotal;
+              }
+            } catch {}
+          }
+        }
+
+        this.viewingTotalCurrentWeek = currentWeek;
+        this.viewingTotalPreviousWeek = previousWeek;
+        this.viewingTotalLast24Hours = last24h;
+        this.viewingTotalPrevious24Hours = prev24h;
+        this.currentPeriodOrderValue = currentOrderValue;
+        this.previousPeriodOrderValue = previousOrderValue;
         this.updateChartOptions(dailyVisits);
-        this.viewingTotalCurrentWeek = this.calculateTotalViews(menuData, 7);
-        this.viewingTotalPreviousWeek = this.calculateTotalViews(menuData, 14, 7);
-        this.viewingTotalLast24Hours = this.calculateTotalViews(menuData, 1);
-        this.viewingTotalPrevious24Hours = this.calculateTotalViews(menuData, 2, 1);
-        this.calculateAverageViewingTime(menuData);
-        this.getMostPopularViewingTime(menuData);
       },
       error: (error) => console.error("Error fetching menus:", error),
     });

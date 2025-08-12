@@ -13,18 +13,13 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-
+  max-width: 900px;
   max-height: 90vh;
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   font-family: var(--hungr-font-family);
-
-  @include respond-to-max('sm') {
-    max-width: 95vw;
-    max-height: 95vh;
-  }
 }
 
 // Header
@@ -32,7 +27,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px;
+  padding: 16px 20px;
   border-bottom: 1px solid #e0e0e0;
   background: white;
 
@@ -58,6 +53,7 @@
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s ease;
+    flex-shrink: 0;
 
     &:hover {
       background-color: rgba(0, 0, 0, 0.04);
@@ -80,6 +76,7 @@
   display: flex;
   flex-direction: column;
   --mat-dialog-headline-padding: 0px;
+  padding: 16px;
 
 
 
@@ -93,7 +90,7 @@
       background: #f8f9fa;
 
       .mat-tab-label-container {
-        padding: 0 24px;
+        padding: 0 12px;
       }
 
       .mat-tab-label {
@@ -126,14 +123,13 @@
     ::ng-deep .mat-tab-body-wrapper {
       flex: 1;
       overflow: hidden;
-      padding:2rem;
+      padding: 0;
     }
 
     ::ng-deep .mat-tab-body {
       flex: 1;
       overflow: auto;
-      padding: 24px;
-      padding:2rem;
+      padding: 16px;
     }
   }
 }
@@ -863,3 +859,14 @@ mat-progress-bar {
   outline: 2px solid var(--hungr-secondary-color);
   outline-offset: 2px;
 } 
+
+// Override Material dialog container for this modal so content isn't clipped
+::ng-deep .media-upload-modal .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 12px !important;
+  overflow: visible !important;
+}
+
+::ng-deep .media-upload-modal .mat-mdc-dialog-surface {
+  border-radius: 12px !important;
+}

@@ -12,7 +12,7 @@
     display: flex;
     flex-direction: column;
     form {
-      width: 40%;
+      width: min(720px, 92%);
       justify-content: center;
       align-items: center;
       display: flex;
@@ -27,32 +27,53 @@
 
 .row {
   display: flex;
-  gap: 1em;
+  gap: 16px;
   width: 100%;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   
-  // First element (item selection) takes 2/3 of the width
-  > *:first-child {
-    flex: 2;
+  > .field.field-grow,
+  > .full-width {
+    flex: 2 1 0;
   }
   
-  // Second element (price/percentage) takes 1/3 of the width
-  > *:last-child {
-    flex: 1;
+  > .field.field-shrink,
+  app-price-input.compact {
+    flex: 1 1 0;
   }
+
+}
+.inputHolder {
+  width:100%;
 }
 
-.inputBox {
-  flex: 1;
-  input {
-    width: 100%;
-    border: 1px solid var(--hungr-dark-grey);
-    height: 38px;
-    border-radius: 5px;
-    padding: 5px 12px;
-    line-height: 38px;
-    font-family: "Poppins", sans-serif;
+// Section title
+.section-title {
+  margin: 0 0 8px 2px;
+  font-weight: 600;
+  color: var(--hungr-text, #222);
+}
+
+// Helper text
+.helper-text {
+  text-align: right;
+  width: 100%;
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.fieldHolder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+
+  label {
+    color: #9a9a9a;
+    font-weight: 400;
+    font-size: 14px;
+    margin: 0 0 2px 2px;
   }
 }
 
@@ -69,11 +90,38 @@
     border-radius: 5px;
     margin-bottom: 10px;
     
+    .left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .btnRemove {
-      color: red;
+      appearance: none;
+      border: none;
+      background: #ffe6e6;
+      color: #b91c1c;
       cursor: pointer;
-      margin-right: 10px;
-      font-weight: bold;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-name {
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .item-amount {
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+      color: #111827;
+      font-weight: 500;
     }
   }
 }
@@ -82,3 +130,25 @@
   color: #9a9a9a;
   font-style: italic;
 } 
+
+// Tighten mat-form-field density for compact layout
+:host ::ng-deep .compact-field .mat-mdc-form-field-infix {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+:host ::ng-deep .compact-field .mat-mdc-text-field-wrapper {
+  min-height: 40px;
+  
+}
+
+// Keep labels static (no floating)
+:host ::ng-deep .mat-mdc-form-field-appearance-outline .mdc-floating-label {
+  transform: none !important;
+  top: 50% !important;
+  translate: 0 -50% !important;
+}
+
+:host ::ng-deep .mat-mdc-form-field-has-icon-suffix .mat-mdc-form-field-infix {
+  padding-right: 6px;
+}

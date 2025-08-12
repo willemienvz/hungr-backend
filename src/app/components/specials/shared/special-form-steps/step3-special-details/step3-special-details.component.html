@@ -4,84 +4,101 @@
   <div class="block rowSpecial openTop">
     <form [formGroup]="specialForm">
       <!-- Percentage Discount -->
-      <div *ngIf="selectedSpecialType === 1">
-        <p>Select Items and Percentage</p>
+      <div *ngIf="selectedSpecialType === 1"  class="inputHolder">
+        <p class="section-title">Select Items and Percentage</p>
         <div class="row">
-          <div class="inputBox">
-            <input
-              type="text"
-              placeholder="Search and select menu items..."
-              [formControl]="menuItemAutocompleteControl"
-              [matAutocomplete]="auto"
-            />
-            <mat-autocomplete 
-              #auto="matAutocomplete" 
-              [displayWith]="displayFn"
-              (optionSelected)="onMenuItemSelected($event)"
-            >
-              <mat-option 
-                *ngFor="let menuItem of filteredMenuItems | async" 
-                [value]="menuItem"
+          <div class="fieldHolder field field-grow full-width">
+            <label>Search and select menu items</label>
+            <mat-form-field>
+              <input
+                matInput
+                type="text"
+                [formControl]="menuItemAutocompleteControl"
+                [matAutocomplete]="auto"
+              />
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                [displayWith]="displayFn"
+                (optionSelected)="onMenuItemSelected($event)"
               >
-                <span>{{ menuItem.name }}</span>
-              </mat-option>
-              
-              <!-- Show no results message when no items match -->
-              <mat-option 
-                *ngIf="(filteredMenuItems | async)?.length === 0" 
-                class="no-results-option" 
-                disabled
-              >
-                <span class="no-results-text">No menu items found</span>
-              </mat-option>
-            </mat-autocomplete>
+                <mat-option
+                  *ngFor="let menuItem of filteredMenuItems | async"
+                  [value]="menuItem"
+                >
+                  <span>{{ menuItem.name }}</span>
+                </mat-option>
+
+                <!-- Show no results message when no items match -->
+                <mat-option
+                  *ngIf="(filteredMenuItems | async)?.length === 0"
+                  class="no-results-option"
+                  disabled
+                >
+                  <span class="no-results-text">No menu items found</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
           </div>
-          <input
-            type="number"
-            formControlName="percentage"
-            placeholder="Enter percentage discount"
-            (keydown.enter)="onAddItem()"
-          />
+
+          <div class="fieldHolder field field-shrink compact-field">
+            <label>Percentage discount</label>
+            <mat-form-field>
+              <input
+                matInput
+                type="number"
+                min="0"
+                max="100"
+                formControlName="percentage"
+                (keydown.enter)="onAddItem()"
+              />
+              <span matSuffix>%</span>
+            </mat-form-field>
+          </div>
         </div>
       </div>
 
       <!-- Price Discount (Add Mode) -->
-      <div *ngIf="selectedSpecialType === 2 && !editMode">
-        <p>Select Items and Prices</p>
+      <div *ngIf="selectedSpecialType === 2 && !editMode" class="inputHolder">
+        <p class="section-title">Select Items and Prices</p>
         <div class="row">
-          <div class="inputBox">
-            <input
-              type="text"
-              placeholder="Search and select menu items..."
-              [formControl]="menuItemAutocompleteControl"
-              [matAutocomplete]="auto"
-            />
-            <mat-autocomplete 
-              #auto="matAutocomplete" 
-              [displayWith]="displayFn"
-              (optionSelected)="onMenuItemSelected($event)"
-            >
-              <mat-option 
-                *ngFor="let menuItem of filteredMenuItems | async" 
-                [value]="menuItem"
+          <div class="fieldHolder field field-grow full-width">
+            <label>Search and select menu items</label>
+            <mat-form-field>
+              <input
+                matInput
+                type="text"
+                [formControl]="menuItemAutocompleteControl"
+                [matAutocomplete]="auto"
+              />
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                [displayWith]="displayFn"
+                (optionSelected)="onMenuItemSelected($event)"
               >
-                <span>{{ menuItem.name }}</span>
-              </mat-option>
-              
-              <!-- Show no results message when no items match -->
-              <mat-option 
-                *ngIf="(filteredMenuItems | async)?.length === 0" 
-                class="no-results-option" 
-                disabled
-              >
-                <span class="no-results-text">No menu items found</span>
-              </mat-option>
-            </mat-autocomplete>
+                <mat-option
+                  *ngFor="let menuItem of filteredMenuItems | async"
+                  [value]="menuItem"
+                >
+                  <span>{{ menuItem.name }}</span>
+                </mat-option>
+
+                <!-- Show no results message when no items match -->
+                <mat-option
+                  *ngIf="(filteredMenuItems | async)?.length === 0"
+                  class="no-results-option"
+                  disabled
+                >
+                  <span class="no-results-text">No menu items found</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
           </div>
+
           <app-price-input
+            class="compact"
             formControlName="amount"
             placeholder="R 0.00"
-            label=""
+            label="Price"
             [required]="true"
             (keydown.enter)="onAddItem()">
           </app-price-input>
@@ -89,21 +106,27 @@
       </div>
 
       <!-- Price Discount (Edit Mode) -->
-      <div *ngIf="selectedSpecialType === 2 && editMode">
-        <p>Select Items and Prices</p>
+      <div *ngIf="selectedSpecialType === 2 && editMode"  class="inputHolder">
+        <p class="section-title">Select Items and Prices</p>
         <div class="row">
-          <mat-select formControlName="typeSpecialDetails">
-            <mat-option
-              *ngFor="let item of selectedMenu?.items"
-              [value]="item.name"
-            >
-              {{ item.name }}
-            </mat-option>
-          </mat-select>
+          <div class="fieldHolder field field-grow full-width">
+            <label>Item</label>
+            <mat-form-field>
+              <mat-select formControlName="typeSpecialDetails">
+                <mat-option
+                  *ngFor="let item of selectedMenu?.items"
+                  [value]="item.name"
+                >
+                  {{ item.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
           <app-price-input
+            class="compact"
             formControlName="amount"
             placeholder="R 0.00"
-            label=""
+            label="Price"
             [required]="true"
             (keydown.enter)="onAddItem()">
           </app-price-input>
@@ -111,21 +134,27 @@
       </div>
 
       <!-- Category Special -->
-      <div *ngIf="selectedSpecialType === 4">
-        <p>Select Category</p>
+      <div *ngIf="selectedSpecialType === 4"  class="inputHolder">
+        <p class="section-title">Select Category</p>
         <div class="row">
-          <mat-select formControlName="featureSpecialUnder">
-            <mat-option
-              *ngFor="let category of selectedMenu?.categories"
-              [value]="category.id"
-            >
-              {{ category.name }}
-            </mat-option>
-          </mat-select>
+          <div class="fieldHolder field field-grow full-width">
+            <label>Category</label>
+            <mat-form-field>
+              <mat-select formControlName="featureSpecialUnder">
+                <mat-option
+                  *ngFor="let category of selectedMenu?.categories"
+                  [value]="category.id"
+                >
+                  {{ category.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
           <app-price-input
+            class="compact"
             formControlName="amount"
             placeholder="R 0.00"
-            label=""
+            label="Price"
             [required]="true"
             (keydown.enter)="onAddItem()">
           </app-price-input>
@@ -134,36 +163,49 @@
 
       <!-- Combo Special -->
       <div *ngIf="selectedSpecialType === 3">
-        <h6>Combo Details</h6>
+        <h6 class="section-title">Combo Details</h6>
         <div class="row">
-          <mat-select formControlName="typeSpecialDetails" multiple>
-            <mat-option
-              *ngFor="let item of selectedMenu?.items"
-              [value]="item.name"
-            >
-              {{ item.name }}
-            </mat-option>
-          </mat-select>
-          <input
-            type="number"
-            formControlName="percentage"
-            placeholder="Enter percentage discount"
-            (keydown.enter)="onAddItem()"
-          />
+          <div class="fieldHolder field field-grow full-width">
+            <label>Items in combo</label>
+            <mat-form-field>
+              <mat-select formControlName="typeSpecialDetails" multiple>
+                <mat-option
+                  *ngFor="let item of selectedMenu?.items"
+                  [value]="item.name"
+                >
+                  {{ item.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="fieldHolder field field-shrink compact-field">
+            <label>Percentage discount</label>
+            <mat-form-field>
+              <input
+                matInput
+                type="number"
+                min="0"
+                max="100"
+                formControlName="percentage"
+                (keydown.enter)="onAddItem()"
+              />
+              <span matSuffix>%</span>
+            </mat-form-field>
+          </div>
         </div>
       </div>
       
-      <p style="text-align: right; width: 100%">Press enter to add an item</p>
+      <p class="helper-text">Press Enter to add an item</p>
       
       <!-- Display List of Added Items -->
       <div *ngIf="addedItems.length > 0" class="item-list">
         <h6>Items</h6>
         <div class="list" *ngFor="let item of addedItems; let i = index">
-          <div>
-            <a class="btnRemove" (click)="onRemoveItem(i)">X</a>
-            <p>{{ item.name }}</p>
+          <div class="left">
+            <button type="button" class="btnRemove" (click)="onRemoveItem(i)" aria-label="Remove item">×</button>
+            <p class="item-name">{{ item.name }}</p>
           </div>
-          <p>{{ item.amount }}</p>
+          <p class="item-amount">{{ item.amount }}</p>
         </div>
       </div>
     </form>

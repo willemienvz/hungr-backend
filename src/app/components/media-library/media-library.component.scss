@@ -102,7 +102,7 @@
 .filter-controls {
   display: flex;
   gap: 1rem;
-  align-items: flex-end;
+  align-items: center;
   flex-wrap: wrap;
   
   @media (max-width: 1024px) {
@@ -166,14 +166,20 @@
   }
   
   .sort-order-btn {
-    background-color: white;
-    border: 1px solid #ddd;
+    background: transparent;
+    border: none;
     height: 38px;
     width: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
     
     &:hover {
-      background-color: var(--hungr-light-grey);
+      background-color: rgba(0,0,0,0.04);
     }
+    mat-icon { color: #666; }
   }
   
   .clear-filters-btn {
@@ -291,6 +297,7 @@
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
+      z-index: 2;
       
       .view-btn, .delete-btn {
         background-color: white;
@@ -333,6 +340,7 @@
         color: #f44336;
       }
     }
+    &:hover .media-overlay { opacity: 1; pointer-events: auto; }
     
     // Fallback: Always show buttons on touch devices or when needed
     &.show-buttons .media-overlay,

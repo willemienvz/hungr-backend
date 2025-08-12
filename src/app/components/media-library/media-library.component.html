@@ -54,7 +54,7 @@
         </div>
 
         <!-- Sort Order -->
-        <button mat-icon-button (click)="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; onSortChanged()" 
+        <button type="button" (click)="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; onSortChanged()" 
                 class="sort-order-btn" [attr.aria-label]="'Sort ' + (sortOrder === 'asc' ? 'descending' : 'ascending')">
           <mat-icon>{{ sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
         </button>

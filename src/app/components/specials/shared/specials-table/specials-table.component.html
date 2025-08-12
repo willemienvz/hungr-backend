@@ -52,15 +52,15 @@
             (change)="toggleStatus.emit({special, index: i})"
             class="toggle-switch">
           </mat-slide-toggle>
-          <button mat-icon-button class="view-btn" title="View" (click)="openViewDialog(special)">
-            <mat-icon>visibility</mat-icon>
-          </button>
-          <button mat-icon-button class="edit-btn" [routerLink]="['/specials/edit-special', special.specialID]" title="Edit">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button class="delete-btn" (click)="deleteSpecial.emit({specialId: special.specialID, index: i})" title="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
+          <a class="view-link" title="View" (click)="openViewDialog(special)">
+            <i class="material-icons">visibility</i>
+          </a>
+          <a class="edit-link" [routerLink]="['/specials/edit-special', special.specialID]" title="Edit">
+            <i class="material-icons">edit</i>
+          </a>
+          <a class="delete-link" (click)="deleteSpecial.emit({specialId: special.specialID, index: i})" title="Delete">
+            <i class="material-icons">delete</i>
+          </a>
         </div>
       </td>
     </tr>

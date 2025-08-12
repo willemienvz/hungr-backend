@@ -47,19 +47,61 @@ export class VisitorDashboardComponent {
 
 
   fetchMenus() {
+    // Load menus and then read aggregated viewing durations and hour histograms for last 7 days
     this.menus$ = this.firestore
       .collection('menus', (ref) => ref.where('OwnerID', '==', this.userDataID))
       .snapshotChanges();
 
     this.menus$.subscribe({
-      next: (menus) => {
-        const menuData = menus.map((menu) => menu.payload.doc.data());
-        this.calculateAverageViewingTime(menuData);
-        this.getMostPopularViewingTime(menuData);
-        this.processData(menuData); 
+      next: async (menus) => {
+        const menuIds = menus.map((m) => (m.payload.doc.data() as any).menuID).filter(Boolean);
+        if (menuIds.length === 0) return;
+
+        const today = new Date();
+        const dates: string[] = [];
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(today);
+          d.setDate(today.getDate() - i);
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          dates.push(`${yyyy}-${mm}-${dd}`);
+        }
+
+        // Accumulate durations and hour histograms
+        let totalDuration = 0;
+        let totalViews = 0;
+        const hourHistogram: { [hour: string]: number } = {};
+
+        for (const dateKey of dates) {
+          for (const menuId of menuIds) {
+            try {
+              const snap = await this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`).get();
+              if (snap.exists) {
+                const data: any = snap.data();
+                totalDuration += data?.viewDurationMs || 0;
+                totalViews += data?.viewCount || 0;
+                const hh = data?.hourHistogram || {};
+                Object.keys(hh).forEach(h => {
+                  hourHistogram[h] = (hourHistogram[h] || 0) + (hh[h] || 0);
+                });
+              }
+            } catch {}
+          }
+        }
+
+        // Average view time in ms
+        this.averageTime = totalViews > 0 ? Math.round(totalDuration / totalViews) : 0;
+
+        // Map histogram to dayData for the active day chart (approximate: use a single day histogram)
+        const mapped = Array(24).fill(0).map((_, h) => ({ hour: h, avgTime: 0 }));
+        Object.keys(hourHistogram).forEach(h => {
+          const hour = parseInt(h, 10);
+          if (!isNaN(hour)) mapped[hour] = { hour, avgTime: hourHistogram[h] };
+        });
+        this.dayData[this.activeDay] = mapped;
+
         this.setChartOptions();
-        console.log(menuData);
-        
       },
       error: (error) => console.error("Error fetching menus:", error),
     });

@@ -31,27 +31,68 @@ export class SpecialsAnalyticsService {
   constructor(private firestore: AngularFirestore) { }
 
   getSpecialsMetrics(ownerId: string): Observable<SpecialsMetrics> {
-    // For now, return mock data that matches the design
-    // In a real implementation, this would aggregate data from orders, views, etc.
-    return new Observable(observer => {
-      observer.next({
-        totalSpecialSales: {
-          amount: 15430,
-          percentage: '+10%'
-        },
-        specialViews: {
-          count: 2341,
-          percentage: '+3%'
-        },
-        topPerformingSpecial: {
-          name: 'Weekend Burger Deal',
-          performance: 'Best Seller'
-        },
-        specialsOrdered: {
-          count: 892,
-          percentage: '+3%'
+    // Read last 7 days of aggregated specials metrics across all specials for this owner
+    const today = new Date();
+    const dates: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      dates.push(`${yyyy}-${mm}-${dd}`);
+    }
+
+    return new Observable<SpecialsMetrics>(observer => {
+      (async () => {
+        try {
+          let impressions = 0;
+          let clicks = 0;
+          let added = 0;
+          let conversions = 0;
+
+          // Fetch all specials for this owner to get ids
+          const specialsSnap = await this.firestore.firestore.collection('specials').where('OwnerID', '==', ownerId).get();
+          const specialIds = specialsSnap.docs.map(d => (d.data() as any).specialID).filter(Boolean);
+
+          for (const dateKey of dates) {
+            for (const specialId of specialIds) {
+              try {
+                const snap = await this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/specials/${specialId}`).get();
+                if (snap.exists) {
+                  const data: any = snap.data();
+                  impressions += data?.specialImpressions || 0;
+                  clicks += data?.specialClicks || 0;
+                  added += data?.specialAddedToOrder || 0;
+                  conversions += data?.specialConversions || 0;
+                }
+              } catch {}
+            }
+          }
+
+          const topPerformingSpecial = specialsSnap.docs[0]?.data()?.['specialTitle'] || 'N/A';
+          observer.next({
+            totalSpecialSales: {
+              amount: conversions, // Placeholder: use conversions count as proxy or sum value if tracked
+              percentage: ''
+            },
+            specialViews: {
+              count: impressions,
+              percentage: ''
+            },
+            topPerformingSpecial: {
+              name: topPerformingSpecial,
+              performance: 'Best Seller'
+            },
+            specialsOrdered: {
+              count: added,
+              percentage: ''
+            }
+          });
+        } catch (e) {
+          observer.error(e);
         }
-      });
+      })();
     });
   }
 

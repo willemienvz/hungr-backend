@@ -1,33 +1,92 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access for development
-    // WARNING: These rules are for development only!
-    // For production, implement proper authentication and security
-    
+    // Default: read-only unless explicitly allowed
     match /{document=**} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if false;
     }
-    
-    // Reviews collection - specific rules for review data protection
+
+    // Raw analytics events: allow public create (no update/delete)
+    match /analytics-events/{eventId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+
+    // Aggregated analytics: allow constrained updates by any client for recent dates
+    match /analytics-aggregated/{dateKey} {
+      allow read: if true;
+
+      // Only allow subcollection docs to be created/updated with numeric increments and lastUpdated
+      match /menus/{menuId} {
+        allow create, update: if isAggregateUpdate();
+        allow delete: if false;
+      }
+      match /items/{itemId} {
+        allow create, update: if isAggregateUpdate();
+        allow delete: if false;
+      }
+      match /categories/{categoryId} {
+        allow create, update: if isAggregateUpdate();
+        allow delete: if false;
+      }
+      match /specials/{specialId} {
+        allow create, update: if isAggregateUpdate();
+        allow delete: if false;
+      }
+
+      function isAggregateUpdate() {
+        // Only allow updates that:
+        // - Set lastUpdated (server timestamp) and increment numeric fields
+        // - Do not remove fields
+        // Note: Firestore rules cannot detect increment() specifically; we validate that only whitelisted fields change
+        let changed = request.resource.data.diff(resource.data).changedKeys();
+        return changed.hasOnly([
+          // base counters and sums
+          'viewCount','clickCount','interactionCount','navigationCount','sessionCount','orderCount',
+          'viewDurationMs','orderValueTotal','orderSubtotalTotal','tipValueTotal','lastUpdated',
+          // distributions and keyed counts (top-level keys)
+          'hourHistogram','itemCounts','categoryCounts','filterCounts',
+          // specials funnel fields
+          'specialImpressions','specialClicks','specialAddedToOrder','specialConversions'
+        ])
+        && request.resource.data.keys().hasAll(['lastUpdated']);
+      }
+    }
+
+    // Reviews collection - unified per-menu-item reviews with anonymous create and admin moderation
     match /reviews/{reviewId} {
-      allow read: if true; // Anyone can read reviews
-      allow create: if request.auth != null 
-        && request.auth.uid == resource.data.userId
-        && request.resource.data.rating >= 1 
-        && request.resource.data.rating <= 5
-        && (request.resource.data.comment == null || request.resource.data.comment.size() >= 10);
-      allow update: if request.auth != null 
-        && request.auth.uid == resource.data.userId
-        && request.resource.data.userId == resource.data.userId;
-      allow delete: if request.auth != null 
-        && request.auth.uid == resource.data.userId;
+      allow read: if true;
+
+      function isAdmin() {
+        return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      }
+
+      // Anonymous creates allowed with strict validation and whitelisted fields
+      function isCreateValid() {
+        let allowed = ['menuItemId','customerName','message','rating','status','createdAt'];
+        return request.resource.data.keys().hasOnly(allowed)
+          && request.resource.data.menuItemId is string && request.resource.data.menuItemId.size() > 0
+          && request.resource.data.customerName is string && request.resource.data.customerName.size() >= 2
+          && request.resource.data.message is string && request.resource.data.message.size() >= 10
+          && request.resource.data.rating is int && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+          && request.resource.data.status == 'pending';
+      }
+
+      // Anyone can create if it passes validation (no auth required)
+      allow create: if isCreateValid();
+
+      // Only admins may moderate status/notes fields
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status','moderatedBy','moderatedAt','moderationNotes']);
+
+      allow delete: if isAdmin();
     }
     
     // Review stats collection
     match /reviewStats/{menuItemId} {
       allow read: if true;
-      allow write: if false; // Only updated by Cloud Functions
+      allow write: if false; // Only updated by backend
     }
     
     // Media collection - rules for media library
@@ -55,4 +114,4 @@ service cloud.firestore {
       allow delete: if request.auth != null;
     }
   }
-} 
+}

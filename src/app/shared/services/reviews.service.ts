@@ -36,9 +36,10 @@ export class ReviewsService {
   /**
    * Creates a new review
    */
-  createReview(request: CreateReviewRequest): Observable<ReviewResponse<Review>> {
+  createReview(request: CreateReviewRequest & { menuItemId: string }): Observable<ReviewResponse<Review>> {
     try {
       const reviewData = {
+        menuItemId: (request as any).menuItemId,
         customerName: request.customerName.trim(),
         message: request.message.trim(),
         rating: request.rating,
@@ -90,8 +91,12 @@ export class ReviewsService {
   /**
    * Gets all reviews with optional filtering
    */
-  getReviews(filters?: ReviewFilters): Observable<Review[]> {
+  getReviews(filters?: ReviewFilters & { menuItemId?: string }): Observable<Review[]> {
     let query: any = this.reviewsCollection.ref;
+
+    if ((filters as any)?.menuItemId) {
+      query = query.where('menuItemId', '==', (filters as any).menuItemId);
+    }
 
     // Apply status filter
     if (filters?.status) {
@@ -315,6 +320,7 @@ export class ReviewsService {
   private convertDocumentToReview(id: string, doc: ReviewDocument): Review {
     return {
       id,
+      menuItemId: doc.menuItemId,
       customerName: doc.customerName,
       message: doc.message,
       rating: doc.rating,

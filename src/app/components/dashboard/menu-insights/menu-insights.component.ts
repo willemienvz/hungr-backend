@@ -57,17 +57,85 @@ export class MenuInsightsComponent {
   ngOnInit(): void {}
 
   fetchMenus() {
+    // Read aggregated analytics for the last 7 days for all menus owned by this user
+    const today = new Date();
+    const dates: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      dates.push(`${yyyy}-${mm}-${dd}`);
+    }
+
+    // Load menus owned by user to map menuIds
     this.menus$ = this.firestore
       .collection('menus', (ref) => ref.where('OwnerID', '==', this.userDataID))
       .snapshotChanges();
 
     this.menus$.subscribe({
-      next: (menus) => {
-        const menuData = menus.map((menu) => menu.payload.doc.data());
-        const dailyVisits = this.countVisitsPerDay(menuData);
+      next: async (menus) => {
+        const menuIds = menus.map((m) => (m.payload.doc.data() as any).menuID).filter(Boolean);
+        if (menuIds.length === 0) return;
+
+        // Aggregate across dates
+        let totalViews7d = 0;
+        let totalViews24h = 0;
+        const dailyVisits: { [date: string]: { [menuId: string]: number } } = {};
+        const categoryCountsAgg: { [categoryId: string]: number } = {};
+        const itemCountsAgg: { [itemId: string]: { name: string; count: number } } = {};
+
+        for (const dateKey of dates) {
+          dailyVisits[dateKey] = {};
+          for (const menuId of menuIds) {
+            try {
+              const docRef = this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`);
+              const snap = await docRef.get();
+              if (snap.exists) {
+                const data: any = snap.data();
+                const views = data?.viewCount || 0;
+                dailyVisits[dateKey][menuId] = views;
+                totalViews7d += views;
+                if (dateKey === dates[0]) totalViews24h += views;
+
+                // Aggregate keyed counts for categories and items if present
+                const categoryCounts = data?.categoryCounts || {};
+                Object.keys(categoryCounts).forEach((cid) => {
+                  categoryCountsAgg[cid] = (categoryCountsAgg[cid] || 0) + (categoryCounts[cid] || 0);
+                });
+
+                const itemCounts = data?.itemCounts || {};
+                Object.keys(itemCounts).forEach((iid) => {
+                  const count = itemCounts[iid] || 0;
+                  // We do not have item names in aggregates; store id as name fallback
+                  const existing = itemCountsAgg[iid] || { name: iid, count: 0 };
+                  itemCountsAgg[iid] = { name: existing.name, count: existing.count + count };
+                });
+              } else {
+                dailyVisits[dateKey][menuId] = 0;
+              }
+            } catch (err) {
+              console.error('Error loading aggregated analytics', dateKey, menuId, err);
+              dailyVisits[dateKey][menuId] = 0;
+            }
+          }
+        }
+
+        // Update charts and totals
         this.updateChartOptions(dailyVisits);
-        this.viewingTotalCurrentWeek = this.calculateTotalViews(menuData, 7);
-        this.viewingTotalLast24Hours = this.calculateTotalViews(menuData, 1);
+        this.viewingTotalCurrentWeek = totalViews7d;
+        this.viewingTotalLast24Hours = totalViews24h;
+
+        // Compute category shares and top items from aggregates
+        this.categoryOrderCounts = categoryCountsAgg;
+        this.calculateCategoryOrderPercentages();
+
+        this.topOrderedItems = Object.entries(itemCountsAgg)
+          .map(([_, v]) => v)
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+        this.updateMostOrderedItemsChart();
       },
       error: (error) => console.error('Error fetching menus:', error),
     });
@@ -139,25 +207,7 @@ export class MenuInsightsComponent {
       });
   }
 
-  calculateTotalViews(
-    menuData: any[],
-    days: number,
-    offset: number = 0
-  ): number {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days - offset);
-
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() - offset);
-
-    return menuData.reduce((acc, menu) => {
-      const filteredViews = (menu['viewingTime'] || []).filter((view) => {
-        const viewDate = new Date(view.timestamp);
-        return viewDate >= startDate && viewDate < endDate;
-      });
-      return acc + filteredViews.length;
-    }, 0);
-  }
+  // calculateTotalViews replaced by aggregated reads
 
   getWeeklyDifferenceMessage(): string {
     return `${this.calculatePercentageDifference(
