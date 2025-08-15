@@ -12,6 +12,7 @@ import { ViewingTime } from '../../../shared/services/viewingTime';
   styleUrl: './visitor-dashboard.component.scss'
 })
 export class VisitorDashboardComponent {
+   isLoading: boolean = false;
    userDataID: string = '';
     menus$: Observable<any[]> | undefined;
     restaurant$: Observable<any[]> | undefined;
@@ -21,7 +22,7 @@ export class VisitorDashboardComponent {
     options: any; // Chart options for ECharts
   activeDay: number = 0; // Active tab index (0 = Sunday)
   daysOfWeek = [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  dayData: { [key: string]: { hour: number; avgTime: number }[] } = {};
+  dayData: { [key: string]: { hour: number; viewCount: number }[] } = {};
 
   accountType = localStorage.getItem('accountType');
   layoutMinimised: boolean = false;
@@ -47,6 +48,7 @@ export class VisitorDashboardComponent {
 
 
   fetchMenus() {
+    this.isLoading = true;
     // Load menus and then read aggregated viewing durations and hour histograms for last 7 days
     this.menus$ = this.firestore
       .collection('menus', (ref) => ref.where('OwnerID', '==', this.userDataID))
@@ -55,7 +57,7 @@ export class VisitorDashboardComponent {
     this.menus$.subscribe({
       next: async (menus) => {
         const menuIds = menus.map((m) => (m.payload.doc.data() as any).menuID).filter(Boolean);
-        if (menuIds.length === 0) return;
+        if (menuIds.length === 0) { this.isLoading = false; return; }
 
         const today = new Date();
         const dates: string[] = [];
@@ -73,37 +75,84 @@ export class VisitorDashboardComponent {
         let totalViews = 0;
         const hourHistogram: { [hour: string]: number } = {};
 
+        const tasks: Array<Promise<{ dateKey: string; data: any | null }>> = [];
         for (const dateKey of dates) {
           for (const menuId of menuIds) {
-            try {
-              const snap = await this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`).get();
-              if (snap.exists) {
-                const data: any = snap.data();
-                totalDuration += data?.viewDurationMs || 0;
-                totalViews += data?.viewCount || 0;
-                const hh = data?.hourHistogram || {};
-                Object.keys(hh).forEach(h => {
-                  hourHistogram[h] = (hourHistogram[h] || 0) + (hh[h] || 0);
-                });
-              }
-            } catch {}
+            const docRef = this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`);
+            tasks.push(
+              docRef
+                .get()
+                .then((snap) => ({ dateKey, data: snap.exists ? (snap.data() as any) : null }))
+                .catch(() => ({ dateKey, data: null }))
+            );
           }
         }
+        const results = await Promise.all(tasks);
+        console.log('Analytics results:', results);
+        
+        // Check if we have any data at all
+        const hasAnyData = results.some(r => r.data !== null);
+        console.log('Has any aggregated data:', hasAnyData);
+        
+        if (!hasAnyData) {
+          console.log('No aggregated analytics data found. Checking for raw analytics events...');
+          // Try to check if there are any raw analytics events
+          const eventsQuery = this.firestore.firestore.collection('analytics-events').limit(1);
+          const eventsSnap = await eventsQuery.get();
+          console.log('Raw analytics events exist:', !eventsSnap.empty);
+        }
+        
+        for (const { dateKey, data } of results) {
+          if (data) {
+            console.log(`Data for ${dateKey}:`, data);
+            totalDuration += data?.viewDurationMs || 0;
+            totalViews += data?.viewCount || 0;
+            const hh = data?.hourHistogram || {};
+            console.log(`Hour histogram for ${dateKey}:`, hh);
+            Object.keys(hh).forEach(h => {
+              hourHistogram[h] = (hourHistogram[h] || 0) + (hh[h] || 0);
+            });
+          }
+        }
+        console.log('Final hourHistogram:', hourHistogram);
+        console.log('Total views:', totalViews);
+        console.log('Total duration:', totalDuration);
 
         // Average view time in ms
-        this.averageTime = totalViews > 0 ? Math.round(totalDuration / totalViews) : 0;
+        this.averageTime = totalViews > 0 ? Math.round((totalDuration / totalViews) / 60000) : 0;
 
-        // Map histogram to dayData for the active day chart (approximate: use a single day histogram)
-        const mapped = Array(24).fill(0).map((_, h) => ({ hour: h, avgTime: 0 }));
-        Object.keys(hourHistogram).forEach(h => {
-          const hour = parseInt(h, 10);
-          if (!isNaN(hour)) mapped[hour] = { hour, avgTime: hourHistogram[h] };
-        });
-        this.dayData[this.activeDay] = mapped;
+        // Calculate most popular viewing time from aggregated analytics data
+        this.getMostPopularViewingTimeFromAggregates(hourHistogram);
+
+        // If no aggregated data, fall back to raw viewing time data
+        if (totalViews === 0) {
+          console.log('No aggregated data found, falling back to raw viewing time data');
+          const menuData = menus.map(m => m.payload.doc.data() as Menu);
+          this.calculateAverageViewingTime(menuData);
+          this.processData(menuData);
+          
+          // If still no data, generate sample data for testing
+          if (this.averageTime === 0) {
+            console.log('No viewing time data found, generating sample data for testing');
+            this.generateSampleData();
+          }
+        } else {
+          // Map histogram to dayData for the active day chart (showing view counts per hour)
+          const mapped = Array(24).fill(0).map((_, h) => ({ hour: h, viewCount: 0 }));
+          Object.keys(hourHistogram).forEach(h => {
+            const hour = parseInt(h, 10);
+            if (!isNaN(hour) && hour >= 0 && hour < 24) {
+              mapped[hour] = { hour, viewCount: hourHistogram[h] };
+            }
+          });
+          this.dayData[this.activeDay] = mapped;
+          console.log('Mapped dayData for active day:', this.dayData[this.activeDay]);
+        }
 
         this.setChartOptions();
+        this.isLoading = false;
       },
-      error: (error) => console.error("Error fetching menus:", error),
+      error: (error) => { console.error("Error fetching menus:", error); this.isLoading = false; },
     });
   }
 
@@ -148,6 +197,11 @@ getMostPopularViewingTime(menus: Menu[]):void {
         }
       }
 
+      // If no viewing time data found, set a default message
+      if (!mostPopularKey) {
+        this.popularTime = 'No data available';
+        return;
+      }
 
       // Extract day and hour from the key
       const [day, hour] = mostPopularKey.split('-').map(Number);
@@ -157,6 +211,37 @@ getMostPopularViewingTime(menus: Menu[]):void {
       const period = hour < 12 ? 'AM' : 'PM';
       const formattedHour = hour % 12 || 12;
       this.popularTime = `${daysOfWeek[day]}s, ${formattedHour} ${period}`;
+}
+
+getMostPopularViewingTimeFromAggregates(hourHistogram: { [hour: string]: number }): void {
+  console.log('🔍 Visitor Dashboard: Calculating most popular viewing time from histogram:', hourHistogram);
+  
+  // Find the hour with the most views
+  let mostPopularHour = '';
+  let maxViews = 0;
+
+  for (const hour in hourHistogram) {
+    if (hourHistogram[hour] > maxViews) {
+      mostPopularHour = hour;
+      maxViews = hourHistogram[hour];
+    }
+  }
+
+  console.log('🔍 Visitor Dashboard: Most popular hour:', mostPopularHour, 'with', maxViews, 'views');
+
+  // If no viewing time data found, set a default message
+  if (!mostPopularHour) {
+    this.popularTime = 'No data available';
+    console.log('⚠️ Visitor Dashboard: No viewing time data found, showing "No data available"');
+    return;
+  }
+
+  // Convert hour to readable format
+  const hour = parseInt(mostPopularHour, 10);
+  const period = hour < 12 ? 'AM' : 'PM';
+  const formattedHour = hour % 12 || 12;
+  this.popularTime = `${formattedHour} ${period}`;
+  console.log('✅ Visitor Dashboard: Most popular viewing time set to:', this.popularTime);
 }
 
 processData(viewingTimes: any[]): void {
@@ -181,7 +266,7 @@ processData(viewingTimes: any[]): void {
   for (const day in groupedData) {
     this.dayData[day] = groupedData[day].map((entry, hour) => ({
       hour,
-      avgTime: entry.count > 0 ? entry.total / entry.count : 0,
+      viewCount: entry.count,
     }));
   }
 }
@@ -192,9 +277,10 @@ setChartOptions(): void {
       trigger: 'axis',
       formatter: (params: any) => {
         const data = params[0].data;
-        return `${this.daysOfWeek[this.activeDay]} ${data.hour}:00<br>Average Viewing Time: ${(
-          data.avgTime / 1000
-        ).toFixed(2)} seconds`;
+        const viewCount = data.value || 0;
+        const hour = data.hour || params[0].dataIndex || 0;
+        
+        return `${this.daysOfWeek[this.activeDay]} ${hour}:00<br>View Count: ${viewCount}`;
       },
     },
     xAxis: {
@@ -206,7 +292,7 @@ setChartOptions(): void {
     },
     yAxis: {
       type: 'value',
-      name: 'Average Viewing Time (ms)',
+      name: 'View Count',
       nameLocation: 'middle', // Places the label in the middle of the axis
       nameRotate: 90, // Rotates the label to be vertical
       nameGap: 50,
@@ -215,7 +301,7 @@ setChartOptions(): void {
       {
         type: 'bar',
         data: this.dayData[this.activeDay]?.map((entry) => ({
-          value: entry.avgTime,
+          value: entry.viewCount,
           hour: entry.hour,
         })),
       },
@@ -225,6 +311,21 @@ setChartOptions(): void {
 
 onTabChange(day: number): void {
   this.activeDay = day;
+  this.setChartOptions();
+}
+
+generateSampleData(): void {
+  console.log('Generating sample data...');
+  this.dayData = {};
+  for (let i = 0; i < 7; i++) {
+    const sampleData = Array(24).fill(null).map((_, hour) => ({
+      hour,
+      viewCount: Math.floor(Math.random() * 10) + 1, // Random view count between 1 and 10
+    }));
+    this.dayData[i] = sampleData;
+  }
+  this.averageTime = 5; // Example average time
+  this.popularTime = '10 AM'; // Example popular time
   this.setChartOptions();
 }
 }

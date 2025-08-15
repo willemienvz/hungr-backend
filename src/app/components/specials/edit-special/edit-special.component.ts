@@ -51,6 +51,12 @@ export class EditSpecialComponent implements OnInit {
   selectedMediaItem: MediaItem | null = null;
   mediaId: string | null = null;
 
+  // Computed properties for navigation
+  get showNextButton(): boolean {
+    console.log('showNextButton called, currentStep:', this.currentStep, 'result:', this.currentStep < 5);
+    return this.currentStep < 5;
+  }
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -86,6 +92,10 @@ export class EditSpecialComponent implements OnInit {
 
   ngOnInit() {
     this.specialId = this.route.snapshot.paramMap.get('id') || '';
+    const stepParam = this.route.snapshot.paramMap.get('step');
+    if (stepParam) {
+      this.currentStep = parseInt(stepParam, 10);
+    }
     this.fetchSpecialData();
     this.fetchMenus();
     this.trackFormChanges();

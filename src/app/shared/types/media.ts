@@ -118,6 +118,9 @@ export interface MediaUploadRequest {
   
   /** ID of the component initiating the upload */
   componentId?: string;
+
+  /** Optional field name within the component (e.g., 'logo', 'image') */
+  fieldName?: string;
 }
 
 /**

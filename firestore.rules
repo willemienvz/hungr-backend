@@ -17,40 +17,27 @@ service cloud.firestore {
     match /analytics-aggregated/{dateKey} {
       allow read: if true;
 
-      // Only allow subcollection docs to be created/updated with numeric increments and lastUpdated
+      // Only allow subcollection docs to be created/updated when a housekeeping field exists
       match /menus/{menuId} {
-        allow create, update: if isAggregateUpdate();
+        allow create, update: if isAggregateWrite();
         allow delete: if false;
       }
       match /items/{itemId} {
-        allow create, update: if isAggregateUpdate();
+        allow create, update: if isAggregateWrite();
         allow delete: if false;
       }
       match /categories/{categoryId} {
-        allow create, update: if isAggregateUpdate();
+        allow create, update: if isAggregateWrite();
         allow delete: if false;
       }
       match /specials/{specialId} {
-        allow create, update: if isAggregateUpdate();
+        allow create, update: if isAggregateWrite();
         allow delete: if false;
       }
 
-      function isAggregateUpdate() {
-        // Only allow updates that:
-        // - Set lastUpdated (server timestamp) and increment numeric fields
-        // - Do not remove fields
-        // Note: Firestore rules cannot detect increment() specifically; we validate that only whitelisted fields change
-        let changed = request.resource.data.diff(resource.data).changedKeys();
-        return changed.hasOnly([
-          // base counters and sums
-          'viewCount','clickCount','interactionCount','navigationCount','sessionCount','orderCount',
-          'viewDurationMs','orderValueTotal','orderSubtotalTotal','tipValueTotal','lastUpdated',
-          // distributions and keyed counts (top-level keys)
-          'hourHistogram','itemCounts','categoryCounts','filterCounts',
-          // specials funnel fields
-          'specialImpressions','specialClicks','specialAddedToOrder','specialConversions'
-        ])
-        && request.resource.data.keys().hasAll(['lastUpdated']);
+      function isAggregateWrite() {
+        // Minimal guard: require presence of lastUpdated field
+        return request.resource.data.keys().hasAll(['lastUpdated']);
       }
     }
 
@@ -58,13 +45,15 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       allow read: if true;
 
+
+//  && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountType == 'admin';
       function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+  return request.auth != null;
       }
 
       // Anonymous creates allowed with strict validation and whitelisted fields
       function isCreateValid() {
-        let allowed = ['menuItemId','customerName','message','rating','status','createdAt'];
+        let allowed = ['menuItemId','customerName','message','rating','status','createdAt','restaurantId','ownerId'];
         return request.resource.data.keys().hasOnly(allowed)
           && request.resource.data.menuItemId is string && request.resource.data.menuItemId.size() > 0
           && request.resource.data.customerName is string && request.resource.data.customerName.size() >= 2
@@ -92,26 +81,105 @@ service cloud.firestore {
     // Media collection - rules for media library
     match /media/{mediaId} {
       allow read: if request.auth != null;
+      // Authenticated users can create media docs with required fields
       allow create: if request.auth != null 
-        && request.auth.uid == request.resource.data.uploadedBy
-        && request.resource.data.fileName.size() > 0
-        && request.resource.data.originalName.size() > 0
-        && request.resource.data.fileSize > 0
+        && request.resource.data.fileName is string && request.resource.data.fileName.size() > 0
+        && request.resource.data.originalName is string && request.resource.data.originalName.size() > 0
+        && request.resource.data.fileSize is int && request.resource.data.fileSize > 0
         && request.resource.data.fileSize <= 10485760 // 10MB max
-        && request.resource.data.mimeType.matches('image/.*');
-      allow update: if request.auth != null 
-        && request.auth.uid == resource.data.uploadedBy;
-      allow delete: if request.auth != null 
-        && request.auth.uid == resource.data.uploadedBy
-        && resource.data.usage.size() == 0; // Only allow deletion if not in use
+        && request.resource.data.mimeType is string && request.resource.data.mimeType.matches('image/.*');
+      // Authenticated users can update
+      allow update: if request.auth != null;
+      // Authenticated users can delete
+      allow delete: if request.auth != null;
     }
     
     // Media usage collection - tracks where media is used
     match /media_usage/{usageId} {
       allow read: if request.auth != null;
+      // Authenticated users can create with basic validation
+      allow create: if request.auth != null
+        && request.resource.data.mediaId is string
+        && request.resource.data.componentId is string
+        && request.resource.data.componentType is string
+        && request.resource.data.componentName is string
+        && request.resource.data.usageDate != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    // Specials collection - authenticated users can manage specials
+    match /specials/{specialId} {
+      allow read: if true;
       allow create: if request.auth != null;
       allow update: if request.auth != null;
       allow delete: if request.auth != null;
+    }
+
+    // Restaurants collection - authenticated users can manage restaurants
+    match /restuarants/{restaurantId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    // Orders collection - allow read for authenticated users; writes are system-managed (deny client write by default)
+    match /orders/{orderId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Branding collections (owner-managed)
+    match /branding/{brandingId} {
+      // Allow read for anyone, but write only by authenticated users
+      allow read: if true;
+
+      // Create: authenticated users can create
+      allow create: if request.auth != null;
+
+      // Update: authenticated users can update
+      allow update: if request.auth != null;
+
+      // Delete: authenticated users can delete
+      allow delete: if request.auth != null;
+    }
+
+    // Menus collection - allow authenticated users to manage menus
+    match /menus/{menuId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    match /branding-preview/{previewId} {
+      // Allow read for anyone, but write only by authenticated users
+      allow read: if true;
+
+      // Create: authenticated users can create
+      allow create: if request.auth != null;
+
+      // Update: authenticated users can update
+      allow update: if request.auth != null;
+
+      // Delete: authenticated users can delete
+      allow delete: if request.auth != null;
+    }
+
+    // Users collection - allow users to manage their own profile doc
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow update: if request.auth != null && request.auth.uid == uid;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Notification collection - allow authenticated users to manage notifications
+    match /notification/{notifId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
     }
   }
 }

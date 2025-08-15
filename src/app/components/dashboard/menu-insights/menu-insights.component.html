@@ -1,5 +1,8 @@
 @if (layoutMinimised) {
 <div class="inner-page">
+    <div class="loading-container" *ngIf="isLoading">
+        <mat-progress-spinner mode="indeterminate" color="primary" diameter="48"></mat-progress-spinner>
+    </div>
     <div class="row">
         <app-stats-overview-block heading="Total Menu Views" tooltiptext="Tooltip Text" timeText="Last 7 days"
             [stat]="viewingTotalCurrentWeek.toString()"
@@ -37,7 +40,7 @@
             [stat]="topOrderedItems[0]?.name" [movement]="" textSize="S"></app-stats-overview-block>
 
     </div>
-    <div class="row">
+    <div class="row" *ngIf="!isLoading">
         <div class="block biggerBlock">
             <h6 class="heading">Daily Menu Visits</h6>
             <div echarts [options]="chartOptions" class="echart"></div>

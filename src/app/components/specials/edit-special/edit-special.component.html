@@ -78,6 +78,7 @@
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
+      [showNext]="showNextButton"
       [isSaving]="isSaving"
       [nextDisabled]="isStep2Invalid()"
       (previous)="previousStep()"
@@ -132,6 +133,7 @@
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
+      [showNext]="showNextButton"
       [isSaving]="isSaving"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
@@ -178,6 +180,7 @@
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
+      [showNext]="showNextButton"
       [isSaving]="isSaving"
       (previous)="previousStep()"
       (draft)="onDraftSave()"

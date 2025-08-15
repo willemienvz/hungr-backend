@@ -32,6 +32,7 @@
       </ng-container>
     </app-step1-special-basics>
     <app-step-navigation
+      [showNext]="showNextButton"
       [nextDisabled]="isStep1Invalid()"
       [cancelRoute]="'/specials'"
       [isSaving]="isSaving"
@@ -82,6 +83,7 @@
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
+      [showNext]="showNextButton"
       [isSaving]="isSaving"
       [nextDisabled]="isStep2Invalid()"
       (previous)="previousStep()"
@@ -135,6 +137,7 @@
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
+      [showNext]="showNextButton"
       [isSaving]="isSaving"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
@@ -181,6 +184,7 @@
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"
+      [showNext]="showNextButton"
       [isSaving]="isSaving"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
@@ -190,34 +194,31 @@
 
   <!-- Step 5: Overview -->
   <div *ngIf="currentStep === 5">
-    <div class="step1-container openTop">
-      <div class="headerBlock">
-        <app-progress-bar 
-          [progress]="currentStep" 
-          [backRoute]="'/specials'"
-          [backText]="'Back'"
-          (stepClick)="navigateToStep($event)"
-          (backButtonClick)="onBackButtonClick()">
-        </app-progress-bar>
-        <app-step-header
-          [stepNumber]="5"
-          [stepTitle]="'Overview'"
-          [showDescription]="false">
-        </app-step-header>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="block">
-            <h3>Special Details</h3>
-            <p><strong>Title:</strong> {{ specialForm.get('specialTitle')?.value }}</p>
-            <p><strong>Type:</strong> {{ getSpecialTypeLabel(specialForm.get('typeSpecial')?.value) }}</p>
-            <p><strong>Date Range:</strong> {{ specialForm.get('dateFrom')?.value }} - {{ specialForm.get('dateTo')?.value }}</p>
-            <p><strong>Time Range:</strong> {{ specialForm.get('timeFrom')?.value }} - {{ specialForm.get('timeTo')?.value }}</p>
-            <p><strong>Days:</strong> {{ selectedDays.join(', ') }}</p>
-          </div>
+    <app-step5-overview
+      [specialForm]="specialForm"
+      [selectedSpecialType]="selectedSpecialType"
+      [selectedDays]="selectedDays"
+      [addedItems]="addedItems"
+      [isSaving]="isSaving"
+      [editMode]="false"
+    >
+      <ng-container header>
+        <div class="headerBlock">
+          <app-progress-bar 
+            [progress]="currentStep" 
+            [backRoute]="'/specials'"
+            [backText]="'Back'"
+            (stepClick)="navigateToStep($event)"
+            (backButtonClick)="onBackButtonClick()">
+          </app-progress-bar>
+          <app-step-header
+            [stepNumber]="5"
+            [stepTitle]="'Overview'"
+            [showDescription]="false">
+          </app-step-header>
         </div>
-      </div>
-    </div>
+      </ng-container>
+    </app-step5-overview>
     <app-step-navigation
       [showPrevious]="true"
       [showDraft]="true"

@@ -11,6 +11,7 @@ import { environment } from '../../../../environments/environment';
 import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
 import { MediaLibraryService } from '../../../shared/services/media-library.service';
 import { MediaItem } from '../../../shared/types/media';
+import { AuthService } from '../../../shared/services/auth.service';
 
 import { BrandingPreviewMessage } from '../../../types/branding-preview';
 
@@ -40,6 +41,7 @@ export class BrandingComponent implements OnInit {
   originalSettings: any = {};
   previewDocId: string | null = null;
   hasUnsavedChanges: boolean = false;
+  private previewSaveTimer: any = null;
   
   // Debounce mechanism to prevent duplicate calls
   private lastChangeTime: number = 0;
@@ -96,36 +98,43 @@ export class BrandingComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
     private mediaUploadModalService: MediaUploadModalService,
-    private mediaLibraryService: MediaLibraryService
+    private mediaLibraryService: MediaLibraryService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    const userJson = localStorage.getItem('user');
-    console.log('User data from localStorage:', userJson);
-    
-    if (!userJson) {
-      console.error('No user data found in localStorage');
-      return;
-    }
-
-    try {
-      this.user = JSON.parse(userJson);
-      if (!this.user || !this.user.uid) {
-        console.error('Invalid user data:', this.user);
-        return;
+    // Subscribe to authentication state changes
+    this.authService.afAuth.authState.subscribe((user) => {
+      if (user) {
+        this.user = user;
+        this.OwnerID = user.uid;
+        console.log('User authenticated with Firebase, owner ID:', this.OwnerID);
+        console.log('User auth state:', user);
+        
+        // First fetch branding data
+        this.fetchBrandingData();
+        // Then fetch available menus
+        this.fetchMenus();
+        // Also fetch branding collection data
+        this.fetchBranding();
+      } else {
+        console.error('No authenticated user found');
+        this.toastr.error('Please log in to access branding settings');
       }
-      
-      this.OwnerID = this.user.uid;
-      console.log('Initialized with owner ID:', this.OwnerID);
-      
-      // First fetch branding data
-      this.fetchBrandingData();
-      // Then fetch available menus
-      this.fetchMenus();
-      // Also fetch branding collection data
-      this.fetchBranding();
+    });
+  }
+
+  // Debug method to check authentication status
+  private async checkAuthStatus(): Promise<boolean> {
+    try {
+      const currentUser = await this.authService.afAuth.currentUser;
+      console.log('Current auth user:', currentUser);
+      console.log('Component OwnerID:', this.OwnerID);
+      console.log('Component user:', this.user);
+      return !!currentUser;
     } catch (error) {
-      console.error('Error parsing user data:', error);
+      console.error('Error checking auth status:', error);
+      return false;
     }
   }
 
@@ -306,6 +315,14 @@ export class BrandingComponent implements OnInit {
     try {
       this.isSaving = true;
       
+      // Check authentication status
+      const isAuthenticated = await this.checkAuthStatus();
+      if (!isAuthenticated || !this.OwnerID) {
+        throw new Error('User not authenticated');
+      }
+      
+      console.log('Removing logo with OwnerID:', this.OwnerID, 'lastSavedDocId:', this.lastSavedDocId);
+      
       // Clear the image URL
       this.imageUrl = '';
       
@@ -320,6 +337,18 @@ export class BrandingComponent implements OnInit {
             parentID: this.OwnerID
           });
         console.log('Logo removed from branding with media library reference');
+      } else {
+        // If no document exists, create one
+        console.log('No existing branding document found, creating new one');
+        const docRef = await this.firestore
+          .collection('branding')
+          .add({
+            imageUrl: '',
+            logoMediaId: null,
+            parentID: this.OwnerID
+          });
+        this.lastSavedDocId = docRef.id;
+        console.log('Created new branding document with ID:', docRef.id);
       }
       
       this.isSaving = false;
@@ -759,6 +788,17 @@ export class BrandingComponent implements OnInit {
 
   savePreviewSettings(): void {
     if (!this.isPreviewMode) return;
+    // Debounce rapid writes during slider/color changes
+    if (this.previewSaveTimer) {
+      clearTimeout(this.previewSaveTimer);
+    }
+    this.previewSaveTimer = setTimeout(() => {
+      this.savePreviewSettingsImmediate();
+    }, 400);
+  }
+
+  private savePreviewSettingsImmediate(): void {
+    if (!this.isPreviewMode) return;
 
     const previewData = {
       ...this.getBrandingSettings(),
@@ -773,12 +813,12 @@ export class BrandingComponent implements OnInit {
       this.firestore
         .collection('branding-preview')
         .doc(this.previewDocId)
-        .update(previewData)
+        .set(previewData, { merge: true })
         .then(() => {
-          console.log('Preview settings updated');
+          console.log('Preview settings upserted');
         })
         .catch((error) => {
-          console.error('Error updating preview settings:', error);
+          console.warn('Non-fatal preview save error:', error);
         });
     } else {
       // Create new preview document
@@ -790,7 +830,7 @@ export class BrandingComponent implements OnInit {
           console.log('Preview settings saved with ID:', docRef.id);
         })
         .catch((error) => {
-          console.error('Error saving preview settings:', error);
+          console.warn('Non-fatal preview save error:', error);
         });
     }
   }

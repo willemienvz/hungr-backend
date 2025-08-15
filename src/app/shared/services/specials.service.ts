@@ -163,15 +163,19 @@ export class SpecialsService {
    * Track media usage for a special
    */
   trackMediaUsage(mediaId: string, specialId: string, fieldName: string = 'image'): Observable<void> {
-    const usage: MediaUsage = {
-      componentType: 'special',
-      componentId: specialId,
-      componentName: 'Special',
-      usageDate: new Date(),
-      fieldName: fieldName
-    };
-
-    return from(this.mediaLibraryService.trackMediaUsage(mediaId, usage));
+    // Fetch the special to get a human-friendly name for usage tracking
+    return this.getSpecialById(specialId).pipe(
+      switchMap((special) => {
+        const usage: MediaUsage = {
+          componentType: 'special',
+          componentId: specialId,
+          componentName: special?.specialTitle || 'Special',
+          usageDate: new Date(),
+          fieldName: fieldName
+        };
+        return from(this.mediaLibraryService.trackMediaUsage(mediaId, usage));
+      })
+    );
   }
 
   /**

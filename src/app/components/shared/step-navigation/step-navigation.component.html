@@ -19,6 +19,8 @@
       <button *ngIf="showNext" class="btnPrimary" (click)="onNext()" [disabled]="nextDisabled || isDisabled">
         {{ nextText }}
       </button>
+      <!-- Debug info -->
+      <div style="display: none;">showNext: {{ showNext }}</div>
       <a *ngIf="showDone" class="btnPrimary" [routerLink]="cancelRoute" [class.disabled]="isDisabled">
         Done
       </a>

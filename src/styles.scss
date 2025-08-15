@@ -1,6 +1,29 @@
 @use "@angular/material" as mat;
 @include mat.core();
 
+/* Global hungr button variants */
+.btnPrimary {
+  background-color: #16D3D2;
+  color: #fff;
+  border: none;
+  font-family: var(--hungr-font-family);
+}
+
+.btnSecondary {
+  background-color: #F5F5F5;
+  color: #181818;
+  border: 1px solid #DEDEDE;
+  font-family: var(--hungr-font-family);
+}
+
+.btnOutline {
+  background-color: transparent;
+  color: #16D3D2;
+  border: 1px solid #16D3D2;
+  font-family: var(--hungr-font-family);
+}
+
+
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
@@ -49,6 +72,7 @@ $hungr-backend-theme: mat.define-light-theme(
   --hungr-darker-grey: #444444;
   --hungr-font-family: "Poppins", sans-serif;
   --hungr-red: #FE1B54;
+  --hungr-letter-spacing-normal: normal;
 
   --mat-option-selected-state-label-text-color: var(--hungr-secondary-color);
   --mat-minimal-pseudo-checkbox-selected-checkmark-color: var(--hungr-secondary-color);
@@ -92,6 +116,31 @@ $hungr-backend-theme: mat.define-light-theme(
   --mdc-switch-unselected-track-color: #e0e0e0;
   --mdc-switch-disabled-label-text-color: rgba(0, 0, 0, 0.38);
   --mat-select-container-elevation-shadow : 0 5px 10px rgba(0,0,0,0.1);
+}
+
+/* Global letter-spacing reset for backend UI */
+body,
+h1, h2, h3, h4, h5, h6,
+p, label, a, button,
+input, textarea,
+.mdc-typography,
+.mat-mdc-tab .mdc-tab__text-label {
+  letter-spacing: var(--hungr-letter-spacing-normal) !important;
+}
+
+/* Ensure all typography defaults to the Hungr font family */
+html, body, .mdc-typography, .mat-typography {
+  font-family: var(--hungr-font-family) !important;
+}
+
+/* Material MDC Tabs - enforce Hungr font */
+.mat-mdc-tab .mdc-tab__text-label {
+  font-family: var(--hungr-font-family) !important;
+}
+
+/* Also enforce in dialog overlays (e.g., media upload modal) */
+.cdk-overlay-pane .mat-mdc-tab .mdc-tab__text-label {
+  font-family: var(--hungr-font-family) !important;
 }
 
 .material-symbols-outlined {
@@ -339,6 +388,35 @@ textarea {
   color: #2e3646 !important;
   width: 100% !important;
   text-align: center !important;
+}
+
+/* Media Upload Modal specific fixes */
+.cdk-overlay-pane.media-upload-modal .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 12px !important;
+  overflow: visible !important; /* prevent close button ripple clipping */
+}
+
+.cdk-overlay-pane.media-upload-modal .mdc-dialog__title,
+.cdk-overlay-pane.media-upload-modal [mat-dialog-title] {
+  width: auto !important; /* avoid pushing close button off-screen */
+  text-align: left !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  letter-spacing: var(--hungr-letter-spacing-normal) !important;
+}
+
+.cdk-overlay-pane.media-upload-modal .mat-mdc-tab-body-content {
+  padding: 24px !important; /* ensure inner padding around tab content */
+  box-sizing: border-box;
+}
+
+.cdk-overlay-pane.media-upload-modal .mat-mdc-tab .mdc-tab__text-label {
+  letter-spacing: var(--hungr-letter-spacing-normal) !important;
+}
+
+.cdk-overlay-pane.media-upload-modal .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: var(--hungr-secondary-color) !important; /* selected tab color */
 }
 
 .mat-mdc-dialog-container-with-actions .mat-mdc-dialog-content {
@@ -906,4 +984,12 @@ input[type="submit"]:disabled {
 }
 .align-center {
   text-align: center;
+}
+
+/* Centered loading container used in analytics dashboards */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
 }

@@ -184,6 +184,14 @@ const routes: Routes = [
         },
       },
       {
+        path: 'specials/edit-special/:id/:step',
+        component: EditSpecialComponent,
+        data: {
+          title:
+            'Edit Specials<span class="submenuHeading">/Edit A special</span>',
+        },
+      },
+      {
         path: 'specials',
         component: SpecialsLandingComponent,
         data: { title: 'Specials' },

@@ -2,10 +2,12 @@
 
 // Using CSS custom properties defined in global styles.scss
 .modal-header {
-  padding: 0 24px;
+  padding: 0 24px; // ensure basic side padding before detailed header rule below
 }
-.mat-mdc-tab-body-wrapper{
-  padding:20px;
+
+// Remove global padding on tab wrapper to avoid layout glitches and control it locally
+.mat-mdc-tab-body-wrapper {
+  padding: 0;
 }
 
 
@@ -18,7 +20,8 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+  // Allow header actions (e.g., close button ripple) to render fully
+  overflow: visible;
   font-family: var(--hungr-font-family);
 }
 
@@ -27,7 +30,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  // Reduce bottom padding to remove excess space under the title
+  padding: 12px 24px 8px 24px;
   border-bottom: 1px solid #e0e0e0;
   background: white;
 
@@ -40,11 +44,14 @@
     font-weight: 600;
     color: #333;
     font-family: var(--hungr-font-family);
+    letter-spacing: normal;
+    width: auto; // avoid stretching across header
   }
 
   button[mat-icon-button] {
     width: 40px;
     height: 40px;
+    padding: 0;
     border-radius: 50%;
     border: none;
     background: transparent;
@@ -66,6 +73,16 @@
       color: var(--hungr-dark-grey);
     }
   }
+
+  // Remove any default Material title padding/margins applied via mat-dialog-title
+  [mat-dialog-title],
+  .mdc-dialog__title {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    text-align: left !important;
+    letter-spacing: normal !important;
+  }
 }
 
 
@@ -76,7 +93,7 @@
   display: flex;
   flex-direction: column;
   --mat-dialog-headline-padding: 0px;
-  padding: 16px;
+  padding: 0; // let tab content control its own padding
 
 
 
@@ -96,7 +113,7 @@
       .mat-tab-label {
         min-width: 120px;
         padding: 16px 24px;
-        font-family: var(--hungr-font-family);
+        font-family: var(--hungr-font-family) !important;
         font-size: 14px;
         font-weight: 500;
         color: var(--hungr-dark-grey);
@@ -126,12 +143,57 @@
       padding: 0;
     }
 
+    // Angular Material MDC tabs use .mat-mdc-tab-body-content for inner content
+    ::ng-deep .media-upload-modal .mat-mdc-tab-body-content,
+    ::ng-deep .mat-mdc-tab-body-content {
+      padding: 24px !important; // ensure visible spacing around drag-and-drop
+      box-sizing: border-box;
+    }
+
+    // Keep compatibility for non-MDC class name just in case
     ::ng-deep .mat-tab-body {
       flex: 1;
       overflow: auto;
       padding: 16px;
     }
   }
+}
+
+// Tabs: remove letter-spacing and set active color to primary
+::ng-deep .media-upload-modal .mat-mdc-tab .mdc-tab__text-label,
+::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+  letter-spacing: normal !important;
+}
+
+::ng-deep .media-upload-modal .mat-mdc-tab .mdc-tab__text-label {
+  color: var(--hungr-dark-grey);
+}
+
+::ng-deep .media-upload-modal .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label,
+::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: var(--hungr-secondary-color) !important; // selected tab text color
+}
+
+// Tabs underline/indicator color for MDC-based tabs
+::ng-deep .media-upload-modal .mat-mdc-tab .mdc-tab-indicator__content--underline,
+::ng-deep .mat-mdc-tab .mdc-tab-indicator__content--underline {
+  border-color: var(--hungr-secondary-color) !important;
+}
+
+::ng-deep .media-upload-modal .mat-mdc-tab.mdc-tab--active .mdc-tab-indicator__content--underline,
+::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab-indicator__content--underline {
+  border-color: var(--hungr-secondary-color) !important;
+}
+
+// Tab ripple color (focus/press/hover) to primary
+::ng-deep .media-upload-modal .mat-mdc-tab .mat-ripple-element {
+  background-color: var(--hungr-secondary-color) !important;
+}
+
+// Fallback for MDC ripple layers if present
+::ng-deep .media-upload-modal .mat-mdc-tab .mdc-tab__ripple::before,
+::ng-deep .media-upload-modal .mat-mdc-tab .mdc-tab__ripple::after {
+  background-color: var(--hungr-secondary-color) !important;
 }
 
 // Upload Section

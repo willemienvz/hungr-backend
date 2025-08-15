@@ -1,62 +1,57 @@
 <div class="reviews-container">
-  <div class="reviews-header">
-    <h1>Reviews Management</h1>
-    <p>Manage and moderate customer reviews</p>
-  </div>
+  <app-content-block [showHeader]="false">
 
-  <div class="reviews-controls">
-    <div class="reviews-filters">
-      <button 
-        class="filter-btn" 
-        [class.active]="currentFilter === 'all'"
-        (click)="setFilter('all')">
-        All Reviews
-      </button>
-      <button 
-        class="filter-btn" 
-        [class.active]="currentFilter === 'pending'"
-        (click)="setFilter('pending')">
-        Pending
-      </button>
-      <button 
-        class="filter-btn" 
-        [class.active]="currentFilter === 'approved'"
-        (click)="setFilter('approved')">
-        Approved
-      </button>
-      <button 
-        class="filter-btn" 
-        [class.active]="currentFilter === 'rejected'"
-        (click)="setFilter('rejected')">
-        Rejected
-      </button>
-    </div>
-
-    <div class="search-container">
-      <div class="search-input">
-        <i class="material-icons">search</i>
-        <input 
-          type="text" 
-          [value]="searchControl.value"
-          (input)="onSearchInput($event)"
-          placeholder="Search by customer name or message..."
-          class="search-field">
+    <div class="reviews-controls">
+      <div class="search-container">
+        <div class="search-input">
+          <i class="material-icons">search</i>
+          <input 
+            type="text" 
+            [value]="searchControl.value"
+            (input)="onSearchInput($event)"
+            placeholder="Search by customer name or message..."
+            class="search-field">
+        </div>
+      </div>
+      <div class="filter-dropdown">
+        <mat-select 
+          [placeholder]="'Filter by status'" 
+          [value]="currentFilter"
+          (selectionChange)="onFilterChange($event.value)">
+          <mat-option 
+            *ngFor="let option of reviewFilterOptions" 
+            [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+        <mat-icon class="filter-icon">filter_list</mat-icon>
+      </div>
+      <div class="filter-dropdown">
+        <mat-select 
+          [placeholder]="'Filter by restaurant'"
+          [value]="'all'"
+          (selectionChange)="onRestaurantFilterChange($event.value)">
+          <mat-option [value]="'all'">All restaurants</mat-option>
+          <mat-option *ngFor="let r of restaurants" [value]="r.restaurantID">
+            {{ r.restaurantName }}
+          </mat-option>
+        </mat-select>
+        <mat-icon class="filter-icon">store</mat-icon>
       </div>
     </div>
-  </div>
 
-  <div class="reviews-content">
+    <div class="reviews-content">
     <div *ngIf="loading" class="loading">
       <div class="spinner"></div>
       <p>Loading reviews...</p>
     </div>
 
-    <div *ngIf="!loading" class="reviews-list">
-      <ng-container *ngIf="filteredReviews$ | async as reviews; else noReviews">
+      <div *ngIf="!loading" class="reviews-list">
+      <ng-container *ngIf="(paginatedReviews$ | async) as reviews; else noReviews">
         <div *ngFor="let review of reviews" class="review-item">
           <div class="review-header">
             <div class="review-info">
-              <h3>{{ review.customerName }}</h3>
+              <h3>{{ menuItemNameMap[review.menuItemId] || review.menuItemId }}</h3>
               <div class="review-rating">
                 <span class="stars">
                   <i *ngFor="let star of [1,2,3,4,5]" 
@@ -84,42 +79,54 @@
               <i class="material-icons">schedule</i>
               {{ review.createdAt.toLocaleString() }}
             </span>
+            <span *ngIf="review.restaurantId" class="review-scope">
+              <i class="material-icons">store</i>
+              {{ getRestaurantName(review.restaurantId) }}
+            </span>
+            <span class="review-menu-item" *ngIf="review.menuItemId">
+              <i class="material-icons">restaurant_menu</i>
+              {{ menuItemNameMap[review.menuItemId] || review.menuItemId }}
+            </span>
             
-            <div *ngIf="review.moderatedBy" class="moderation-info">
-              <span class="moderated-by">
-                <i class="material-icons">admin_panel_settings</i>
-                Moderated by: {{ review.moderatedBy }}
-              </span>
-              <span *ngIf="review.moderatedAt" class="moderated-date">
-                {{ review.moderatedAt.toLocaleString() }}
-              </span>
-            </div>
+            <!-- Moderated by removed per request -->
           </div>
 
-          <div *ngIf="review.moderationNotes" class="moderation-notes">
-            <strong>Moderation Notes:</strong>
-            <p>{{ review.moderationNotes }}</p>
-          </div>
+          <!-- Moderation notes hidden for now -->
 
-          <div *ngIf="review.status === 'pending'" class="review-actions">
-            <button class="action-btn approve-btn" (click)="approveReview(review)">
+          <div class="review-actions">
+            <ng-container *ngIf="review.status === 'pending'; else approvedActions">
+            <button class="btnPrimary" (click)="approveReview(review)">
               <i class="material-icons">check</i>
               Approve
             </button>
-            <button class="action-btn reject-btn" (click)="rejectReview(review)">
+            <button class="btnOutline" (click)="rejectReview(review)">
               <i class="material-icons">close</i>
               Reject
             </button>
-          </div>
+            </ng-container>
+            <ng-template #approvedActions>
+            <button class="btnOutline" (click)="unapproveReview(review)">
+              <i class="material-icons">undo</i>
+              Unapprove
+            </button>
+            </ng-template>
 
-          <div class="review-actions">
-            <button class="action-btn delete-btn" (click)="deleteReview(review)">
+            <button class="btnSecondary" (click)="deleteReview(review)">
               <i class="material-icons">delete</i>
               Delete
             </button>
           </div>
         </div>
       </ng-container>
+      <div class="review-pagination" *ngIf="(totalPages$ | async) as totalPages">
+        <ng-container *ngIf="(pageIndex$ | async) as pageIndex">
+          <button class="btnSecondary" (click)="goToPage(1, totalPages)">« First</button>
+          <button class="btnSecondary" (click)="goToPage(pageIndex - 1, totalPages)">‹ Prev</button>
+          <span class="page-indicator">Page {{ pageIndex }} of {{ totalPages }}</span>
+          <button class="btnSecondary" (click)="goToPage(pageIndex + 1, totalPages)">Next ›</button>
+          <button class="btnSecondary" (click)="goToPage(totalPages, totalPages)">Last »</button>
+        </ng-container>
+      </div>
 
       <ng-template #noReviews>
         <div class="no-reviews">
@@ -130,4 +137,5 @@
       </ng-template>
     </div>
   </div>
+  </app-content-block>
 </div> 

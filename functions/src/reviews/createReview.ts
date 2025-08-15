@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 
 export const createReview = async (data: any, context: functions.https.CallableContext) => {
   // Unified endpoint: supports authenticated menu-item reviews and anonymous restaurant reviews
-  const { menuItemId, rating, comment, customerName, message, reviewerIp, userAgent } = data || {};
+  const { menuItemId, rating, comment, customerName, message, reviewerIp, userAgent, restaurantId, ownerId } = data || {};
 
   // Branch A: legacy authenticated menu-item review
   if (menuItemId) {
@@ -50,7 +50,9 @@ export const createReview = async (data: any, context: functions.https.CallableC
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         isEdited: false,
-        status: 'pending'
+        status: 'pending',
+        restaurantId: restaurantId || null,
+        ownerId: ownerId || null
       };
       const reviewRef = await admin.firestore().collection('reviews').add(reviewData);
     
@@ -86,7 +88,9 @@ export const createReview = async (data: any, context: functions.https.CallableC
       status: 'pending',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       reviewerIp: reviewerIp || null,
-      userAgent: userAgent || null
+      userAgent: userAgent || null,
+      restaurantId: restaurantId || null,
+      ownerId: ownerId || null
     };
     const docRef = await admin.firestore().collection('reviews').add(review);
     return { success: true, reviewId: docRef.id };

@@ -1,62 +1,22 @@
 .reviews-container {
-  padding: 24px;
+  padding: 0 24px;
   max-width: 1200px;
   margin: 0 auto;
-
-  .reviews-header {
-    margin-bottom: 32px;
-    
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-    }
-    
-    p {
-      color: #666;
-      font-size: 16px;
-      margin: 0;
-    }
-  }
 
   .reviews-controls {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+    align-items: stretch;
     gap: 16px;
-    flex-wrap: wrap;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #e6e9ec;
+    border-radius: 8px;
+    margin-bottom: 16px;
 
-    .reviews-filters {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-
-      .filter-btn {
-        padding: 8px 16px;
-        border: 1px solid #ddd;
-        background: white;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.2s ease;
-        color: #666;
-
-        &:hover {
-          background: #f5f5f5;
-          border-color: #ccc;
-        }
-
-        &.active {
-          background: #1976d2;
-          color: white;
-          border-color: #1976d2;
-        }
-      }
-    }
 
     .search-container {
+      flex: 3 1 75%;
       .search-input {
         position: relative;
         display: flex;
@@ -74,8 +34,9 @@
           border: 1px solid #ddd;
           border-radius: 6px;
           font-size: 14px;
-          width: 300px;
+          width: 100%;
           background: white;
+          font-family: var(--hungr-font-family);
 
           &:focus {
             outline: none;
@@ -89,9 +50,18 @@
         }
       }
     }
+    .filter-dropdown {
+      flex: 1 1 25%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      mat-select { width: 100%; font-family: var(--hungr-font-family); }
+      .filter-icon { color: #9a9a9a; font-size: 20px; }
+    }
   }
 
   .reviews-content {
+    font-family: var(--hungr-font-family);
     .loading {
       display: flex;
       flex-direction: column;
@@ -122,12 +92,13 @@
 
     .reviews-list {
       .review-item {
+        font-family: var(--hungr-font-family);
         background: white;
-        border: 1px solid #e0e0e0;
+        border: 1px solid #e6e9ec;
         border-radius: 8px;
         padding: 20px;
         margin-bottom: 16px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
         .review-header {
           display: flex;
@@ -179,13 +150,13 @@
               text-transform: uppercase;
 
               &.status-pending {
-                background: #fff3cd;
-                color: #856404;
+                background: #ffeaa7;
+                color: #d68910;
               }
 
               &.status-approved {
-                background: #d4edda;
-                color: #155724;
+                background: #e8f5e8;
+                color: #2e7d32;
               }
 
               &.status-rejected {
@@ -225,26 +196,12 @@
             }
           }
 
-          .moderation-info {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-
-            .moderated-by {
-              display: flex;
+            .review-menu-item, .review-scope {
+              display: inline-flex;
               align-items: center;
               gap: 4px;
-
-              .material-icons {
-                font-size: 16px;
-              }
+              margin-left: 10px;
             }
-
-            .moderated-date {
-              font-size: 12px;
-            }
-          }
         }
 
         .moderation-notes {
@@ -268,53 +225,25 @@
 
         .review-actions {
           display: flex;
-          gap: 8px;
+          gap: 10px;
           margin-top: 16px;
           padding-top: 16px;
           border-top: 1px solid #f0f0f0;
+          justify-content: flex-end;
 
-          .action-btn {
-            display: flex;
+          .btnPrimary, .btnSecondary, .btnOutline {
+            display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
+            gap: 6px;
+            font-family: var(--hungr-font-family);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+          }
 
-            .material-icons {
-              font-size: 16px;
-            }
-
-            &.approve-btn {
-              background: #4caf50;
-              color: white;
-
-              &:hover {
-                background: #45a049;
-              }
-            }
-
-            &.reject-btn {
-              background: #f44336;
-              color: white;
-
-              &:hover {
-                background: #da190b;
-              }
-            }
-
-            &.delete-btn {
-              background: #ff9800;
-              color: white;
-
-              &:hover {
-                background: #e68900;
-              }
-            }
+          .material-icons {
+            font-size: 16px;
           }
         }
       }
@@ -340,6 +269,23 @@
         p {
           font-size: 16px;
           margin: 0;
+        }
+      }
+
+      .review-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+
+        .page-indicator {
+          font-family: var(--hungr-font-family);
+          color: #666;
+        }
+
+        .btnSecondary {
+          padding: 6px 12px;
         }
       }
     }

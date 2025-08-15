@@ -363,7 +363,7 @@ export class MenuItemFormComponent implements OnInit {
         await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
           componentType: 'menuItem',
           componentId: this.menuItem.itemId || 'new',
-          componentName: 'Menu Item',
+          componentName: this.menuItem?.name || 'Menu Item',
           usageDate: new Date(),
           fieldName: 'images'
         });

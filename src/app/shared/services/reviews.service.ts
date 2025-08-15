@@ -36,7 +36,7 @@ export class ReviewsService {
   /**
    * Creates a new review
    */
-  createReview(request: CreateReviewRequest & { menuItemId: string }): Observable<ReviewResponse<Review>> {
+  createReview(request: CreateReviewRequest & { menuItemId: string; restaurantId?: string; ownerId?: string }): Observable<ReviewResponse<Review>> {
     try {
       const reviewData = {
         menuItemId: (request as any).menuItemId,
@@ -46,7 +46,9 @@ export class ReviewsService {
         status: 'pending' as ReviewStatus,
         createdAt: Timestamp.now(),
         reviewerIp: request.reviewerIp,
-        userAgent: request.userAgent
+        userAgent: request.userAgent,
+        restaurantId: (request as any).restaurantId || null,
+        ownerId: (request as any).ownerId || null
       };
 
       return from(this.reviewsCollection.add(reviewData)).pipe(
@@ -91,47 +93,58 @@ export class ReviewsService {
   /**
    * Gets all reviews with optional filtering
    */
-  getReviews(filters?: ReviewFilters & { menuItemId?: string }): Observable<Review[]> {
-    let query: any = this.reviewsCollection.ref;
+  getReviews(filters?: ReviewFilters & { menuItemId?: string; restaurantId?: string; ownerId?: string }): Observable<Review[]> {
+    const collection = this.firestore.collection<ReviewDocument>(this.collectionName, (ref: Query) => {
+      let query: Query = ref;
 
-    if ((filters as any)?.menuItemId) {
-      query = query.where('menuItemId', '==', (filters as any).menuItemId);
-    }
+      if ((filters as any)?.menuItemId) {
+        query = query.where('menuItemId', '==', (filters as any).menuItemId);
+      }
 
-    // Apply status filter
-    if (filters?.status) {
-      query = query.where('status', '==', filters.status);
-    }
+      if ((filters as any)?.restaurantId) {
+        query = query.where('restaurantId', '==', (filters as any).restaurantId);
+      }
 
-    // Apply rating range filter
-    if (filters?.ratingRange) {
-      query = query.where('rating', '>=', filters.ratingRange.min)
-                   .where('rating', '<=', filters.ratingRange.max);
-    }
+      if ((filters as any)?.ownerId) {
+        query = query.where('ownerId', '==', (filters as any).ownerId);
+      }
 
-    // Apply date range filter
-    if (filters?.dateRange) {
-      query = query.where('createdAt', '>=', Timestamp.fromDate(filters.dateRange.start))
-                   .where('createdAt', '<=', Timestamp.fromDate(filters.dateRange.end));
-    }
+      // Apply status filter
+      if (filters?.status) {
+        query = query.where('status', '==', filters.status);
+      }
 
-    // Apply sorting
-    if (filters?.sortBy) {
-      query = query.orderBy(filters.sortBy, filters.sortOrder || 'desc');
-    } else {
-      query = query.orderBy('createdAt', 'desc');
-    }
+      // Apply rating range filter
+      if (filters?.ratingRange) {
+        query = query.where('rating', '>=', filters.ratingRange.min)
+                     .where('rating', '<=', filters.ratingRange.max);
+      }
 
-    // Apply pagination (limit only, offset not available in Firestore)
-    if (filters?.pagination) {
-      const { limit } = filters.pagination;
-      query = query.limit(limit);
-    }
+      // Apply date range filter
+      if (filters?.dateRange) {
+        query = query.where('createdAt', '>=', Timestamp.fromDate(filters.dateRange.start))
+                     .where('createdAt', '<=', Timestamp.fromDate(filters.dateRange.end));
+      }
 
-    return from(query.get()).pipe(
-      map((snapshot: any) => 
-        snapshot.docs.map((doc: any) => this.convertDocumentToReview(doc.id, doc.data()))
-      ),
+      // Apply sorting
+      if (filters?.sortBy) {
+        query = query.orderBy(filters.sortBy, filters.sortOrder || 'desc');
+      } else {
+        query = query.orderBy('createdAt', 'desc');
+      }
+
+      // Apply pagination (limit only, offset not available in Firestore)
+      if (filters?.pagination) {
+        const { limit } = filters.pagination;
+        query = query.limit(limit);
+      }
+
+      return query;
+    });
+
+    // Realtime stream via snapshotChanges so UI updates instantly on approvals
+    return collection.snapshotChanges().pipe(
+      map(snaps => snaps.map(snap => this.convertDocumentToReview(snap.payload.doc.id, snap.payload.doc.data() as ReviewDocument))),
       catchError(error => {
         console.error('Error getting reviews:', error);
         return of([]);
@@ -213,6 +226,17 @@ export class ReviewsService {
   rejectReview(id: string, moderatedBy: string, notes?: string): Observable<ReviewResponse<Review>> {
     return this.updateReviewStatus(id, {
       status: 'rejected',
+      moderatedBy,
+      moderationNotes: notes
+    });
+  }
+
+  /**
+   * Unapproves a review (revert to pending)
+   */
+  unapproveReview(id: string, moderatedBy: string, notes?: string): Observable<ReviewResponse<Review>> {
+    return this.updateReviewStatus(id, {
+      status: 'pending',
       moderatedBy,
       moderationNotes: notes
     });
@@ -330,7 +354,9 @@ export class ReviewsService {
       moderatedAt: doc.moderatedAt?.toDate(),
       moderationNotes: doc.moderationNotes,
       reviewerIp: doc.reviewerIp,
-      userAgent: doc.userAgent
+      userAgent: doc.userAgent,
+      restaurantId: doc.restaurantId,
+      ownerId: doc.ownerId
     };
   }
 

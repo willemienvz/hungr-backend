@@ -1,5 +1,8 @@
 @if (layoutMinimised) {
 <div class="inner-page">
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-progress-spinner mode="indeterminate" color="primary" diameter="48"></mat-progress-spinner>
+  </div>
   <div class="row">
     <app-stats-overview-block
       heading="Total menu views"
@@ -24,7 +27,7 @@
 
 } @else {
 <div class="inner-page">
-  <div class="row">
+  <div class="row" *ngIf="!isLoading">
     <app-stats-overview-block
       heading="Total menu views"
       tooltiptext="Tooltip Text"

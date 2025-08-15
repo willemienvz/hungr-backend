@@ -458,7 +458,8 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
         description: this.uploadForm.get('description')?.value,
         isPublic: this.uploadForm.get('isPublic')?.value,
         componentType: this.componentType,
-        componentId: this.componentId
+        componentId: this.componentId,
+        fieldName: this.fieldName
       };
 
       const mediaItem = await this.mediaLibraryService.uploadMedia(request);

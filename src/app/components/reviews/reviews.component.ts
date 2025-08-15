@@ -2,8 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ReviewsService } from '../../shared/services/reviews.service';
 import { Review, ReviewStatus } from '../../shared/types/review.interface';
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { map, switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { map, switchMap, debounceTime, distinctUntilChanged, startWith, tap } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
+import { AuthService } from '../../shared/services/auth.service';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Restaurant } from '../../shared/services/restaurant';
+import { Menu } from '../../shared/services/menu';
 
 @Component({
   selector: 'app-reviews',
@@ -16,12 +20,28 @@ export class ReviewsComponent implements OnInit {
   approvedReviews$: Observable<Review[]>;
   rejectedReviews$: Observable<Review[]>;
   filteredReviews$: Observable<Review[]>;
+  paginatedReviews$: Observable<Review[]>;
+  totalPages$: Observable<number>;
   currentFilter: ReviewStatus | 'all' = 'all';
   loading = false;
   searchControl = new FormControl('');
-  currentUserId = 'admin'; // This should come from auth service in real implementation
+  private restaurantFilter$ = new BehaviorSubject<string>('all');
+  pageIndex$ = new BehaviorSubject<number>(1);
+  pageSize = 20;
+  currentUserId = 'admin'; // fallback
+  reviewFilterOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' }
+  ];
 
-  constructor(private reviewsService: ReviewsService) {
+  constructor(
+    private reviewsService: ReviewsService,
+    private authService: AuthService,
+    private firestore: AngularFirestore
+  ) {
+    // Scope by owner
     this.reviews$ = this.reviewsService.getReviews();
     this.pendingReviews$ = this.reviewsService.getPendingReviews();
     this.approvedReviews$ = this.reviewsService.getApprovedReviews();
@@ -29,10 +49,34 @@ export class ReviewsComponent implements OnInit {
     
     // Set up filtered reviews with search
     this.filteredReviews$ = this.getFilteredReviews();
+    this.paginatedReviews$ = combineLatest([this.filteredReviews$, this.pageIndex$]).pipe(
+      map(([reviews, pageIndex]) => {
+        const start = (pageIndex - 1) * this.pageSize;
+        return reviews.slice(start, start + this.pageSize);
+      })
+    );
+    this.totalPages$ = this.filteredReviews$.pipe(
+      map(reviews => Math.max(1, Math.ceil(reviews.length / this.pageSize)))
+    );
   }
 
   ngOnInit(): void {
-    this.loadReviews();
+    // Load current user and scope lists by owner
+    this.authService.getCurrentUserId().then(uid => {
+      if (uid) {
+        this.currentUserId = uid;
+        // Recreate streams with owner filter
+        this.reviews$ = this.reviewsService.getReviews({ ownerId: uid });
+        this.pendingReviews$ = this.reviewsService.getReviews({ status: 'pending', ownerId: uid });
+        this.approvedReviews$ = this.reviewsService.getReviews({ status: 'approved', ownerId: uid });
+        this.rejectedReviews$ = this.reviewsService.getReviews({ status: 'rejected', ownerId: uid });
+        // Update filtered stream
+        this.filteredReviews$ = this.getFilteredReviews();
+        this.loadRestaurantsForOwner(uid);
+        this.loadMenuItemsForOwner(uid);
+      }
+      this.loadReviews();
+    });
   }
 
   loadReviews(): void {
@@ -43,24 +87,56 @@ export class ReviewsComponent implements OnInit {
 
   setFilter(filter: ReviewStatus | 'all'): void {
     this.currentFilter = filter;
+    // Recreate filtered stream so new tab's base observable is used
+    this.filteredReviews$ = this.getFilteredReviews();
     this.loadReviews();
+  }
+
+  onFilterChange(value: string): void {
+    this.setFilter(value as ReviewStatus | 'all');
+    this.pageIndex$.next(1);
+  }
+
+  onRestaurantFilterChange(value: string): void {
+    this.restaurantFilter$.next(value || 'all');
+    this.pageIndex$.next(1);
+  }
+
+  goToPage(page: number, totalPages: number): void {
+    const safe = Math.min(Math.max(page, 1), totalPages);
+    this.pageIndex$.next(safe);
   }
 
   getFilteredReviews(): Observable<Review[]> {
     const baseReviews$ = this.getBaseReviews();
     const searchTerm$ = this.searchControl.valueChanges.pipe(
+      startWith(this.searchControl.value || ''),
       debounceTime(300),
       distinctUntilChanged(),
       map(term => term?.toLowerCase() || '')
     );
 
-    return combineLatest([baseReviews$, searchTerm$]).pipe(
-      map(([reviews, searchTerm]) => {
-        if (!searchTerm) return reviews;
-        return reviews.filter(review => 
-          review.customerName.toLowerCase().includes(searchTerm) ||
-          review.message.toLowerCase().includes(searchTerm)
-        );
+    return combineLatest([baseReviews$, searchTerm$, this.restaurantFilter$]).pipe(
+      tap(([reviews]) => this.ensureModeratorNamesCached(reviews)),
+      map(([reviews, searchTerm, restaurantId]) => {
+        let result = reviews;
+        if (searchTerm) {
+          result = result.filter(review =>
+            review.customerName.toLowerCase().includes(searchTerm) ||
+            review.message.toLowerCase().includes(searchTerm)
+          );
+        }
+        if (restaurantId && restaurantId !== 'all') {
+          result = result.filter(r => (r.restaurantId || '') === restaurantId);
+        }
+        const statusPriority: Record<ReviewStatus, number> = { pending: 0, approved: 1, rejected: 2 } as const;
+        result = [...result].sort((a, b) => {
+          const pa = statusPriority[a.status];
+          const pb = statusPriority[b.status];
+          if (pa !== pb) return pa - pb;
+          return (b.createdAt?.getTime?.() || 0) - (a.createdAt?.getTime?.() || 0);
+        });
+        return result;
       })
     );
   }
@@ -114,6 +190,87 @@ export class ReviewsComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  unapproveReview(review: Review): void {
+    this.loading = true;
+    this.reviewsService.unapproveReview(review.id, this.currentUserId, 'Reverted to pending by admin').subscribe({
+      next: (result) => {
+        if (result.success) {
+          console.log('Review unapproved successfully');
+          this.loadReviews();
+        } else {
+          console.error('Failed to unapprove review:', result.error);
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error unapproving review:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  // ===== Display helpers and caching for names =====
+  restaurantNameMap: Record<string, string> = {};
+  userNameMap: Record<string, string> = {};
+  menuItemNameMap: Record<string, string> = {};
+  restaurants: Restaurant[] = [];
+
+  private loadRestaurantsForOwner(ownerId: string): void {
+    this.firestore
+      .collection<Restaurant>('restuarants', ref => ref.where('ownerID', '==', ownerId))
+      .valueChanges()
+      .subscribe(restaurants => {
+        restaurants.forEach(r => {
+          if (r.restaurantID) this.restaurantNameMap[r.restaurantID] = r.restaurantName;
+        });
+      });
+  }
+
+  private loadMenuItemsForOwner(ownerId: string): void {
+    this.firestore
+      .collection<Menu>('menus', ref => ref.where('OwnerID', '==', ownerId))
+      .valueChanges()
+      .subscribe(menus => {
+        menus.forEach(menu => {
+          const items: any[] = (menu as any).items || (menu as any).menuItems || [];
+          items.forEach(item => {
+            if (item?.itemId && item?.name) {
+              this.menuItemNameMap[item.itemId] = item.name;
+            }
+          });
+        });
+      });
+  }
+
+  getRestaurantName(restaurantId?: string | null): string {
+    if (!restaurantId) return '';
+    return this.restaurantNameMap[restaurantId] || restaurantId;
+  }
+
+  private ensureModeratorNamesCached(reviews: Review[]): void {
+    reviews.forEach(r => {
+      const uid = r.moderatedBy;
+      if (uid && !this.userNameMap[uid]) {
+        this.firestore
+          .collection<any>('users', ref => ref.where('uid', '==', uid))
+          .valueChanges()
+          .pipe(startWith([] as any[]))
+          .subscribe(users => {
+            const u = users && users[0];
+            if (u) {
+              const display = [u.firstName, u.Surname].filter(Boolean).join(' ').trim() || u.email || uid;
+              this.userNameMap[uid] = display;
+            }
+          });
+      }
+    });
+  }
+
+  getUserName(uid?: string | null): string {
+    if (!uid) return '';
+    return this.userNameMap[uid] || uid;
   }
 
   deleteReview(review: Review): void {

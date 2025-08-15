@@ -188,7 +188,7 @@ export class MediaLibraryService {
         await this.trackMediaUsage(mediaItem.id, {
           componentType: request.componentType as any,
           componentId: request.componentId,
-          componentName: request.componentType,
+          componentName: request.fieldName || request.componentType,
           usageDate: new Date()
         });
       }

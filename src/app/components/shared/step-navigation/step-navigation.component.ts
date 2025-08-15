@@ -10,7 +10,14 @@ export class StepNavigationComponent {
   @Input() showDraft: boolean = false;
   @Input() showPublish: boolean = false;
   @Input() showSubmit: boolean = false;
-  @Input() showNext: boolean = true;
+  @Input() set showNext(value: boolean) {
+    console.log('StepNavigation: showNext set to:', value);
+    this._showNext = value;
+  }
+  get showNext(): boolean {
+    return this._showNext;
+  }
+  private _showNext: boolean = true;
   @Input() showPrevious: boolean = false;
   @Input() showDone: boolean = false;
   @Input() nextDisabled: boolean = false;

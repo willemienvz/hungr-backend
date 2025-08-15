@@ -52,6 +52,12 @@ export class AddSpecialComponent implements OnInit {
   selectedMediaItem: MediaItem | null = null;
   mediaId: string | null = null;
 
+  // Computed properties for navigation
+  get showNextButton(): boolean {
+    console.log('showNextButton called, currentStep:', this.currentStep, 'result:', this.currentStep < 5);
+    return this.currentStep < 5;
+  }
+
   constructor(
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,

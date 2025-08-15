@@ -16,6 +16,7 @@ interface ItemPair {
   styleUrls: ['./menu-insights.component.scss'],
 })
 export class MenuInsightsComponent {
+  isLoading: boolean = false;
   userDataID: string = '';
   menus$: Observable<any[]> | undefined;
   restaurant$: Observable<any[]> | undefined;
@@ -57,15 +58,17 @@ export class MenuInsightsComponent {
   ngOnInit(): void {}
 
   fetchMenus() {
+    this.isLoading = true;
     // Read aggregated analytics for the last 7 days for all menus owned by this user
+    // Build UTC date keys to match frontend aggregator buckets
     const today = new Date();
     const dates: string[] = [];
     for (let i = 0; i < 7; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
+      const d = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+      d.setUTCDate(d.getUTCDate() - i);
+      const yyyy = d.getUTCFullYear();
+      const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(d.getUTCDate()).padStart(2, '0');
       dates.push(`${yyyy}-${mm}-${dd}`);
     }
 
@@ -76,8 +79,15 @@ export class MenuInsightsComponent {
 
     this.menus$.subscribe({
       next: async (menus) => {
-        const menuIds = menus.map((m) => (m.payload.doc.data() as any).menuID).filter(Boolean);
-        if (menuIds.length === 0) return;
+        // Create a mapping from menuID to menuName
+        const menuIdToNameMap: { [menuId: string]: string } = {};
+        const menuIds = menus.map((m) => {
+          const menuData = m.payload.doc.data() as any;
+          menuIdToNameMap[menuData.menuID] = menuData.menuName;
+          return menuData.menuID;
+        }).filter(Boolean);
+        
+        if (menuIds.length === 0) { this.isLoading = false; return; }
 
         // Aggregate across dates
         let totalViews7d = 0;
@@ -86,44 +96,39 @@ export class MenuInsightsComponent {
         const categoryCountsAgg: { [categoryId: string]: number } = {};
         const itemCountsAgg: { [itemId: string]: { name: string; count: number } } = {};
 
+        const tasks: Array<Promise<{ dateKey: string; menuId: string; data: any | null }>> = [];
         for (const dateKey of dates) {
           dailyVisits[dateKey] = {};
           for (const menuId of menuIds) {
-            try {
-              const docRef = this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`);
-              const snap = await docRef.get();
-              if (snap.exists) {
-                const data: any = snap.data();
-                const views = data?.viewCount || 0;
-                dailyVisits[dateKey][menuId] = views;
-                totalViews7d += views;
-                if (dateKey === dates[0]) totalViews24h += views;
-
-                // Aggregate keyed counts for categories and items if present
-                const categoryCounts = data?.categoryCounts || {};
-                Object.keys(categoryCounts).forEach((cid) => {
-                  categoryCountsAgg[cid] = (categoryCountsAgg[cid] || 0) + (categoryCounts[cid] || 0);
-                });
-
-                const itemCounts = data?.itemCounts || {};
-                Object.keys(itemCounts).forEach((iid) => {
-                  const count = itemCounts[iid] || 0;
-                  // We do not have item names in aggregates; store id as name fallback
-                  const existing = itemCountsAgg[iid] || { name: iid, count: 0 };
-                  itemCountsAgg[iid] = { name: existing.name, count: existing.count + count };
-                });
-              } else {
-                dailyVisits[dateKey][menuId] = 0;
-              }
-            } catch (err) {
-              console.error('Error loading aggregated analytics', dateKey, menuId, err);
-              dailyVisits[dateKey][menuId] = 0;
-            }
+            const docRef = this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`);
+            tasks.push(
+              docRef
+                .get()
+                .then((snap) => ({ dateKey, menuId, data: snap.exists ? (snap.data() as any) : null }))
+                .catch(() => ({ dateKey, menuId, data: null }))
+            );
           }
+        }
+        const results = await Promise.all(tasks);
+        for (const { dateKey, menuId, data } of results) {
+          const views = data?.viewCount || 0;
+          dailyVisits[dateKey][menuId] = views;
+          totalViews7d += views;
+          if (dateKey === dates[0]) totalViews24h += views;
+          const categoryCounts = data?.categoryCounts || {};
+          Object.keys(categoryCounts).forEach((cid) => {
+            categoryCountsAgg[cid] = (categoryCountsAgg[cid] || 0) + (categoryCounts[cid] || 0);
+          });
+          const itemCounts = data?.itemCounts || {};
+          Object.keys(itemCounts).forEach((iid) => {
+            const count = itemCounts[iid] || 0;
+            const existing = itemCountsAgg[iid] || { name: iid, count: 0 };
+            itemCountsAgg[iid] = { name: existing.name, count: existing.count + count };
+          });
         }
 
         // Update charts and totals
-        this.updateChartOptions(dailyVisits);
+        this.updateChartOptions(dailyVisits, menuIdToNameMap);
         this.viewingTotalCurrentWeek = totalViews7d;
         this.viewingTotalLast24Hours = totalViews24h;
 
@@ -136,8 +141,9 @@ export class MenuInsightsComponent {
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);
         this.updateMostOrderedItemsChart();
+        this.isLoading = false;
       },
-      error: (error) => console.error('Error fetching menus:', error),
+      error: (error) => { console.error('Error fetching menus:', error); this.isLoading = false; },
     });
   }
 
@@ -264,9 +270,10 @@ export class MenuInsightsComponent {
       });
     });
     this.categoryOrderCounts = categoryCounts;
-    this.mostOrderedCategory = Object.keys(categoryCounts).reduce((a, b) =>
-      categoryCounts[a] > categoryCounts[b] ? a : b
-    );
+    const keys = Object.keys(categoryCounts);
+    this.mostOrderedCategory = keys.length
+      ? keys.reduce((a, b) => (categoryCounts[a] > categoryCounts[b] ? a : b))
+      : '';
   }
 
   calculateCategoryOrderPercentages() {
@@ -274,6 +281,11 @@ export class MenuInsightsComponent {
       (sum, count) => sum + count,
       0
     );
+
+    if (totalOrders === 0) {
+      this.updateCategoryPercentageChart([]);
+      return;
+    }
 
     const categoryPercentages = Object.keys(this.categoryOrderCounts).map(
       (category) => ({
@@ -370,7 +382,7 @@ export class MenuInsightsComponent {
 
   updateChartOptions(dailyVisits: {
     [date: string]: { [menuId: string]: number };
-  }) {
+  }, menuIdToNameMap: { [menuId: string]: string }) {
     const dates = Object.keys(dailyVisits).sort();
     const menuIds = new Set<string>();
 
@@ -380,14 +392,29 @@ export class MenuInsightsComponent {
     });
 
     // Prepare series data for each menuId
-    const seriesData = Array.from(menuIds).map((menuId) => ({
-      name: menuId,
-      type: 'line',
-      smooth: true,
-      data: dates.map((date) => dailyVisits[date][menuId] || 0), // Use 0 if no data for that date
-      areaStyle: {},
-      lineStyle: { color: this.getMenuColor(menuId) },
-    }));
+    const seriesData = Array.from(menuIds).map((menuId) => {
+      const color = this.getMenuColor(menuId);
+      return {
+        name: menuIdToNameMap[menuId] || menuId,
+        type: 'line',
+        smooth: true,
+        data: dates.map((date) => dailyVisits[date][menuId] || 0), // Use 0 if no data for that date
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: color + '40' }, // 25% opacity at top
+              { offset: 1, color: color + '00' }  // 0% opacity at bottom
+            ]
+          }
+        },
+        lineStyle: { color: color },
+      };
+    });
 
     this.chartOptions = {
       title: {
@@ -398,7 +425,7 @@ export class MenuInsightsComponent {
         trigger: 'axis',
       },
       legend: {
-        data: Array.from(menuIds),
+        data: Array.from(menuIds).map(menuId => menuIdToNameMap[menuId] || menuId),
         bottom: 0,
       },
       xAxis: {
@@ -413,8 +440,32 @@ export class MenuInsightsComponent {
     };
   }
 
+  // Configurable color array for menu lines
+  private menuColors: string[] = ['#1FCC96', '#C49DFF', '#FFA500', '#FF6347', '#4A90E2', '#F39C12', '#E74C3C', '#9B59B6'];
+
   getMenuColor(menuId: string): string {
-    const colors = ['#1FCC96', '#C49DFF', '#FFA500', '#FF6347'];
-    return colors[parseInt(menuId, 10) % colors.length];
+    const hash = Array.from(menuId).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+    return this.menuColors[hash % this.menuColors.length];
+  }
+
+  // Method to update the color array
+  setMenuColors(colors: string[]): void {
+    this.menuColors = colors;
+  }
+
+  // Example method to set custom colors
+  setCustomMenuColors(): void {
+    // Example: Set custom colors for your brand
+    const customColors = [
+      '#FF6B6B', // Coral Red
+      '#4ECDC4', // Turquoise
+      '#45B7D1', // Sky Blue
+      '#96CEB4', // Mint Green
+      '#FFEAA7', // Soft Yellow
+      '#DDA0DD', // Plum
+      '#98D8C8', // Seafoam
+      '#F7DC6F'  // Golden Yellow
+    ];
+    this.setMenuColors(customColors);
   }
 }

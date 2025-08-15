@@ -127,6 +127,7 @@ import { MenuDetailsModalComponent } from './components/shared/menu-details-moda
 import { ContentBlockComponent } from './components/shared/content-block/content-block.component';
 import { MediaLibraryComponent } from './components/media-library/media-library.component';
 import { FileSizePipe } from './shared/pipes/file-size.pipe';
+import { ReviewsComponent } from './components/reviews/reviews.component';
 
 @NgModule({
   declarations: [
@@ -218,6 +219,7 @@ import { FileSizePipe } from './shared/pipes/file-size.pipe';
     FileSizePipe,
     MediaUploadModalComponent,
     MediaPreviewDialogComponent,
+      ReviewsComponent,
   ],
   imports: [
     BrowserModule,

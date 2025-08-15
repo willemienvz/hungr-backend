@@ -45,6 +45,11 @@ export interface Review {
   
   /** User agent string (for spam prevention) */
   userAgent?: string;
+
+  /** Restaurant scope for filtering in admin */
+  restaurantId?: string;
+  /** Owner scope for filtering in admin */
+  ownerId?: string;
 }
 
 /**
@@ -68,6 +73,8 @@ export interface ReviewDocument {
   moderationNotes?: string;
   reviewerIp?: string;
   userAgent?: string;
+  restaurantId?: string;
+  ownerId?: string;
 }
 
 /**

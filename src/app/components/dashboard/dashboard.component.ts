@@ -12,6 +12,7 @@ import { ViewingTime } from '../../shared/services/viewingTime';
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
+  isLoading: boolean = false;
   averageTime:number = 0;
   popularTime: string = '';
 
@@ -76,15 +77,17 @@ export class DashboardComponent implements OnInit {
   }
 
   fetchMenus() {
+    this.isLoading = true;
     // Read aggregated analytics for the last 14 days to compute current vs previous week
+    // Build UTC date keys to match frontend aggregator buckets
     const today = new Date();
     const dates: string[] = [];
     for (let i = 0; i < 14; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
+      const d = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+      d.setUTCDate(d.getUTCDate() - i);
+      const yyyy = d.getUTCFullYear();
+      const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(d.getUTCDate()).padStart(2, '0');
       dates.push(`${yyyy}-${mm}-${dd}`);
     }
 
@@ -94,8 +97,15 @@ export class DashboardComponent implements OnInit {
 
     this.menus$.subscribe({
       next: async (menus) => {
-        const menuIds = menus.map((m) => (m.payload.doc.data() as any).menuID).filter(Boolean);
-        if (menuIds.length === 0) return;
+        // Create a mapping from menuID to menuName
+        const menuIdToNameMap: { [menuId: string]: string } = {};
+        const menuIds = menus.map((m) => {
+          const menuData = m.payload.doc.data() as any;
+          menuIdToNameMap[menuData.menuID] = menuData.menuName;
+          return menuData.menuID;
+        }).filter(Boolean);
+        
+        if (menuIds.length === 0) { this.isLoading = false; return; }
 
         let currentWeek = 0;
         let previousWeek = 0;
@@ -103,23 +113,45 @@ export class DashboardComponent implements OnInit {
         let prev24h = 0;
         let currentOrderValue = 0;
         let previousOrderValue = 0;
+        let totalDuration = 0;
+        let totalViews = 0;
         const dailyVisits: { [date: string]: { [menuId: string]: number } } = {};
+        const hourHistogram: { [hour: string]: number } = {};
 
+        // Prepare all document fetches in parallel to reduce round trips
+        const tasks: Array<Promise<{ idx: number; dateKey: string; menuId: string; data: any | null }>> = [];
         for (const [idx, dateKey] of dates.entries()) {
           dailyVisits[dateKey] = {};
           for (const menuId of menuIds) {
-            try {
-              const snap = await this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`).get();
-              const data: any = snap.exists ? (snap.data() as any) : null;
-              const views = data?.viewCount || 0;
-              dailyVisits[dateKey][menuId] = views;
-              if (idx < 7) currentWeek += views; else previousWeek += views;
-              if (idx === 0) last24h += views; if (idx === 1) prev24h += views;
-              if (data) {
-                const orderValueTotal = Number(data.orderValueTotal || 0);
-                if (idx < 7) currentOrderValue += orderValueTotal; else previousOrderValue += orderValueTotal;
-              }
-            } catch {}
+            const docRef = this.firestore.firestore.doc(`analytics-aggregated/${dateKey}/menus/${menuId}`);
+            tasks.push(
+              docRef
+                .get()
+                .then((snap) => ({ idx, dateKey, menuId, data: snap.exists ? (snap.data() as any) : null }))
+                .catch(() => ({ idx, dateKey, menuId, data: null }))
+            );
+          }
+        }
+
+        const results = await Promise.all(tasks);
+        for (const { idx, dateKey, menuId, data } of results) {
+          const views = data?.viewCount || 0;
+          dailyVisits[dateKey][menuId] = views;
+          if (idx < 7) currentWeek += views; else previousWeek += views;
+          if (idx === 0) last24h += views; if (idx === 1) prev24h += views;
+          if (data) {
+            const orderValueTotal = Number(data.orderValueTotal || 0);
+            if (idx < 7) currentOrderValue += orderValueTotal; else previousOrderValue += orderValueTotal;
+            
+            // Accumulate viewing time data for average calculation
+            totalDuration += data?.viewDurationMs || 0;
+            totalViews += views;
+            
+            // Accumulate hour histogram data
+            const hh = data?.hourHistogram || {};
+            Object.keys(hh).forEach(h => {
+              hourHistogram[h] = (hourHistogram[h] || 0) + (hh[h] || 0);
+            });
           }
         }
 
@@ -129,9 +161,23 @@ export class DashboardComponent implements OnInit {
         this.viewingTotalPrevious24Hours = prev24h;
         this.currentPeriodOrderValue = currentOrderValue;
         this.previousPeriodOrderValue = previousOrderValue;
-        this.updateChartOptions(dailyVisits);
+        
+        // Calculate average viewing time in minutes
+        this.averageTime = totalViews > 0 ? Math.round((totalDuration / totalViews) / 60000) : 0;
+        
+        console.log('📊 Dashboard Analytics Summary:');
+        console.log('  - Total views:', totalViews);
+        console.log('  - Total duration:', totalDuration);
+        console.log('  - Average time:', this.averageTime, 'minutes');
+        console.log('  - Hour histogram:', hourHistogram);
+        
+        // Calculate most popular viewing time from aggregated analytics data
+        this.getMostPopularViewingTimeFromAggregates(hourHistogram);
+        
+        this.updateChartOptions(dailyVisits, menuIdToNameMap);
+        this.isLoading = false;
       },
-      error: (error) => console.error("Error fetching menus:", error),
+      error: (error) => { console.error("Error fetching menus:", error); this.isLoading = false; },
     });
   }
   countVisitsPerDay(menuData: any[]): { [date: string]: { [menuId: string]: number } } {
@@ -363,10 +409,17 @@ export class DashboardComponent implements OnInit {
     this.categoryOrderCounts = categoryCounts;
 
     // Determine most and least ordered categories
-    this.mostOrderedCategory = Object.keys(categoryCounts).reduce((a, b) =>
+    const categoryKeys = Object.keys(categoryCounts);
+    if (categoryKeys.length === 0) {
+      this.mostOrderedCategory = '';
+      this.leastOrderedCategory = '';
+      this.topOrderedCategories = [];
+      return;
+    }
+    this.mostOrderedCategory = categoryKeys.reduce((a, b) =>
       categoryCounts[a] > categoryCounts[b] ? a : b
     );
-    this.leastOrderedCategory = Object.keys(categoryCounts).reduce((a, b) =>
+    this.leastOrderedCategory = categoryKeys.reduce((a, b) =>
       categoryCounts[a] < categoryCounts[b] ? a : b
     );
     const sortedCategories = Object.entries(categoryCounts)
@@ -406,7 +459,7 @@ export class DashboardComponent implements OnInit {
     this.drinksCategoryOrderChange = this.calculatePercentageDifference(currentDrinksCount, previousDrinksCount);
   }
 
-  updateChartOptions(dailyVisits: { [date: string]: { [menuId: string]: number } }) {
+  updateChartOptions(dailyVisits: { [date: string]: { [menuId: string]: number } }, menuIdToNameMap: { [menuId: string]: string }) {
     const dates = Object.keys(dailyVisits).sort();
     const menuIds = new Set<string>();
   
@@ -424,7 +477,7 @@ export class DashboardComponent implements OnInit {
         trigger: 'axis',
       },
       legend: {
-        data: Array.from(menuIds),
+        data: Array.from(menuIds).map(menuId => menuIdToNameMap[menuId] || menuId),
       },
       xAxis: {
         type: 'category',
@@ -433,20 +486,60 @@ export class DashboardComponent implements OnInit {
       yAxis: {
         type: 'value',
       },
-      series: Array.from(menuIds).map((menuId) => ({
-        name: menuId,
-        type: 'line',
-        smooth: true,
-        data: dates.map((date) => dailyVisits[date][menuId] || 0),
-        areaStyle: {},
-        lineStyle: { color: this.getMenuColor(menuId) },
-      })),
+      series: Array.from(menuIds).map((menuId) => {
+        const color = this.getMenuColor(menuId);
+        return {
+          name: menuIdToNameMap[menuId] || menuId,
+          type: 'line',
+          smooth: true,
+          data: dates.map((date) => dailyVisits[date][menuId] || 0),
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: color + '40' }, // 25% opacity at top
+                { offset: 1, color: color + '00' }  // 0% opacity at bottom
+              ]
+            }
+          },
+          lineStyle: { color: color },
+        };
+      }),
     };
   }
   
+  // Configurable color array for menu lines
+  private menuColors: string[] = ['#1FCC96', '#C49DFF', '#FFA500', '#FF6347', '#4A90E2', '#F39C12', '#E74C3C', '#9B59B6'];
+
   getMenuColor(menuId: string): string {
-    const colors = ['#1FCC96', '#C49DFF', '#FFA500', '#FF6347'];
-    return colors[parseInt(menuId, 10) % colors.length];
+    //nst colors = ['#1FCC96', '#C49DFF', '#FFA500', '#FF6347'];
+    const hash = Array.from(menuId).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+    return this.menuColors[hash % this.menuColors.length];
+  }
+
+  // Method to update the color array
+  setMenuColors(colors: string[]): void {
+    this.menuColors = colors;
+  }
+
+  // Example method to set custom colors
+  setCustomMenuColors(): void {
+    // Example: Set custom colors for your brand
+    const customColors = [
+      '#FF6B6B', // Coral Red
+      '#4ECDC4', // Turquoise
+      '#45B7D1', // Sky Blue
+      '#96CEB4', // Mint Green
+      '#FFEAA7', // Soft Yellow
+      '#DDA0DD', // Plum
+      '#98D8C8', // Seafoam
+      '#F7DC6F'  // Golden Yellow
+    ];
+    this.setMenuColors(customColors);
   }
 
   countOrdersPerMonth(orders: any[]): { [month: string]: number } {
@@ -493,7 +586,19 @@ export class DashboardComponent implements OnInit {
           type: 'line',
           smooth: true,
           data: orderTotals,
-          areaStyle: {},
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: '#1FCC9640' }, // 25% opacity at top
+                { offset: 1, color: '#1FCC9600' }  // 0% opacity at bottom
+              ]
+            }
+          },
           lineStyle: { color: '#1FCC96' },
         },
       ],
@@ -521,10 +626,10 @@ export class DashboardComponent implements OnInit {
           this.averageTime = Math.round((totalViewingTime/totalEntries)/ 60000);
   }
   
-  getMostPopularViewingTime(menus: Menu[]):void {
+    getMostPopularViewingTime(menus: Menu[]):void {
     
         const viewingTimeMap: { [key: string]: number } = {};
-  
+
         menus.forEach((menu) => {
           if (menu.viewingTime && Array.isArray(menu.viewingTime)) {
             menu.viewingTime.forEach((view: ViewingTime) => {
@@ -533,27 +638,63 @@ export class DashboardComponent implements OnInit {
             });
           }
         });
-  
+
         // Find the most popular day-hour
         let mostPopularKey = '';
         let maxTime = 0;
-  
+
         for (const key in viewingTimeMap) {
           if (viewingTimeMap[key] > maxTime) {
             mostPopularKey = key;
             maxTime = viewingTimeMap[key];
           }
         }
-  
-  
+
+        // If no viewing time data found, set a default message
+        if (!mostPopularKey) {
+          this.popularTime = 'No data available';
+          return;
+        }
+
         // Extract day and hour from the key
         const [day, hour] = mostPopularKey.split('-').map(Number);
-  
+
         // Convert day and hour into a readable format
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const period = hour < 12 ? 'AM' : 'PM';
         const formattedHour = hour % 12 || 12;
         this.popularTime = `${daysOfWeek[day]}s, ${formattedHour} ${period}`;
-  }
+}
+
+  getMostPopularViewingTimeFromAggregates(hourHistogram: { [hour: string]: number }): void {
+    console.log('🔍 Calculating most popular viewing time from histogram:', hourHistogram);
+    
+    // Find the hour with the most views
+    let mostPopularHour = '';
+    let maxViews = 0;
+
+    for (const hour in hourHistogram) {
+      if (hourHistogram[hour] > maxViews) {
+        mostPopularHour = hour;
+        maxViews = hourHistogram[hour];
+      }
+    }
+
+    console.log('🔍 Most popular hour:', mostPopularHour, 'with', maxViews, 'views');
+
+    // If no viewing time data found, set a default message
+    if (!mostPopularHour) {
+      this.popularTime = 'No data available';
+      console.log('⚠️ No viewing time data found, showing "No data available"');
+      return;
+    }
+
+    // Convert hour to readable format
+    const hour = parseInt(mostPopularHour, 10);
+    const period = hour < 12 ? 'AM' : 'PM';
+    const formattedHour = hour % 12 || 12;
+    this.popularTime = `${formattedHour} ${period}`;
+    console.log('✅ Most popular viewing time set to:', this.popularTime);
+}
   
 }
