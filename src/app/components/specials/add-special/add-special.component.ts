@@ -16,7 +16,8 @@ import { SpecialsService } from '../../../shared/services/specials.service';
 import { MediaItem } from '../../../shared/types/media';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption } from '../shared/special-types.constants';
+import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption, SpecialType } from '../shared/special-types.constants';
+import { AddedItem } from '../../../types/special';
 
 @Component({
   selector: 'app-add-special',
@@ -26,7 +27,7 @@ import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption } from '../shared/special-types
 export class AddSpecialComponent implements OnInit {
   isSaving: boolean = false;
   currentStep = 1;
-  selectedSpecialType: number = 1;
+  selectedSpecialType: SpecialType = SpecialType.PERCENTAGE_DISCOUNT;
   uploadDone: boolean = false;
   specialForm: FormGroup;
   specialTypes: SpecialTypeOption[] = SPECIAL_TYPE_OPTIONS;
@@ -34,7 +35,7 @@ export class AddSpecialComponent implements OnInit {
   selectedDays: string[] = ['Mon'];
   menus: Menu[] = [];
   selectedMenu: Menu | null = null;
-  addedItems: { name: string; amount: string }[] = [];
+  addedItems: AddedItem[] = [];
   imageUploadProgress: number = 0;
   uploadedImageUrl: string | null = null;
   owner: string = '';
@@ -84,6 +85,9 @@ export class AddSpecialComponent implements OnInit {
         featureSpecialUnder: [''],
         timeFrom: ['00:00', Validators.required],
         timeTo: ['00:00', Validators.required],
+        customPromotionalText: ['', [Validators.maxLength(500)]],
+        selectedCategories: [[]],
+        discountType: ['percentage'],
       },
       {
         validators: [dateRangeValidator(), timeRangeValidator()],
@@ -157,52 +161,89 @@ export class AddSpecialComponent implements OnInit {
   addItem(): void {
     const selectedType = this.selectedSpecialType;
 
-    if (selectedType === 1) {
+    if (selectedType === SpecialType.PERCENTAGE_DISCOUNT) {
       // Percentage Discount
       const percentage = this.specialForm.get('percentage')?.value;
       if (this.selectedMenuItem && percentage) {
-        this.addedItems.push({ 
-          name: this.selectedMenuItem.name, 
-          amount: `${percentage}%` 
+        this.addedItems.push({
+          name: this.selectedMenuItem.name,
+          itemId: this.selectedMenuItem.itemId, // Add itemId for frontend matching
+          amount: `${percentage}%`
         });
         this.specialForm.get('percentage')?.reset();
         this.menuItemAutocompleteControl.setValue('');
         this.selectedMenuItem = null;
       }
-    } else if (selectedType === 2) {
+    } else if (selectedType === SpecialType.PRICE_DISCOUNT) {
       // Price Discount
       const amount = this.specialForm.get('amount')?.value;
       if (this.selectedMenuItem && amount) {
-        this.addedItems.push({ 
-          name: this.selectedMenuItem.name, 
+        this.addedItems.push({
+          name: this.selectedMenuItem.name,
+          itemId: this.selectedMenuItem.itemId, // Add itemId for frontend matching
           amount: amount
         });
         this.specialForm.get('amount')?.reset();
         this.menuItemAutocompleteControl.setValue('');
         this.selectedMenuItem = null;
       }
-    } else if (selectedType === 4) {
+    } else if (selectedType === SpecialType.CATEGORY_SPECIAL) {
       // Category Special
-      const categoryName = this.specialForm.get('featureSpecialUnder')?.value;
+      const selectedCategories = this.specialForm.get('selectedCategories')?.value;
+      const discountType = this.specialForm.get('discountType')?.value || 'percentage';
       const amount = this.specialForm.get('amount')?.value;
 
-      if (categoryName && amount) {
-        this.addedItems.push({
-          name: `Category: ${categoryName}`,
-          amount: amount,
+      if (selectedCategories && selectedCategories.length > 0 && amount) {
+        // Create a category special for each selected category
+        selectedCategories.forEach((categoryId: string) => {
+          const category = this.selectedMenu?.categories?.find((cat: any) => cat.id === categoryId);
+          const categoryName = category?.name || categoryId;
+
+          const displayAmount = discountType === 'percentage' ? `${amount}%` : `R${amount}`;
+          const itemName = `Category: ${categoryName}`;
+
+          this.addedItems.push({
+            name: itemName,
+            categoryId: categoryId,
+            amount: displayAmount,
+            discountType: discountType,
+            selectedCategories: [categoryId] // Store selected categories for backend
+          });
         });
-        this.specialForm.get('featureSpecialUnder')?.reset();
-        this.specialForm.get('amount')?.reset();
+
+        // Reset form fields
+        this.specialForm.patchValue({
+          selectedCategories: [],
+          amount: '',
+          discountType: 'percentage'
+        });
       }
-    } else if (selectedType === 3) {
+    } else if (selectedType === SpecialType.COMBO_DEAL) {
       // Combo Special
-      const comboItems = this.specialForm.get('typeSpecialDetails')?.value;
+      const comboItemNames = this.specialForm.get('typeSpecialDetails')?.value;
       const percentage = this.specialForm.get('percentage')?.value;
 
-      if (Array.isArray(comboItems) && comboItems.length > 0 && percentage) {
-        const comboItemNames = comboItems.join(', ');
+      if (Array.isArray(comboItemNames) && comboItemNames.length > 0 && percentage) {
+        // Get the actual menu items to extract their IDs
+        const comboItems = comboItemNames.map(itemName => {
+          const menuItem = this.selectedMenu?.items.find(item => item.name === itemName);
+          return menuItem;
+        }).filter(item => item !== undefined);
+
+        // Extract item IDs - menu items should always have itemId
+        const comboItemIds = comboItems.map(item => {
+          if (!item.itemId) {
+            console.error('Menu item missing itemId:', item);
+            throw new Error(`Menu item "${item.name}" is missing itemId`);
+          }
+          return item.itemId;
+        });
+        const displayNames = comboItemNames.join(', ');
+
         this.addedItems.push({
-          name: `Combo: ${comboItemNames}`,
+          name: `Combo: ${displayNames}`,
+          comboItemIds: comboItemIds, // Store item IDs or names as fallback
+          comboItemNames: comboItemNames, // Store names for display/backward compatibility
           amount: `${percentage}%`,
         });
         this.specialForm.get('typeSpecialDetails')?.reset();
@@ -211,7 +252,7 @@ export class AddSpecialComponent implements OnInit {
     }
     this.markAsChanged();
   }
-  getSpecialTypeLabel(type: number): string {
+  getSpecialTypeLabel(type: SpecialType): string {
     const typeOption = this.specialTypes.find(t => t.id === type);
     return typeOption ? typeOption.name : 'Special Type';
   }
@@ -246,7 +287,7 @@ export class AddSpecialComponent implements OnInit {
     if (menuControl?.value) {
       this.specialForm.enable();
       this.selectedMenu = this.menus.find((menu) => menu.menuID === menuControl.value) || null;
-      
+
       // Reset the autocomplete and selected item when menu changes
       this.menuItemAutocompleteControl.setValue('');
       this.selectedMenuItem = null;
@@ -292,6 +333,17 @@ export class AddSpecialComponent implements OnInit {
   onSubmit() {
     this.isSaving = true;
     const formValue = this.specialForm.getRawValue();
+
+    // Collect selected categories from added items for category specials
+    let selectedCategories: string[] = [];
+    if (this.selectedSpecialType === SpecialType.CATEGORY_SPECIAL) {
+      selectedCategories = this.addedItems
+        .filter(item => item.selectedCategories)
+        .flatMap(item => item.selectedCategories || []);
+      // Remove duplicates
+      selectedCategories = [...new Set(selectedCategories)];
+    }
+
     const data = {
       ...formValue,
       addedItems: this.addedItems,
@@ -300,6 +352,9 @@ export class AddSpecialComponent implements OnInit {
       OwnerID: this.owner,
       active: true,
       isDraft: false,
+      selectedCategories: selectedCategories.length > 0 ? selectedCategories : undefined,
+      discountType: this.selectedSpecialType === SpecialType.CATEGORY_SPECIAL ?
+        this.specialForm.get('discountType')?.value : undefined
     };
 
     // Use the new SpecialsService with media library integration
@@ -335,6 +390,17 @@ export class AddSpecialComponent implements OnInit {
     this.isSaving = true;
 
     const formValue = this.specialForm.getRawValue();
+
+    // Collect selected categories from added items for category specials
+    let selectedCategories: string[] = [];
+    if (this.selectedSpecialType === SpecialType.CATEGORY_SPECIAL) {
+      selectedCategories = this.addedItems
+        .filter(item => item.selectedCategories)
+        .flatMap(item => item.selectedCategories || []);
+      // Remove duplicates
+      selectedCategories = [...new Set(selectedCategories)];
+    }
+
     const data = {
       ...formValue,
       addedItems: this.addedItems,
@@ -344,6 +410,9 @@ export class AddSpecialComponent implements OnInit {
       OwnerID: this.owner,
       active: false,
       isDraft: true,
+      selectedCategories: selectedCategories.length > 0 ? selectedCategories : undefined,
+      discountType: this.selectedSpecialType === SpecialType.CATEGORY_SPECIAL ?
+        this.specialForm.get('discountType')?.value : undefined
     };
 
     this.firestore
@@ -408,12 +477,12 @@ export class AddSpecialComponent implements OnInit {
   isStep1Invalid(): boolean {
     const dateFrom = this.specialForm.get('dateFrom')?.value;
     const dateTo = this.specialForm.get('dateTo')?.value;
-    
+
     return (
-      this.specialForm.get('specialTitle')?.invalid || 
-      this.specialForm.get('menu')?.invalid || 
-      this.specialForm.get('typeSpecial')?.invalid || 
-      !dateFrom || 
+      this.specialForm.get('specialTitle')?.invalid ||
+      this.specialForm.get('menu')?.invalid ||
+      this.specialForm.get('typeSpecial')?.invalid ||
+      !dateFrom ||
       !dateTo ||
       dateFrom.toString().trim() === '' ||
       dateTo.toString().trim() === '' ||
@@ -424,7 +493,7 @@ export class AddSpecialComponent implements OnInit {
   isStep2Invalid(): boolean {
     const timeFrom = this.specialForm.get('timeFrom')?.value;
     const timeTo = this.specialForm.get('timeTo')?.value;
-    
+
     return (
       this.selectedDays.length === 0 ||
       !timeFrom ||
@@ -439,30 +508,32 @@ export class AddSpecialComponent implements OnInit {
     const typeControl = this.specialForm.get('typeSpecial');
     if (typeControl?.value) {
       this.selectedSpecialType = typeControl.value;
-      
+
       // Reset/clear all type-specific form controls when special type changes
       this.specialForm.patchValue({
         typeSpecialDetails: '',
         comboPrice: '',
         percentage: '',
         amount: '',
-        featureSpecialUnder: ''
+        featureSpecialUnder: '',
+        selectedCategories: [],
+        discountType: 'percentage'
       });
-      
+
       // Clear autocomplete control
       this.menuItemAutocompleteControl.setValue('');
       this.selectedMenuItem = null;
-      
+
       // Clear added items from previous type
       this.addedItems = [];
-      
+
       // Auto-select first item/category when special type changes
       if (this.selectedMenu) {
-        if (this.selectedSpecialType === 1 && this.selectedMenu.items?.length > 0) {
+        if (this.selectedSpecialType === SpecialType.PERCENTAGE_DISCOUNT && this.selectedMenu.items?.length > 0) {
           this.specialForm.patchValue({
             typeSpecialDetails: this.selectedMenu.items[0].name
           });
-        } else if (this.selectedSpecialType === 4 && this.selectedMenu.categories?.length > 0) {
+        } else if (this.selectedSpecialType === SpecialType.CATEGORY_SPECIAL && this.selectedMenu.categories?.length > 0) {
           this.specialForm.patchValue({
             featureSpecialUnder: this.selectedMenu.categories[0].id
           });
@@ -480,7 +551,7 @@ export class AddSpecialComponent implements OnInit {
 
   private filterMenuItems(value: string): any[] {
     if (!this.selectedMenu?.items) return [];
-    
+
     const filterValue = typeof value === 'string' ? value.toLowerCase() : '';
     return this.selectedMenu.items.filter(item =>
       item.name.toLowerCase().includes(filterValue)

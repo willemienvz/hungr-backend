@@ -1,0 +1,79 @@
+// Button size variations
+.btn-small {
+    padding: var(--padding-xs) var(--padding-sm);
+    font-size: var(--font-size-sm);
+    min-width: 100px;
+}
+
+.btn-large {
+    padding: var(--padding-md) var(--padding-lg);
+    font-size: var(--font-size-lg);
+    min-width: 180px;
+}
+
+// Loading state
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: spin 1s linear infinite;
+
+    .material-icons {
+        font-size: 16px;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// Icon positioning
+.left-icon {
+    margin-right: var(--spacing-2);
+}
+
+.right-icon {
+    margin-left: var(--spacing-2);
+}
+
+// Custom danger button styling (since it might not be in global styles)
+.btnDanger {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    text-align: center;
+    padding: var(--padding-sm) var(--padding-md);
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    min-width: 140px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-3);
+    transition: var(--transition-normal);
+}
+
+.btnDanger:hover:not(:disabled) {
+    background: #b71c1c;
+}
+
+.btnDanger:disabled {
+    background-color: #ef9a9a;
+    color: #ffcdd2;
+    cursor: not-allowed;
+    opacity: 0.6;
+}

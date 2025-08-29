@@ -2,10 +2,13 @@
   .headerBlock {
     margin-bottom: 20px;
   }
+
   .block {
     width: 100%;
     position: relative;
+    /* Uses centralized block styling */
   }
+
   .rowSpecial {
     justify-content: center;
     align-items: center;
@@ -27,14 +30,14 @@
   font-family: "Poppins", sans-serif;
   font-size: 14px;
   font-weight: 500;
-  
+
   &:hover {
     background-color: var(--hungr-secondary-dark);
   }
-  
+
   mat-icon {
     font-size: 18px;
     width: 18px;
     height: 18px;
   }
-} 
+}

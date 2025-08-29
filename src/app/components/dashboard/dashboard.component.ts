@@ -13,7 +13,9 @@ import { ViewingTime } from '../../shared/services/viewingTime';
 })
 export class DashboardComponent implements OnInit {
   isLoading: boolean = false;
-  averageTime:number = 0;
+  private loadingOperations: number = 0;
+  private pendingRestaurantFetches: number = 0;
+  averageTime: number = 0;
   popularTime: string = '';
 
 
@@ -58,12 +60,13 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     private firestore: AngularFirestore
   ) {
-    if (this.accountType === 'true'){
+    if (this.accountType === 'true') {
       this.layoutMinimised = true;
     }
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
         this.userDataID = uid;
+        this.startLoading();
         this.fetchMenus();
         this.fetchRestaurants();
       } else {
@@ -76,8 +79,48 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  fetchMenus() {
+  /**
+   * Start a loading operation
+   */
+  private startLoading(): void {
+    this.loadingOperations++;
     this.isLoading = true;
+    console.log('Loading started, operations count:', this.loadingOperations);
+  }
+
+  /**
+   * Complete a loading operation
+   */
+  private completeLoading(): void {
+    this.loadingOperations--;
+    console.log('Loading completed, operations remaining:', this.loadingOperations);
+
+    // Only set loading to false if all operations are complete AND no restaurant fetches are pending
+    if (this.loadingOperations <= 0 && this.pendingRestaurantFetches <= 0) {
+      this.loadingOperations = 0;
+      this.pendingRestaurantFetches = 0;
+      this.isLoading = false;
+      console.log('All loading operations completed, isLoading set to false');
+    }
+  }
+
+  /**
+   * Complete a restaurant order fetch operation
+   */
+  private completeRestaurantFetch(): void {
+    this.pendingRestaurantFetches--;
+    console.log('Restaurant fetch completed, remaining:', this.pendingRestaurantFetches);
+
+    // Check if we can complete loading now
+    if (this.loadingOperations <= 0 && this.pendingRestaurantFetches <= 0) {
+      this.loadingOperations = 0;
+      this.pendingRestaurantFetches = 0;
+      this.isLoading = false;
+      console.log('All operations completed, isLoading set to false');
+    }
+  }
+
+  fetchMenus() {
     // Read aggregated analytics for the last 14 days to compute current vs previous week
     // Build UTC date keys to match frontend aggregator buckets
     const today = new Date();
@@ -104,7 +147,7 @@ export class DashboardComponent implements OnInit {
           menuIdToNameMap[menuData.menuID] = menuData.menuName;
           return menuData.menuID;
         }).filter(Boolean);
-        
+
         if (menuIds.length === 0) { this.isLoading = false; return; }
 
         let currentWeek = 0;
@@ -142,11 +185,11 @@ export class DashboardComponent implements OnInit {
           if (data) {
             const orderValueTotal = Number(data.orderValueTotal || 0);
             if (idx < 7) currentOrderValue += orderValueTotal; else previousOrderValue += orderValueTotal;
-            
+
             // Accumulate viewing time data for average calculation
             totalDuration += data?.viewDurationMs || 0;
             totalViews += views;
-            
+
             // Accumulate hour histogram data
             const hh = data?.hourHistogram || {};
             Object.keys(hh).forEach(h => {
@@ -161,47 +204,51 @@ export class DashboardComponent implements OnInit {
         this.viewingTotalPrevious24Hours = prev24h;
         this.currentPeriodOrderValue = currentOrderValue;
         this.previousPeriodOrderValue = previousOrderValue;
-        
+
         // Calculate average viewing time in minutes
         this.averageTime = totalViews > 0 ? Math.round((totalDuration / totalViews) / 60000) : 0;
-        
+
         console.log('📊 Dashboard Analytics Summary:');
         console.log('  - Total views:', totalViews);
         console.log('  - Total duration:', totalDuration);
         console.log('  - Average time:', this.averageTime, 'minutes');
         console.log('  - Hour histogram:', hourHistogram);
-        
+
         // Calculate most popular viewing time from aggregated analytics data
         this.getMostPopularViewingTimeFromAggregates(hourHistogram);
-        
+
         this.updateChartOptions(dailyVisits, menuIdToNameMap);
-        this.isLoading = false;
+        this.completeLoading();
       },
-      error: (error) => { console.error("Error fetching menus:", error); this.isLoading = false; },
+      error: (error) => {
+        console.error("Error fetching menus:", error);
+        this.completeLoading();
+      },
     });
   }
   countVisitsPerDay(menuData: any[]): { [date: string]: { [menuId: string]: number } } {
     console.log(menuData);
     const dailyVisits: { [date: string]: { [menuId: string]: number } } = {};
-  
+
     menuData.forEach((menu) => {
       const menuId = menu['menuName'];
       const viewingTimes = menu['viewingTime'] || [];
-  
+
       viewingTimes.forEach((view: any) => {
         const viewDate = new Date(view.timestamp).toLocaleDateString();
-  
+
         if (!dailyVisits[viewDate]) {
           dailyVisits[viewDate] = {};
         }
         if (!dailyVisits[viewDate][menuId]) {
           dailyVisits[viewDate][menuId] = 0;
         }
-  
+
         dailyVisits[viewDate][menuId]++;
       });
     });
-  
+
+    this.completeLoading();
     return dailyVisits;
   }
   fetchRestaurants() {
@@ -211,18 +258,31 @@ export class DashboardComponent implements OnInit {
 
     this.restaurant$.subscribe({
       next: (restaurants) => {
-        const restaurantData = restaurants.map((restaurant) => {
+        const restaurantIds = restaurants.map((restaurant) => {
           const restaurantInfo = restaurant.payload.doc.data();
-          const restaurantId = restaurantInfo.restaurantID;
-          
-          console.log("Restaurant:", restaurantId);
-          
+          return restaurantInfo.restaurantID;
+        });
+
+        console.log("Found restaurants:", restaurantIds.length);
+
+        if (restaurantIds.length === 0) {
+          // No restaurants, complete loading
+          this.completeLoading();
+          return;
+        }
+
+        // Track how many restaurant order fetches we need to complete
+        this.pendingRestaurantFetches = restaurantIds.length;
+
+        // Start fetching orders for each restaurant
+        restaurantIds.forEach(restaurantId => {
           this.fetchOrdersForRestaurant(restaurantId);
-          
-          return restaurantInfo;
         });
       },
-      error: (error) => console.error("Error fetching restaurants:", error),
+      error: (error) => {
+        console.error("Error fetching restaurants:", error);
+        this.completeLoading();
+      },
     });
   }
 
@@ -232,26 +292,35 @@ export class DashboardComponent implements OnInit {
       .snapshotChanges()
       .subscribe({
         next: (orders) => {
-          const monthlyTotals = this.countOrdersPerMonth(orders);
-          this.updateMonthlyOrderChart(monthlyTotals);
-          this.calculateOrderAndTipValues(orders, 30);
-          const currentWeekCount = this.countOrdersWithinPeriod(orders, 7, 0);
-          const previousWeekCount = this.countOrdersWithinPeriod(orders, 7, 7);
-          this.currentWeekOrderCount += currentWeekCount;
-          this.previousWeekOrderCount += previousWeekCount;
-          this.calculateOrderMovementPercentage();
-          this.findTopOrderedItems(orders);
-          this.calculateCategoryOrders(orders);
-          this.calculateDrinksCategoryChange(orders, 30); 
+          try {
+            const monthlyTotals = this.countOrdersPerMonth(orders);
+            this.updateMonthlyOrderChart(monthlyTotals);
+            this.calculateOrderAndTipValues(orders, 30);
+            const currentWeekCount = this.countOrdersWithinPeriod(orders, 7, 0);
+            const previousWeekCount = this.countOrdersWithinPeriod(orders, 7, 7);
+            this.currentWeekOrderCount += currentWeekCount;
+            this.previousWeekOrderCount += previousWeekCount;
+            this.calculateOrderMovementPercentage();
+            this.findTopOrderedItems(orders);
+            this.calculateCategoryOrders(orders);
+            this.calculateDrinksCategoryChange(orders, 30);
+            this.completeRestaurantFetch();
+          } catch (error) {
+            console.error(`Error processing orders for restaurant ${restaurantId}:`, error);
+            this.completeRestaurantFetch();
+          }
         },
-        error: (error) => console.error(`Error fetching orders for restaurant ${restaurantId}:`, error),
+        error: (error) => {
+          console.error(`Error fetching orders for restaurant ${restaurantId}:`, error);
+          this.completeRestaurantFetch();
+        },
       });
   }
 
   countOrdersWithinPeriod(orders: any[], days: number, offset: number): number {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days - offset);
-    
+
     const endDate = new Date();
     endDate.setDate(endDate.getDate() - offset);
 
@@ -272,7 +341,7 @@ export class DashboardComponent implements OnInit {
   calculateTotalViews(menuData: any[], days: number, offset: number = 0): number {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days - offset);
-    
+
     const endDate = new Date();
     endDate.setDate(endDate.getDate() - offset);
 
@@ -296,7 +365,7 @@ export class DashboardComponent implements OnInit {
   get displayAverageTime(): number {
     return isNaN(this.averageTime) ? 0 : this.averageTime;
   }
-  
+
 
   // Function to calculate the percentage difference between the last 24 hours and the 24 hours before
   getDailyDifferenceMessage(): string {
@@ -423,15 +492,15 @@ export class DashboardComponent implements OnInit {
       categoryCounts[a] < categoryCounts[b] ? a : b
     );
     const sortedCategories = Object.entries(categoryCounts)
-    .sort((a, b) => b[1] - a[1]) // Sort by count in descending order
-    .slice(0, 3); // Get the top 3 categories
+      .sort((a, b) => b[1] - a[1]) // Sort by count in descending order
+      .slice(0, 3); // Get the top 3 categories
 
-  // Format the top 3 most ordered categories
+    // Format the top 3 most ordered categories
     this.topOrderedCategories = sortedCategories.map(([category, count]) => ({ category, count }));
     console.log(this.topOrderedCategories);
   }
 
-  calculateDrinksCategoryChange(orders: any[], days: number) {
+  calculateDrinksCategoryChange(orders: any[], days: number): void {
     const currentPeriodStart = new Date();
     currentPeriodStart.setDate(currentPeriodStart.getDate() - days);
     const previousPeriodStart = new Date();
@@ -459,16 +528,16 @@ export class DashboardComponent implements OnInit {
     this.drinksCategoryOrderChange = this.calculatePercentageDifference(currentDrinksCount, previousDrinksCount);
   }
 
-  updateChartOptions(dailyVisits: { [date: string]: { [menuId: string]: number } }, menuIdToNameMap: { [menuId: string]: string }) {
+  updateChartOptions(dailyVisits: { [date: string]: { [menuId: string]: number } }, menuIdToNameMap: { [menuId: string]: string }): void {
     const dates = Object.keys(dailyVisits).sort();
     const menuIds = new Set<string>();
-  
+
     const seriesData = dates.map((date) => {
       const dailyData = dailyVisits[date];
       Object.keys(dailyData).forEach((menuId) => menuIds.add(menuId));
       return dailyData;
     });
-  
+
     this.chartOptions = {
       title: {
         text: '',
@@ -511,64 +580,59 @@ export class DashboardComponent implements OnInit {
       }),
     };
   }
-  
-  // Configurable color array for menu lines
-  private menuColors: string[] = ['#1FCC96', '#C49DFF', '#FFA500', '#FF6347', '#4A90E2', '#F39C12', '#E74C3C', '#9B59B6'];
 
   getMenuColor(menuId: string): string {
-    //nst colors = ['#1FCC96', '#C49DFF', '#FFA500', '#FF6347'];
+    const colors = this.getChartColors();
     const hash = Array.from(menuId).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-    return this.menuColors[hash % this.menuColors.length];
+    return colors[hash % colors.length];
   }
 
-  // Method to update the color array
-  setMenuColors(colors: string[]): void {
-    this.menuColors = colors;
-  }
+  /**
+   * Get actual color values from CSS custom properties for chart usage
+   */
+  private getChartColors(): string[] {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
 
-  // Example method to set custom colors
-  setCustomMenuColors(): void {
-    // Example: Set custom colors for your brand
-    const customColors = [
-      '#FF6B6B', // Coral Red
-      '#4ECDC4', // Turquoise
-      '#45B7D1', // Sky Blue
-      '#96CEB4', // Mint Green
-      '#FFEAA7', // Soft Yellow
-      '#DDA0DD', // Plum
-      '#98D8C8', // Seafoam
-      '#F7DC6F'  // Golden Yellow
+    return [
+      computedStyle.getPropertyValue('--hungr-main-color').trim() || '#FE1B54',
+      computedStyle.getPropertyValue('--hungr-secondary-color').trim() || '#16D3D2',
+      computedStyle.getPropertyValue('--color-tertiary').trim() || '#3CE1AF',
+      computedStyle.getPropertyValue('--color-quaternary').trim() || '#9747FF',
+      computedStyle.getPropertyValue('--color-success').trim() || '#4CAF50',
+      computedStyle.getPropertyValue('--color-warning').trim() || '#FF9800',
+      computedStyle.getPropertyValue('--color-error').trim() || '#F44336',
+      computedStyle.getPropertyValue('--color-info').trim() || '#2196F3'
     ];
-    this.setMenuColors(customColors);
   }
 
   countOrdersPerMonth(orders: any[]): { [month: string]: number } {
     const monthlyTotals: { [month: string]: number } = {};
- 
+
     orders.forEach((order) => {
       const orderData = order.payload.doc.data();
       console.log('t', orderData);
       const orderTimestamp = orderData.items[0]?.timeOrdered?.seconds * 1000;
       const orderTotal = parseFloat(orderData.orderTotal || '0');
-  
+
       if (orderTimestamp) {
         const orderDate = new Date(orderTimestamp);
         const month = orderDate.toLocaleString('default', { month: 'short', year: 'numeric' });
-  
+
         if (!monthlyTotals[month]) {
           monthlyTotals[month] = 0;
         }
         monthlyTotals[month] += orderTotal;
       }
     });
-  
+
     return monthlyTotals;
   }
 
   updateMonthlyOrderChart(monthlyTotals: { [month: string]: number }) {
     const months = Object.keys(monthlyTotals).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     const orderTotals = months.map((month) => monthlyTotals[month]);
-  
+
     this.chartOptionsSales = {
       tooltip: {
         trigger: 'axis',
@@ -605,70 +669,70 @@ export class DashboardComponent implements OnInit {
     };
   }
 
-  
-  
-  
-  
-    calculateAverageViewingTime(menus: Menu[]):void {
-          let totalViewingTime = 0;
-          let totalEntries = 0;
-  
-          menus.forEach((menu) => {
-            if (menu.viewingTime && Array.isArray(menu.viewingTime)) {
-              menu.viewingTime.forEach((entry: { time: number }) => {
-                totalViewingTime += entry.time;
-                totalEntries++;
-              });
-            }
-          });
-          console.log(totalViewingTime/60000);
-          console.log(totalEntries);
-          this.averageTime = Math.round((totalViewingTime/totalEntries)/ 60000);
-  }
-  
-    getMostPopularViewingTime(menus: Menu[]):void {
-    
-        const viewingTimeMap: { [key: string]: number } = {};
 
-        menus.forEach((menu) => {
-          if (menu.viewingTime && Array.isArray(menu.viewingTime)) {
-            menu.viewingTime.forEach((view: ViewingTime) => {
-              const key = `${view.day}-${view.hour}`;
-              viewingTimeMap[key] = (viewingTimeMap[key] || 0) + view.time;
-            });
-          }
+
+
+
+  calculateAverageViewingTime(menus: Menu[]): void {
+    let totalViewingTime = 0;
+    let totalEntries = 0;
+
+    menus.forEach((menu) => {
+      if (menu.viewingTime && Array.isArray(menu.viewingTime)) {
+        menu.viewingTime.forEach((entry: { time: number }) => {
+          totalViewingTime += entry.time;
+          totalEntries++;
         });
+      }
+    });
+    console.log(totalViewingTime / 60000);
+    console.log(totalEntries);
+    this.averageTime = Math.round((totalViewingTime / totalEntries) / 60000);
+  }
 
-        // Find the most popular day-hour
-        let mostPopularKey = '';
-        let maxTime = 0;
+  getMostPopularViewingTime(menus: Menu[]): void {
 
-        for (const key in viewingTimeMap) {
-          if (viewingTimeMap[key] > maxTime) {
-            mostPopularKey = key;
-            maxTime = viewingTimeMap[key];
-          }
-        }
+    const viewingTimeMap: { [key: string]: number } = {};
 
-        // If no viewing time data found, set a default message
-        if (!mostPopularKey) {
-          this.popularTime = 'No data available';
-          return;
-        }
+    menus.forEach((menu) => {
+      if (menu.viewingTime && Array.isArray(menu.viewingTime)) {
+        menu.viewingTime.forEach((view: ViewingTime) => {
+          const key = `${view.day}-${view.hour}`;
+          viewingTimeMap[key] = (viewingTimeMap[key] || 0) + view.time;
+        });
+      }
+    });
 
-        // Extract day and hour from the key
-        const [day, hour] = mostPopularKey.split('-').map(Number);
+    // Find the most popular day-hour
+    let mostPopularKey = '';
+    let maxTime = 0;
 
-        // Convert day and hour into a readable format
-        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const period = hour < 12 ? 'AM' : 'PM';
-        const formattedHour = hour % 12 || 12;
-        this.popularTime = `${daysOfWeek[day]}s, ${formattedHour} ${period}`;
-}
+    for (const key in viewingTimeMap) {
+      if (viewingTimeMap[key] > maxTime) {
+        mostPopularKey = key;
+        maxTime = viewingTimeMap[key];
+      }
+    }
+
+    // If no viewing time data found, set a default message
+    if (!mostPopularKey) {
+      this.popularTime = 'No data available';
+      return;
+    }
+
+    // Extract day and hour from the key
+    const [day, hour] = mostPopularKey.split('-').map(Number);
+
+    // Convert day and hour into a readable format
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const period = hour < 12 ? 'AM' : 'PM';
+    const formattedHour = hour % 12 || 12;
+    this.popularTime = `${daysOfWeek[day]}s, ${formattedHour} ${period}`;
+  }
 
   getMostPopularViewingTimeFromAggregates(hourHistogram: { [hour: string]: number }): void {
     console.log('🔍 Calculating most popular viewing time from histogram:', hourHistogram);
-    
+
     // Find the hour with the most views
     let mostPopularHour = '';
     let maxViews = 0;
@@ -695,6 +759,6 @@ export class DashboardComponent implements OnInit {
     const formattedHour = hour % 12 || 12;
     this.popularTime = `${formattedHour} ${period}`;
     console.log('✅ Most popular viewing time set to:', this.popularTime);
-}
-  
+  }
+
 }

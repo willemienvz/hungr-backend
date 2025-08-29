@@ -1,5 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption, SpecialType } from '../../../shared/special-types.constants';
+import { AddedItem } from '../../../../../types/special';
 
 @Component({
   selector: 'app-step5-overview',
@@ -8,18 +10,21 @@ import { FormGroup } from '@angular/forms';
 })
 export class Step5OverviewComponent {
   @Input() specialForm!: FormGroup;
-  @Input() selectedSpecialType: number = 1;
+  @Input() selectedSpecialType!: SpecialType;
+  @Input() selectedMenu: any = null;
+  @Input() addedItems: AddedItem[] = [];
   @Input() selectedDays: string[] = [];
-  @Input() addedItems: { name: string; amount: string }[] = [];
+  @Input() uploadedImageUrl: string | null = null;
+  @Input() selectedMediaItem: any = null;
   @Input() isSaving: boolean = false;
   @Input() editMode: boolean = false;
 
-  getSpecialTypeLabel(type: number): string {
+  getSpecialTypeLabel(type: SpecialType): string {
     switch (type) {
-      case 1: return 'Percentage Discount';
-      case 2: return 'Price Discount';
-      case 3: return 'Combo Deal';
-      case 4: return 'Category Special';
+      case SpecialType.PERCENTAGE_DISCOUNT: return 'Percentage Discount';
+      case SpecialType.PRICE_DISCOUNT: return 'Price Discount';
+      case SpecialType.COMBO_DEAL: return 'Combo Deal';
+      case SpecialType.CATEGORY_SPECIAL: return 'Category Special';
       default: return 'Special Type';
     }
   }

@@ -28,15 +28,15 @@
       </div>
       <div class="filter-dropdown">
         <mat-select 
-          [placeholder]="'Filter by restaurant'"
+          [placeholder]="'Filter by menu item'"
           [value]="'all'"
-          (selectionChange)="onRestaurantFilterChange($event.value)">
-          <mat-option [value]="'all'">All restaurants</mat-option>
-          <mat-option *ngFor="let r of restaurants" [value]="r.restaurantID">
-            {{ r.restaurantName }}
+          (selectionChange)="onMenuItemFilterChange($event.value)">
+          <mat-option [value]="'all'">All menu items</mat-option>
+          <mat-option *ngFor="let menuItem of menuItems" [value]="menuItem.itemId">
+            {{ menuItem.name }}
           </mat-option>
         </mat-select>
-        <mat-icon class="filter-icon">store</mat-icon>
+        <mat-icon class="filter-icon">restaurant_menu</mat-icon>
       </div>
     </div>
 
@@ -120,11 +120,19 @@
       </ng-container>
       <div class="review-pagination" *ngIf="(totalPages$ | async) as totalPages">
         <ng-container *ngIf="(pageIndex$ | async) as pageIndex">
-          <button class="btnSecondary" (click)="goToPage(1, totalPages)">« First</button>
-          <button class="btnSecondary" (click)="goToPage(pageIndex - 1, totalPages)">‹ Prev</button>
+          <button class="pagination-btn" (click)="goToPage(1, totalPages)">
+            <i class="material-icons">first_page</i>
+          </button>
+          <button class="pagination-btn" (click)="goToPage(pageIndex - 1, totalPages)">
+            <i class="material-icons">chevron_left</i>
+          </button>
           <span class="page-indicator">Page {{ pageIndex }} of {{ totalPages }}</span>
-          <button class="btnSecondary" (click)="goToPage(pageIndex + 1, totalPages)">Next ›</button>
-          <button class="btnSecondary" (click)="goToPage(totalPages, totalPages)">Last »</button>
+          <button class="pagination-btn" (click)="goToPage(pageIndex + 1, totalPages)">
+            <i class="material-icons">chevron_right</i>
+          </button>
+          <button class="pagination-btn" (click)="goToPage(totalPages, totalPages)">
+            <i class="material-icons">last_page</i>
+          </button>
         </ng-container>
       </div>
 

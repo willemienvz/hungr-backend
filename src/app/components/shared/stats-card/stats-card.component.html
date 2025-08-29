@@ -1,0 +1,23 @@
+<div [class]="cardClass">
+  <!-- Icon Section -->
+  <div class="stats-icon" *ngIf="icon">
+    <i class="material-icons">{{ icon }}</i>
+  </div>
+
+  <!-- Content Section -->
+  <div class="stats-content">
+    <h3 class="stats-title">{{ title }}</h3>
+    <div class="stats-value">{{ formatValue(value) }}</div>
+
+    <!-- Subtitle -->
+    <div class="stats-subtitle" *ngIf="subtitle">
+      {{ subtitle }}
+    </div>
+
+    <!-- Trend -->
+    <div class="stats-trend" *ngIf="trend" [class]="trendClass">
+      <i class="material-icons trend-icon">{{ trendIcon }}</i>
+      <span class="trend-text">{{ trend }}</span>
+    </div>
+  </div>
+</div>

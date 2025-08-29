@@ -1,0 +1,188 @@
+/* Import design tokens for block styling */
+@import "../../../../styles/_design-tokens";
+
+.page-layout {
+    min-height: 100vh;
+    background-color: var(--color-grey-50);
+    padding: 24px;
+
+    .page-content {
+        position: relative;
+    }
+
+    .page-loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+}
+
+.page-header {
+    @extend .block;
+    margin-bottom: 24px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    /* Override block padding for header layout */
+    background: white;
+    /* Override block background for white */
+
+    .header-left {
+        flex: 0 0 auto;
+        min-width: 120px;
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-grey-600);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: var(--font-weight-medium);
+            transition: color 0.2s ease;
+
+            &:hover {
+                color: var(--color-text-primary);
+            }
+
+            .material-icons {
+                font-size: 18px;
+            }
+        }
+
+        .back-link {
+            cursor: pointer;
+
+            &:hover {
+                color: var(--color-secondary);
+            }
+        }
+    }
+
+    .header-center {
+        flex: 1;
+        text-align: center;
+
+        .page-title {
+            font-size: 24px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            margin: 0 0 4px 0;
+            line-height: 1.2;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin: 0;
+            line-height: 1.4;
+        }
+    }
+
+    .header-right {
+        flex: 0 0 auto;
+        min-width: 120px;
+        display: flex;
+        justify-content: flex-end;
+
+        .page-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            app-button {
+                white-space: nowrap;
+            }
+        }
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .page-layout {
+        padding: 16px;
+    }
+
+    .page-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 16px;
+        text-align: left;
+
+        .header-left {
+            min-width: auto;
+            order: 1;
+        }
+
+        .header-center {
+            order: 2;
+            text-align: left;
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .page-subtitle {
+                font-size: 13px;
+            }
+        }
+
+        .header-right {
+            min-width: auto;
+            order: 3;
+            justify-content: flex-start;
+
+            .page-actions {
+                flex-wrap: wrap;
+                gap: 8px;
+
+                app-button {
+                    flex: 1;
+                    min-width: 120px;
+                }
+            }
+        }
+    }
+}
+
+// Full width variant (for pages that need more space)
+.page-layout.full-width {
+    padding: 0;
+}
+
+.page-layout.full-width .page-header {
+    margin-bottom: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+}
+
+.page-layout.full-width .page-content {
+    padding: 24px;
+
+    @media (max-width: 768px) {
+        padding: 16px;
+    }
+}
+
+// Compact variant (for simpler pages)
+.page-layout.compact .page-header {
+    padding: 16px 20px;
+    margin-bottom: 16px;
+}
+
+.page-layout.compact .page-header .page-title {
+    font-size: 20px;
+}
+
+.page-layout.compact .page-content {
+    gap: 16px;
+}

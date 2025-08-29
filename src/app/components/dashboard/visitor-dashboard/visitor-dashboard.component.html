@@ -1,7 +1,5 @@
 <div class="inner-page">
-    <div class="loading-container" *ngIf="isLoading">
-        <mat-progress-spinner mode="indeterminate" color="primary" diameter="48"></mat-progress-spinner>
-    </div>
+    <app-loading [isLoading]="isLoading"></app-loading>
     <div class="row">
         <div class="col-large">
             <div class="block">
@@ -14,18 +12,18 @@
             </div>
         </div>
         <div class="col-small">
-            <div class="block">
-                <h6 class="heading">Average Viewing Time</h6>
-                <div class="blueBlock">
-                    {{averageTime}} min
-                </div>
-            </div>
-            <div class="block">
-                <h6 class="heading">Most Popular Viewing time</h6>
-                <div class="purpleBlock">
-                    {{ popularTime }}
-                </div>
-            </div>
+            <app-stats-insight-card
+                title="Average Viewing Time"
+                [value]="averageTime + ' min'"
+                type="text-block"
+                variant="primary"
+            ></app-stats-insight-card>
+            <app-stats-insight-card
+                title="Most Popular Viewing Time"
+                [value]="popularTime"
+                type="text-block"
+                variant="secondary"
+            ></app-stats-insight-card>
         </div>
     </div>
 </div>

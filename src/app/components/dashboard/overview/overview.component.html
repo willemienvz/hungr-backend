@@ -1,1 +1,52 @@
-<p>overview works!</p>
+<div class="overview-page">
+  <app-loading [isLoading]="isLoading"></app-loading>
+  
+  <!-- Stats Cards Section -->
+  <div class="stats-section" *ngIf="!isLoading">
+    <div class="stats-grid">
+      <!-- Total Menu Views Card -->
+      <app-stats-insight-card
+        title="Total menu views"
+        subtitle="Last 7 days"
+        [value]="(viewingTotalCurrentWeek || 0).toString()"
+        [trend]="getWeeklyDifferenceMessage()"
+        [trendDirection]="viewingTotalCurrentWeek >= viewingTotalPreviousWeek ? 'up' : 'down'"
+        type="numeric"
+        tooltipText="Total number of menu views in the last 7 days compared to the previous week"
+      ></app-stats-insight-card>
+
+      <!-- Average Viewing Time Card -->
+      <app-stats-insight-card
+        title="Average Viewing Time"
+        [value]="(averageTime || 0) + ' min'"
+        type="colored-block"
+        variant="primary"
+        tooltipText="Average time users spend viewing your menu"
+      ></app-stats-insight-card>
+
+      <!-- Most Popular Viewing Time Card -->
+      <app-stats-insight-card
+        title="Most Popular Viewing time"
+        [value]="popularTime || 'No data available'"
+        type="text-block"
+        variant="secondary"
+        tooltipText="The most common day and time when users view your menu"
+      ></app-stats-insight-card>
+
+   
+    </div>
+  </div>
+
+  <!-- Fallback message when no data -->
+  
+  <!-- Main Charts Section -->
+  <div class="charts-section" *ngIf="!isLoading && viewingTotalCurrentWeek > 0">
+    <div class="charts-grid">
+      <!-- Daily Menu Visits Chart -->
+      <div class="chart-block main-chart">
+        <h6 class="chart-title">Daily Menu Visits</h6>
+        <div echarts [options]="chartOptions" class="chart-container"></div>
+      </div>
+    </div>
+  </div>
+</div>

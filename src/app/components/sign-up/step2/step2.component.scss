@@ -18,6 +18,7 @@
     left: 46px;
     width: 150px;
   }
+
   &-inner {
     width: 100%;
     max-width: 630px;
@@ -39,6 +40,7 @@
     justify-content: center;
     align-items: center;
     gap: 30px;
+
     .row {
       width: 100%;
       display: flex;
@@ -46,12 +48,14 @@
       justify-content: center;
       align-items: flex-start;
       gap: 56px;
+
       .col {
         width: calc(50% - 28px);
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
+
         h6 {
           color: #2e3646;
           text-align: left;
@@ -96,6 +100,7 @@
               display: flex;
               flex-wrap: wrap;
               flex-direction: row;
+
               p {
                 width: 50%;
                 font-family: "Poppins", sans-serif;
@@ -105,17 +110,20 @@
                 letter-spacing: -0.001em;
                 text-align: left;
               }
+
               .vaild {
                 color: #16d3d2;
               }
             }
           }
         }
+
         .inner-row-form-group {
           width: 100%;
           display: flex;
           flex-direction: row;
           gap: 23px;
+
           .formGroup {
             width: calc(50% - 12px);
           }
@@ -132,6 +140,7 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
+
   .material-icons {
     position: absolute;
     top: 11px;
@@ -149,6 +158,7 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
+
   .material-icons {
     position: absolute;
     top: 11px;
@@ -156,6 +166,7 @@
     font-size: 19px;
     color: #000000;
   }
+
   input {
     padding-left: 40px;
   }
@@ -198,12 +209,14 @@
   width: 100%;
   gap: 12px;
 }
+
 .checkbox-container {
   display: flex;
   justify-content: flex-start;
   align-self: center;
   flex-direction: row;
   width: 100%;
+
   label {
     display: flex;
     justify-content: flex-start;
@@ -274,6 +287,7 @@
         margin-top: 26px;
         gap: 8px;
         margin-bottom: 23px;
+
         .listitem {
           width: 100%;
           display: flex;
@@ -294,6 +308,7 @@
   .col:first-of-type {
     background-color: #afdcff;
   }
+
   .col:last-of-type {
     background-color: #c8afeb;
   }
@@ -311,17 +326,11 @@
   display: flex;
 }
 
+@import "../../../../styles/_design-tokens";
+
+/* Back Link styling - Now centralized in _design-tokens.scss */
 .backLink {
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #2e3646;
-  text-decoration: none;
-  text-transform: uppercase;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 5px;
-  align-items: center;
-  cursor: pointer;
+  /* Using absolute and uppercase variants for this component */
+  @include backLink-absolute;
+  @include backLink-uppercase;
 }

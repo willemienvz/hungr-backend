@@ -81,6 +81,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
@@ -99,6 +101,7 @@ import { UnsavedChangesDialogComponent } from './components/unsaved-changes-dial
 import { DeleteConfirmationModalComponent } from './components/shared/delete-confirmation-modal/delete-confirmation-modal.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ViewUsersComponent } from './components/manage-users/view-users/view-users.component';
+import { PermissionsManagerComponent } from './components/manage-users/permissions-manager/permissions-manager.component';
 import { MenuFormStepComponent } from './components/shared/menu-form-step/menu-form-step.component';
 import { CategoryManagementComponent } from './components/shared/category-management/category-management.component';
 import { MenuItemFormComponent } from './components/shared/menu-item-form/menu-item-form.component';
@@ -125,9 +128,20 @@ import { Step5OverviewComponent } from './components/specials/shared/special-for
 import { SpecialSummaryComponent } from './components/specials/shared/special-summary/special-summary.component';
 import { MenuDetailsModalComponent } from './components/shared/menu-details-modal/menu-details-modal.component';
 import { ContentBlockComponent } from './components/shared/content-block/content-block.component';
+import { ButtonComponent } from './components/shared/button/button.component';
+import { FormInputComponent } from './components/shared/form-input/form-input.component';
+import { FormSelectComponent } from './components/shared/form-select/form-select.component';
+import { FormTextareaComponent } from './components/shared/form-textarea/form-textarea.component';
+import { DataTableComponent } from './components/shared/data-table/data-table.component';
+import { ActionButtonComponent } from './components/shared/action-button/action-button.component';
+import { StatusBadgeComponent } from './components/shared/status-badge/status-badge.component';
+import { StatsCardComponent } from './components/shared/stats-card/stats-card.component';
+import { StatsInsightCardComponent } from './components/shared/stats-insight-card/stats-insight-card.component';
+import { PageLayoutComponent } from './components/shared/page-layout/page-layout.component';
 import { MediaLibraryComponent } from './components/media-library/media-library.component';
 import { FileSizePipe } from './shared/pipes/file-size.pipe';
 import { ReviewsComponent } from './components/reviews/reviews.component';
+import { PermissionService } from './shared/services/permission.service';
 
 @NgModule({
   declarations: [
@@ -190,6 +204,7 @@ import { ReviewsComponent } from './components/reviews/reviews.component';
     UnsavedChangesDialogComponent,
     DeleteConfirmationModalComponent,
     ViewUsersComponent,
+    PermissionsManagerComponent,
     MenuFormStepComponent,
     CategoryManagementComponent,
     MenuItemFormComponent,
@@ -215,11 +230,21 @@ import { ReviewsComponent } from './components/reviews/reviews.component';
     SpecialSummaryComponent,
     MenuDetailsModalComponent,
     ContentBlockComponent,
+    ButtonComponent,
+    FormInputComponent,
+    FormSelectComponent,
+    FormTextareaComponent,
+    DataTableComponent,
+    ActionButtonComponent,
+    StatusBadgeComponent,
+    StatsCardComponent,
+    StatsInsightCardComponent,
+    PageLayoutComponent,
     MediaLibraryComponent,
     FileSizePipe,
     MediaUploadModalComponent,
     MediaPreviewDialogComponent,
-      ReviewsComponent,
+    ReviewsComponent,
   ],
   imports: [
     BrowserModule,
@@ -254,6 +279,8 @@ import { ReviewsComponent } from './components/reviews/reviews.component';
     MatProgressBarModule,
     MatButtonModule,
     MatMenuModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     DragDropModule,
     ColorPickerModule,
     MatTooltipModule,
@@ -262,7 +289,7 @@ import { ReviewsComponent } from './components/reviews/reviews.component';
     }),
     ToastrModule.forRoot(),
   ],
-  providers: [FormDataService, DatePipe],
+  providers: [FormDataService, DatePipe, PermissionService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

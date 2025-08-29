@@ -1,162 +1,177 @@
-.inner-page{
-    width: 100%;
+/* Import design tokens for block styling */
+@import "../../../../styles/_design-tokens";
+
+.inner-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .row {
     display: flex;
-    flex-direction: column;
-    .row{
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        gap:15px
-    }
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 15px
+  }
 
-    .row > * {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    } 
-    
-    
-    .biggerBlock{
-        width: calc(66%);
-        flex: none !important;
-    }
-}
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-6);
+    margin-bottom: var(--spacing-8);
+  }
 
-
-.stat{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
+  .row>* {
     flex: 1;
-    .row{
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
+    display: flex;
+    flex-direction: column;
+  }
 
-        .heading{
-          margin-bottom: 0;
-        }
-  
-        .time{
-          text-align: right;
-          margin-bottom: 0;
-        }
-    }
 
-    .list{
-      margin-bottom: 10px;  
-      background-color: rgba(60,225,175,0.15);
-      padding: 20px 25px;
-      border-radius: 10px;
-      min-height: 65px;
-
-    }
-
-    .list:last-of-type{
-        margin-bottom: 0px;  
-        background-color: #F3F4F5;
-      }
-      .list p:first-of-type{
-        font-weight: bold;
-        font-size: 16px;
-        flex:1;
-      }
-
-      .list p:last-of-type{
-        font-size: 24px;
-        width: 15%;
-        text-align: left;
-        flex: unset;
-      }
-
-    
-    .heading{
-        color: #444444;
-        margin-bottom: 10px;
-    }
-
-    .material-icons{
-        cursor: pointer;
-        width: 30px;
-        margin-bottom: 10px;
-        color: #9A9A9A;
-    }
-
-    .time{
-        color: #9A9A9A;
-        margin-bottom: 33px;
-    }
-
- 
+  .biggerBlock {
+    width: calc(66%);
+    flex: none !important;
+  }
 }
 
-.stat1{
+
+.stat {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
   flex: 1;
-  .row{
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
 
-      .heading{
-        margin-bottom: 0;
-      }
+  .row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 
-      .time{
-        text-align: right;
-        margin-bottom: 0;
-      }
+    .heading {
+      margin-bottom: 0;
+    }
+
+    .time {
+      text-align: right;
+      margin-bottom: 0;
+    }
   }
 
-  .list{
-    margin-bottom: 10px;  
+  .list {
+    margin-bottom: 10px;
+    background-color: rgba(60, 225, 175, 0.15);
+    padding: 20px 25px;
+    border-radius: 10px;
+    min-height: 65px;
+
+  }
+
+  .list:last-of-type {
+    margin-bottom: 0px;
+    background-color: #F3F4F5;
+  }
+
+  .list p:first-of-type {
+    font-weight: bold;
+    font-size: 16px;
+    flex: 1;
+  }
+
+  .list p:last-of-type {
+    font-size: 24px;
+    width: 15%;
+    text-align: left;
+    flex: unset;
+  }
+
+
+  .heading {
+    color: #444444;
+    margin-bottom: 10px;
+  }
+
+  .material-icons {
+    cursor: pointer;
+    width: 30px;
+    margin-bottom: 10px;
+    color: #9A9A9A;
+  }
+
+  .time {
+    color: #9A9A9A;
+    margin-bottom: 33px;
+  }
+
+
+}
+
+.stat1 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+
+  .row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
+    .heading {
+      margin-bottom: 0;
+    }
+
+    .time {
+      text-align: right;
+      margin-bottom: 0;
+    }
+  }
+
+  .list {
+    margin-bottom: 10px;
     padding: 20px 25px;
     border-radius: 10px;
     min-height: 65px;
     background-color: #F3F4F5;
   }
 
-  .list:last-of-type{
-      margin-bottom: 0px;  
-    }
-    .list p:first-of-type{
-      font-size: 13px;
-      flex:1;
-    }
-
-    .list p:last-of-type{
-      font-size: 13px;
-      width: 15%;
-      text-align: left;
-      flex: unset;
-    }
-
-  
-  .heading{
-      color: #444444;
-      margin-bottom: 10px;
+  .list:last-of-type {
+    margin-bottom: 0px;
   }
 
-  .material-icons{
-      cursor: pointer;
-      width: 30px;
-      margin-bottom: 10px;
-      color: #9A9A9A;
+  .list p:first-of-type {
+    font-size: 13px;
+    flex: 1;
   }
 
-  .time{
-      color: #9A9A9A;
-      margin-bottom: 33px;
+  .list p:last-of-type {
+    font-size: 13px;
+    width: 15%;
+    text-align: left;
+    flex: unset;
+  }
+
+
+  .heading {
+    color: #444444;
+    margin-bottom: 10px;
+  }
+
+  .material-icons {
+    cursor: pointer;
+    width: 30px;
+    margin-bottom: 10px;
+    color: #9A9A9A;
+  }
+
+  .time {
+    color: #9A9A9A;
+    margin-bottom: 33px;
   }
 
 }
@@ -164,13 +179,14 @@
 .pair-card {
   display: flex;
   width: 100%;
-  
+
   margin-bottom: 15px;
 }
 
 .side {
   flex: 1;
-  background-color: #F3F4F5; /* Light gray sides */
+  background-color: #F3F4F5;
+  /* Light gray sides */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -184,16 +200,116 @@
 }
 
 .center {
-  width:25px;
+  width: 25px;
   display: flex;
   font-family: "Poppins", sans-serif;
   justify-content: center;
   align-items: center;
-  color: #444; 
+  color: #444;
   font-size: 15px;
   font-weight: bold;
 }
 
-.pariholder{
+.pariholder {
   margin-top: 20px;
+}
+
+// Compact date range picker styles
+.date-range-compact {
+  @extend .block;
+  margin-bottom: var(--spacing-8);
+  justify-content: flex-end;
+
+  /* Override block padding for compact layout */
+
+  .date-range-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    .date-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .date-label {
+        color: var(--color-text-secondary);
+        font-weight: var(--font-weight-medium);
+        font-size: 14px;
+        white-space: nowrap;
+        min-width: 35px;
+      }
+
+      .formControl {
+        width: 140px;
+        border: 1px solid var(--color-border-medium);
+        height: 36px;
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-family: var(--font-family-primary);
+        font-size: 14px;
+        background-color: var(--color-white);
+        transition: border-color 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: var(--hungr-main-color);
+          box-shadow: 0 0 0 3px rgba(var(--hungr-main-color), 0.1);
+        }
+
+        &:hover {
+          border-color: var(--color-grey-600);
+        }
+      }
+    }
+
+    .apply-button {
+      height: 36px;
+      min-width: 80px;
+      font-weight: var(--font-weight-medium);
+      font-family: var(--font-family-primary);
+      background-color: var(--hungr-main-color) !important;
+      color: var(--color-white) !important;
+      border: none;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      font-size: 14px;
+
+      &:hover {
+        background-color: var(--hungr-secondary-color) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(var(--hungr-main-color), 0.3);
+      }
+    }
+  }
+}
+
+// Responsive design for compact date pickers
+@media (max-width: 768px) {
+  .date-range-compact {
+    .date-range-controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+
+      .date-field {
+        justify-content: space-between;
+
+        .formControl {
+          flex: 1;
+        }
+      }
+
+      .apply-button {
+        width: 100%;
+        margin-top: 8px;
+      }
+    }
+  }
 }

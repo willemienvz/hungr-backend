@@ -1,0 +1,33 @@
+<button
+  *ngIf="!routerLink"
+  type="button"
+  [class]="buttonClass"
+  [disabled]="disabled || loading"
+  [title]="title"
+  [style]="buttonStyle"
+  (click)="onClick($event)">
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="action-button-spinner">
+    <i class="material-icons">hourglass_empty</i>
+  </div>
+
+  <!-- Icon -->
+  <i *ngIf="!loading" class="material-icons action-button-icon">
+    {{ iconName }}
+  </i>
+</button>
+
+<a
+  *ngIf="routerLink"
+  [routerLink]="routerLink"
+  [queryParams]="queryParams"
+  [class]="buttonClass"
+  [title]="title"
+  [style]="buttonStyle">
+
+  <!-- Icon -->
+  <i class="material-icons action-button-icon">
+    {{ iconName }}
+  </i>
+</a>

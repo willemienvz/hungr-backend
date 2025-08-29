@@ -1,10 +1,14 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Router } from '@angular/router';
 import { Restaurant } from '../../shared/services/restaurant';
 import { MatDialog } from '@angular/material/dialog';
 import { ViewComponent } from './view/view.component';
 import { ToastrService } from 'ngx-toastr';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../shared/delete-confirmation-modal/delete-confirmation-modal.component';
+import { TableColumn, TableAction } from '../shared/data-table/data-table.component';
+import { UnsavedChangesDialogComponent } from '../unsaved-changes-dialog/unsaved-changes-dialog.component';
+
 @Component({
   selector: 'app-restaurant',
   templateUrl: './restaurant.component.html',
@@ -14,15 +18,53 @@ export class RestaurantComponent {
   isTooltipOpen: boolean = false;
   isPopupMenuOpen: boolean[] = [];
   isSaving: boolean = false;
+  isLoading: boolean = false;
   restuarants: Restaurant[] = [];
+  hasUnsavedChanges: boolean = false;
+
+  // Table configuration
+  restaurantColumns: TableColumn[] = [
+    {
+      key: 'restaurantName',
+      label: 'Restaurant Name',
+      sortable: true
+    },
+    {
+      key: 'city',
+      label: 'Location',
+      sortable: true
+    }
+  ];
+
+  restaurantActions: TableAction[] = [
+    {
+      key: 'view',
+      label: 'View',
+      icon: 'visibility',
+      color: 'secondary'
+    },
+    {
+      key: 'edit',
+      label: 'Edit',
+      icon: 'edit',
+      color: 'secondary'
+    },
+    {
+      key: 'delete',
+      label: 'Delete',
+      icon: 'delete',
+      color: 'danger'
+    }
+  ];
   constructor(
     private readonly toastr: ToastrService,
     private firestore: AngularFirestore,
+    private router: Router,
     private elementRef: ElementRef,
     public dialog: MatDialog
-  ) {}
+  ) { }
   ngOnInit() {
-    this.isSaving = true;
+    this.isLoading = true;
     this.fetchRestaurant();
   }
   @HostListener('document:click', ['$event'])
@@ -70,8 +112,41 @@ export class RestaurantComponent {
       .subscribe((restuarants) => {
         this.restuarants = restuarants;
         console.log(this.restuarants);
-        this.isSaving = false;
+        this.isLoading = false;
       });
+  }
+
+  onRestaurantAction(event: any) {
+    const { action, row, index } = event;
+
+    switch (action.key) {
+      case 'view':
+        this.viewRestaurant(row.restaurantID, index);
+        break;
+      case 'edit':
+        // Navigate to edit restaurant page with unsaved changes check
+        this.navigateWithUnsavedChangesCheck(['/restaurants/edit-restaurant', row.restaurantID]);
+        break;
+      case 'delete':
+        this.openDialog(row.restaurantID, index, row.restaurantName);
+        break;
+    }
+  }
+
+  /**
+   * Handle row click - trigger first available action
+   */
+  onRowClick(event: any) {
+    const { row, index } = event;
+
+    // Find the first available action for this row
+    const firstAvailableAction = this.restaurantActions.find(action =>
+      action.visible ? action.visible(row) : true
+    );
+
+    if (firstAvailableAction) {
+      this.onRestaurantAction({ action: firstAvailableAction, row, index });
+    }
   }
 
   deleteRestaurant(id: string, index: number) {
@@ -103,5 +178,44 @@ export class RestaurantComponent {
       } else {
       }
     });
+  }
+
+  // Navigation safety methods
+  private markAsChanged() {
+    this.hasUnsavedChanges = true;
+  }
+
+  private markAsSaved() {
+    this.hasUnsavedChanges = false;
+  }
+
+  async navigateWithUnsavedChangesCheck(route: string | any[]) {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+        width: '400px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === true) {
+          if (Array.isArray(route)) {
+            this.router.navigate(route);
+          } else {
+            this.router.navigate([route]);
+          }
+        }
+      });
+    } else {
+      if (Array.isArray(route)) {
+        this.router.navigate(route);
+      } else {
+        this.router.navigate([route]);
+      }
+    }
+  }
+
+  // Method to navigate to add restaurant page
+  navigateToAddRestaurant() {
+    this.navigateWithUnsavedChangesCheck(['/restaurants/add-restaurant']);
   }
 }

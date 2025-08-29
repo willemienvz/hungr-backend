@@ -35,19 +35,19 @@ export class BrandingComponent implements OnInit {
   isTooltipOpen: boolean = false;
   lastSavedDocId: string | null = null;
   tooltipOpen: { [key: string]: boolean } = {};
-  
+
   // Preview mode management
   isPreviewMode: boolean = false;
   originalSettings: any = {};
   previewDocId: string | null = null;
   hasUnsavedChanges: boolean = false;
   private previewSaveTimer: any = null;
-  
+
   // Debounce mechanism to prevent duplicate calls
   private lastChangeTime: number = 0;
   private lastChangeValue: any = null;
   private lastChangeType: string = '';
-  
+
   // Color settings
   backgroundColor: string = '#FFFFFF';
   primaryColor: string = '#000000';
@@ -100,7 +100,7 @@ export class BrandingComponent implements OnInit {
     private mediaUploadModalService: MediaUploadModalService,
     private mediaLibraryService: MediaLibraryService,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Subscribe to authentication state changes
@@ -110,7 +110,7 @@ export class BrandingComponent implements OnInit {
         this.OwnerID = user.uid;
         console.log('User authenticated with Firebase, owner ID:', this.OwnerID);
         console.log('User auth state:', user);
-        
+
         // First fetch branding data
         this.fetchBrandingData();
         // Then fetch available menus
@@ -163,7 +163,7 @@ export class BrandingComponent implements OnInit {
   fetchMenus() {
     console.log('Fetching menus for owner ID:', this.OwnerID);
     this.firestore
-      .collection('menus', (ref) => 
+      .collection('menus', (ref) =>
         ref.where('OwnerID', '==', this.OwnerID)
       )
       .valueChanges({ idField: 'menuID' })
@@ -171,9 +171,9 @@ export class BrandingComponent implements OnInit {
         // Filter active menus (not drafts and has Status true)
         this.activeMenus = menus.filter(menu => !menu.isDraft && menu.Status);
         this.menus = this.activeMenus;
-        
+
         console.log('Active menus:', this.activeMenus);
-        
+
         // Set default selected menu if available and not already set
         if (this.menus.length > 0 && !this.selectedMenuId) {
           this.selectedMenuId = this.menus[0].menuID;
@@ -191,9 +191,9 @@ export class BrandingComponent implements OnInit {
         oldId: this.lastSelectedMenuId,
         newId: this.selectedMenuId
       });
-      
+
       this.lastSelectedMenuId = this.selectedMenuId;
-      
+
       if (this.selectedMenuId) {
         const url = `${this.previewUrlBase}${this.selectedMenuId}`;
         this.cachedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -206,7 +206,7 @@ export class BrandingComponent implements OnInit {
         this.cachedPreviewUrl = null;
       }
     }
-    
+
     return this.cachedPreviewUrl || this.sanitizer.bypassSecurityTrustResourceUrl('');
   }
 
@@ -215,7 +215,7 @@ export class BrandingComponent implements OnInit {
       console.log('Same menu selected, skipping update');
       return;
     }
-    
+
     console.log('Selected menu:', event.value);
     this.selectedMenuId = event.value;
     // No need to force change detection here
@@ -261,10 +261,10 @@ export class BrandingComponent implements OnInit {
   private async onLogoUploaded(mediaItem: MediaItem): Promise<void> {
     try {
       this.isSaving = true;
-      
+
       // Update branding with media library reference
       this.imageUrl = mediaItem.url;
-      
+
       // Track usage in media library
       await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
         componentType: 'branding',
@@ -276,10 +276,10 @@ export class BrandingComponent implements OnInit {
 
       // Save the logo with media library integration
       await this.saveLogoWithMediaLibrary(mediaItem);
-      
+
       this.isSaving = false;
       this.toastr.success('Logo uploaded successfully!');
-      
+
       // Trigger preview mode for image changes
       this.triggerPreviewForImageChange();
     } catch (error) {
@@ -314,18 +314,18 @@ export class BrandingComponent implements OnInit {
   async removeLogoWithMediaLibrary(): Promise<void> {
     try {
       this.isSaving = true;
-      
+
       // Check authentication status
       const isAuthenticated = await this.checkAuthStatus();
       if (!isAuthenticated || !this.OwnerID) {
         throw new Error('User not authenticated');
       }
-      
+
       console.log('Removing logo with OwnerID:', this.OwnerID, 'lastSavedDocId:', this.lastSavedDocId);
-      
+
       // Clear the image URL
       this.imageUrl = '';
-      
+
       // Update branding to remove media library reference
       if (this.lastSavedDocId) {
         await this.firestore
@@ -350,10 +350,10 @@ export class BrandingComponent implements OnInit {
         this.lastSavedDocId = docRef.id;
         console.log('Created new branding document with ID:', docRef.id);
       }
-      
+
       this.isSaving = false;
       this.toastr.success('Logo removed successfully!');
-      
+
       // Trigger preview mode for image changes
       this.triggerPreviewForImageChange();
     } catch (error) {
@@ -370,21 +370,21 @@ export class BrandingComponent implements OnInit {
   applyChanges(type: string, value: any): void {
     // Debounce duplicate events
     const currentTime = Date.now();
-    if (this.lastChangeType === type && 
-        this.lastChangeValue === value && 
-        (currentTime - this.lastChangeTime) < 100) {
+    if (this.lastChangeType === type &&
+      this.lastChangeValue === value &&
+      (currentTime - this.lastChangeTime) < 100) {
       return;
     }
-    
+
     this.lastChangeTime = currentTime;
     this.lastChangeValue = value;
     this.lastChangeType = type;
-    
+
     // Enable preview mode on first change
     if (!this.isPreviewMode) {
       this.enablePreviewMode();
     }
-    
+
     switch (type) {
       case 'Background Color':
         this.backgroundColor = value;
@@ -453,7 +453,7 @@ export class BrandingComponent implements OnInit {
       default:
         console.warn('Unrecognized setting type');
     }
-    
+
     // Mark as having unsaved changes and update preview
     this.hasUnsavedChanges = true;
     this.savePreviewSettings();
@@ -526,10 +526,10 @@ export class BrandingComponent implements OnInit {
   // Enhanced method to save logo with media library integration
   async saveLogoWithMediaLibrary(mediaItem: MediaItem): Promise<void> {
     try {
-      const brandingData = { 
-        imageUrl: mediaItem.url, 
+      const brandingData = {
+        imageUrl: mediaItem.url,
         logoMediaId: mediaItem.id,
-        parentID: this.OwnerID 
+        parentID: this.OwnerID
       };
 
       if (this.lastSavedDocId) {
@@ -543,7 +543,7 @@ export class BrandingComponent implements OnInit {
           ref.where('parentID', '==', this.OwnerID)
         );
         const querySnapshot = await brandingRef.get().toPromise();
-        
+
         if (!querySnapshot || querySnapshot.empty) {
           const docRef = await this.firestore
             .collection('branding')
@@ -590,7 +590,7 @@ export class BrandingComponent implements OnInit {
           const brandingDoc = querySnapshot.docs[0];
           if (brandingDoc) {
             const brandingData = brandingDoc.data() as any;
-            
+
             // Handle media library integration for logo
             if (brandingData.logoMediaId) {
               try {
@@ -605,7 +605,7 @@ export class BrandingComponent implements OnInit {
                 }
               }
             }
-            
+
             this.loadBrandingSettings(brandingData);
             this.lastSavedDocId = brandingDoc.id; // Save the document ID for future updates
             console.log('Branding data loaded:', brandingData);
@@ -643,10 +643,10 @@ export class BrandingComponent implements OnInit {
 
   loadBrandingSettings(brandingData: any): void {
     console.log(brandingData);
-    
+
     // Store the complete branding data for template access
     this.brandingData = brandingData;
-    
+
     this.backgroundColor = brandingData?.backgroundColor ?? '#FFFFFF';
     this.primaryColor = brandingData?.primaryColor ?? '#000000';
     this.secondaryColor = brandingData?.secondaryColor ?? '#666666';
@@ -681,7 +681,7 @@ export class BrandingComponent implements OnInit {
     const brandingDetails = this.getBrandingSettings();
     brandingDetails.parentID = this.OwnerID;
     console.log(brandingDetails);
-    
+
     if (this.lastSavedDocId) {
       this.firestore
         .collection('branding')
@@ -896,19 +896,19 @@ export class BrandingComponent implements OnInit {
     console.log('Clearing preview mode...');
     this.isPreviewMode = false;
     this.hasUnsavedChanges = false;
-    
+
     // Always clean up all preview documents for this restaurant (more reliable)
     this.cleanupAllPreviewDocuments();
-    
+
     // Reset preview doc ID
     this.previewDocId = null;
   }
 
   cleanupAllPreviewDocuments(): void {
     console.log('🧹 Starting cleanup of all preview documents for parentID:', this.OwnerID);
-    
+
     this.firestore
-      .collection('branding-preview', ref => 
+      .collection('branding-preview', ref =>
         ref.where('parentID', '==', this.OwnerID)
       )
       .get()
@@ -940,7 +940,7 @@ export class BrandingComponent implements OnInit {
     if (!this.isPreviewMode) {
       this.enablePreviewMode();
     }
-    
+
     // Mark as having unsaved changes and update preview
     this.hasUnsavedChanges = true;
     this.savePreviewSettings();

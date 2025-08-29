@@ -1,23 +1,23 @@
-.inner-page{
+.inner-page {
     display: flex;
-    flex-direction: row;
-    gap: 15px;
+    flex-direction: column;
+    gap: var(--grid-gap-md);
 
-    .block{
+    .block {
+        /* Uses centralized block styling */
         width: 100%;
     }
-    .list{
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 25px;
 
-        .tut{
+    .list {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--grid-gap-md);
+        margin-top: var(--margin-lg);
+
+        .tut {
             position: relative;
-            width: calc(50% - 15px);
-            border-radius: 15px;
+            border-radius: var(--border-radius-lg);
             overflow: hidden;
             cursor: pointer;
             height: 260px;
@@ -25,14 +25,14 @@
             justify-content: center;
             align-items: center;
 
-            img{
+            img {
                 width: 100%;
                 transition: 0.3s all;
                 transform: scale(1);
                 border-radius: 15px;
             }
 
-            p{
+            p {
                 position: absolute;
                 bottom: 15px;
                 left: 15px;
@@ -41,8 +41,9 @@
                 font-size: 15px;
                 margin: 0;
             }
-            i{
-                opacity: 0;                
+
+            i {
+                opacity: 0;
                 color: white;
                 font-size: 40px;
                 position: absolute;
@@ -50,11 +51,11 @@
             }
         }
 
-        .tut:hover img{
+        .tut:hover img {
             transform: scale(1.05);
         }
 
-        .tut:hover i{
+        .tut:hover i {
             opacity: 1;
         }
     }
@@ -63,7 +64,8 @@
 
 
 .modal {
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
     position: fixed;
     z-index: 1;
     left: 0;
@@ -71,10 +73,10 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-  }
-  
-  .modal-content {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
     background-color: #fefefe;
     padding: 20px;
     border: 1px solid #888;
@@ -83,39 +85,40 @@
     flex-direction: column;
     position: relative;
     gap: 20px;
-align-items: flex-start;
+    align-items: flex-start;
 
-iframe{
-    width: 100%;
-}
-.row{
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
+    iframe {
+        width: 100%;
+    }
+
+    .row {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+
 }
 
-  }
-  
-  .close {
+.close {
     color: #aaa;
     position: absolute;
     font-size: 28px;
     font-weight: bold;
     right: 15px;
-    top:15px;
-  }
-  
-  .close:hover,
-  .close:focus {
+    top: 15px;
+}
+
+.close:hover,
+.close:focus {
     color: black;
     text-decoration: none;
     cursor: pointer;
-  }
-  
-  .open {
-    display: flex; 
+}
+
+.open {
+    display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 50px;
-  }
+}

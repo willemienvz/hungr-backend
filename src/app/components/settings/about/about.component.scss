@@ -10,6 +10,7 @@
     color: #9a9a9a;
   }
 }
+
 .container {
   display: flex;
   padding: 20px;
@@ -22,6 +23,7 @@
     display: flex;
     flex-direction: row;
     gap: 10px;
+
     .col {
       width: calc(50% - 10px);
       display: flex;
@@ -40,6 +42,7 @@
     justify-content: center;
     flex-direction: row;
     align-items: center;
+
     label {
       color: #16d3d2;
     }
@@ -48,6 +51,7 @@
   .block {
     width: 100%;
     position: relative;
+    /* Uses centralized block styling */
   }
 }
 
@@ -61,10 +65,12 @@
     gap: 20px;
     display: flex;
     flex-direction: column;
+
     textarea {
       width: 100%;
       min-height: 200px;
     }
+
     .example-full-width {
       width: 100%;
     }
@@ -108,6 +114,7 @@ textarea {
   border: 1px solid #dedede;
   border-radius: 10px;
 }
+
 .outerCol {
   width: calc(60% - 25px);
   display: flex;
@@ -121,6 +128,7 @@ textarea {
   flex-direction: column;
   gap: 15px;
 }
+
 .hold {
   display: flex;
   justify-content: center;
@@ -237,6 +245,7 @@ textarea {
   .about-text {
     white-space: pre-wrap;
   }
+
   .mainImg {
     width: 100%;
   }
@@ -262,6 +271,7 @@ textarea {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+
     h6 {
       margin-bottom: 15px;
     }
@@ -273,6 +283,7 @@ textarea {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+
     a {
       color: #444;
     }

@@ -1,73 +1,34 @@
-<div class="inner-page">
-  <div class="block">
-    <div class="row">
-      <div class="formGroup">
-        <div class="label-container">
-          <label>Main Admin</label>
-        </div>
-        <div class="input-holder">
-          <input
-            type="text"
-            class="formControl"
-            placeholder="John"
-            disabled="true"
-            [value]="mainUserName"
-          />
-        </div>
-      </div>
-      <a class="btnSecondary" (click)="addUser.openPopup()" [class.disabled]="isSaving">+ Add user</a>
-    </div>
+<app-page-layout
+  title="User Management"
+  subtitle="Manage team members and their permissions"
+  [actions]="pageActions"
+  [loading]="isSaving">
 
-    <h6>Editors</h6>
-    <div class="userTable">
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>User</th>
-            <th>Email Address</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let user of users; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>
-              <div class="user-info">
-                <div class="user-details">
-                  <span class="user-name">{{ user.firstName }} {{ user.Surname }}</span>
-                  <span class="user-role">Editor</span>
-                </div>
-              </div>
-            </td>
-            <td>{{ user.email }}</td>
-            <td>
-              <span class="status-badge" [class.active]="getUserStatus(user)" [class.inactive]="!getUserStatus(user)">
-                <i class="material-icons status-icon">{{ getUserStatus(user) ? 'check_circle' : 'cancel' }}</i>
-                {{ getUserStatus(user) ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
-            <td class="actions-cell">
-              <div class="action-buttons">
-                <button mat-icon-button class="view-btn" (click)="viewUser(user)" title="View User" [disabled]="isSaving">
-                  <i class="material-icons">visibility</i>
-                </button>
-                <button mat-icon-button class="edit-btn" (click)="editUser(user, i)" title="Edit User" [disabled]="isSaving">
-                  <i class="material-icons">edit</i>
-                </button>
-                <button mat-icon-button class="delete-btn" (click)="confirmDeleteUser(user.uid, i)" title="Delete User" [disabled]="isSaving">
-                  <i class="material-icons">delete</i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+
+
+  <!-- Users Table -->
+  <app-content-block title="Team Members">
+    <app-data-table
+      [data]="users"
+      [columns]="userColumns"
+      [actions]="userActions"
+      [showIndex]="true"
+      [loading]="isSaving"
+      emptyMessage="No users found"
+      (actionClick)="onUserAction($event)">
+
+
+
+    </app-data-table>
+  </app-content-block>
+
+</app-page-layout>
 
 <app-add-user-dialog #addUser></app-add-user-dialog>
 <app-loading [isLoading]="isSaving"></app-loading>
 <app-view-users #editDialog></app-view-users>
+<app-permissions-manager
+  [user]="selectedUserForPermissions"
+  [showPopup]="showPermissionsDialog"
+  (closePopup)="closePermissionsDialog()">
+</app-permissions-manager>

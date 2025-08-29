@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
 import { Observable } from 'rxjs';
+import { CategoryService } from '../../../services/category.service';
 
 interface ItemPair {
   itemA: string;
@@ -15,7 +16,7 @@ interface ItemPair {
   templateUrl: './menu-insights.component.html',
   styleUrls: ['./menu-insights.component.scss'],
 })
-export class MenuInsightsComponent {
+export class MenuInsightsComponent implements OnDestroy {
   isLoading: boolean = false;
   userDataID: string = '';
   menus$: Observable<any[]> | undefined;
@@ -31,14 +32,25 @@ export class MenuInsightsComponent {
   chartOptionsCategoryPercentages: any;
   chartOptionsMostOrderedItems: any;
   categoryOrderCounts: { [category: string]: number } = {};
+  categoryNameMap: { [categoryId: string]: string } = {};
+
+  // Date range properties
+  dateFrom: string = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 7 days ago
+  dateTo: string = new Date().toISOString().split('T')[0]; // Today
+  selectedDateRange: { from: Date; to: Date } = {
+    from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    to: new Date()
+  };
 
   accountType = localStorage.getItem('accountType');
   layoutMinimised: boolean = false;
+  private loadingTimeout: any;
 
   constructor(
     public authService: AuthService,
     private router: Router,
-    private firestore: AngularFirestore
+    private firestore: AngularFirestore,
+    private categoryService: CategoryService
   ) {
     if (this.accountType === 'true') {
       this.layoutMinimised = true;
@@ -47,7 +59,7 @@ export class MenuInsightsComponent {
       if (uid) {
         this.userDataID = uid;
         this.fetchMenus();
-        this.fetchRestaurants();
+        // fetchRestaurants() removed - orders now handled via aggregated analytics
       } else {
         console.log('No authenticated user');
         this.router.navigate(['/signin']);
@@ -55,17 +67,77 @@ export class MenuInsightsComponent {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
+
+  ngOnDestroy(): void {
+    this.clearLoadingTimeout();
+  }
+
+  /**
+   * Load category names from the database with timeout protection
+   */
+  private async loadCategoryNames(categoryIds: string[]): Promise<void> {
+    if (categoryIds.length === 0) return;
+
+    try {
+      console.log('Menu insights: Starting category name loading with timeout');
+
+      // Create a promise that resolves when categories are loaded or times out after 10 seconds
+      const categoryPromise = this.categoryService.getCategoriesByIds(categoryIds).toPromise();
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Category loading timeout')), 10000)
+      );
+
+      const categories = await Promise.race([categoryPromise, timeoutPromise]);
+
+      if (categories) {
+        console.log('Menu insights: Categories loaded successfully:', categories.length);
+        categories.forEach(cat => {
+          this.categoryNameMap[cat.id] = cat.name;
+        });
+      }
+    } catch (error) {
+      console.error('Menu insights: Error loading category names:', error);
+      // Don't throw - we want this to be non-blocking
+    }
+  }
+
+  /**
+   * Get category name by ID, fallback to ID if name not found
+   */
+  private getCategoryName(categoryId: string): string {
+    return this.categoryNameMap[categoryId] || categoryId;
+  }
+
+  /**
+   * Clear the loading timeout to prevent forced loading completion
+   */
+  private clearLoadingTimeout(): void {
+    if (this.loadingTimeout) {
+      clearTimeout(this.loadingTimeout);
+      this.loadingTimeout = null;
+    }
+  }
 
   fetchMenus() {
     this.isLoading = true;
-    // Read aggregated analytics for the last 7 days for all menus owned by this user
+    console.log('Menu insights: Starting data fetch, setting loading to true');
+
+    // Add a safety timeout to prevent loading from getting stuck
+    this.loadingTimeout = setTimeout(() => {
+      if (this.isLoading) {
+        console.warn('Menu insights: Main loading timeout reached, forcing loading to false');
+        this.isLoading = false;
+      }
+    }, 15000); // 15 second timeout for main data loading
+    // Read aggregated analytics for the selected date range
     // Build UTC date keys to match frontend aggregator buckets
-    const today = new Date();
     const dates: string[] = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-      d.setUTCDate(d.getUTCDate() - i);
+    const fromDate = new Date(this.selectedDateRange.from);
+    const toDate = new Date(this.selectedDateRange.to);
+
+    // Generate all dates between from and to (inclusive)
+    for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
       const yyyy = d.getUTCFullYear();
       const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
       const dd = String(d.getUTCDate()).padStart(2, '0');
@@ -86,8 +158,13 @@ export class MenuInsightsComponent {
           menuIdToNameMap[menuData.menuID] = menuData.menuName;
           return menuData.menuID;
         }).filter(Boolean);
-        
-        if (menuIds.length === 0) { this.isLoading = false; return; }
+
+        if (menuIds.length === 0) {
+          console.log('No menus found, setting loading to false');
+          this.clearLoadingTimeout();
+          this.isLoading = false;
+          return;
+        }
 
         // Aggregate across dates
         let totalViews7d = 0;
@@ -95,6 +172,9 @@ export class MenuInsightsComponent {
         const dailyVisits: { [date: string]: { [menuId: string]: number } } = {};
         const categoryCountsAgg: { [categoryId: string]: number } = {};
         const itemCountsAgg: { [itemId: string]: { name: string; count: number } } = {};
+
+        console.log('📊 Menu Insights: Querying dates:', dates);
+        console.log('📊 Menu Insights: Menu IDs:', menuIds);
 
         const tasks: Array<Promise<{ dateKey: string; menuId: string; data: any | null }>> = [];
         for (const dateKey of dates) {
@@ -110,6 +190,12 @@ export class MenuInsightsComponent {
           }
         }
         const results = await Promise.all(tasks);
+        console.log('📊 Menu Insights: Analytics results:', results);
+
+        // Check if we have any data at all
+        const hasAnyData = results.some(r => r.data !== null);
+        console.log('📊 Menu Insights: Has any aggregated data:', hasAnyData);
+
         for (const { dateKey, menuId, data } of results) {
           const views = data?.viewCount || 0;
           dailyVisits[dateKey][menuId] = views;
@@ -132,85 +218,93 @@ export class MenuInsightsComponent {
         this.viewingTotalCurrentWeek = totalViews7d;
         this.viewingTotalLast24Hours = totalViews24h;
 
+        console.log('📊 Menu Insights: Final totals:', {
+          totalViews7d,
+          totalViews24h,
+          categoryCountsAgg,
+          itemCountsAgg
+        });
+
+        // If no aggregated data found, show zero values
+        if (!hasAnyData) {
+          console.log('📊 Menu Insights: No aggregated data found, showing zero values');
+          this.viewingTotalCurrentWeek = 0;
+          this.viewingTotalLast24Hours = 0;
+          this.categoryOrderCounts = {};
+          this.mostOrderedCategory = 'No data available';
+          this.categoryNameMap = {};
+          this.topOrderedItems = [];
+          this.updateChartOptions(dailyVisits, menuIdToNameMap);
+          this.updateMostOrderedItemsChart();
+          console.log('No aggregated data case: setting loading to false');
+          this.clearLoadingTimeout();
+          this.isLoading = false;
+          return;
+        }
+
         // Compute category shares and top items from aggregates
         this.categoryOrderCounts = categoryCountsAgg;
         this.calculateCategoryOrderPercentages();
+
+        // Calculate most ordered category first (don't wait for category names)
+        const categoryKeys = Object.keys(categoryCountsAgg);
+        const mostOrderedCategoryId = categoryKeys.length > 0
+          ? categoryKeys.reduce((a, b) => (categoryCountsAgg[a] > categoryCountsAgg[b] ? a : b))
+          : '';
+
+        // Set initial category name (will be ID until names load)
+        this.mostOrderedCategory = mostOrderedCategoryId;
+
+        // Load category names asynchronously (non-blocking)
+        if (categoryKeys.length > 0) {
+          console.log('Loading category names for keys:', categoryKeys);
+          this.loadCategoryNames(categoryKeys).then(() => {
+            console.log('Category names loaded successfully');
+            // Update the category name if it loaded successfully
+            const updatedName = this.getCategoryName(mostOrderedCategoryId);
+            if (updatedName !== mostOrderedCategoryId) {
+              this.mostOrderedCategory = updatedName;
+              console.log('Most ordered category updated to:', this.mostOrderedCategory);
+            }
+          }).catch((error) => {
+            console.error('Error loading category names:', error);
+            console.log('Keeping category IDs as fallback names');
+            // Keep the ID as fallback - already set above
+          });
+        }
 
         this.topOrderedItems = Object.entries(itemCountsAgg)
           .map(([_, v]) => v)
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);
         this.updateMostOrderedItemsChart();
+
+        // Main data processing complete - set loading to false immediately
+        console.log('Menu insights main data processing complete, setting loading to false');
+        this.clearLoadingTimeout();
         this.isLoading = false;
       },
-      error: (error) => { console.error('Error fetching menus:', error); this.isLoading = false; },
+      error: (error) => {
+        console.error('Error fetching menus:', error);
+        console.log('Error case: setting loading to false');
+        this.clearLoadingTimeout();
+        this.isLoading = false;
+      },
     });
   }
 
+  // Legacy method - no longer used since we now use aggregated analytics data
   countVisitsPerDay(menuData: any[]): {
     [date: string]: { [menuId: string]: number };
   } {
-    const dailyVisits: { [date: string]: { [menuId: string]: number } } = {};
-
-    menuData.forEach((menu) => {
-      const menuId = menu['menuName'];
-      const viewingTimes = menu['viewingTime'] || [];
-
-      viewingTimes.forEach((view: any) => {
-        const viewDate = new Date(view.timestamp).toLocaleDateString();
-
-        if (!dailyVisits[viewDate]) {
-          dailyVisits[viewDate] = {};
-        }
-        if (!dailyVisits[viewDate][menuId]) {
-          dailyVisits[viewDate][menuId] = 0;
-        }
-
-        dailyVisits[viewDate][menuId]++;
-      });
-    });
-
-    return dailyVisits;
+    console.log('⚠️ countVisitsPerDay called - this is legacy code and should not be used');
+    return {};
   }
 
   fetchRestaurants() {
-    this.restaurant$ = this.firestore
-      .collection('restuarants', (ref) =>
-        ref.where('ownerID', '==', this.userDataID)
-      )
-      .snapshotChanges();
-
-    this.restaurant$.subscribe({
-      next: (restaurants) => {
-        restaurants.forEach((restaurant) => {
-          const restaurantId = restaurant.payload.doc.data().restaurantID;
-          this.fetchOrdersForRestaurant(restaurantId);
-        });
-      },
-      error: (error) => console.error('Error fetching restaurants:', error),
-    });
-  }
-
-  fetchOrdersForRestaurant(restaurantId: string) {
-    this.firestore
-      .collection('orders', (ref) =>
-        ref.where('restaurantID', '==', restaurantId)
-      )
-      .snapshotChanges()
-      .subscribe({
-        next: (orders) => {
-          this.findTopOrderedItems(orders);
-          this.updateMostOrderedItemsChart();
-          this.calculateCategoryOrders(orders);
-          this.calculateCategoryOrderPercentages();
-          this.findFrequentItemPairs(orders);
-        },
-        error: (error) =>
-          console.error(
-            `Error fetching orders for restaurant ${restaurantId}:`,
-            error
-          ),
-      });
+    // Note: Orders data is now handled through aggregated analytics data
+    // This method is kept for compatibility but no longer fetches orders
+    console.log('📊 Menu Insights: fetchRestaurants called - orders now handled via aggregated analytics');
   }
 
   // calculateTotalViews replaced by aggregated reads
@@ -229,23 +323,9 @@ export class MenuInsightsComponent {
     ).toFixed(0)}%`;
   }
 
+  // Legacy method - no longer used since we now use aggregated analytics data
   findTopOrderedItems(orders: any[]) {
-    const itemCounts: { [key: string]: { name: string; count: number } } = {};
-
-    orders.forEach((order) => {
-      const orderData = order.payload.doc.data();
-      orderData.items.forEach((item: any) => {
-        if (itemCounts[item.itemId]) {
-          itemCounts[item.itemId].count += item.quantity;
-        } else {
-          itemCounts[item.itemId] = { name: item.name, count: item.quantity };
-        }
-      });
-    });
-
-    this.topOrderedItems = Object.values(itemCounts)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 3);
+    console.log('⚠️ findTopOrderedItems called - this is legacy code and should not be used');
   }
 
   calculatePercentageDifference(current: number, previous: number): number {
@@ -255,25 +335,9 @@ export class MenuInsightsComponent {
     return ((current - previous) / previous) * 100;
   }
 
+  // Legacy method - no longer used since we now use aggregated analytics data
   calculateCategoryOrders(orders: any[]) {
-    const categoryCounts: { [category: string]: number } = {};
-
-    orders.forEach((order) => {
-      const orderData = order.payload.doc.data();
-      orderData.items.forEach((item: any) => {
-        const category = item.category;
-        if (categoryCounts[category]) {
-          categoryCounts[category] += item.quantity;
-        } else {
-          categoryCounts[category] = item.quantity;
-        }
-      });
-    });
-    this.categoryOrderCounts = categoryCounts;
-    const keys = Object.keys(categoryCounts);
-    this.mostOrderedCategory = keys.length
-      ? keys.reduce((a, b) => (categoryCounts[a] > categoryCounts[b] ? a : b))
-      : '';
+    console.log('⚠️ calculateCategoryOrders called - this is legacy code and should not be used');
   }
 
   calculateCategoryOrderPercentages() {
@@ -303,7 +367,7 @@ export class MenuInsightsComponent {
   updateCategoryPercentageChart(
     categoryPercentages: { category: string; percentage: string }[]
   ) {
-    const colors = ['#16D3D2', '#AFDCFF', '#C8AFEB', '#FFF56E', '#AFDCFF'];
+    const colors = this.getChartColors();
     const dataWithColors = categoryPercentages.map((item, index) => ({
       value: parseFloat(item.percentage),
       name: item.category,
@@ -350,35 +414,69 @@ export class MenuInsightsComponent {
     };
   }
 
+  // Legacy method - no longer used since we now use aggregated analytics data
   findFrequentItemPairs(orders: any[]) {
-    const pairCounts: { [pair: string]: number } = {};
+    console.log('⚠️ findFrequentItemPairs called - this is legacy code and should not be used');
+  }
 
-    orders.forEach((order) => {
-      const items = order.payload.doc.data().items;
+  // Date range methods
+  onDateRangeChange(): void {
+    // This method is called when date picker values change
+    // We don't automatically apply changes to avoid too many API calls
+    console.log('📊 Menu Insights: Date range changed:', {
+      from: this.dateFrom,
+      to: this.dateTo
+    });
+  }
 
-      for (let i = 0; i < items.length; i++) {
-        for (let j = i + 1; j < items.length; j++) {
-          const itemA = items[i].name;
-          const itemB = items[j].name;
-          const pairKey =
-            itemA < itemB ? `${itemA}-${itemB}` : `${itemB}-${itemA}`;
-
-          if (pairCounts[pairKey]) {
-            pairCounts[pairKey]++;
-          } else {
-            pairCounts[pairKey] = 1;
-          }
-        }
-      }
+  applyDateRange(): void {
+    console.log('📊 Menu Insights: Applying date range:', {
+      from: this.dateFrom,
+      to: this.dateTo
     });
 
-    this.frequentItemPairs = Object.entries(pairCounts)
-      .map(([pair, count]) => {
-        const [itemA, itemB] = pair.split('-');
-        return { itemA, itemB, count };
-      })
-      .sort((a, b) => b.count - a.count);
+    // Validate date range
+    if (!this.dateFrom || !this.dateTo) {
+      console.warn('📊 Menu Insights: Invalid date range');
+      return;
+    }
+
+    const fromDate = new Date(this.dateFrom);
+    const toDate = new Date(this.dateTo);
+
+    if (fromDate > toDate) {
+      console.warn('📊 Menu Insights: From date cannot be after to date');
+      return;
+    }
+
+    // Update selected date range
+    this.selectedDateRange = {
+      from: fromDate,
+      to: toDate
+    };
+
+    // Refetch data with new date range
+    this.fetchMenus();
   }
+
+  getDateRangeText(): string {
+    if (!this.dateFrom || !this.dateTo) {
+      return 'Last 7 days';
+    }
+
+    const fromDate = new Date(this.dateFrom);
+    const toDate = new Date(this.dateTo);
+    const fromStr = fromDate.toLocaleDateString();
+    const toStr = toDate.toLocaleDateString();
+
+    if (fromStr === toStr) {
+      return fromStr;
+    }
+
+    return `${fromStr} - ${toStr}`;
+  }
+
+
 
   updateChartOptions(dailyVisits: {
     [date: string]: { [menuId: string]: number };
@@ -440,32 +538,32 @@ export class MenuInsightsComponent {
     };
   }
 
-  // Configurable color array for menu lines
-  private menuColors: string[] = ['#1FCC96', '#C49DFF', '#FFA500', '#FF6347', '#4A90E2', '#F39C12', '#E74C3C', '#9B59B6'];
-
   getMenuColor(menuId: string): string {
+    const colors = this.getChartColors();
     const hash = Array.from(menuId).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-    return this.menuColors[hash % this.menuColors.length];
+    return colors[hash % colors.length];
   }
 
-  // Method to update the color array
-  setMenuColors(colors: string[]): void {
-    this.menuColors = colors;
-  }
+  /**
+   * Get actual color values from CSS custom properties for chart usage
+   */
+  private getChartColors(): string[] {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
 
-  // Example method to set custom colors
-  setCustomMenuColors(): void {
-    // Example: Set custom colors for your brand
-    const customColors = [
-      '#FF6B6B', // Coral Red
-      '#4ECDC4', // Turquoise
-      '#45B7D1', // Sky Blue
-      '#96CEB4', // Mint Green
-      '#FFEAA7', // Soft Yellow
-      '#DDA0DD', // Plum
-      '#98D8C8', // Seafoam
-      '#F7DC6F'  // Golden Yellow
+    return [
+      computedStyle.getPropertyValue('--hungr-main-color').trim() || '#FE1B54',
+      computedStyle.getPropertyValue('--hungr-secondary-color').trim() || '#16D3D2',
+      computedStyle.getPropertyValue('--color-tertiary').trim() || '#3CE1AF',
+      computedStyle.getPropertyValue('--color-quaternary').trim() || '#9747FF',
+      computedStyle.getPropertyValue('--color-success').trim() || '#4CAF50',
+      computedStyle.getPropertyValue('--color-warning').trim() || '#FF9800',
+      computedStyle.getPropertyValue('--color-error').trim() || '#F44336',
+      computedStyle.getPropertyValue('--color-info').trim() || '#2196F3'
     ];
-    this.setMenuColors(customColors);
   }
+
+
+
+
 }

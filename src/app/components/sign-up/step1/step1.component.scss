@@ -14,6 +14,7 @@
     left: 46px;
     width: 150px;
   }
+
   &-inner {
     width: 100%;
     max-width: 630px;
@@ -36,19 +37,21 @@
     justify-content: center;
     align-items: center;
     gap: 40px;
+
     .row {
       width: 100%;
-      display: flex;
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: var(--layout-equal-split) var(--layout-equal-split);
       justify-content: center;
       align-items: flex-start;
-      gap: 15px;
+      gap: var(--grid-gap-md);
+
       .col {
-        width: calc(50% - 15px);
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
+
         h6 {
           color: #2e3646;
           text-align: left;
@@ -65,7 +68,7 @@
 
           label {
             color: #9a9a9a;
- 
+
           }
         }
 
@@ -74,11 +77,13 @@
           display: flex;
           flex-direction: column;
         }
+
         .inner-row-form-group {
           width: 100%;
           display: flex;
           flex-direction: row;
           gap: 23px;
+
           .formGroup {
             width: calc(50% - 12px);
           }
@@ -95,6 +100,7 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
+
   .material-icons {
     position: absolute;
     top: 11px;
@@ -112,6 +118,7 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
+
   .material-icons {
     position: absolute;
     top: 11px;
@@ -119,24 +126,19 @@
     font-size: 19px;
     color: #000000;
   }
+
   input {
     padding-left: 40px;
   }
 }
 
+@import "../../../../styles/_design-tokens";
+
+/* Back Link styling - Now centralized in _design-tokens.scss */
 .backLink {
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #2e3646;
-  text-decoration: none;
-  text-transform: uppercase;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 5px;
-  align-items: center;
-  cursor: pointer;
+  /* Using absolute and uppercase variants for this component */
+  @include backLink-absolute;
+  @include backLink-uppercase;
 }
 
 .valid {
@@ -161,6 +163,7 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
+
     p {
       width: 50%;
       font-family: "Poppins", sans-serif;

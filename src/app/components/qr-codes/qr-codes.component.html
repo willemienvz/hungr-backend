@@ -1,44 +1,47 @@
-<div class="inner-page">
-  <app-content-block 
-    title="QR Codes"
-    [showActions]="true"
-    [actions]="[{ label: '+ Create QR Code', class: 'btnSecondary' }]"
-    (actionClick)="openAddQrModal()">
-    
-    <p style="margin: 0 0 40px 0">
-      QR codes allow customers to access your menus. Menus must be assigned QR
-      codes to be accessible.
-    </p>
-    <div class="userTable">
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 80px"></th>
-            <th>Menu Name</th>
-            <th></th>
-            <th>Location</th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let menu of menus; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ menu.menuName }}</td>
-            <td></td>
-            <td>{{ menu.location }}</td>
-            <td></td>
-            <td style="text-align: right">
-              <a (click)="viewQR.openPopup(menu.menuID)"
-                ><i class="material-symbols-outlined">visibility</i></a
-              >
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<app-page-layout
+  title="QR Code Management"
+  subtitle="Generate and manage QR codes for your restaurant menus"
+  [actions]="[
+    {
+      label: '+ Create QR Code',
+      type: 'primary',
+      onClick: openAddQrModal.bind(this)
+    }
+  ]"
+  [loading]="isLoading">
+
+
+  <!-- QR Codes Table -->
+  <app-content-block
+    title="Menu QR Codes"
+    subtitle="QR codes allow customers to access your menus. Menus must be assigned QR codes to be accessible.">
+
+    <app-data-table
+      [data]="menus"
+      [columns]="menuColumns"
+      [actions]="menuActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No menus found"
+      (actionClick)="onMenuAction($event)"
+      (rowClick)="onRowClick($event)">
+
+
+
+      <!-- Custom view QR action template -->
+      <ng-template #viewQrActionTemplate let-row="row">
+        <app-action-button *ngIf="row.qrAssigned"
+                          type="view"
+                          title="View QR Code"
+                          (actionClick)="viewQR.openPopup(row.menuID)">
+        </app-action-button>
+        <span *ngIf="!row.qrAssigned" class="no-qr-text">No QR assigned</span>
+      </ng-template>
+
+    </app-data-table>
   </app-content-block>
-</div>
+
+</app-page-layout>
+
 <app-add-qr #newQR [menus]="menus"></app-add-qr>
 <app-view-qr #viewQR></app-view-qr>
-<app-loading [isLoading]="isSaving"></app-loading>

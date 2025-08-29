@@ -1,0 +1,298 @@
+/* ===============================================
+   SPECIAL DESIGN TOKENS
+   Unified design system for all special types (combo, category, etc.)
+   =============================================== */
+
+/* Special Color Palette */
+:root {
+    /* Special Type Colors */
+    --special-combo-primary: #16D3D2;
+    /* Teal - for combo specials */
+    --special-combo-secondary: #14C0BF;
+    /* Darker teal for hover states */
+    --special-combo-accent: #B8E6E6;
+    /* Light teal for backgrounds */
+
+    --special-category-primary: #9747FF;
+    /* Purple - for category specials */
+    --special-category-secondary: #8B3FE6;
+    /* Darker purple for hover states */
+    --special-category-accent: #E6D4FF;
+    /* Light purple for backgrounds */
+
+    --special-general-primary: #FE1B54;
+    /* Red - for general special elements */
+    --special-general-secondary: #E6174A;
+    /* Darker red for hover states */
+
+    /* Price Display Colors */
+    --special-price-original: #9A9A9A;
+    /* Gray for original prices */
+    --special-price-discounted: #16D3D2;
+    /* Teal for discounted prices */
+    --special-price-strikethrough: #D32F2F;
+    /* Red for strikethrough */
+
+    /* Message & Badge Colors */
+    --special-message-bg: #FFF8E1;
+    /* Light yellow for messages */
+    --special-message-border: #FFB300;
+    /* Orange border for messages */
+    --special-message-text: #E65100;
+    /* Dark orange text */
+
+    --special-badge-combo-bg: #B8E6E6;
+    /* Light teal for combo badges */
+    --special-badge-combo-text: #004D40;
+    /* Dark teal text */
+    --special-badge-category-bg: #E6D4FF;
+    /* Light purple for category badges */
+    --special-badge-category-text: #4A148C;
+    /* Dark purple text */
+
+    /* Special Container & Layout */
+    --special-container-border: #E6E9EC;
+    /* Light gray borders */
+    --special-container-bg: #FFFFFF;
+    /* White background */
+    --special-container-radius: 8px;
+    /* Border radius */
+
+    /* Typography for Specials */
+    --special-heading-font-size: 16px;
+    --special-heading-font-weight: 600;
+    --special-body-font-size: 14px;
+    --special-body-font-weight: 400;
+    --special-price-font-size: 18px;
+    --special-price-font-weight: 700;
+
+    /* Spacing for Special Components */
+    --special-spacing-xs: 4px;
+    --special-spacing-sm: 8px;
+    --special-spacing-md: 16px;
+    --special-spacing-lg: 24px;
+
+    /* Shadows for Special Cards */
+    --special-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --special-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ===============================================
+   SPECIAL COMPONENT CLASSES
+   Reusable classes for consistent special styling
+   =============================================== */
+
+/* Base Special Container */
+.special-container {
+    background: var(--special-container-bg);
+    border: 1px solid var(--special-container-border);
+    border-radius: var(--special-container-radius);
+    padding: var(--special-spacing-md);
+    box-shadow: var(--special-shadow-sm);
+    transition: all 0.3s ease;
+
+    &:hover {
+        box-shadow: var(--special-shadow-md);
+    }
+}
+
+/* Special Type Variants */
+.special-combo {
+    border-left: 4px solid var(--special-combo-primary);
+
+    .special-badge {
+        background: var(--special-badge-combo-bg);
+        color: var(--special-badge-combo-text);
+    }
+
+    .special-price-discounted {
+        color: var(--special-combo-primary);
+    }
+}
+
+.special-category {
+    border-left: 4px solid var(--special-category-primary);
+
+    .special-badge {
+        background: var(--special-badge-category-bg);
+        color: var(--special-badge-category-text);
+    }
+
+    .special-price-discounted {
+        color: var(--special-category-primary);
+    }
+}
+
+/* Price Display Components */
+.special-price-container {
+    display: flex;
+    align-items: center;
+    gap: var(--special-spacing-sm);
+    flex-wrap: wrap;
+}
+
+.special-price-original {
+    color: var(--special-price-original);
+    text-decoration: line-through;
+    font-size: var(--special-body-font-size);
+    font-weight: var(--special-body-font-weight);
+}
+
+.special-price-discounted {
+    font-size: var(--special-price-font-size);
+    font-weight: var(--special-price-font-weight);
+    color: var(--special-price-discounted);
+}
+
+.special-price-strikethrough {
+    color: var(--special-price-strikethrough);
+    text-decoration: line-through;
+    font-weight: var(--special-price-font-weight);
+}
+
+/* Special Badges */
+.special-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--special-spacing-xs) var(--special-spacing-sm);
+    border-radius: calc(var(--special-container-radius) / 2);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Special Messages */
+.special-message {
+    background: var(--special-message-bg);
+    border: 1px solid var(--special-message-border);
+    border-radius: var(--special-container-radius);
+    padding: var(--special-spacing-sm);
+    margin: var(--special-spacing-sm) 0;
+    color: var(--special-message-text);
+    font-size: var(--special-body-font-size);
+    line-height: 1.4;
+}
+
+/* Special Thumbnails Grid */
+.special-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: var(--special-spacing-sm);
+    margin: var(--special-spacing-sm) 0;
+}
+
+.special-thumbnail {
+    aspect-ratio: 1;
+    border-radius: calc(var(--special-container-radius) / 2);
+    overflow: hidden;
+    border: 1px solid var(--special-container-border);
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+/* Special Actions */
+.special-actions {
+    display: flex;
+    gap: var(--special-spacing-sm);
+    margin-top: var(--special-spacing-md);
+}
+
+.special-btn-primary {
+    background: var(--special-general-primary);
+    color: white;
+    border: none;
+    padding: var(--special-spacing-sm) var(--special-spacing-md);
+    border-radius: calc(var(--special-container-radius) / 2);
+    font-weight: var(--special-heading-font-weight);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--special-general-secondary);
+    }
+}
+
+.special-btn-secondary {
+    background: transparent;
+    color: var(--special-general-primary);
+    border: 1px solid var(--special-general-primary);
+    padding: var(--special-spacing-sm) var(--special-spacing-md);
+    border-radius: calc(var(--special-container-radius) / 2);
+    font-weight: var(--special-heading-font-weight);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--special-general-primary);
+        color: white;
+    }
+}
+
+/* Special Header */
+.special-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--special-spacing-md);
+
+    .special-title {
+        font-size: var(--special-heading-font-size);
+        font-weight: var(--special-heading-font-weight);
+        margin: 0;
+    }
+
+    .special-meta {
+        font-size: 12px;
+        color: var(--special-price-original);
+    }
+}
+
+/* Special Item Grid (for menu items with specials) */
+.special-item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--special-spacing-lg);
+}
+
+.special-item-card {
+    position: relative;
+    overflow: hidden;
+
+    .special-indicator {
+        position: absolute;
+        top: var(--special-spacing-sm);
+        right: var(--special-spacing-sm);
+        z-index: 10;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .special-thumbnails {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .special-item-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .special-price-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .special-thumbnails {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .special-actions {
+        flex-direction: column;
+    }
+}

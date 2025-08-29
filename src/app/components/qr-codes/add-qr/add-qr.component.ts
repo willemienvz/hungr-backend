@@ -15,10 +15,10 @@ export class AddQrComponent {
   public qrCodeDownloadLink: SafeUrl = "";
   filteredMenus: Menu[] = [];
   selectedMenu: Menu | undefined;
-  validationError:boolean= false;
-  saveSuccess:boolean= false;
+  validationError: boolean = false;
+  saveSuccess: boolean = false;
 
-  constructor(private firestore: AngularFirestore) {}
+  constructor(private firestore: AngularFirestore) { }
 
   onChangeURL(url: SafeUrl) {
     this.qrCodeDownloadLink = url;
@@ -35,10 +35,10 @@ export class AddQrComponent {
 
   selectMenu(menu: Menu) {
     this.selectedMenu = menu;
-    this.validationError = false; 
+    this.validationError = false;
   }
 
-  saveSettings(){
+  saveSettings() {
     if (this.selectedMenu) {
       this.validationError = false;
       this.updateMenuQrData(this.selectedMenu.menuID, this.qrCodeDownloadLink);
@@ -48,7 +48,7 @@ export class AddQrComponent {
   }
 
 
-  updateMenuQrData(menuId: string,  qrUrl: SafeUrl) {
+  updateMenuQrData(menuId: string, qrUrl: SafeUrl) {
     const qrUrlString = qrUrl.toString();
     const dataToUpdate = {
       qrAssigned: true,
@@ -62,6 +62,6 @@ export class AddQrComponent {
       .catch((error) => {
         this.saveSuccess = false;
         console.log(error);
-      }); 
+      });
   }
 }

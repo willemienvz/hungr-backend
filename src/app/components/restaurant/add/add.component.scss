@@ -14,11 +14,10 @@
   gap: 15px;
 
   .block {
-    gap: 25px;
-    display: flex;
-    flex-direction: column;
+    /* Uses centralized block styling with default flex column layout */
   }
 }
+
 .radiogroup {
   flex-direction: row;
   gap: 20px;
@@ -34,36 +33,16 @@
   width: 32%;
 }
 
+@import "../../../../styles/_design-tokens";
+
+/* Back Link styling - Now centralized in _design-tokens.scss */
 .backLink {
-  width: 100%;
-  flex-direction: row;
-  display: flex;
-  justify-content: flex-start;
-  gap: 5px;
-  align-items: center;
-  text-decoration: none;
-  color: #2e3646;
-  font-size: 16px;
-  font-weight: 600;
-}
-.block {
-  gap: 20px;
-  display: flex;
-  flex-direction: column;
+  /* Using large variant for this component */
+  @include backLink-large;
 }
 
-.block-row {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  gap: 8px;
-  justify-content: space-between;
-  align-items: flex-start;
-
-  p {
-    margin-top: 10px;
-  }
-}
+/* Block styling now uses centralized definition from design tokens */
+/* Block row styling now uses .block.block-row from design tokens */
 
 label {
   color: #9a9a9a;
@@ -127,9 +106,11 @@ label {
 
 .col .contactBlock {
   gap: 0;
+
   mat-form-field {
     width: 32%;
   }
+
   h6 {
     margin-bottom: 20px;
   }
@@ -139,18 +120,7 @@ label {
   }
 }
 
-.block-row {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  gap: 8px;
-  justify-content: space-between;
-  align-items: flex-start;
-
-  p {
-    margin-top: 10px;
-  }
-}
+/* Block row styling now uses .block.block-row from design tokens */
 
 .rowMenu {
   display: flex;
@@ -181,6 +151,7 @@ label {
   position: relative;
   align-items: center;
   text-align: center;
+
   span {
     position: absolute;
     right: 10px;

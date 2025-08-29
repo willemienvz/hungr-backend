@@ -48,11 +48,22 @@
     <!-- Right Column - Preview -->
     <div class="right-column white-box">
       <div class="preview-section">
-        <h6>Preview</h6>
-        <div class="phone-mockup">
+        <h6>Menu Preview</h6>
+        <div class="preview-container">
           <div class="phone-frame">
-            <div class="phone-screen">
-              <!-- Phone content would go here -->
+            <iframe
+              *ngIf="menuId"
+              #previewIframe
+              [src]="getPreviewUrl()"
+              frameborder="0"
+              class="preview-iframe"
+              title="Menu Preview"
+            ></iframe>
+            <div *ngIf="!menuId" class="preview-placeholder">
+              <div class="placeholder-content">
+                <i class="material-icons">restaurant_menu</i>
+                <p>Menu preview will be available once saved</p>
+              </div>
             </div>
           </div>
         </div>

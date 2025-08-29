@@ -26,5 +26,5 @@ export class ConfirmBulkDeleteDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ConfirmBulkDeleteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { count: number; mediaItems: MediaItem[] }
-  ) {}
+  ) { }
 } 

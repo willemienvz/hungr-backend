@@ -32,7 +32,7 @@ export class MediaManagementComponent implements OnInit, OnDestroy {
     private mediaLibraryService: MediaLibraryService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadAnalytics();
@@ -318,7 +318,7 @@ export class MediaManagementComponent implements OnInit, OnDestroy {
   `
 })
 export class ConfirmBulkDeleteDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { count: number; mediaItems: MediaItem[] }) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { count: number; mediaItems: MediaItem[] }) { }
 }
 
 @Component({
@@ -340,7 +340,7 @@ export class ConfirmBulkDeleteDialogComponent {
 })
 export class BulkCategorizeDialogComponent {
   category = '';
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { count: number }) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { count: number }) { }
 }
 
 
@@ -360,5 +360,5 @@ export class BulkCategorizeDialogComponent {
   `
 })
 export class ConfirmCleanupDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { operation: string }) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { operation: string }) { }
 } 

@@ -37,7 +37,7 @@
 
     <footer class="confirmation-actions">
         <button class="action-button cancel" (click)="onCancel()">Close</button>
-        <button class="action-button confirm" routerLink="/restaurants/edit-restaurant"
-            [queryParams]="{ id: restuarant.restaurantID}" (click)="onCancel()">Edit</button>
+        <button class="action-button confirm" [routerLink]="['/restaurants/edit-restaurant', restuarant.restaurantID]"
+            (click)="onCancel()">Edit</button>
     </footer>
 </section>

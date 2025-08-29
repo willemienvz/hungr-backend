@@ -1,73 +1,86 @@
-<div class="media-library-container">
-  <!-- Header Section -->
-  <app-content-block 
-    title="Media Library"
-    [showActions]="true"
-    [actions]="[{ label: '+ UPLOAD MEDIA', class: 'btnSecondary' }]"
-    (actionClick)="openUploadModal()">
-  </app-content-block>
+<app-page-layout
+  title="Media Library"
+  subtitle="Manage your uploaded images and media files"
+  [actions]="pageActions"
+  [loading]="loading">
 
-  <!-- Error Display -->
-  <div *ngIf="error" class="error-message">
-    <mat-icon>error</mat-icon>
-    <span>{{ error }}</span>
+  <!-- Media Stats -->
+  <div class="stats-grid" *ngIf="filteredMedia.length > 0">
+    <app-stats-card
+      title="Total Files"
+      [value]="filteredMedia.length"
+      icon="image">
+    </app-stats-card>
+
+    <app-stats-card
+      title="Storage Used"
+      [value]="getTotalStorageSize()"
+      icon="storage">
+    </app-stats-card>
+
+    <app-stats-card
+      title="Categories"
+      [value]="getUniqueCategoriesCount()"
+      icon="category">
+    </app-stats-card>
   </div>
 
   <!-- Filters and Controls Section -->
-  <div class="controls-section">
-    <div class="controls-row">
+  <app-content-block title="Filters & Search">
+    <div class="media-filters">
       <!-- Search Bar -->
-      <div class="search-container">
-        <div class="field-holder">
-          <label>Search media</label>
-          <input 
-            type="text" 
-            [formControl]="searchControl" 
-            placeholder="Search by name or description"
-            class="search-input">
-        </div>
+      <div class="filter-group">
+        <app-form-input
+          label="Search"
+          placeholder="Search by name or description"
+          [formControl]="searchControl"
+          prefixIcon="search">
+        </app-form-input>
       </div>
 
       <!-- Filter Controls -->
-      <div class="filter-controls">
-        <!-- Category Filter -->
-        <div class="field-holder">
-          <label>Category</label>
-          <select [(value)]="selectedCategory" (change)="onCategoryChange($event)" class="filter-select">
-            <option value="">All Categories</option>
-            <option *ngFor="let category of categories" [value]="category">
-              {{ category }}
-            </option>
-          </select>
-        </div>
+      <div class="filter-group">
+        <app-form-select
+          label="Category"
+          placeholder="All Categories"
+          [options]="categoryOptions"
+          [(ngModel)]="selectedCategory"
+          (selectionChange)="onCategoryChange($event)">
+        </app-form-select>
+      </div>
 
+      <div class="filter-group">
+        <app-form-select
+          label="Sort By"
+          placeholder="Sort by"
+          [options]="sortOptions"
+          [(ngModel)]="sortBy"
+          (selectionChange)="onSortChange($event)">
+        </app-form-select>
+      </div>
 
+      <!-- Sort Order and Clear Filters -->
+      <div class="filter-actions">
+       <!-- <app-button
+          [icon]="sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward'"
+          (buttonClick)="toggleSortOrder()"
+          type="tertiary"
+          size="small">
+          {{ sortOrder === 'asc' ? 'Ascending' : 'Descending' }}
+        </app-button>-->
 
-        <!-- Sort Options -->
-        <div class="field-holder">
-          <label>Sort By</label>
-          <select [(value)]="sortBy" (change)="onSortChange($event)" class="filter-select">
-            <option *ngFor="let option of sortOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Sort Order -->
-        <button type="button" (click)="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; onSortChanged()" 
-                class="sort-order-btn" [attr.aria-label]="'Sort ' + (sortOrder === 'asc' ? 'descending' : 'ascending')">
-          <mat-icon>{{ sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
-        </button>
-
-        <!-- Clear Filters -->
-        <button *ngIf="hasActiveFilters" mat-button (click)="clearFilters()" class="clear-filters-btn">
-          <mat-icon>clear</mat-icon>
+        <app-button
+          *ngIf="hasActiveFilters"
+          icon="clear"
+          (buttonClick)="clearFilters()"
+          type="tertiary"
+          size="small">
           Clear Filters
-        </button>
+        </app-button>
       </div>
 
       <!-- View Toggle -->
-      <div class="view-controls">
+      <div class="view-toggle-group">
         <mat-button-toggle-group [(value)]="viewMode" (change)="changeViewMode($event)" class="view-toggle">
           <mat-button-toggle value="grid" aria-label="Grid view">
             <mat-icon>grid_view</mat-icon>
@@ -80,85 +93,98 @@
         </mat-button-toggle-group>
       </div>
     </div>
+  </app-content-block>
+
+  <!-- Error Display -->
+  <div *ngIf="error" class="error-message">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
   </div>
 
   <!-- Media Display Section -->
-  <div class="media-content">
-    <ng-container *ngIf="!loading; else loadingTemplate">
-      <ng-container *ngIf="filteredMedia.length > 0; else emptyTemplate">
-        <!-- Grid View -->
-        <div *ngIf="viewMode === 'grid'" class="media-grid">
-          <div *ngFor="let media of filteredMedia" class="media-item">
-            <div class="media-thumbnail">
-              <img [src]="media.thumbnailUrl || media.url" [alt]="media.originalName" 
-                   (error)="onImageError($event)">
-              <div class="media-overlay">
-                <button mat-icon-button (click)="onMediaSelect(media)" 
-                        class="view-btn" aria-label="View media">
-                  <mat-icon>visibility</mat-icon>
-                </button>
-                <button mat-icon-button (click)="onMediaDelete(media)" 
-                        class="delete-btn" aria-label="Delete media">
-                  <mat-icon>delete</mat-icon>
-                </button>
+  <app-content-block title="Media Files">
+    <div class="media-content">
+      <ng-container *ngIf="!loading; else loadingTemplate">
+        <ng-container *ngIf="filteredMedia.length > 0; else emptyTemplate">
+          <!-- Grid View -->
+          <div *ngIf="viewMode === 'grid'" class="media-grid">
+            <div *ngFor="let media of paginatedMedia" class="media-item">
+              <div class="media-thumbnail">
+                <img [src]="media.thumbnailUrl || media.url" [alt]="media.originalName"
+                     (error)="onImageError($event)">
+                <div class="media-overlay">
+                  <app-action-button
+                    type="view"
+                    title="View media"
+                    (actionClick)="onMediaSelect(media)"
+                    customColor="rgba(255, 255, 255, 0.9)">
+                  </app-action-button>
+                  <app-action-button
+                    type="delete"
+                    title="Delete media"
+                    (actionClick)="onMediaDelete(media)"
+                    customColor="rgba(255, 255, 255, 0.9)">
+                  </app-action-button>
+                </div>
+              </div>
+              <div class="media-info">
+                <h4 class="media-title" [title]="media.originalName">{{ media.originalName }}</h4>
+                <p class="media-meta">
+                  <span class="file-size">{{ media.fileSize | fileSize }}</span>
+                  <span class="upload-date">{{ media.uploadedAt | date:'short' }}</span>
+                </p>
               </div>
             </div>
-            <div class="media-info">
-              <h4 class="media-title" [title]="media.originalName">{{ media.originalName }}</h4>
-              <p class="media-meta">
-                <span class="file-size">{{ media.fileSize | fileSize }}</span>
-                <span class="upload-date">{{ media.uploadedAt | date:'short' }}</span>
-              </p>
-
-            </div>
           </div>
-        </div>
-        
-        <!-- List View -->
-        <div *ngIf="viewMode === 'list'" class="media-list">
-          <div *ngFor="let media of filteredMedia" class="media-list-item">
-            <div class="list-thumbnail">
-              <img [src]="media.thumbnailUrl || media.url" [alt]="media.originalName" 
-                   (error)="onImageError($event)">
-            </div>
-            <div class="list-info">
-              <h4 class="list-title" [title]="media.originalName">{{ media.originalName }}</h4>
-              <p class="list-description" *ngIf="media.description">{{ media.description }}</p>
-              <div class="list-meta">
-                <span class="file-size">{{ media.fileSize | fileSize }}</span>
-                <span class="upload-date">{{ media.uploadedAt | date:'short' }}</span>
-                <span class="category" *ngIf="media.category">{{ media.category }}</span>
+
+          <!-- List View -->
+          <div *ngIf="viewMode === 'list'" class="media-list">
+            <div *ngFor="let media of paginatedMedia" class="media-list-item">
+              <div class="list-thumbnail">
+                <img [src]="media.thumbnailUrl || media.url" [alt]="media.originalName"
+                     (error)="onImageError($event)">
               </div>
-
-            </div>
-            <div class="list-actions">
-              <button mat-icon-button (click)="onMediaSelect(media)" 
-                      class="view-btn" aria-label="View media">
-                <mat-icon>visibility</mat-icon>
-              </button>
-              <button mat-icon-button (click)="onMediaDelete(media)" 
-                      class="delete-btn" aria-label="Delete media">
-                <mat-icon>delete</mat-icon>
-              </button>
+              <div class="list-info">
+                <h4 class="list-title" [title]="media.originalName">{{ media.originalName }}</h4>
+                <p class="list-description" *ngIf="media.description">{{ media.description }}</p>
+                <div class="list-meta">
+                  <span class="file-size">{{ media.fileSize | fileSize }}</span>
+                  <span class="upload-date">{{ media.uploadedAt | date:'short' }}</span>
+                  <span class="category" *ngIf="media.category">{{ media.category }}</span>
+                </div>
+              </div>
+              <div class="list-actions">
+                <app-action-button
+                  type="view"
+                  title="View media"
+                  (actionClick)="onMediaSelect(media)">
+                </app-action-button>
+                <app-action-button
+                  type="delete"
+                  title="Delete media"
+                  (actionClick)="onMediaDelete(media)">
+                </app-action-button>
+              </div>
             </div>
           </div>
-        </div>
+        </ng-container>
       </ng-container>
-    </ng-container>
-  </div>
+    </div>
 
-  <!-- Pagination -->
-  <div class="pagination-container" *ngIf="totalItems > itemsPerPage">
-    <mat-paginator
-      [length]="totalItems"
-      [pageSize]="itemsPerPage"
-      [pageIndex]="currentPage - 1"
-      [pageSizeOptions]="[10, 20, 50, 100]"
-      (page)="onPageChange($event)"
-      aria-label="Select page">
-    </mat-paginator>
-  </div>
-</div>
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="totalItems > itemsPerPage">
+      <mat-paginator
+        [length]="totalItems"
+        [pageSize]="itemsPerPage"
+        [pageIndex]="currentPage - 1"
+        [pageSizeOptions]="[10, 20, 50, 100]"
+        (page)="onPageChange($event)"
+        aria-label="Select page">
+      </mat-paginator>
+    </div>
+  </app-content-block>
+
+</app-page-layout>
 
 <!-- Loading Template -->
 <ng-template #loadingTemplate>

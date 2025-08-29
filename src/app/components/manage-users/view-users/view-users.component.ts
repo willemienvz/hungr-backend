@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { User } from '../../../shared/services/user';
+import { User, UserRole, UserPermissions } from '../../../shared/services/user';
 import {
   AngularFirestore,
   AngularFirestoreDocument,
 } from '@angular/fire/compat/firestore';
+import { PermissionService } from '../../../shared/services/permission.service';
 @Component({
   selector: 'app-view-users',
   templateUrl: './view-users.component.html',
@@ -17,13 +18,29 @@ export class ViewUsersComponent {
   isSaving: boolean = false;
   isEditMode: boolean = false;
 
+  // Role and permission properties
+  availableRoles: UserRole[] = ['admin', 'editor', 'viewer', 'custom'];
+  editRole: UserRole = 'editor';
+  editPermissions: UserPermissions = {
+    viewAnalytics: false,
+    createMenus: false,
+    editMenus: false,
+    editRestaurants: false,
+    addSpecials: false,
+    editBranding: false,
+    manageUsers: false
+  };
+  showCustomPermissions: boolean = false;
+
   constructor(
     private readonly toastr: ToastrService,
-    private readonly firestore: AngularFirestore
-  ) {}
+    private readonly firestore: AngularFirestore,
+    private permissionService: PermissionService
+  ) { }
 
   openPopup(user: any) {
     this.user = { ...user };
+    this.initializeRoleAndPermissions();
     this.showPopup = true;
     this.isEditMode = false; // Start in view mode
   }
@@ -31,6 +48,13 @@ export class ViewUsersComponent {
   closePopup() {
     this.showPopup = false;
     this.isEditMode = false;
+  }
+
+  private initializeRoleAndPermissions() {
+    // Set default values for role and permissions if not present
+    this.editRole = this.user.role || 'editor';
+    this.editPermissions = this.user.permissions || this.permissionService.getPermissionsForRole(this.editRole);
+    this.showCustomPermissions = this.editRole === 'custom';
   }
 
   switchToEditMode() {
@@ -51,6 +75,8 @@ export class ViewUsersComponent {
       firstName: updatedUser.firstName,
       Surname: updatedUser.Surname,
       cellphoneNumber: updatedUser.cellphoneNumber,
+      role: this.editRole,
+      permissions: this.editRole === 'custom' ? this.editPermissions : this.permissionService.getPermissionsForRole(this.editRole)
     };
 
     userRef
@@ -64,5 +90,76 @@ export class ViewUsersComponent {
         this.toastr.error('Error updating user');
         this.isSaving = false;
       });
+  }
+
+  // Role and permission management methods
+  onRoleChange(role: UserRole) {
+    this.editRole = role;
+    this.showCustomPermissions = role === 'custom';
+
+    if (role !== 'custom') {
+      // Update permissions to match the selected role
+      this.editPermissions = { ...this.permissionService.getPermissionsForRole(role) };
+    }
+  }
+
+  getRoleDisplayName(role: UserRole): string {
+    return this.permissionService.getRoleDisplayName(role);
+  }
+
+  getRoleDescription(role: UserRole): string {
+    return this.permissionService.getRoleDescription(role);
+  }
+
+  getPermissionLabels(): Record<keyof UserPermissions, string> {
+    return this.permissionService.getPermissionLabels();
+  }
+
+  getAllPermissions(): (keyof UserPermissions)[] {
+    return this.permissionService.getAllPermissions();
+  }
+
+  updateCustomPermission(permission: keyof UserPermissions, value: boolean) {
+    this.editPermissions[permission] = value;
+  }
+
+  hasPermission(permission: keyof UserPermissions): boolean {
+    return this.editPermissions[permission];
+  }
+
+  /**
+   * Get user status display information
+   */
+  getUserStatusInfo() {
+    if (this.user.invitationAccepted === false && this.user.invitedAt) {
+      // Check if invitation has expired (7 days)
+      const invitedDate = this.user.invitedAt instanceof Date ? this.user.invitedAt : new Date(this.user.invitedAt);
+      const expiryDate = new Date(invitedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const now = new Date();
+
+      if (now > expiryDate) {
+        return { status: 'Expired', class: 'expired', icon: 'error' };
+      }
+      return { status: 'Pending', class: 'pending', icon: 'schedule' };
+    }
+
+    return { status: 'Active', class: 'active', icon: 'check_circle' };
+  }
+
+  /**
+   * Reset permissions to role defaults
+   */
+  resetToRoleDefaults() {
+    if (this.editRole !== 'custom') {
+      this.editPermissions = { ...this.permissionService.getPermissionsForRole(this.editRole) };
+    }
+  }
+
+  /**
+   * Handle checkbox change event for custom permissions
+   */
+  onPermissionChange(event: Event, permission: keyof UserPermissions) {
+    const target = event.target as HTMLInputElement;
+    this.updateCustomPermission(permission, target.checked);
   }
 }

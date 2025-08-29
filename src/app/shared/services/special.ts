@@ -1,4 +1,5 @@
 import { Special } from '../../types/special';
+import { SpecialType } from '../components/specials/shared/special-types.constants';
 
 export function isSpecial(data: any): data is Special {
   return (
@@ -8,7 +9,7 @@ export function isSpecial(data: any): data is Special {
     Array.isArray(data.selectedDays) &&
     (typeof data.timeFrom === 'string' || typeof data.timeFrom === 'undefined') &&
     (typeof data.timeTo === 'string' || typeof data.timeTo === 'undefined') &&
-    typeof data.typeSpecial === 'number' &&
+    (typeof data.typeSpecial === 'number' || Object.values(SpecialType).includes(data.typeSpecial)) &&
     typeof data.active === 'boolean' &&
     typeof data.isDraft === 'boolean' &&
     typeof data.OwnerID === 'string' &&

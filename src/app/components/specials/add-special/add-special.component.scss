@@ -23,21 +23,23 @@
       display: flex;
       flex-direction: column;
 
-  
+
       .formGroup {
         margin-bottom: 20px;
         gap: 8px;
       }
     }
   }
+
   .row {
     width: 100%;
     display: flex;
     flex-direction: row;
     gap: 50px;
     align-items: flex-start;
+
     .col {
-      width:100%;
+      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 30px;
@@ -47,14 +49,16 @@
   .block {
     width: 100%;
     position: relative;
- 
+    /* Uses centralized block styling */
   }
 }
+
 a.btnSecondary.disabled {
   pointer-events: none;
   color: grey;
   cursor: not-allowed;
 }
+
 .formGroup {
   width: 100%;
   display: flex;
@@ -68,6 +72,7 @@ a.btnSecondary.disabled {
     align-items: center;
   }
 }
+
 .weekday-selector {
   display: flex;
   gap: 10px;
@@ -103,13 +108,16 @@ a.btnSecondary.disabled {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+
   .colmediaBlock {
     width: 50%;
     display: flex;
     flex-direction: column;
+
     p {
       margin: 0 0 25px 0;
     }
+
     a {
       margin: 0 0 15px 0;
       text-decoration: none;
@@ -138,36 +146,40 @@ a.btnSecondary.disabled {
   gap: 0;
   justify-content: center;
   align-items: center;
+
   input {
-    width:100%;
+    width: 100%;
     border: 1px solid var(--hungr-dark-grey);
     height: 38px;
     padding: 3px 12px;
     border-radius: 5px;
     line-height: 38px;
-    text-align:center;
+    text-align: center;
   }
 
   .col {
-    width:140px;
+    width: 140px;
   }
 
   .toCol {
-    width:30px;
+    width: 30px;
     justify-content: center;
     align-items: center;
-    text-align:center;
-    padding-top:1.35em;
+    text-align: center;
+    padding-top: 1.35em;
   }
 }
+
 .error-message {
   color: red;
 }
+
 .listMenuItems {
   display: flex;
   align-items: center;
   flex-direction: row;
   gap: 40px;
+
   a {
     text-decoration: underline;
   }
@@ -175,7 +187,8 @@ a.btnSecondary.disabled {
 
 
 .modal {
-  display: none; /* Hidden by default */
+  display: none;
+  /* Hidden by default */
   position: fixed;
   z-index: 1;
   left: 0;
@@ -223,7 +236,8 @@ a.btnSecondary.disabled {
 }
 
 .open {
-  display: block; /* Show when open */
+  display: block;
+  /* Show when open */
 }
 
 .popup {
@@ -242,6 +256,7 @@ a.btnSecondary.disabled {
     align-items: center;
     justify-content: space-between;
   }
+
   h1 {
     color: black;
     font-weight: 700;
@@ -252,6 +267,7 @@ a.btnSecondary.disabled {
     text-transform: capitalize;
     margin-bottom: 20px;
   }
+
   p {
     font-weight: 400;
     font-size: 16px;
@@ -261,10 +277,12 @@ a.btnSecondary.disabled {
     color: black;
     margin-bottom: 20px;
   }
+
   .row {
     justify-content: center;
     align-items: center;
   }
+
   .col {
     text-align: center;
     display: flex;
@@ -278,6 +296,7 @@ a.btnSecondary.disabled {
       gap: 20px;
     }
   }
+
   img {
     width: 30%;
     object-fit: cover;
@@ -300,10 +319,12 @@ a.btnSecondary.disabled {
   left: 20px;
   color: #2e3646;
   text-decoration: none;
+
   i {
     font-size: 15px;
   }
 }
+
 .bigBlock .block form {
   width: 700px;
 }
@@ -317,6 +338,7 @@ a.btnSecondary.disabled {
   border: 1px solid #9747ff;
   gap: 20px;
   padding: 15px 9px;
+
   div {
     display: flex;
     flex-direction: row;
@@ -337,6 +359,7 @@ a.btnSecondary.disabled {
   margin-top: 20px;
   background: #f3f4f5;
   padding: 25px;
+
   .summary-title {
     color: #181818;
     font-size: 15px;
@@ -347,6 +370,7 @@ a.btnSecondary.disabled {
     width: 100%;
     letter-spacing: -0.015px;
   }
+
   .summary-card {
     border-radius: 5px;
     background: #fff;
@@ -387,6 +411,7 @@ a.btnSecondary.disabled {
   text-align: right;
   color: #9747ff;
 }
+
 .navRow {
   display: flex;
   width: 100%;
@@ -416,7 +441,7 @@ a.btnSecondary.disabled {
 .inputBox {
   width: 100%;
   position: relative;
-  
+
   input {
     flex: 1;
     padding: 8px 12px;
@@ -436,4 +461,3 @@ a.btnSecondary.disabled {
     }
   }
 }
-

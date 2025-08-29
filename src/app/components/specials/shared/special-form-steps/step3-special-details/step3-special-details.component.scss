@@ -2,21 +2,26 @@
   .headerBlock {
     margin-bottom: 20px;
   }
+
   .block {
     width: 100%;
     position: relative;
+    /* Uses centralized block styling */
   }
+
   .rowSpecial {
     justify-content: center;
     align-items: center;
     display: flex;
     flex-direction: column;
+
     form {
       width: min(720px, 92%);
       justify-content: center;
       align-items: center;
       display: flex;
       flex-direction: column;
+
       .formGroup {
         margin-bottom: 20px;
         gap: 8px;
@@ -31,20 +36,21 @@
   width: 100%;
   justify-content: center;
   align-items: flex-start;
-  
-  > .field.field-grow,
-  > .full-width {
+
+  >.field.field-grow,
+  >.full-width {
     flex: 2 1 0;
   }
-  
-  > .field.field-shrink,
+
+  >.field.field-shrink,
   app-price-input.compact {
     flex: 1 1 0;
   }
 
 }
+
 .inputHolder {
-  width:100%;
+  width: 100%;
 }
 
 // Section title
@@ -80,7 +86,7 @@
 .item-list {
   width: 100%;
   margin-top: 20px;
-  
+
   .list {
     display: flex;
     justify-content: space-between;
@@ -89,7 +95,7 @@
     border: 1px solid var(--hungr-dark-grey);
     border-radius: 5px;
     margin-bottom: 10px;
-    
+
     .left {
       display: inline-flex;
       align-items: center;
@@ -129,7 +135,7 @@
 .no-results-option {
   color: #9a9a9a;
   font-style: italic;
-} 
+}
 
 // Tighten mat-form-field density for compact layout
 :host ::ng-deep .compact-field .mat-mdc-form-field-infix {
@@ -139,7 +145,7 @@
 
 :host ::ng-deep .compact-field .mat-mdc-text-field-wrapper {
   min-height: 40px;
-  
+
 }
 
 // Keep labels static (no floating)

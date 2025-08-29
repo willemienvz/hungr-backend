@@ -25,7 +25,7 @@ export class ReviewsComponent implements OnInit {
   currentFilter: ReviewStatus | 'all' = 'all';
   loading = false;
   searchControl = new FormControl('');
-  private restaurantFilter$ = new BehaviorSubject<string>('all');
+  private menuItemFilter$ = new BehaviorSubject<string>('all');
   pageIndex$ = new BehaviorSubject<number>(1);
   pageSize = 20;
   currentUserId = 'admin'; // fallback
@@ -46,7 +46,7 @@ export class ReviewsComponent implements OnInit {
     this.pendingReviews$ = this.reviewsService.getPendingReviews();
     this.approvedReviews$ = this.reviewsService.getApprovedReviews();
     this.rejectedReviews$ = this.reviewsService.getReviewsByStatus('rejected');
-    
+
     // Set up filtered reviews with search
     this.filteredReviews$ = this.getFilteredReviews();
     this.paginatedReviews$ = combineLatest([this.filteredReviews$, this.pageIndex$]).pipe(
@@ -97,8 +97,8 @@ export class ReviewsComponent implements OnInit {
     this.pageIndex$.next(1);
   }
 
-  onRestaurantFilterChange(value: string): void {
-    this.restaurantFilter$.next(value || 'all');
+  onMenuItemFilterChange(value: string): void {
+    this.menuItemFilter$.next(value || 'all');
     this.pageIndex$.next(1);
   }
 
@@ -116,9 +116,9 @@ export class ReviewsComponent implements OnInit {
       map(term => term?.toLowerCase() || '')
     );
 
-    return combineLatest([baseReviews$, searchTerm$, this.restaurantFilter$]).pipe(
+    return combineLatest([baseReviews$, searchTerm$, this.menuItemFilter$]).pipe(
       tap(([reviews]) => this.ensureModeratorNamesCached(reviews)),
-      map(([reviews, searchTerm, restaurantId]) => {
+      map(([reviews, searchTerm, menuItemId]) => {
         let result = reviews;
         if (searchTerm) {
           result = result.filter(review =>
@@ -126,8 +126,8 @@ export class ReviewsComponent implements OnInit {
             review.message.toLowerCase().includes(searchTerm)
           );
         }
-        if (restaurantId && restaurantId !== 'all') {
-          result = result.filter(r => (r.restaurantId || '') === restaurantId);
+        if (menuItemId && menuItemId !== 'all') {
+          result = result.filter(r => (r.menuItemId || '') === menuItemId);
         }
         const statusPriority: Record<ReviewStatus, number> = { pending: 0, approved: 1, rejected: 2 } as const;
         result = [...result].sort((a, b) => {
@@ -215,7 +215,7 @@ export class ReviewsComponent implements OnInit {
   restaurantNameMap: Record<string, string> = {};
   userNameMap: Record<string, string> = {};
   menuItemNameMap: Record<string, string> = {};
-  restaurants: Restaurant[] = [];
+  menuItems: { itemId: string; name: string }[] = [];
 
   private loadRestaurantsForOwner(ownerId: string): void {
     this.firestore
@@ -233,11 +233,16 @@ export class ReviewsComponent implements OnInit {
       .collection<Menu>('menus', ref => ref.where('OwnerID', '==', ownerId))
       .valueChanges()
       .subscribe(menus => {
+        this.menuItems = [];
         menus.forEach(menu => {
           const items: any[] = (menu as any).items || (menu as any).menuItems || [];
           items.forEach(item => {
             if (item?.itemId && item?.name) {
               this.menuItemNameMap[item.itemId] = item.name;
+              this.menuItems.push({
+                itemId: item.itemId,
+                name: item.name
+              });
             }
           });
         });

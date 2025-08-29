@@ -23,7 +23,7 @@ export class GeneralComponent {
   userInsightsEnabled: boolean = false;
   isPopupMenuOpen: boolean[] = [];
   currentUser: any;
-  currentUserData!: User;
+  currentUserData: User | null = null;
   userdateAll: any;
   accountForm!: FormGroup;
   userDataID: string = '';
@@ -107,15 +107,15 @@ export class GeneralComponent {
     }
   }
 
-  getUserData() {}
+  getUserData() { }
 
   updateFormWithUserData() {
     if (this.currentUserData && this.accountForm) {
       this.accountForm.patchValue({
-        name: this.currentUserData.firstName,
-        surname: this.currentUserData.Surname,
-        email: this.currentUserData.email,
-        phone: this.currentUserData.cellphoneNumber,
+        name: this.currentUserData.firstName || '',
+        surname: this.currentUserData.Surname || '',
+        email: this.currentUserData.email || '',
+        phone: this.currentUserData.cellphoneNumber || '',
       });
       this.markAsSaved(); // Mark as saved since we're loading data
     }
@@ -129,9 +129,14 @@ export class GeneralComponent {
     this.isTooltipOpen != this.isTooltipOpen;
   }
 
-  saveAccountDetails() {}
+  saveAccountDetails() { }
 
   saveAll() {
+    if (!this.currentUserData) {
+      console.error('No user data available');
+      return;
+    }
+
     this.isSaving = true;
     const userToSave: Partial<User> = {
       firstName: this.accountForm.get('name')?.value,

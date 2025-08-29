@@ -13,15 +13,14 @@ export class ViewSpecialDialogComponent {
     public dialogRef: MatDialogRef<ViewSpecialDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public special: Special,
     private router: Router
-  ) {}
+  ) { }
 
   onClose(): void {
     this.dialogRef.close();
   }
 
   onEdit(): void {
-    this.dialogRef.close();
-    this.router.navigate(['/specials/edit-special', this.special.specialID]);
+    this.dialogRef.close('edit');
   }
 
   getSpecialTypeLabel(type: number): string {

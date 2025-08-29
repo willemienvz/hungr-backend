@@ -1,6 +1,23 @@
-.popup{
+.popup {
+    .section {
+        margin-bottom: 30px;
 
-    .row{
+        h4 {
+            color: #2E3646;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        h5 {
+            color: #444444;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    }
+
+    .row {
         width: 100%;
         display: flex;
         flex-direction: row;
@@ -8,31 +25,34 @@
         align-items: flex-start;
         margin-bottom: 25px;
     }
-    .formGroup{
+
+    .formGroup {
         width: 49.5%;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: flex-start;
     }
-    h3{
+
+    h3 {
         margin-bottom: 23px;
         color: #2E3646;
         text-align: center;
     }
-    label{
+
+    label {
         color: #444444;
         text-align: left;
         margin-bottom: 12px;
     }
-    
-    p{
+
+    p {
         color: #181818;
         text-align: center;
         margin-bottom: 27px;
     }
 
-    .btnHolder{
+    .btnHolder {
         display: flex;
         width: 100%;
         justify-content: center;
@@ -40,8 +60,136 @@
         flex-direction: row;
         gap: 20px;
 
-        .btnTertiary{
+        .btnTertiary {
             max-width: 100px;
+        }
+    }
+
+    // Role selection styles
+    .role-selection {
+        .role-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            .role-option {
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                padding: 16px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                background-color: #ffffff;
+
+                &:hover {
+                    border-color: #16d3d2;
+                    background-color: #f8fffe;
+                }
+
+                &.selected {
+                    border-color: #16d3d2;
+                    background-color: #f0fffe;
+
+                    .role-header {
+                        .role-name {
+                            color: #16d3d2;
+                        }
+                    }
+                }
+
+                .role-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 8px;
+
+                    .role-name {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #2E3646;
+                        transition: color 0.2s ease;
+                    }
+
+                    input[type="radio"] {
+                        width: 18px;
+                        height: 18px;
+                        accent-color: #16d3d2;
+                    }
+                }
+
+                .role-description {
+                    font-size: 14px;
+                    color: #6c757d;
+                    margin: 0;
+                    line-height: 1.4;
+                }
+            }
+        }
+    }
+
+    // Custom permissions styles
+    .custom-permissions {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+
+            .permission-item {
+                .permission-checkbox {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    color: #444444;
+                    padding: 8px;
+                    border-radius: 4px;
+                    transition: background-color 0.2s ease;
+
+                    &:hover {
+                        background-color: #f8f9fa;
+                    }
+
+                    input[type="checkbox"] {
+                        width: 18px;
+                        height: 18px;
+                        accent-color: #16d3d2;
+                        cursor: pointer;
+                    }
+
+                    .checkmark {
+                        width: 18px;
+                        height: 18px;
+                        border: 2px solid #dee2e6;
+                        border-radius: 3px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: #ffffff;
+                        transition: all 0.2s ease;
+
+                        &::after {
+                            content: '✓';
+                            color: #16d3d2;
+                            font-size: 14px;
+                            font-weight: bold;
+                            display: none;
+                        }
+                    }
+
+                    input[type="checkbox"]:checked+.checkmark {
+                        background-color: #16d3d2;
+                        border-color: #16d3d2;
+
+                        &::after {
+                            display: block;
+                        }
+                    }
+                }
+            }
         }
     }
 }

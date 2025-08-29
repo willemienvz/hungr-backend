@@ -1,19 +1,67 @@
 @if (layoutMinimised) {
 <div class="inner-page">
-    <div class="loading-container" *ngIf="isLoading">
-        <mat-progress-spinner mode="indeterminate" color="primary" diameter="48"></mat-progress-spinner>
+    <app-loading [isLoading]="isLoading"></app-loading>
+    
+    <!-- Compact Date Range Selection (Minimized) -->
+    <div class="date-range-compact">
+        <div class="date-range-controls">
+            <div class="date-field">
+                <label class="date-label">From:</label>
+                <input
+                    type="date"
+                    class="formControl"
+                    [(ngModel)]="dateFrom"
+                    (change)="onDateRangeChange()"
+                    placeholder="From date"
+                />
+            </div>
+
+            <div class="date-field">
+                <label class="date-label">To:</label>
+                <input
+                    type="date"
+                    class="formControl"
+                    [(ngModel)]="dateTo"
+                    (change)="onDateRangeChange()"
+                    placeholder="To date"
+                />
+            </div>
+
+            <button mat-raised-button color="primary" (click)="applyDateRange()" class="apply-button">
+                Apply
+            </button>
+        </div>
     </div>
-    <div class="row">
-        <app-stats-overview-block heading="Total Menu Views" tooltiptext="Tooltip Text" timeText="Last 7 days"
-            [stat]="viewingTotalCurrentWeek.toString()"
-            [movement]="getWeeklyDifferenceMessage()"></app-stats-overview-block>
-        <app-stats-overview-block heading="New views" tooltiptext="Tooltip Text" timeText="Last 7 days"
-            [stat]="viewingTotalLast24Hours.toString()"
-            [movement]="getDailyDifferenceMessage()"></app-stats-overview-block>
+    
+    <div class="stats-grid">
+        <app-stats-insight-card 
+            title="Total Menu Views" 
+            [subtitle]="getDateRangeText()"
+            [value]="viewingTotalCurrentWeek.toString()"
+            [trend]="getWeeklyDifferenceMessage()"
+            [trendDirection]="viewingTotalCurrentWeek >= viewingTotalPreviousWeek ? 'up' : 'down'"
+            type="numeric"
+            tooltipText="Total number of menu views in the selected date range"
+        ></app-stats-insight-card>
+        
+        <app-stats-insight-card 
+            title="New views" 
+            [subtitle]="getDateRangeText()"
+            [value]="viewingTotalLast24Hours.toString()"
+            [trend]="getDailyDifferenceMessage()"
+            [trendDirection]="viewingTotalLast24Hours >= viewingTotalPrevious24Hours ? 'up' : 'down'"
+            type="numeric"
+            tooltipText="New views in the selected date range"
+        ></app-stats-insight-card>
 
-        <app-stats-overview-block heading="Top categories" tooltiptext="Tooltip Text" timeText="Last 7 days"
-            [stat]="mostOrderedCategory" [movement]="" textSize="S"></app-stats-overview-block>
-
+        <app-stats-insight-card 
+            title="Most Viewed Category" 
+            [subtitle]="getDateRangeText()"
+            [value]="mostOrderedCategory || 'No data'"
+            type="text-block"
+            variant="primary"
+            tooltipText="The most viewed category in the selected date range"
+        ></app-stats-insight-card>
     </div>
     <div class="row">
         <div class="block">
@@ -25,20 +73,77 @@
 }@else {
 
 <div class="inner-page">
-    <div class="row">
-        <app-stats-overview-block heading="Total Menu Views" tooltiptext="Tooltip Text" timeText="Last 7 days"
-            [stat]="viewingTotalCurrentWeek.toString()"
-            [movement]="getWeeklyDifferenceMessage()"></app-stats-overview-block>
-        <app-stats-overview-block heading="New views" tooltiptext="Tooltip Text" timeText="Last 7 days"
-            [stat]="viewingTotalLast24Hours.toString()"
-            [movement]="getDailyDifferenceMessage()"></app-stats-overview-block>
+    <app-loading [isLoading]="isLoading"></app-loading>
 
-        <app-stats-overview-block heading="Most Viewed Category" tooltiptext="Tooltip Text" timeText="Last 7 days"
-            [stat]="mostOrderedCategory" [movement]="" textSize="S"></app-stats-overview-block>
+    <!-- Compact Date Range Selection -->
+    <div class="date-range-compact">
+        <div class="date-range-controls">
+            <div class="date-field">
+                <label class="date-label">From:</label>
+                <input
+                    type="date"
+                    class="formControl"
+                    [(ngModel)]="dateFrom"
+                    (change)="onDateRangeChange()"
+                    placeholder="From date"
+                />
+            </div>
 
-        <app-stats-overview-block heading="Most Ordered Item" tooltiptext="Tooltip Text" timeText="Last 7 days"
-            [stat]="topOrderedItems[0]?.name" [movement]="" textSize="S"></app-stats-overview-block>
+            <div class="date-field">
+                <label class="date-label">To:</label>
+                <input
+                    type="date"
+                    class="formControl"
+                    [(ngModel)]="dateTo"
+                    (change)="onDateRangeChange()"
+                    placeholder="To date"
+                />
+            </div>
 
+            <button mat-raised-button color="primary" (click)="applyDateRange()" class="apply-button">
+                Apply
+            </button>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <app-stats-insight-card 
+            title="Total Menu Views" 
+            [subtitle]="getDateRangeText()"
+            [value]="viewingTotalCurrentWeek.toString()"
+            [trend]="getWeeklyDifferenceMessage()"
+            [trendDirection]="viewingTotalCurrentWeek >= viewingTotalPreviousWeek ? 'up' : 'down'"
+            type="numeric"
+            tooltipText="Total number of menu views in the selected date range"
+        ></app-stats-insight-card>
+        
+        <app-stats-insight-card 
+            title="New views" 
+            [subtitle]="getDateRangeText()"
+            [value]="viewingTotalLast24Hours.toString()"
+            [trend]="getDailyDifferenceMessage()"
+            [trendDirection]="viewingTotalLast24Hours >= viewingTotalPrevious24Hours ? 'up' : 'down'"
+            type="numeric"
+            tooltipText="New views in the selected date range"
+        ></app-stats-insight-card>
+
+        <app-stats-insight-card 
+            title="Most Viewed Category" 
+            [subtitle]="getDateRangeText()"
+            [value]="mostOrderedCategory || 'No data'"
+            type="text-block"
+            variant="primary"
+            tooltipText="The most viewed category in the selected date range"
+        ></app-stats-insight-card>
+
+        <app-stats-insight-card 
+            title="Most Ordered Item" 
+            [subtitle]="getDateRangeText()"
+            [value]="topOrderedItems[0]?.name || 'No data'"
+            type="text-block"
+            variant="secondary"
+            tooltipText="The most ordered item in the selected date range"
+        ></app-stats-insight-card>
     </div>
     <div class="row" *ngIf="!isLoading">
         <div class="block biggerBlock">
@@ -51,17 +156,16 @@
         </div>
     </div>
     <div class="row">
-        <div class="block biggerBlock">
+        <div class="block">
             <h6 class="heading">Most Ordered Items</h6>
             <div echarts [options]="chartOptionsMostOrderedItems" class="echart"></div>
         </div>
         <div class="block">
-            <h6 class="heading">Frequently ordered together</h6>
-            <div *ngFor="let pair of frequentItemPairs | slice:0:3" class="pariholder">
-                <div class="pair-card">
-                    <div class="side">{{ pair.itemA }}</div>
-                    <div class="center">&</div>
-                    <div class="side">{{ pair.itemB }}</div>
+            <h6 class="heading">Frequent Item Pairs</h6>
+            <div class="pariholder">
+                <div *ngFor="let pair of frequentItemPairs" class="pair-item">
+                    <span class="pair-text">{{ pair.itemA }} + {{ pair.itemB }}</span>
+                    <span class="pair-count">{{ pair.count }} orders</span>
                 </div>
             </div>
         </div>

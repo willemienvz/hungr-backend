@@ -73,7 +73,7 @@ export interface ImageUploadResult {
 })
 export class MediaUploadModalComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef;
-  
+
   // Component state
   activeTab = 0;
   selectedFile: File | null = null;
@@ -82,16 +82,16 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
   uploading = false;
   error: string | null = null;
   isDragOver = false;
-  
+
   // Component info for upload
   componentType = 'media-library';
   componentId = 'media-upload-modal';
   fieldName?: string;
-  
+
   // Form properties
   uploadForm: FormGroup;
   categories: string[] = ['Logos', 'Banners', 'Menu Items', 'Specials', 'Branding', 'Other'];
-  
+
   // Media library selection
   showMediaLibrary = false;
   mediaItems: MediaItem[] = [];
@@ -99,10 +99,10 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
   mediaLibraryLoading = false;
   mediaFilters: MediaFilters = {};
   searchQuery = '';
-  
+
   // Image dimensions
   imageDimensions: { width: number; height: number } | null = null;
-  
+
   // Validation configuration
   validationConfig: ImageValidationConfig = {
     allowedTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
@@ -111,13 +111,13 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     minDimensions: { width: 100, height: 100 },
     requiredDimensions: null
   };
-  
+
   // Backward compatibility properties
   selectedFiles: File[] = [];
   previewUrls: string[] = [];
   existingImageUrls: string[] = [];
   isLegacyMode = false;
-  
+
   private destroy$ = new Subject<void>();
   private searchSubject = new BehaviorSubject<string>('');
 
@@ -133,14 +133,14 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
       description: [''],
       isPublic: [true]
     });
-    
+
     this.initializeComponent();
   }
 
   ngOnInit(): void {
     this.setupSearchSubscription();
     this.loadMediaLibrary();
-    
+
     // Initialize search subject with empty string
     this.searchSubject.next('');
   }
@@ -175,7 +175,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
         requiredDimensions: this.parseDimensions(data.config.dimensions)
       };
     }
-    
+
     // Set existing images
     if (data.currentImageUrls && data.currentImageUrls.length > 0) {
       this.existingImageUrls = [...data.currentImageUrls];
@@ -200,12 +200,12 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     if (config.minDimensions) {
       this.validationConfig.minDimensions = config.minDimensions;
     }
-    
+
     // Store component info for upload
     this.componentType = config.componentType || 'media-library';
     this.componentId = config.componentId || 'media-upload-modal';
     this.fieldName = config.fieldName;
-    
+
     // Set existing media URL
     if (config.existingMediaUrl) {
       // TODO: Load existing media item from library
@@ -214,7 +214,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
 
   private parseDimensions(dimensions?: string): { width: number; height: number } | null {
     if (!dimensions) return null;
-    
+
     const match = dimensions.match(/(\d+)x(\d+)/);
     if (match) {
       return {
@@ -278,7 +278,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
 
   private async processFile(file: File): Promise<void> {
     this.error = null;
-    
+
     // Validate file
     const validation = this.validateFile(file);
     if (!validation.valid) {
@@ -323,7 +323,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
 
       // Validate file size
       if (this.validationConfig.maxFileSize && file.size > this.validationConfig.maxFileSize) {
-        this.error = `File size too large: ${file.name}. Maximum size: ${this.validationConfig.maxFileSize / (1024*1024)}MB`;
+        this.error = `File size too large: ${file.name}. Maximum size: ${this.validationConfig.maxFileSize / (1024 * 1024)}MB`;
         return;
       }
     }
@@ -331,7 +331,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     // All files are valid, process them
     files.forEach(file => {
       this.selectedFiles.push(file);
-      
+
       // Create preview URL
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -354,7 +354,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     if (file.size > this.validationConfig.maxFileSize) {
       return {
         valid: false,
-        error: `File size too large: ${file.name}. Maximum size: ${this.validationConfig.maxFileSize / (1024*1024)}MB`
+        error: `File size too large: ${file.name}. Maximum size: ${this.validationConfig.maxFileSize / (1024 * 1024)}MB`
       };
     }
 
@@ -372,7 +372,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
         img.onload = () => {
           const width = img.width;
           const height = img.height;
-          
+
           // Store dimensions for display
           this.imageDimensions = { width, height };
 
@@ -436,7 +436,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     this.previewUrl = null;
     this.imageDimensions = null;
     this.error = null;
-    
+
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
@@ -463,7 +463,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
       };
 
       const mediaItem = await this.mediaLibraryService.uploadMedia(request);
-      
+
       // Subscribe to upload progress
       this.mediaLibraryService.uploadProgress$.pipe(
         takeUntil(this.destroy$)
@@ -565,7 +565,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
       this.existingImageUrls.splice(existingIndex, 1);
     }
     this.error = null;
-    
+
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
@@ -576,7 +576,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     this.previewUrls = [];
     this.existingImageUrls = [];
     this.error = null;
-    
+
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
@@ -611,19 +611,19 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     return this.selectedFiles.length > 0;
   }
 
-  get allImages(): Array<{url: string, isNew: boolean, index: number}> {
-    const images: Array<{url: string, isNew: boolean, index: number}> = [];
-    
+  get allImages(): Array<{ url: string, isNew: boolean, index: number }> {
+    const images: Array<{ url: string, isNew: boolean, index: number }> = [];
+
     // Add new images
     this.previewUrls.forEach((url, index) => {
       images.push({ url, isNew: true, index });
     });
-    
+
     // Add existing images
     this.existingImageUrls.forEach((url, index) => {
       images.push({ url, isNew: false, index: index + this.selectedFiles.length });
     });
-    
+
     return images;
   }
 

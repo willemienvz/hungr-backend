@@ -1,0 +1,455 @@
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.permissions-modal {
+    background: white;
+    border-radius: 12px;
+    max-width: 800px;
+    min-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    .modal-header {
+        padding: 24px 24px 20px;
+        border-bottom: 1px solid #e6e9ec;
+        margin-bottom: 24px;
+        position: relative;
+
+        h3 {
+            color: #2e3646;
+            font-family: "Poppins", sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .user-name {
+                font-size: 16px;
+                font-weight: 500;
+                color: #2e3646;
+            }
+
+            .user-email {
+                font-size: 14px;
+                color: #6c757d;
+            }
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            color: #9a9a9a;
+            cursor: pointer;
+            font-size: 24px;
+            transition: color 0.2s ease;
+
+            &:hover {
+                color: #444;
+            }
+        }
+    }
+
+    .modal-body {
+        padding: 0 24px;
+        max-height: 60vh;
+        overflow-y: auto;
+
+        h4 {
+            color: #2e3646;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+        }
+
+        h5 {
+            color: #444444;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0 0 12px 0;
+        }
+    }
+
+    .modal-footer {
+        padding: 24px;
+        border-top: 1px solid #f0f0f0;
+        background-color: #f8f9fb;
+        border-radius: 0 0 12px 12px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+}
+
+// Current role display
+.current-role-section {
+    margin-bottom: 32px;
+
+    .role-display {
+        padding: 16px;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        background-color: #f8f9fa;
+
+        &.role-admin {
+            border-color: #ffebee;
+            background-color: #ffebee;
+
+            .role-name {
+                color: #c62828;
+            }
+        }
+
+        &.role-editor {
+            border-color: #e8f5e8;
+            background-color: #e8f5e8;
+
+            .role-name {
+                color: #2e7d32;
+            }
+        }
+
+        &.role-viewer {
+            border-color: #e3f2fd;
+            background-color: #e3f2fd;
+
+            .role-name {
+                color: #1565c0;
+            }
+        }
+
+        &.role-custom {
+            border-color: #f3e5f5;
+            background-color: #f3e5f5;
+
+            .role-name {
+                color: #6a1b9a;
+            }
+        }
+
+        .role-name {
+            font-size: 16px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .role-description {
+            font-size: 14px;
+            color: #6c757d;
+        }
+    }
+}
+
+// Role selection
+.role-selection-section {
+    margin-bottom: 32px;
+
+    .role-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+
+        .role-option-card {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+
+            &:hover {
+                border-color: #16d3d2;
+                background-color: #f8fffe;
+            }
+
+            &.selected {
+                border-color: #16d3d2;
+                background-color: #f0fffe;
+                box-shadow: 0 2px 8px rgba(22, 211, 210, 0.2);
+
+                .role-card-header {
+                    .role-name {
+                        color: #16d3d2;
+                    }
+                }
+            }
+
+            .role-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+
+                .role-name {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #2e3646;
+                    transition: color 0.2s ease;
+                }
+
+                input[type="radio"] {
+                    width: 18px;
+                    height: 18px;
+                    accent-color: #16d3d2;
+                }
+            }
+
+            .role-description {
+                font-size: 14px;
+                color: #6c757d;
+                margin: 0 0 12px 0;
+                line-height: 1.4;
+            }
+
+            .role-permissions-preview {
+                .permission-tags {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 4px;
+
+                    .permission-tag {
+                        font-size: 11px;
+                        padding: 2px 6px;
+                        border-radius: 4px;
+                        font-weight: 500;
+
+                        &.granted {
+                            background-color: #e8f5e8;
+                            color: #2e7d32;
+                        }
+
+                        &.denied {
+                            background-color: #ffebee;
+                            color: #c62828;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Permissions editor
+.permissions-editor-section {
+    margin-bottom: 32px;
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: #16d3d2;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: rgba(22, 211, 210, 0.1);
+            }
+        }
+    }
+
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+
+        .permission-category {
+            .permission-items {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+
+                .permission-checkbox {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 12px;
+                    cursor: pointer;
+                    padding: 12px;
+                    border-radius: 8px;
+                    transition: background-color 0.2s ease;
+                    border: 1px solid transparent;
+
+                    &:hover {
+                        background-color: #f8f9fa;
+                        border-color: #e9ecef;
+                    }
+
+                    input[type="checkbox"] {
+                        width: 20px;
+                        height: 20px;
+                        margin-top: 2px;
+                        accent-color: #16d3d2;
+                        cursor: pointer;
+                    }
+
+                    .checkmark {
+                        width: 20px;
+                        height: 20px;
+                        border: 2px solid #dee2e6;
+                        border-radius: 3px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: #ffffff;
+                        transition: all 0.2s ease;
+
+                        &::after {
+                            content: '✓';
+                            color: #16d3d2;
+                            font-size: 16px;
+                            font-weight: bold;
+                            display: none;
+                        }
+                    }
+
+                    input[type="checkbox"]:checked+.checkmark {
+                        background-color: #16d3d2;
+                        border-color: #16d3d2;
+
+                        &::after {
+                            display: block;
+                        }
+                    }
+
+                    .permission-info {
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 2px;
+
+                        .permission-name {
+                            font-size: 14px;
+                            font-weight: 500;
+                            color: #2e3646;
+                        }
+
+                        .permission-desc {
+                            font-size: 12px;
+                            color: #6c757d;
+                            line-height: 1.3;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Permissions summary
+.permissions-summary {
+    margin-bottom: 24px;
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+
+            .permission-name {
+                font-size: 14px;
+                font-weight: 500;
+                color: #2e3646;
+            }
+
+            .permission-status {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                font-weight: 500;
+
+                &.granted {
+                    color: #2e7d32;
+
+                    i {
+                        color: #2e7d32;
+                        font-size: 16px;
+                    }
+                }
+
+                &:not(.granted) {
+                    color: #c62828;
+
+                    i {
+                        color: #c62828;
+                        font-size: 16px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Button styles
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &.btnTertiary {
+        background-color: transparent;
+        color: #9a9a9a;
+        border: 1px solid #e6e9ec;
+
+        &:hover:not(:disabled) {
+            background-color: #f8f9fb;
+            color: #444;
+        }
+    }
+
+    &.btnPrimary {
+        background-color: #16d3d2;
+        color: white;
+
+        &:hover:not(:disabled) {
+            background-color: #14c0bf;
+        }
+    }
+}

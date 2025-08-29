@@ -1,0 +1,178 @@
+<div class="popup" *ngIf="showPopup">
+  <div class="popup-content permissions-modal">
+    <div class="modal-header">
+      <h3>Manage Permissions</h3>
+      <div class="user-info">
+        <span class="user-name">{{ user?.firstName }} {{ user?.Surname }}</span>
+        <span class="user-email">{{ user?.email }}</span>
+      </div>
+      <i class="material-icons popup-close" (click)="cancel()">close</i>
+    </div>
+
+    <div class="modal-body">
+      <!-- Current Role Display -->
+      <div class="current-role-section">
+        <h4>Current Role</h4>
+        <div class="role-display" [class]="'role-' + selectedRole">
+          <span class="role-name">{{ getRoleDisplayName(selectedRole) }}</span>
+          <span class="role-description">{{ getRoleDescription(selectedRole) }}</span>
+        </div>
+      </div>
+
+      <!-- Role Selection -->
+      <div class="role-selection-section">
+        <h4>Change Role</h4>
+        <div class="role-options">
+          <div
+            *ngFor="let role of availableRoles"
+            class="role-option-card"
+            [class.selected]="selectedRole === role"
+            (click)="onRoleChange(role)">
+            <div class="role-card-header">
+              <span class="role-name">{{ getRoleDisplayName(role) }}</span>
+              <input type="radio" [value]="role" [checked]="selectedRole === role" readonly>
+            </div>
+            <p class="role-description">{{ getRoleDescription(role) }}</p>
+            <div class="role-permissions-preview" *ngIf="role !== 'custom'">
+              <div class="permission-tags">
+                <span
+                  *ngFor="let permission of getAllPermissions()"
+                  class="permission-tag"
+                  [class.granted]="getRolePermission(role, permission)"
+                  [class.denied]="!getRolePermission(role, permission)">
+                  {{ getPermissionLabel(permission) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Permissions Editor -->
+      <div class="permissions-editor-section" *ngIf="selectedRole === 'custom'">
+        <div class="section-header">
+          <h4>Custom Permissions</h4>
+          <button class="btn-link" (click)="resetToRoleDefaults()">Reset to Defaults</button>
+        </div>
+
+        <div class="permissions-grid">
+          <div class="permission-category">
+            <h5>Analytics & Reporting</h5>
+            <div class="permission-items">
+              <label class="permission-checkbox" *ngFor="let permission of ['viewAnalytics']">
+                <input
+                  type="checkbox"
+                  [checked]="hasPermission(permission)"
+                  (change)="onPermissionChange($event, permission)">
+                <span class="checkmark"></span>
+                <div class="permission-info">
+                  <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
+                  <span class="permission-desc">Access to view analytics and reports</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="permission-category">
+            <h5>Menu Management</h5>
+            <div class="permission-items">
+              <label class="permission-checkbox" *ngFor="let permission of ['createMenus', 'editMenus']">
+                <input
+                  type="checkbox"
+                  [checked]="hasPermission(permission)"
+                  (change)="onPermissionChange($event, permission)">
+                <span class="checkmark"></span>
+                <div class="permission-info">
+                  <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
+                  <span class="permission-desc">
+                    {{ permission === 'createMenus' ? 'Create new menus and menu items' : 'Edit existing menus and menu items' }}
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="permission-category">
+            <h5>Restaurant Settings</h5>
+            <div class="permission-items">
+              <label class="permission-checkbox" *ngFor="let permission of ['editRestaurants', 'editBranding']">
+                <input
+                  type="checkbox"
+                  [checked]="hasPermission(permission)"
+                  (change)="onPermissionChange($event, permission)">
+                <span class="checkmark"></span>
+                <div class="permission-info">
+                  <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
+                  <span class="permission-desc">
+                    {{ permission === 'editRestaurants' ? 'Modify restaurant information and settings' : 'Update branding, logos, and themes' }}
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="permission-category">
+            <h5>Specials & Promotions</h5>
+            <div class="permission-items">
+              <label class="permission-checkbox" *ngFor="let permission of ['addSpecials']">
+                <input
+                  type="checkbox"
+                  [checked]="hasPermission(permission)"
+                  (change)="onPermissionChange($event, permission)">
+                <span class="checkmark"></span>
+                <div class="permission-info">
+                  <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
+                  <span class="permission-desc">Create and manage daily specials and promotions</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="permission-category">
+            <h5>Administration</h5>
+            <div class="permission-items">
+              <label class="permission-checkbox" *ngFor="let permission of ['manageUsers']">
+                <input
+                  type="checkbox"
+                  [checked]="hasPermission(permission)"
+                  (change)="onPermissionChange($event, permission)">
+                <span class="checkmark"></span>
+                <div class="permission-info">
+                  <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
+                  <span class="permission-desc">Invite, manage, and remove team members</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permission Summary -->
+      <div class="permissions-summary">
+        <h4>Permission Summary</h4>
+        <div class="summary-grid">
+          <div class="summary-item" *ngFor="let permission of getAllPermissions()">
+            <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
+            <span class="permission-status" [class.granted]="hasPermission(permission)">
+              <i class="material-icons" [class.granted]="hasPermission(permission)">
+                {{ hasPermission(permission) ? 'check_circle' : 'cancel' }}
+              </i>
+              {{ hasPermission(permission) ? 'Allowed' : 'Denied' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btnTertiary" (click)="cancel()" [disabled]="isSaving">
+        Cancel
+      </button>
+      <button class="btn btnPrimary" (click)="savePermissions()" [disabled]="isSaving">
+        Save Permissions
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-loading [isLoading]="isSaving"></app-loading>

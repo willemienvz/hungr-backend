@@ -1,65 +1,18 @@
-<div class="container">
-  <!-- Header Section -->
-  <div class="header-section block">
-    <div class="header-content">
-      <h6 class="add-special-text">Add a special</h6>
-      <a class="btnSecondary add-special-btn" routerLink="/specials/add-new-special">
-        + ADD SPECIAL
-      </a>
-    </div>
-  </div>
+<app-page-layout
+  title="Specials Management"
+  subtitle="Create and manage promotional offers and specials"
+  [actions]="[
+    {
+      label: '+ Add Special',
+      type: 'primary',
+      routerLink: '/specials/add-new-special'
+    }
+  ]"
+  [loading]="isLoading">
 
-
-
-  <!-- Key Metrics Dashboard -->
-  <div class="metrics-dashboard" *ngIf="metrics">
-    <div class="metric-card">
-      <div class="metric-content">
-        <h3 class="metric-title">Total Special Sales</h3>
-        <div class="metric-value">{{ formatCurrency(metrics.totalSpecialSales.amount) }}</div>
-        <div class="metric-movement positive">{{ metrics.totalSpecialSales.percentage }}</div>
-      </div>
-      <div class="metric-info">
-        <mat-icon>info_outline</mat-icon>
-      </div>
-    </div>
-    
-    <div class="metric-card">
-      <div class="metric-content">
-        <h3 class="metric-title">Special Views</h3>
-        <div class="metric-value">{{ metrics.specialViews.count.toLocaleString() }}</div>
-        <div class="metric-movement positive">{{ metrics.specialViews.percentage }}</div>
-      </div>
-      <div class="metric-info">
-        <mat-icon>info_outline</mat-icon>
-      </div>
-    </div>
-    
-    <div class="metric-card">
-      <div class="metric-content">
-        <h3 class="metric-title">Top Performing Special</h3>
-        <div class="metric-value">{{ metrics.topPerformingSpecial.name }}</div>
-        <div class="metric-subtitle">{{ metrics.topPerformingSpecial.performance }}</div>
-      </div>
-      <div class="metric-info">
-        <mat-icon>info_outline</mat-icon>
-      </div>
-    </div>
-    
-    <div class="metric-card">
-      <div class="metric-content">
-        <h3 class="metric-title">Specials Ordered</h3>
-        <div class="metric-value">{{ metrics.specialsOrdered.count.toLocaleString() }}</div>
-        <div class="metric-movement positive">{{ metrics.specialsOrdered.percentage }}</div>
-      </div>
-      <div class="metric-info">
-        <mat-icon>info_outline</mat-icon>
-      </div>
-    </div>
-  </div>
 
   <!-- Active Specials Section -->
-  <app-content-block 
+  <app-content-block
     title="Active Specials"
     [showFilter]="true"
     [filterOptions]="[
@@ -69,32 +22,54 @@
       { value: 'combo', label: 'Combo Special' }
     ]"
     (filterChange)="onFilterChange($event)">
-    
-    <app-specials-table
-      [specials]="activeSpecials"
-      tableType="active"
-      (toggleStatus)="toggleSpecialStatus($event.special, $event.index)"
-      (deleteSpecial)="deleteSpecial($event.specialId, $event.index)">
-    </app-specials-table>
+
+    <app-data-table
+      [data]="activeSpecials"
+      [columns]="activeSpecialsColumns"
+      [actions]="activeSpecialsActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No active specials found"
+      (actionClick)="onSpecialAction($event, 'active')"
+      (rowClick)="onRowClick($event, 'active')">
+
+
+
+    </app-data-table>
   </app-content-block>
 
   <!-- Inactive Specials Section -->
   <app-content-block title="Inactive Specials">
-    <app-specials-table
-      [specials]="inactiveSpecials"
-      tableType="inactive"
-      (toggleStatus)="toggleSpecialStatus($event.special, $event.index)"
-      (deleteSpecial)="deleteSpecial($event.specialId, $event.index)">
-    </app-specials-table>
+    <app-data-table
+      [data]="inactiveSpecials"
+      [columns]="inactiveSpecialsColumns"
+      [actions]="inactiveSpecialsActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No inactive specials found"
+      (actionClick)="onSpecialAction($event, 'inactive')"
+      (rowClick)="onRowClick($event, 'inactive')">
+
+
+
+    </app-data-table>
   </app-content-block>
 
   <!-- Drafts Section -->
   <app-content-block title="Drafts">
-    <app-specials-table
-      [specials]="draftSpecials"
-      tableType="draft"
-      [showToggle]="false"
-      (deleteSpecial)="deleteSpecial($event.specialId, $event.index)">
-    </app-specials-table>
+    <app-data-table
+      [data]="draftSpecials"
+      [columns]="draftSpecialsColumns"
+      [actions]="draftSpecialsActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No draft specials found"
+      (actionClick)="onSpecialAction($event, 'draft')"
+      (rowClick)="onRowClick($event, 'draft')">
+
+
+
+    </app-data-table>
   </app-content-block>
-</div>
+
+</app-page-layout>

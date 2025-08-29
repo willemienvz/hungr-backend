@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Special } from '../../../../types/special'
 import { ViewSpecialDialogComponent } from '../view-special-dialog/view-special-dialog.component';
+import { SpecialType } from '../special-types.constants';
 
 @Component({
   selector: 'app-specials-table',
@@ -13,10 +14,10 @@ export class SpecialsTableComponent {
   @Input() tableType: 'active' | 'inactive' | 'draft' = 'active';
   @Input() showToggle: boolean = true;
 
-  @Output() toggleStatus = new EventEmitter<{special: Special, index: number}>();
-  @Output() deleteSpecial = new EventEmitter<{specialId: string, index: number}>();
+  @Output() toggleStatus = new EventEmitter<{ special: Special, index: number }>();
+  @Output() deleteSpecial = new EventEmitter<{ specialId: string, index: number }>();
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog) { }
 
   openViewDialog(special: Special): void {
     console.log("opened");
@@ -27,12 +28,12 @@ export class SpecialsTableComponent {
     });
   }
 
-  getSpecialTypeLabel(type: number): string {
+  getSpecialTypeLabel(type: SpecialType): string {
     switch (type) {
-      case 1: return 'Percentage Discount';
-      case 2: return 'Price Discount';
-      case 3: return 'Combo Deal';
-      case 4: return 'Category Special';
+      case SpecialType.PERCENTAGE_DISCOUNT: return 'Percentage Discount';
+      case SpecialType.PRICE_DISCOUNT: return 'Price Discount';
+      case SpecialType.COMBO_DEAL: return 'Combo Deal';
+      case SpecialType.CATEGORY_SPECIAL: return 'Category Special';
       default: return 'Special Type';
     }
   }

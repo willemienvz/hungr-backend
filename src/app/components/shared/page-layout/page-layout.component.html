@@ -1,0 +1,47 @@
+<div [class]="pageClass">
+  <!-- Page Header -->
+  <div class="page-header">
+    <!-- Back Button -->
+    <div class="header-left">
+      <a *ngIf="showBackButton"
+         [routerLink]="backRoute"
+         class="back-button"
+         [class]="backRoute ? '' : 'back-link'">
+        <i class="material-icons">chevron_left</i>
+        <span>{{ backButtonText }}</span>
+      </a>
+    </div>
+
+    <!-- Title and Subtitle -->
+    <div class="header-center">
+      <h1 class="page-title" *ngIf="title">{{ title }}</h1>
+      <p class="page-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="header-right" *ngIf="actions.length > 0">
+      <div class="page-actions">
+        <app-button
+          *ngFor="let action of actions"
+          [type]="action.type || 'primary'"
+          [routerLink]="action.routerLink"
+          [queryParams]="action.queryParams"
+          [disabled]="action.disabled || loading"
+          [icon]="action.icon"
+          [label]="action.label"
+          (buttonClick)="onActionClick(action)">
+        </app-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div class="page-content">
+    <ng-content></ng-content>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="loading" class="page-loading">
+    <app-loading [isLoading]="true"></app-loading>
+  </div>
+</div>

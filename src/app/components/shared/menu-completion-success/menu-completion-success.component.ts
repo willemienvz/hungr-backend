@@ -1,5 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-menu-completion-success',
@@ -7,6 +9,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./menu-completion-success.component.scss']
 })
 export class MenuCompletionSuccessComponent {
+  @ViewChild('previewIframe') previewIframe: ElementRef;
+
   // Display control inputs
   @Input() showBackButton: boolean = true;
   @Input() showSaveDraft: boolean = true;
@@ -23,7 +27,21 @@ export class MenuCompletionSuccessComponent {
   @Output() saveAsDraft = new EventEmitter<void>();
   @Output() publishMenu = new EventEmitter<void>();
 
-  constructor(private router: Router) { }
+  private readonly previewUrlBase = environment.menuUrl;
+  private cachedPreviewUrl: SafeResourceUrl | null = null;
+
+  constructor(
+    private router: Router,
+    private sanitizer: DomSanitizer
+  ) { }
+
+  getPreviewUrl(): SafeResourceUrl {
+    if (this.menuId) {
+      const url = `${this.previewUrlBase}${this.menuId}`;
+      this.cachedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    }
+    return this.cachedPreviewUrl || this.sanitizer.bypassSecurityTrustResourceUrl('');
+  }
 
   onGenerateQRCode() {
     if (this.menuId) {

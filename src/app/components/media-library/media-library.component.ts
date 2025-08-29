@@ -27,22 +27,22 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
   filteredMedia: MediaItem[] = [];
   loading = false;
   error: string | null = null;
-  
+
   // Filter and search properties
   searchControl = new FormControl('');
   selectedCategory = '';
   sortBy = 'uploadedAt';
   sortOrder: 'asc' | 'desc' = 'desc';
   viewMode: 'grid' | 'list' = 'grid';
-  
+
   // Pagination properties
   currentPage = 1;
   itemsPerPage = 20;
   totalItems = 0;
-  
+
   // Available options for filters
   categories: string[] = [];
-  
+
   // Sort options
   sortOptions = [
     { value: 'uploadedAt', label: 'Upload Date' },
@@ -50,7 +50,19 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
     { value: 'fileSize', label: 'File Size' },
     { value: 'originalName', label: 'Original Name' }
   ];
-  
+
+  // Category options for form-select
+  categoryOptions: { value: string; label: string }[] = [];
+
+  // Page actions for unified layout
+  pageActions = [
+    {
+      label: '+ Upload Media',
+      type: 'primary' as const,
+      onClick: () => this.openUploadModal()
+    }
+  ];
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -58,10 +70,11 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog,
     private mediaUploadModalService: MediaUploadModalService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.setupSearchSubscription();
+    this.initializeCategoryOptions();
     this.loadMedia();
   }
 
@@ -286,7 +299,7 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
         title: 'Delete Media Item',
         itemName: media.originalName,
         itemType: 'media item',
-        message: media.usage.length > 0 
+        message: media.usage.length > 0
           ? `Are you sure you want to delete "${media.originalName}"? This will also remove it from ${media.usage.length} component(s) where it's currently being used. This action cannot be undone.`
           : `Are you sure you want to delete "${media.originalName}"? This action cannot be undone.`,
         confirmButtonText: 'Delete',
@@ -298,21 +311,21 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
       if (result) {
         try {
           await this.mediaLibraryService.deleteMedia(media.id);
-          
+
           // Remove from local arrays
           this.mediaItems = this.mediaItems.filter(item => item.id !== media.id);
           this.filteredMedia = this.filteredMedia.filter(item => item.id !== media.id);
-          
+
           // Re-extract filter options
           this.extractFilterOptions();
-          
+
           this.cdr.detectChanges();
         } catch (error) {
           console.error('Error deleting media:', error);
-          
+
           // Provide error message
           let errorMessage = 'Failed to delete media item. Please try again.';
-          
+
           if (error instanceof Error) {
             if (error.message.includes('not found')) {
               errorMessage = 'Media item not found. It may have already been deleted.';
@@ -320,7 +333,7 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
               errorMessage = 'You must be logged in to delete media items.';
             }
           }
-          
+
           alert(errorMessage);
         }
       }
@@ -402,5 +415,63 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
     if (event.target) {
       event.target.style.display = 'none';
     }
+  }
+
+  /**
+   * Initialize category options for form-select
+   */
+  private initializeCategoryOptions(): void {
+    // Add "All Categories" option
+    this.categoryOptions = [
+      { value: '', label: 'All Categories' }
+    ];
+
+    // Add actual categories when they're loaded
+    // This will be updated when categories are fetched
+  }
+
+  /**
+   * Toggle sort order between ascending and descending
+   */
+  toggleSortOrder(): void {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.onSortChanged();
+  }
+
+  /**
+   * Get total storage size of all media files
+   */
+  getTotalStorageSize(): string {
+    const totalBytes = this.filteredMedia.reduce((sum, media) => sum + (media.fileSize || 0), 0);
+
+    if (totalBytes >= 1073741824) { // GB
+      return (totalBytes / 1073741824).toFixed(2) + ' GB';
+    } else if (totalBytes >= 1048576) { // MB
+      return (totalBytes / 1048576).toFixed(2) + ' MB';
+    } else if (totalBytes >= 1024) { // KB
+      return (totalBytes / 1024).toFixed(2) + ' KB';
+    }
+    return totalBytes + ' bytes';
+  }
+
+  /**
+   * Get count of unique categories
+   */
+  getUniqueCategoriesCount(): number {
+    const uniqueCategories = new Set(
+      this.filteredMedia
+        .map(media => media.category)
+        .filter(category => category)
+    );
+    return uniqueCategories.size;
+  }
+
+  /**
+   * Get paginated media items for current view
+   */
+  get paginatedMedia(): MediaItem[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredMedia.slice(startIndex, endIndex);
   }
 } 

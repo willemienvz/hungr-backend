@@ -1,8 +1,6 @@
 @if (layoutMinimised) {
 <div class="inner-page">
-  <div class="loading-container" *ngIf="isLoading">
-    <mat-progress-spinner mode="indeterminate" color="primary" diameter="48"></mat-progress-spinner>
-  </div>
+  <app-loading [isLoading]="isLoading"></app-loading>
   <div class="row">
     <app-stats-overview-block
       heading="Total menu views"
@@ -12,16 +10,18 @@
       [movement]="getWeeklyDifferenceMessage()"
       textSize="L"
     ></app-stats-overview-block>
-    <div class="block">
-      <h6 class="heading">Average Viewing Time</h6>
-      <div class="blueBlock">{{ displayAverageTime }} min</div>
-    </div>
-    <div class="block">
-      <h6 class="heading">Most Popular Viewing time</h6>
-      <div class="purpleBlock">
-        {{ popularTime }}
-      </div>
-    </div>
+    <app-stats-card
+      title="Average Viewing Time"
+      [value]="displayAverageTime + ' min'"
+      icon="schedule"
+      class="stats-card-primary"
+    ></app-stats-card>
+    <app-stats-card
+      title="Most Popular Viewing Time"
+      [value]="popularTime"
+      icon="access_time"
+      class="stats-card-secondary"
+    ></app-stats-card>
   </div>
 </div>
 

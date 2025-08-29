@@ -1,0 +1,42 @@
+<div class="form-input-wrapper" [class]="customClass">
+  <!-- Label -->
+  <label *ngIf="label" class="form-label" [class.required]="required">
+    {{ label }}
+  </label>
+
+  <!-- Input container -->
+  <div class="input-container">
+    <!-- Prefix icon -->
+    <i *ngIf="prefixIcon" class="material-icons prefix-icon">
+      {{ prefixIcon }}
+    </i>
+
+    <!-- Input element -->
+    <input
+      [type]="type"
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled"
+      [required]="required"
+      [min]="min"
+      [max]="max"
+      [step]="step"
+      [pattern]="pattern"
+      [class]="inputClass"
+      (input)="onInputChange($event)"
+      (focus)="onFocus($event)"
+      (blur)="onBlur($event)"
+    />
+
+    <!-- Suffix icon -->
+    <i *ngIf="suffixIcon" class="material-icons suffix-icon">
+      {{ suffixIcon }}
+    </i>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="showError && errorMessage" class="error-message">
+    <i class="material-icons">error</i>
+    <span>{{ errorMessage }}</span>
+  </div>
+</div>

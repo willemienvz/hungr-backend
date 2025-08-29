@@ -1,27 +1,8 @@
 @use "@angular/material" as mat;
 @include mat.core();
 
-/* Global hungr button variants */
-.btnPrimary {
-  background-color: #16D3D2;
-  color: #fff;
-  border: none;
-  font-family: var(--hungr-font-family);
-}
-
-.btnSecondary {
-  background-color: #F5F5F5;
-  color: #181818;
-  border: 1px solid #DEDEDE;
-  font-family: var(--hungr-font-family);
-}
-
-.btnOutline {
-  background-color: transparent;
-  color: #16D3D2;
-  border: 1px solid #16D3D2;
-  font-family: var(--hungr-font-family);
-}
+/* Import design tokens */
+@import "styles/_design-tokens";
 
 
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
@@ -35,17 +16,13 @@ $hungr-backend-warn: mat.define-palette(mat.$red-palette);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
-$hungr-backend-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: $hungr-backend-primary,
-      accent: $hungr-backend-accent,
-      warn: $hungr-backend-warn,
-    ),
-    typography: mat.define-typography-config(),
-    density: 0,
-  )
-);
+$hungr-backend-theme: mat.define-light-theme((color: (primary: $hungr-backend-primary,
+        accent: $hungr-backend-accent,
+        warn: $hungr-backend-warn,
+      ),
+      typography: mat.define-typography-config(),
+      density: 0,
+    ));
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
@@ -56,26 +33,121 @@ $hungr-backend-theme: mat.define-light-theme(
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap");
 
+/* Special design tokens imported via main design tokens file */
+
+/* ===============================================
+   GRID LAYOUT UTILITIES
+   Centralized responsive grid system
+   =============================================== */
+
+/* Grid Container */
+.grid {
+  display: grid;
+  gap: var(--grid-gap-md);
+}
+
+.grid-sm {
+  gap: var(--grid-gap-sm);
+}
+
+.grid-lg {
+  gap: var(--grid-gap-lg);
+}
+
+/* Grid Columns */
+.grid-cols-1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-cols-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.grid-cols-12 {
+  grid-template-columns: repeat(12, 1fr);
+}
+
+/* Flex Container (for existing flexbox layouts) */
+.flex {
+  display: flex;
+  gap: var(--grid-gap-md);
+}
+
+.flex-sm {
+  gap: var(--grid-gap-sm);
+}
+
+.flex-lg {
+  gap: var(--grid-gap-lg);
+}
+
+/* Common Layout Patterns */
+.layout-sidebar {
+  display: grid;
+  grid-template-columns: var(--layout-sidebar-width) var(--layout-content-width);
+  gap: var(--grid-gap-md);
+}
+
+.layout-equal {
+  display: grid;
+  grid-template-columns: var(--layout-equal-split) var(--layout-equal-split);
+  gap: var(--grid-gap-md);
+}
+
+.layout-dashboard {
+  display: grid;
+  grid-template-columns: var(--layout-content-width) var(--layout-sidebar-width);
+  gap: var(--grid-gap-md);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+
+  .layout-sidebar,
+  .layout-equal,
+  .layout-dashboard {
+    grid-template-columns: 1fr;
+    gap: var(--grid-gap-sm);
+  }
+
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4,
+  .grid-cols-6,
+  .grid-cols-12 {
+    grid-template-columns: 1fr;
+  }
+
+  .flex {
+    flex-direction: column;
+  }
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
   transition: 0.3s all;
 
-  --hungr-main-color: #FE1B54;
-  --hungr-secondary-color: #16D3D2;
-  --hungr-tertiary-color: #3CE1AF;
-  --hungr-quinary-color: #9747FF;
-  --hungr-light-grey: #EBEDEE;
-  --hungr-light-grey-2: #F2F3F4;
-  --hungr-dark-grey: #9A9A9A;
-  --hungr-darker-grey: #444444;
-  --hungr-font-family: "Poppins", sans-serif;
-  --hungr-red: #FE1B54;
-  --hungr-letter-spacing-normal: normal;
+  /* Design token references - using new token system */
 
   --mat-option-selected-state-label-text-color: var(--hungr-secondary-color);
   --mat-minimal-pseudo-checkbox-selected-checkmark-color: var(--hungr-secondary-color);
+
+  /* Tab indicator primary color */
+  --mdc-tab-indicator-active-indicator-color: var(--hungr-main-color);
 
   --mdc-switch-selected-focus-state-layer-color: #fff;
   --mdc-switch-selected-handle-color: #fff;
@@ -98,8 +170,7 @@ $hungr-backend-theme: mat.define-light-theme(
   --mdc-switch-handle-elevation-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
     0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
   --mdc-switch-handle-shadow-color: black;
-  --mdc-switch-disabled-handle-elevation-shadow: 0px 0px 0px 0px
-      rgba(0, 0, 0, 0.2),
+  --mdc-switch-disabled-handle-elevation-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2),
     0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12);
   --mdc-switch-selected-icon-color: #fff;
   --mdc-switch-unselected-focus-handle-color: #212121;
@@ -115,21 +186,33 @@ $hungr-backend-theme: mat.define-light-theme(
   --mdc-switch-unselected-pressed-track-color: #e0e0e0;
   --mdc-switch-unselected-track-color: #e0e0e0;
   --mdc-switch-disabled-label-text-color: rgba(0, 0, 0, 0.38);
-  --mat-select-container-elevation-shadow : 0 5px 10px rgba(0,0,0,0.1);
+  --mat-select-container-elevation-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Global letter-spacing reset for backend UI */
 body,
-h1, h2, h3, h4, h5, h6,
-p, label, a, button,
-input, textarea,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label,
+a,
+button,
+input,
+textarea,
 .mdc-typography,
 .mat-mdc-tab .mdc-tab__text-label {
   letter-spacing: var(--hungr-letter-spacing-normal) !important;
 }
 
 /* Ensure all typography defaults to the Hungr font family */
-html, body, .mdc-typography, .mat-typography {
+html,
+body,
+.mdc-typography,
+.mat-typography {
   font-family: var(--hungr-font-family) !important;
 }
 
@@ -146,11 +229,13 @@ html, body, .mdc-typography, .mat-typography {
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0, "wght" 0, "GRAD" 0, "opsz" 24;
 }
+
 .mat-mdc-optgroup-label {
   font-size: 12px;
   font-weight: bold;
   min-height: 25px !important;
 }
+
 .extra-large-text {
   font-family: "Poppins", sans-serif;
   font-size: 40px;
@@ -158,32 +243,34 @@ html, body, .mdc-typography, .mat-typography {
   line-height: 48px;
   letter-spacing: -0.001em;
 }
+
 .colorPicker .mat-mdc-form-field {
   height: 40px;
 }
+
 h1 {
-  font-family: "Poppins", sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 22px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-family: var(--font-family-primary);
+  font-size: var(--heading-1-font-size);
+  font-weight: var(--heading-1-font-weight);
+  line-height: var(--heading-1-line-height);
+  letter-spacing: var(--heading-1-letter-spacing);
+  text-transform: var(--heading-1-text-transform);
 }
 
 h3 {
-  font-family: "Poppins", sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 24px;
-  letter-spacing: -0.001em;
+  font-family: var(--font-family-primary);
+  font-size: var(--heading-2-font-size);
+  font-weight: var(--heading-2-font-weight);
+  line-height: var(--heading-2-line-height);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 h6 {
-  font-family: "Poppins", sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 125%;
-  letter-spacing: -0.001em;
+  font-family: var(--font-family-primary);
+  font-size: var(--heading-3-font-size);
+  font-weight: var(--heading-3-font-weight);
+  line-height: var(--heading-3-line-height);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .font-small-medium {
@@ -209,122 +296,139 @@ h6 {
 }
 
 p {
-  font-family: "Poppins", sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 130%;
-  letter-spacing: -0.02em;
+  font-family: var(--font-family-primary);
+  font-size: var(--body-font-size);
+  font-weight: var(--body-font-weight);
+  line-height: var(--body-line-height);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 label {
-  font-family: "Poppins", sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 130%;
-  letter-spacing: -0.001em;
+  font-family: var(--font-family-primary);
+  font-size: var(--label-font-size);
+  font-weight: var(--label-font-weight);
+  line-height: var(--body-line-height);
+  letter-spacing: var(--letter-spacing-tight);
 }
+
 input[type="text"],
 input[type="password"],
 input[type="email"],
 input[type="tel"],
 input[type="number"] {
-  border: 1px solid var(--hungr-dark-grey);
+  border: 1px solid var(--form-field-border-color);
   width: 100%;
-  height: 38px;
-  border-radius: 5px;
-  font-family: "Poppins", sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: -0.001em;
-  padding: 12px;
-  color: #181818;
+  height: var(--form-field-height);
+  border-radius: var(--form-field-border-radius);
+  font-family: var(--font-family-primary);
+  font-size: var(--form-field-font-size);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--form-field-line-height);
+  letter-spacing: var(--letter-spacing-tight);
+  padding: var(--form-field-padding);
+  color: var(--form-field-color);
+  background: var(--form-field-bg);
   outline: none !important;
 
+  &:focus {
+    border-color: var(--form-field-focus-border-color);
+  }
+
   &::placeholder {
-    color:var(--hungr-dark-grey);
-    font-size:14px;
+    color: var(--form-field-placeholder-color);
+    font-size: var(--font-size-base);
   }
 }
 
 textarea {
-  border: 1px solid var(--hungr-dark-grey);
+  border: 1px solid var(--form-field-border-color);
   width: 100%;
-  border-radius: 5px;
-  font-family: "Poppins", sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: -0.001em;
-  padding: 12px;
-  color: #181818;
+  border-radius: var(--form-field-border-radius);
+  font-family: var(--font-family-primary);
+  font-size: var(--form-field-font-size);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--form-field-line-height);
+  letter-spacing: var(--letter-spacing-tight);
+  padding: var(--form-field-padding);
+  color: var(--form-field-color);
+  background: var(--form-field-bg);
   outline: none !important;
 
+  &:focus {
+    border-color: var(--form-field-focus-border-color);
+  }
+
   &::placeholder {
-    color:var(--hungr-dark-grey);
-    font-size:14px;
+    color: var(--form-field-placeholder-color);
+    font-size: var(--font-size-base);
   }
 }
+
 .error-text {
-  color: #dc3545;
-  font-size: 12px;
-  margin-top: 0px;
-  font-family: "Poppins", sans-serif;
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: 0;
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-normal);
 }
 
-.mdc-text-field--filled:not(.mdc-text-field--disabled)
-  .mdc-line-ripple::before {
+.mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-line-ripple::before {
   border: none !important;
 }
 
 .mdc-text-field--filled .mdc-line-ripple::after {
   border: none !important;
 }
+
+/* Updated button styles using design tokens */
 .btnPrimary {
-  background: #16d3d2;
-  border-radius: 6px;
+  background: var(--button-primary-bg);
+  border-radius: var(--button-primary-border-radius);
   text-align: center;
-  padding: 12px 15px;
-  font-family: "Poppins", sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 14px;
-  letter-spacing: -0.001em;
-  min-width: 140px;
+  padding: var(--button-primary-padding);
+  font-family: var(--font-family-primary);
+  font-size: var(--button-primary-font-size);
+  font-weight: var(--button-primary-font-weight);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  min-width: var(--button-primary-min-width);
   border: none;
   text-transform: uppercase;
-  color: #181818;
+  color: var(--button-primary-color);
   cursor: pointer;
   text-decoration: none;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  transition: 0.1s all;
+  gap: var(--spacing-3);
+  transition: var(--transition-fast);
 }
+
 .btnPrimary:disabled {
-  background-color: #cccccc;
-  color: #666666;
+  background-color: var(--color-grey-300);
+  color: var(--color-grey-600);
   cursor: not-allowed;
   opacity: 0.6;
 }
-.btnPrimary:hover {
-  background: #1b1b3a;
-  color: #fff;
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--button-primary-hover-bg);
+  color: var(--color-text-inverse);
 }
+
 .btnSecondary {
-  color: #181818;
-  background: #16d3d2;
-  border-radius: 6px;
+  color: var(--button-secondary-color);
+  background: var(--button-secondary-bg);
+  border: var(--button-secondary-border);
+  border-radius: var(--border-radius-md);
   text-align: center;
-  padding: 12px 15px;
-  font-family: "Poppins", sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 14px;
-  letter-spacing: -0.001em;
-  border: none;
+  padding: var(--padding-sm) var(--padding-md);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
   text-transform: uppercase;
   cursor: pointer;
   text-decoration: none;
@@ -333,27 +437,30 @@ textarea {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-3);
   position: relative;
-  transition: 0.3s all;
+  transition: var(--transition-normal);
+}
+
+.btnPadding {
+  padding: var(--padding-sm) var(--spacing-8) !important;
 }
 
 .btnSecondary:hover {
-  background: #181818;
-  color: #fff;
+  background: var(--button-secondary-hover-bg);
 }
 
 .btnGray {
-  color: #181818;
-  background: #e4e4e4;
-  border-radius: 6px;
+  color: var(--color-text-primary);
+  background: var(--color-grey-300);
+  border-radius: var(--border-radius-md);
   text-align: center;
-  padding: 12px 15px;
-  font-family: "Poppins", sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 14px;
-  letter-spacing: -0.001em;
+  padding: var(--padding-sm) var(--padding-md);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
   border: none;
   text-transform: uppercase;
   cursor: pointer;
@@ -363,14 +470,14 @@ textarea {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-3);
   position: relative;
-  transition: 0.3s all;
+  transition: var(--transition-normal);
 }
 
 .btnGray:hover {
-  background: #181818;
-  color: #fff;
+  background: var(--color-text-primary);
+  color: var(--color-text-inverse);
 }
 
 .btnSecondary:disabled {
@@ -394,12 +501,14 @@ textarea {
 .cdk-overlay-pane.media-upload-modal .mat-mdc-dialog-container {
   padding: 0 !important;
   border-radius: 12px !important;
-  overflow: visible !important; /* prevent close button ripple clipping */
+  overflow: visible !important;
+  /* prevent close button ripple clipping */
 }
 
 .cdk-overlay-pane.media-upload-modal .mdc-dialog__title,
 .cdk-overlay-pane.media-upload-modal [mat-dialog-title] {
-  width: auto !important; /* avoid pushing close button off-screen */
+  width: auto !important;
+  /* avoid pushing close button off-screen */
   text-align: left !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -407,7 +516,8 @@ textarea {
 }
 
 .cdk-overlay-pane.media-upload-modal .mat-mdc-tab-body-content {
-  padding: 24px !important; /* ensure inner padding around tab content */
+  padding: 24px !important;
+  /* ensure inner padding around tab content */
   box-sizing: border-box;
 }
 
@@ -416,7 +526,8 @@ textarea {
 }
 
 .cdk-overlay-pane.media-upload-modal .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
-  color: var(--hungr-secondary-color) !important; /* selected tab color */
+  color: var(--hungr-secondary-color) !important;
+  /* selected tab color */
 }
 
 .mat-mdc-dialog-container-with-actions .mat-mdc-dialog-content {
@@ -426,20 +537,200 @@ textarea {
   line-height: 135% !important;
   text-align: center !important;
   color: #2e3646 !important;
-
-  
 }
+
+/* ===============================================
+   UNIFIED DIALOG STYLING SYSTEM
+   Consistent styling for all Material dialogs
+   =============================================== */
+
+/* Base Dialog Container Styles */
+.mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  background: var(--color-bg-primary) !important;
+}
+
+/* Dialog Surface (inner container) */
+.mat-mdc-dialog-surface {
+  border-radius: 16px !important;
+  padding: 0 !important;
+  background: var(--color-bg-primary) !important;
+  position: relative !important;
+}
+
+/* Dialog Title Styles */
+.mat-mdc-dialog-container .mdc-dialog__title,
+.mat-mdc-dialog-container [mat-dialog-title] {
+  font-family: var(--font-family-primary) !important;
+  font-weight: var(--font-weight-bold) !important;
+  font-size: var(--font-size-xl) !important;
+  line-height: var(--line-height-tight) !important;
+  color: var(--color-text-primary) !important;
+  padding: 24px 24px 16px 24px !important;
+  margin: 0 !important;
+  text-align: left !important;
+  letter-spacing: var(--letter-spacing-normal) !important;
+  border-bottom: 1px solid var(--color-border-light) !important;
+}
+
+/* Dialog Content Styles */
+.mat-mdc-dialog-container .mdc-dialog__content,
+.mat-mdc-dialog-container [mat-dialog-content] {
+  font-family: var(--font-family-primary) !important;
+  font-weight: var(--font-weight-normal) !important;
+  font-size: var(--font-size-base) !important;
+  line-height: var(--line-height-normal) !important;
+  color: var(--color-text-secondary) !important;
+  padding: 24px !important;
+  margin: 0 !important;
+  max-height: 60vh !important;
+  overflow-y: auto !important;
+}
+
+/* Dialog Actions Container */
+.mat-mdc-dialog-container .mdc-dialog__actions,
+.mat-mdc-dialog-container [mat-dialog-actions] {
+  padding: 16px 24px 24px 24px !important;
+  margin: 0 !important;
+  gap: 12px !important;
+  border-top: 1px solid var(--color-border-light) !important;
+  justify-content: flex-end !important;
+  flex-wrap: wrap !important;
+}
+
+
+/* Button Focus States */
+.mat-mdc-dialog-container .mdc-dialog__actions button:focus,
+.mat-mdc-dialog-container [mat-dialog-actions] button:focus {
+  outline: 0px solid var(--button-primary-focus-ring) !important;
+  outline-offset: 0px !important;
+}
+
+/* Close Button (X) in Dialog Header */
+.mat-mdc-dialog-container .mdc-dialog__header button[mat-dialog-close],
+.mat-mdc-dialog-container .mdc-dialog__header button[aria-label="Close"],
+.mat-mdc-dialog-container button[mat-dialog-close] {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: var(--color-grey-100) !important;
+  border: none !important;
+  color: var(--color-text-secondary) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: var(--transition-fast) !important;
+  z-index: 1 !important;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__header button[mat-dialog-close]:hover,
+.mat-mdc-dialog-container .mdc-dialog__header button[aria-label="Close"]:hover,
+.mat-mdc-dialog-container button[mat-dialog-close]:hover {
+  background: var(--color-grey-200) !important;
+  color: var(--color-text-primary) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Responsive Design for Dialogs */
+@media (max-width: 600px) {
+
+  .mat-mdc-dialog-container .mdc-dialog__title,
+  .mat-mdc-dialog-container [mat-dialog-title] {
+    padding: 20px 20px 12px 20px !important;
+    font-size: var(--font-size-lg) !important;
+  }
+
+  .mat-mdc-dialog-container .mdc-dialog__content,
+  .mat-mdc-dialog-container [mat-dialog-content] {
+    padding: 20px !important;
+  }
+
+  .mat-mdc-dialog-container .mdc-dialog__actions,
+  .mat-mdc-dialog-container [mat-dialog-actions] {
+    padding: 12px 20px 20px 20px !important;
+    gap: 8px !important;
+  }
+
+  .mat-mdc-dialog-container .mdc-dialog__actions button,
+  .mat-mdc-dialog-container [mat-dialog-actions] button {
+    min-width: 100px !important;
+    padding: var(--spacing-2) var(--spacing-3) !important;
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+/* Special Dialog Variants */
+
+/* Full-width dialogs (for larger content) */
+.mat-mdc-dialog-container.full-width {
+  max-width: 90vw !important;
+  width: 90vw !important;
+}
+
+/* Compact dialogs (for simple confirmations) */
+.mat-mdc-dialog-container.compact {
+  max-width: 400px !important;
+}
+
+.mat-mdc-dialog-container.compact .mdc-dialog__title,
+.mat-mdc-dialog-container.compact [mat-dialog-title] {
+  padding: 20px 20px 12px 20px !important;
+  font-size: var(--font-size-lg) !important;
+}
+
+.mat-mdc-dialog-container.compact .mdc-dialog__content,
+.mat-mdc-dialog-container.compact [mat-dialog-content] {
+  padding: 12px 20px !important;
+}
+
+.mat-mdc-dialog-container.compact .mdc-dialog__actions,
+.mat-mdc-dialog-container.compact [mat-dialog-actions] {
+  padding: 12px 20px 20px 20px !important;
+}
+
+/* Special Dialog Overrides */
+
+/* Media upload dialogs (special padding override) */
+.cdk-overlay-pane.media-upload-modal .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+}
+
+/* Media preview dialogs (full width for media display) */
+.media-preview-dialog-panel .mat-mdc-dialog-container {
+  max-width: 95vw !important;
+}
+
+/* Compact dialogs for simple confirmations */
+.delete-confirmation-modal-panel .mat-mdc-dialog-container,
+.image-upload-modal-panel .mat-mdc-dialog-container {
+  max-width: 450px !important;
+}
+
+/* Special view dialogs (can be wider for content) */
+.special-view-dialog-panel .mat-mdc-dialog-container {
+  max-width: 800px !important;
+}
+
 .btnTertiary {
-  color: #181818;
-  background: #e4e4e4;
-  border-radius: 6px;
+  color: var(--color-text-primary);
+  background: var(--color-grey-300);
+  border-radius: var(--border-radius-md);
   text-align: center;
-  padding: 12px 15px;
-  font-family: "Poppins", sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 14px;
-  letter-spacing: -0.001em;
+  padding: var(--padding-sm) var(--padding-md);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
   border: none;
   text-transform: uppercase;
   cursor: pointer;
@@ -449,34 +740,37 @@ textarea {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  transition: 0.3s all;
+  gap: var(--spacing-3);
+  transition: var(--transition-normal);
 }
 
 .btnTertiary:hover {
-  background: #ededed;
+  background: var(--color-grey-400);
 }
+
 .btnBlue {
-  color: #181818;
+  color: var(--color-text-primary);
   background: #afdcff;
-  border-radius: 6px;
+  /* Keeping original blue for now */
+  border-radius: var(--border-radius-md);
   text-align: center;
-  padding: 12px 15px;
+  padding: var(--padding-sm) var(--padding-md);
   min-width: 140px;
-  font-family: "Poppins", sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 14px;
-  letter-spacing: -0.001em;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
   border: none;
   text-transform: uppercase;
   cursor: pointer;
   text-decoration: none;
-  transition: 0.3s all;
+  transition: var(--transition-normal);
 }
 
 .btnBlue:hover {
   background: #bbe2ff;
+  /* Keeping original hover for now */
 }
 
 .mainLink {
@@ -501,8 +795,7 @@ ngx-colors-panel button {
   text-decoration: underline;
 }
 
-.mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled)
-  .mat-mdc-text-field-wrapper {
+.mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper {
   border-radius: 5px;
 }
 
@@ -620,28 +913,18 @@ a {
   display: flex;
   flex-direction: row;
   align-items: center;
+
   i {
     font-size: 12px;
   }
 }
+
 .inner-page {
-  padding: 25px;
+  padding: var(--spacing-6);
 }
 
-.block {
-  border: 1px solid var(--hungr-light-grey);
-  background-color: white;
-  padding: 25px;
+/* Block styling moved to design tokens - see _design-tokens.scss */
 
-  border-radius: 10px;
-
-  &.openTop {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-top:none;
-    padding-top:0px;
-  }
-}
 .toggle-container {
   width: 100%;
   display: flex;
@@ -654,6 +937,7 @@ a {
     color: #444444;
   }
 }
+
 .mat-slide-toggle-thumb {
   background-color: #fff;
 }
@@ -677,11 +961,13 @@ mat-select {
   line-height: 20.25px;
   letter-spacing: -0.001em;
 }
+
 .mat-mdc-select-panel {
   margin-left: 0px;
   margin-top: 6px;
 
 }
+
 ::ng-deep .mat-select-panel {
   background-color: transparent !important;
 }
@@ -693,12 +979,14 @@ mat-select {
 
 /* Style the background color of the options in the dropdown */
 ::ng-deep .mat-option {
-  background-color: white; /* Set to white to match default background */
+  background-color: white;
+  /* Set to white to match default background */
 }
 
 /* Style the hover color of the options in the dropdown */
 ::ng-deep .mat-option:hover:not(.mat-option-disabled) {
-  background-color: #e0e0e0; /* Change to the desired hover color */
+  background-color: #e0e0e0;
+  /* Change to the desired hover color */
 }
 
 .mdc-text-field--filled:not(.mdc-text-field--disabled) {
@@ -753,6 +1041,7 @@ mat-label {
   .mat-mdc-form-field {
     width: 100px;
   }
+
   .mat-mdc-form-field-focus-overlay {
     opacity: 0 !important;
   }
@@ -773,15 +1062,9 @@ input[type="submit"]:disabled {
   background-color: #f2f2f2;
 }
 
-.mdc-checkbox
-  .mdc-checkbox__native-control[disabled]:checked
-  ~ .mdc-checkbox__background,
-.mdc-checkbox
-  .mdc-checkbox__native-control[disabled]:indeterminate
-  ~ .mdc-checkbox__background,
-.mdc-checkbox
-  .mdc-checkbox__native-control[data-indeterminate="true"][disabled]
-  ~ .mdc-checkbox__background {
+.mdc-checkbox .mdc-checkbox__native-control[disabled]:checked~.mdc-checkbox__background,
+.mdc-checkbox .mdc-checkbox__native-control[disabled]:indeterminate~.mdc-checkbox__background,
+.mdc-checkbox .mdc-checkbox__native-control[data-indeterminate="true"][disabled]~.mdc-checkbox__background {
   background-color: #1fcc96 !important;
 }
 
@@ -812,8 +1095,7 @@ input[type="submit"]:disabled {
   position: relative;
 }
 
-.mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled)
-  .mat-mdc-text-field-wrapper {
+.mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper {
   height: 38px;
 }
 
@@ -826,17 +1108,19 @@ input[type="submit"]:disabled {
   align-items: center;
   display: flex !important;
 
-  
+
 }
+
 .mat-mdc-select {
-  padding:0;
+  padding: 0;
 }
 
 .select-arrow-fix {
   .mat-mdc-select-arrow-wrapper {
     display: none !important;
-    
+
   }
+
   &::after {
     content: '';
     background-image: url('data:image/svg+xml;charset=utf8,<svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.82043 0.310934L5.94495 4.43546L10.0695 0.310934C10.4841 -0.103645 11.1538 -0.103645 11.5683 0.310934C11.9829 0.725513 11.9829 1.39522 11.5683 1.80979L6.68907 6.68907C6.27449 7.10364 5.60478 7.10364 5.19021 6.68907L0.310934 1.80979C-0.103645 1.39522 -0.103645 0.725513 0.310934 0.310934C0.725513 -0.0930144 1.40585 -0.103645 1.82043 0.310934Z" fill="%23000"/></svg>');
@@ -868,7 +1152,7 @@ input[type="submit"]:disabled {
   background-color: #fff;
 
 
-  position:relative;
+  position: relative;
 
   display: flex;
   flex-direction: column;
@@ -934,36 +1218,9 @@ input[type="submit"]:disabled {
   }
 }
 
-/* Block styling for content sections */
-.block {
-  background-color: white;
-  border-radius: 8px;
-  border: 1px solid var(--hungr-light-grey);
-  padding: 20px;
+/* Block styling moved to design tokens - see _design-tokens.scss */
 
-  &.rowSpecial {
-    margin-bottom: 20px;
-  }
-}
-
-/* Back Link styling */
-.backLink {
-  display: flex;
-  align-items: center;
-  color: #666;
-  text-decoration: none;
-  margin-bottom: 20px;
-  font-size: 14px;
-  position: absolute;
-
-  i {
-    margin-right: 5px;
-  }
-
-  &:hover {
-    color: var(--hungr-tertiary-color);
-  }
-}
+/* Back Link styling - Now centralized in _design-tokens.scss */
 
 /* Utility classes */
 
@@ -982,6 +1239,7 @@ input[type="submit"]:disabled {
 .mt-2 {
   margin-top: 2em;
 }
+
 .align-center {
   text-align: center;
 }
@@ -993,3 +1251,573 @@ input[type="submit"]:disabled {
   justify-content: center;
   min-height: 200px;
 }
+
+/* ===============================================
+   STANDARDIZED BUTTON SYSTEM
+   Unified button component with variants, sizes, and states
+   =============================================== */
+
+/* Base Button Styles */
+.hungr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--button-icon-spacing);
+  font-family: var(--button-font-family);
+  font-weight: var(--button-font-weight);
+  border-radius: var(--button-border-radius);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: var(--button-transition);
+  border: none;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+
+  /* Focus styles */
+  &:focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
+  }
+
+  /* Disabled state */
+  &:disabled {
+    background: var(--button-disabled-bg);
+    color: var(--button-disabled-color);
+    cursor: var(--button-disabled-cursor);
+    opacity: var(--button-disabled-opacity);
+    box-shadow: none;
+
+    &:hover {
+      background: var(--button-disabled-bg);
+      color: var(--button-disabled-color);
+      transform: none;
+    }
+  }
+
+  /* Loading state */
+  &.hungr-btn-loading {
+    pointer-events: none;
+    position: relative;
+
+    .hungr-btn-text {
+      opacity: var(--button-loading-text-opacity);
+    }
+
+    .hungr-btn-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  /* Icon positioning */
+  .hungr-btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &.hungr-btn-icon-left {
+      order: -1;
+    }
+
+    &.hungr-btn-icon-right {
+      order: 1;
+    }
+
+    &.hungr-btn-icon-only {
+      margin: 0;
+    }
+  }
+
+  /* Text content */
+  .hungr-btn-text {
+    flex: 1;
+    min-width: 0;
+    display: block;
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+/* Button Variants */
+.hungr-btn-primary {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-color);
+  // box-shadow: var(--button-box-shadow);
+
+  &:hover:not(:disabled) {
+    background: var(--button-primary-hover-bg);
+    //   box-shadow: var(--button-box-shadow-hover);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    background: var(--button-primary-active-bg);
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    //  box-shadow: var(--button-box-shadow), 0 0 0 3px var(--button-primary-focus-ring);
+  }
+}
+
+.hungr-btn-secondary {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border: var(--button-secondary-border);
+  // box-shadow: var(--button-box-shadow);
+
+  &:hover:not(:disabled) {
+    background: var(--button-secondary-hover-bg);
+    //box-shadow: var(--button-box-shadow-hover);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    background: var(--button-secondary-active-bg);
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    //box-shadow: var(--button-box-shadow), 0 0 0 3px var(--button-secondary-focus-ring);
+  }
+}
+
+.hungr-btn-outline {
+  background: var(--button-outline-bg);
+  color: var(--button-outline-color);
+  border: var(--button-outline-border);
+  //  box-shadow: var(--button-box-shadow);
+
+  &:hover:not(:disabled) {
+    background: var(--button-outline-hover-bg);
+    color: var(--button-outline-hover-color);
+    // box-shadow: var(--button-box-shadow-hover);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    background: var(--button-outline-active-bg);
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    // box-shadow: var(--button-box-shadow), 0 0 0 3px var(--button-outline-focus-ring);
+  }
+}
+
+.hungr-btn-ghost {
+  background: var(--button-ghost-bg);
+  color: var(--button-ghost-color);
+  border: var(--button-ghost-border);
+
+  &:hover:not(:disabled) {
+    background: var(--button-ghost-hover-bg);
+    color: var(--button-ghost-hover-color);
+  }
+
+  &:active:not(:disabled) {
+    background: var(--button-ghost-active-bg);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px var(--button-ghost-focus-ring);
+  }
+}
+
+.hungr-btn-danger {
+  background: var(--color-error);
+  color: var(--color-text-inverse);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: #d32f2f;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    background: #b71c1c;
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.3);
+  }
+}
+
+.hungr-btn-gray {
+  background: var(--color-grey-300);
+  color: var(--color-text-primary);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: var(--color-grey-400);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    background: var(--color-grey-500);
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(117, 117, 117, 0.3);
+  }
+}
+
+.hungr-btn-blue {
+  background: var(--color-info);
+  color: var(--color-text-inverse);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: #1976d2;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    background: #1565c0;
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+  }
+}
+
+.hungr-btn-tertiary {
+  background: var(--color-tertiary);
+  color: var(--color-text-primary);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: #2bc89a;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    background: #1a9f7a;
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(60, 225, 175, 0.3);
+  }
+}
+
+/* Button Sizes */
+.hungr-btn-sm {
+  font-size: var(--button-sm-font-size);
+  padding: var(--button-sm-padding);
+  min-width: var(--button-sm-min-width);
+  min-height: 32px;
+
+  .hungr-btn-icon {
+    width: var(--button-icon-size-sm);
+    height: var(--button-icon-size-sm);
+  }
+}
+
+.hungr-btn-md {
+  font-size: var(--button-md-font-size);
+  padding: var(--button-md-padding);
+  min-width: var(--button-md-min-width);
+  min-height: 40px;
+
+  .hungr-btn-icon {
+    width: var(--button-icon-size-md);
+    height: var(--button-icon-size-md);
+  }
+}
+
+.hungr-btn-lg {
+  font-size: var(--button-lg-font-size);
+  padding: var(--button-lg-padding);
+  min-width: var(--button-lg-min-width);
+  min-height: 48px;
+
+  .hungr-btn-icon {
+    width: var(--button-icon-size-lg);
+    height: var(--button-icon-size-lg);
+  }
+}
+
+/* Button Loading Spinner */
+.hungr-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--button-loading-spinner-color);
+  border-radius: 50%;
+  animation: hungr-btn-spin 1s linear infinite;
+}
+
+@keyframes hungr-btn-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button Group Styles */
+.hungr-btn-group {
+  display: inline-flex;
+
+  .hungr-btn {
+    border-radius: 0;
+
+    &:first-child {
+      border-top-left-radius: var(--button-border-radius);
+      border-bottom-left-radius: var(--button-border-radius);
+    }
+
+    &:last-child {
+      border-top-right-radius: var(--button-border-radius);
+      border-bottom-right-radius: var(--button-border-radius);
+    }
+
+    &:not(:first-child) {
+      margin-left: -1px;
+    }
+
+    &:focus-visible {
+      z-index: 1;
+    }
+  }
+}
+
+/* Block Button (Full Width) */
+.hungr-btn-block {
+  width: 100%;
+}
+
+/* Icon-only Buttons */
+.hungr-btn-icon-only {
+  padding: 0;
+  aspect-ratio: 1;
+  min-width: auto;
+
+  &.hungr-btn-sm {
+    width: 32px;
+    height: 32px;
+  }
+
+  &.hungr-btn-md {
+    width: 40px;
+    height: 40px;
+  }
+
+  &.hungr-btn-lg {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Responsive Button Styles */
+@media (max-width: 768px) {
+  .hungr-btn {
+    font-size: var(--font-size-sm);
+
+    &.hungr-btn-lg {
+      font-size: var(--font-size-base);
+      padding: var(--button-md-padding);
+      min-height: 44px;
+      /* Touch target size for mobile */
+    }
+  }
+
+  .hungr-btn-icon-only {
+    &.hungr-btn-md {
+      width: 44px;
+      height: 44px;
+    }
+
+    &.hungr-btn-lg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .hungr-btn {
+    border: 2px solid currentColor;
+
+    &.hungr-btn-ghost {
+      border: 2px solid currentColor;
+    }
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .hungr-btn {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+
+    &:active {
+      transform: none;
+    }
+  }
+
+  .hungr-btn-spinner {
+    animation: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .hungr-btn {
+    background: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+/* ===============================================
+   BACKWARD COMPATIBILITY FOR EXISTING BUTTONS
+   Mapping old button classes to new standardized system
+   =============================================== */
+
+/* Legacy Button Classes - Mapped to New System */
+.btnPrimary {
+  @extend .hungr-btn, .hungr-btn-primary, .hungr-btn-md;
+}
+
+.btnSecondary {
+  @extend .hungr-btn, .hungr-btn-secondary, .hungr-btn-md;
+}
+
+.btnOutline {
+  @extend .hungr-btn, .hungr-btn-outline, .hungr-btn-md;
+}
+
+.btnGray {
+  @extend .hungr-btn, .hungr-btn-secondary, .hungr-btn-md;
+}
+
+.btnTertiary {
+  @extend .hungr-btn, .hungr-btn-ghost, .hungr-btn-md;
+}
+
+.btnBlue {
+  @extend .hungr-btn, .hungr-btn-outline, .hungr-btn-md;
+  --button-outline-color: #afdcff;
+  --button-outline-border: 1px solid #afdcff;
+  --button-outline-hover-bg: #afdcff;
+  --button-outline-focus-ring: rgba(175, 220, 255, 0.3);
+}
+
+/* Legacy Button Group Classes */
+.navRow {
+  @extend .hungr-btn-group;
+}
+
+/* Legacy Form Action Buttons */
+.addItemBtn {
+  .hungr-btn {
+    @extend .hungr-btn, .hungr-btn-primary, .hungr-btn-md;
+  }
+}
+
+/* Special Button Classes */
+.special-btn-primary {
+  @extend .hungr-btn, .hungr-btn-primary, .hungr-btn-sm;
+}
+
+.special-btn-secondary {
+  @extend .hungr-btn, .hungr-btn-secondary, .hungr-btn-sm;
+}
+
+/* ===============================================
+   STATS GRID LAYOUT
+   Global styles for stats card grid layout used across management components
+   =============================================== */
+
+// Grid layout for multiple stats cards
+.stats-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 24px;
+  align-items: stretch; // Make all children the same height
+
+  // Make all direct children (stats cards) 100% height
+  >* {
+    flex: 1;
+    min-width: 250px; // Ensure minimum width for cards
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+
+    >* {
+      min-width: unset; // Remove min-width on mobile
+    }
+  }
+}
+
+/* ===============================================
+   UNSAVED CHANGES DIALOG STYLES
+   Global styles for the unsaved changes confirmation dialog
+   =============================================== */
+
+/* Ensure proper button styling and layout */
+.mat-mdc-dialog-container .mat-mdc-dialog-actions {
+  display: flex !important;
+  gap: 12px !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  padding: 16px 24px 24px 24px !important;
+  position: relative !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-actions button {
+  flex-shrink: 0 !important;
+  min-width: 120px !important;
+  position: relative !important;
+  /* Override any absolute positioning from Material Dialog */
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+}
+
+/* Remove the unwanted ::before pseudo-element from dialog title */
+.mat-mdc-dialog-container .mdc-dialog__title::before,
+.mat-mdc-dialog-container [mat-dialog-title]::before {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  content: none !important;
+}
+
+/* Remove all default Material Design button styling */
+.mat-mdc-dialog-container .mdc-dialog__actions button[color="accent"],
+.mat-mdc-dialog-container .mdc-dialog__actions button.mat-accent,
+.mat-mdc-dialog-container .mdc-dialog__actions button:not([color]),
+.mat-mdc-dialog-container .mdc-dialog__actions button[color="warn"]:not(.mat-primary),
+.mat-mdc-dialog-container [mat-dialog-actions] button[color="accent"],
+.mat-mdc-dialog-container [mat-dialog-actions] button.mat-accent,
+.mat-mdc-dialog-container [mat-dialog-actions] button:not([color]),
+.mat-mdc-dialog-container [mat-dialog-actions] button[color="warn"]:not(.mat-primary) {}

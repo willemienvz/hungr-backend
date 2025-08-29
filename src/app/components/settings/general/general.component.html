@@ -149,7 +149,7 @@
       <a class="btnSecondary">Save changes</a>
     </div>
   </div>
-  <div class="block">
+  <div class="block" *ngIf="currentUserData">
     <div class="row">
       <h6 class="heading">Notifications</h6>
     </div>
@@ -157,7 +157,7 @@
       <div class="toggle-container">
         <label>Email Notifications</label>
         <mat-slide-toggle
-          [(ngModel)]="currentUserData.marketingConsent"
+          [(ngModel)]="currentUserData!.marketingConsent"
           color="#16D3D2"
         ></mat-slide-toggle>
       </div>
@@ -165,7 +165,7 @@
       <div class="toggle-container">
         <label>Tips & Tutorials</label>
         <mat-slide-toggle
-          [(ngModel)]="currentUserData.tipsTutorials"
+          [(ngModel)]="currentUserData!.tipsTutorials"
           color="#16D3D2"
         ></mat-slide-toggle>
       </div>
@@ -173,7 +173,7 @@
       <div class="toggle-container">
         <label>User Insights</label>
         <mat-slide-toggle
-          [(ngModel)]="currentUserData.userInsights"
+          [(ngModel)]="currentUserData!.userInsights"
           color="#16D3D2"
         ></mat-slide-toggle>
       </div>

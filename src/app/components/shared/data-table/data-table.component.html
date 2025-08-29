@@ -1,0 +1,118 @@
+<div class="data-table-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="loading-spinner">
+      <i class="material-icons">hourglass_empty</i>
+      <span>Loading...</span>
+    </div>
+  </div>
+
+  <!-- Table - Only show when there's data -->
+  <div class="table-wrapper" [class.loading]="loading" *ngIf="!loading && sortedData.length > 0">
+    <table class="data-table"
+           [class.striped]="striped"
+           [class.hover]="hover"
+           [class.bordered]="bordered">
+
+      <!-- Table Header -->
+      <thead>
+        <tr>
+          <!-- Index Column -->
+          <th *ngIf="showIndex" [style.width]="indexWidth" class="index-column">
+            {{ indexLabel }}
+          </th>
+
+          <!-- Data Columns -->
+          <th *ngFor="let column of visibleColumns"
+              [style.width]="getColumnWidth(column)"
+              [class]="getColumnAlignClass(column)"
+              [class.sortable]="column.sortable && sortable"
+              [class.sorted]="sortColumn === column.key"
+              [class.sort-asc]="sortColumn === column.key && sortDirection === 'asc'"
+              [class.sort-desc]="sortColumn === column.key && sortDirection === 'desc'"
+              (click)="onSort(column)">
+            <div class="header-content">
+              <span class="column-label">{{ column.label }}</span>
+              <div *ngIf="column.sortable && sortable" class="sort-indicator">
+               
+                <i class="material-icons sort-arrow"
+                   [class.asc]="sortColumn === column.key && sortDirection === 'asc'"
+                   [class.desc]="sortColumn === column.key && sortDirection === 'desc'">
+                  arrow_drop_up
+                </i>
+              </div>
+            </div>
+          </th>
+
+          <!-- Actions Column -->
+          <th *ngIf="hasActions" class="actions-column">
+            Actions
+          </th>
+        </tr>
+      </thead>
+
+      <!-- Table Body -->
+      <tbody>
+        <!-- Data Rows -->
+        <tr *ngFor="let row of sortedData; let i = index; trackBy: trackByFn"
+            [class.clickable]="rowClick.observers.length > 0"
+            (click)="onRowClick(row, i)">
+
+          <!-- Index Cell -->
+          <td *ngIf="showIndex" class="index-cell">
+            {{ i + 1 }}
+          </td>
+
+          <!-- Data Cells -->
+          <td *ngFor="let column of visibleColumns"
+              [class]="getColumnAlignClass(column)">
+
+            <!-- Text Type -->
+            <span *ngIf="column.type === 'text' || !column.type" class="cell-content">
+              {{ formatValue(column, row) }}
+            </span>
+
+            <!-- Status Type -->
+            <span *ngIf="column.type === 'status'" class="status-cell">
+              <span class="status-badge"
+                    [class]="'status-' + formatValue(column, row).toLowerCase()">
+                {{ formatValue(column, row) }}
+              </span>
+            </span>
+
+            <!-- Custom Type -->
+            <div *ngIf="column.type === 'custom'" class="custom-cell">
+              <ng-container *ngIf="column.customTemplate">
+                <!-- Custom template would be handled by parent component -->
+                {{ formatValue(column, row) }}
+              </ng-container>
+            </div>
+          </td>
+
+          <!-- Actions Cell -->
+          <td *ngIf="hasActions" class="actions-cell">
+            <div class="action-buttons">
+              <app-action-button *ngFor="let action of actions"
+                                [type]="getActionButtonType(action)"
+                                [disabled]="isActionDisabled(action, row)"
+                                [hidden]="!isActionVisible(action, row)"
+                                [title]="action.label"
+                                [customIcon]="action.icon"
+                                [customColor]="getActionButtonColor(action)"
+                                (actionClick)="onActionClick(action, row, i)">
+              </app-action-button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State - Show when no data and not loading -->
+  <div *ngIf="!loading && sortedData.length === 0" class="empty-state">
+    <div class="empty-content">
+      <i class="material-icons">info_outline</i>
+      <span>{{ emptyMessage }}</span>
+    </div>
+  </div>
+</div>

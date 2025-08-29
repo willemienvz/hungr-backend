@@ -16,7 +16,7 @@ import { MediaItem } from '../../../shared/types/media';
   styleUrls: ['./menu-item-form.component.scss']
 })
 export class MenuItemFormComponent implements OnInit {
-  
+
   @Input() menuItem!: MenuItemInterface;
   @Input() itemIndex!: number;
   @Input() categories: Category[] = [];
@@ -34,24 +34,24 @@ export class MenuItemFormComponent implements OnInit {
   @Input() newSaucePrice: string = 'R 0.00';
 
   @Output() removeMenuItem = new EventEmitter<number>();
-  @Output() toggleDetail = new EventEmitter<{detailType: DetailType, itemIndex: number}>();
-  @Output() addPreparation = new EventEmitter<{itemIndex: number, prepData: {name: string, price?: string}}>();
-  @Output() removePreparation = new EventEmitter<{itemIndex: number, prepIndex: number}>();
-  @Output() addVariation = new EventEmitter<{itemIndex: number, variationData: {name: string, price?: string}}>();
-  @Output() removeVariation = new EventEmitter<{itemIndex: number, variationIndex: number}>();
+  @Output() toggleDetail = new EventEmitter<{ detailType: DetailType, itemIndex: number }>();
+  @Output() addPreparation = new EventEmitter<{ itemIndex: number, prepData: { name: string, price?: string } }>();
+  @Output() removePreparation = new EventEmitter<{ itemIndex: number, prepIndex: number }>();
+  @Output() addVariation = new EventEmitter<{ itemIndex: number, variationData: { name: string, price?: string } }>();
+  @Output() removeVariation = new EventEmitter<{ itemIndex: number, variationIndex: number }>();
   @Output() addPairing = new EventEmitter<number>();
-  @Output() removePairing = new EventEmitter<{itemIndex: number, pairingIndex: number}>();
-  @Output() addMenuItemPairing = new EventEmitter<{itemIndex: number, pairingId: string}>();
-  @Output() removeMenuItemPairing = new EventEmitter<{itemIndex: number, pairingId: string}>();
-  @Output() addSide = new EventEmitter<{itemIndex: number, sideData: {name: string, price?: string}}>();
-  @Output() removeSide = new EventEmitter<{itemIndex: number, sideIndex: number}>();
-  @Output() addAllergen = new EventEmitter<{itemIndex: number, allergenName: string}>();
-  @Output() removeAllergen = new EventEmitter<{itemIndex: number, allergenIndex: number}>();
-  @Output() addSauce = new EventEmitter<{itemIndex: number, sauceData: {name: string, price?: string}}>();
-  @Output() removeSauce = new EventEmitter<{itemIndex: number, sauceIndex: number}>();
+  @Output() removePairing = new EventEmitter<{ itemIndex: number, pairingIndex: number }>();
+  @Output() addMenuItemPairing = new EventEmitter<{ itemIndex: number, pairingId: string }>();
+  @Output() removeMenuItemPairing = new EventEmitter<{ itemIndex: number, pairingId: string }>();
+  @Output() addSide = new EventEmitter<{ itemIndex: number, sideData: { name: string, price?: string } }>();
+  @Output() removeSide = new EventEmitter<{ itemIndex: number, sideIndex: number }>();
+  @Output() addAllergen = new EventEmitter<{ itemIndex: number, allergenName: string }>();
+  @Output() removeAllergen = new EventEmitter<{ itemIndex: number, allergenIndex: number }>();
+  @Output() addSauce = new EventEmitter<{ itemIndex: number, sauceData: { name: string, price?: string } }>();
+  @Output() removeSauce = new EventEmitter<{ itemIndex: number, sauceIndex: number }>();
   @Output() addLabel = new EventEmitter<number>();
-  @Output() removeLabel = new EventEmitter<{itemIndex: number, labelIndex: number}>();
-  @Output() fileSelected = new EventEmitter<{event: Event, itemIndex: number}>();
+  @Output() removeLabel = new EventEmitter<{ itemIndex: number, labelIndex: number }>();
+  @Output() fileSelected = new EventEmitter<{ event: Event, itemIndex: number }>();
   // Removed @Output() priceInput - handled by PriceInputComponent directly
   @Output() getFile = new EventEmitter<number>();
   @Output() newPreparationChange = new EventEmitter<string>();
@@ -65,9 +65,9 @@ export class MenuItemFormComponent implements OnInit {
   @Output() newLabelChange = new EventEmitter<string>();
   @Output() newSauceChange = new EventEmitter<string>();
   @Output() newSaucePriceChange = new EventEmitter<string>();
-  
+
   // Custom heading change events
-  @Output() customHeadingChange = new EventEmitter<{detailType: DetailType, itemIndex: number, heading: string}>();
+  @Output() customHeadingChange = new EventEmitter<{ detailType: DetailType, itemIndex: number, heading: string }>();
 
   /* KB: Add loading state for image operations */
   isUploadingImage = false;
@@ -138,24 +138,24 @@ export class MenuItemFormComponent implements OnInit {
     private dialog: MatDialog,
     private mediaUploadModalService: MediaUploadModalService,
     private mediaLibraryService: MediaLibraryService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Initialize imageUrls array for backward compatibility
     this.initializeImageUrls();
-    
+
     // Set collapsed state based on whether this is a new/empty menu item
     // New items created by createMenuItem() have: name='', description='', price='R ', imageUrl=null
-    const isNewItem = !this.menuItem.name && 
-                     !this.menuItem.description && 
-                     (this.menuItem.price === 'R ' || !this.menuItem.price) && 
-                     !this.menuItem.imageUrl;
-    
+    const isNewItem = !this.menuItem.name &&
+      !this.menuItem.description &&
+      (this.menuItem.price === 'R ' || !this.menuItem.price) &&
+      !this.menuItem.imageUrl;
+
     this.isCollapsed = !isNewItem;
-    
+
     // Initialize custom headings from menuItem
     this.updateConfigCustomHeadings();
-    
+
     // Debug: Log current category assignment if it exists
     if (this.menuItem.categoryId) {
       this.logCategoryAssignment();
@@ -180,7 +180,7 @@ export class MenuItemFormComponent implements OnInit {
   onCategorySelectionChange(event: any) {
     const selectedCategoryId = event.value;
     console.log(`Category selection changed for "${this.menuItem.name}" to ID: ${selectedCategoryId}`);
-    
+
     if (selectedCategoryId) {
       const categoryInfo = this.menuService.findCategoryById(this.categories, selectedCategoryId);
       if (categoryInfo) {
@@ -237,23 +237,23 @@ export class MenuItemFormComponent implements OnInit {
   }
 
   onToggleDetail(detailType: DetailType) {
-    this.toggleDetail.emit({detailType, itemIndex: this.itemIndex});
+    this.toggleDetail.emit({ detailType, itemIndex: this.itemIndex });
   }
 
-  onAddPreparation(prepData: {name: string, price?: string}) {
-    this.addPreparation.emit({itemIndex: this.itemIndex, prepData});
+  onAddPreparation(prepData: { name: string, price?: string }) {
+    this.addPreparation.emit({ itemIndex: this.itemIndex, prepData });
   }
 
   onRemovePreparation(prepIndex: number) {
-    this.removePreparation.emit({itemIndex: this.itemIndex, prepIndex});
+    this.removePreparation.emit({ itemIndex: this.itemIndex, prepIndex });
   }
 
-  onAddVariation(variationData: {name: string, price?: string}) {
-    this.addVariation.emit({itemIndex: this.itemIndex, variationData});
+  onAddVariation(variationData: { name: string, price?: string }) {
+    this.addVariation.emit({ itemIndex: this.itemIndex, variationData });
   }
 
   onRemoveVariation(variationIndex: number) {
-    this.removeVariation.emit({itemIndex: this.itemIndex, variationIndex});
+    this.removeVariation.emit({ itemIndex: this.itemIndex, variationIndex });
   }
 
   onAddPairing() {
@@ -261,39 +261,39 @@ export class MenuItemFormComponent implements OnInit {
   }
 
   onRemovePairing(pairingIndex: number) {
-    this.removePairing.emit({itemIndex: this.itemIndex, pairingIndex});
+    this.removePairing.emit({ itemIndex: this.itemIndex, pairingIndex });
   }
 
   onAddMenuItemPairing(pairingId: string) {
-    this.addMenuItemPairing.emit({itemIndex: this.itemIndex, pairingId});
+    this.addMenuItemPairing.emit({ itemIndex: this.itemIndex, pairingId });
   }
 
   onRemoveMenuItemPairing(pairingId: string) {
-    this.removeMenuItemPairing.emit({itemIndex: this.itemIndex, pairingId});
+    this.removeMenuItemPairing.emit({ itemIndex: this.itemIndex, pairingId });
   }
 
-  onAddSide(sideData: {name: string, price?: string}) {
-    this.addSide.emit({itemIndex: this.itemIndex, sideData});
+  onAddSide(sideData: { name: string, price?: string }) {
+    this.addSide.emit({ itemIndex: this.itemIndex, sideData });
   }
 
   onRemoveSide(sideIndex: number) {
-    this.removeSide.emit({itemIndex: this.itemIndex, sideIndex});
+    this.removeSide.emit({ itemIndex: this.itemIndex, sideIndex });
   }
 
   onAddAllergen(allergenName: string) {
-    this.addAllergen.emit({itemIndex: this.itemIndex, allergenName});
+    this.addAllergen.emit({ itemIndex: this.itemIndex, allergenName });
   }
 
   onRemoveAllergen(allergenIndex: number) {
-    this.removeAllergen.emit({itemIndex: this.itemIndex, allergenIndex});
+    this.removeAllergen.emit({ itemIndex: this.itemIndex, allergenIndex });
   }
 
-  onAddSauce(sauceData: {name: string, price?: string}) {
-    this.addSauce.emit({itemIndex: this.itemIndex, sauceData});
+  onAddSauce(sauceData: { name: string, price?: string }) {
+    this.addSauce.emit({ itemIndex: this.itemIndex, sauceData });
   }
 
   onRemoveSauce(sauceIndex: number) {
-    this.removeSauce.emit({itemIndex: this.itemIndex, sauceIndex});
+    this.removeSauce.emit({ itemIndex: this.itemIndex, sauceIndex });
   }
 
   onAddLabel() {
@@ -301,12 +301,12 @@ export class MenuItemFormComponent implements OnInit {
   }
 
   onRemoveLabel(labelIndex: number) {
-    this.removeLabel.emit({itemIndex: this.itemIndex, labelIndex});
+    this.removeLabel.emit({ itemIndex: this.itemIndex, labelIndex });
   }
 
   onFileSelected(event: Event) {
     /* KB: Legacy method - now handled by modal */
-    this.fileSelected.emit({event, itemIndex: this.itemIndex});
+    this.fileSelected.emit({ event, itemIndex: this.itemIndex });
   }
 
   // Price input handling is now managed by PriceInputComponent
@@ -352,12 +352,12 @@ export class MenuItemFormComponent implements OnInit {
   private async onMenuImagesUploaded(mediaItems: MediaItem[]): Promise<void> {
     try {
       this.isUploadingImage = true;
-      
+
       // Update menu item with media library references
       const newUrls = mediaItems.map(item => item.url);
       this.menuItem.imageUrls = newUrls;
       this.menuItem.imageUrl = newUrls.length > 0 ? newUrls[0] : null;
-      
+
       // Track usage in media library
       for (const mediaItem of mediaItems) {
         await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
@@ -408,7 +408,7 @@ export class MenuItemFormComponent implements OnInit {
     const imageUrl = this.menuItem.imageUrls[index];
     if (imageUrl) {
       this.isUploadingImage = true;
-      
+
       this.menuService.deleteMenuItemImage(imageUrl)
         .then(() => {
           this.menuItem.imageUrls.splice(index, 1);
@@ -430,12 +430,12 @@ export class MenuItemFormComponent implements OnInit {
   removeAllImages() {
     if (this.menuItem.imageUrls && this.menuItem.imageUrls.length > 0) {
       // Delete all images from Firebase Storage
-      const deletePromises = this.menuItem.imageUrls.map(url => 
-        this.menuService.deleteMenuItemImage(url).catch(error => 
+      const deletePromises = this.menuItem.imageUrls.map(url =>
+        this.menuService.deleteMenuItemImage(url).catch(error =>
           console.error('Error deleting image:', error)
         )
       );
-      
+
       Promise.allSettled(deletePromises).then(() => {
         this.menuItem.imageUrls = [];
         this.menuItem.imageUrl = null;

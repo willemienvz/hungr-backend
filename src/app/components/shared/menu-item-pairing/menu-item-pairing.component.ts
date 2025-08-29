@@ -30,7 +30,7 @@ export class MenuItemPairingComponent implements OnInit, OnChanges {
   @Input() availableMenuItems: MenuItemInterface[] = [];
   @Input() selectedPairingIds: string[] = [];
   @Input() currentMenuItemId: string = '';
-  
+
   @Output() closeDetail = new EventEmitter<void>();
   @Output() addPairing = new EventEmitter<string>();
   @Output() removePairing = new EventEmitter<string>();
@@ -43,7 +43,7 @@ export class MenuItemPairingComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.initializeSelectedPairings();
     this.setupAutocomplete();
-    
+
     // Debug log to check if we have available menu items
     console.log('Available menu items for pairing:', this.availableMenuItems.length);
     console.log('Current menu item ID:', this.currentMenuItemId);
@@ -75,8 +75,8 @@ export class MenuItemPairingComponent implements OnInit, OnChanges {
 
   private filterMenuItems(value: string): MenuItemInterface[] {
     const filterValue = typeof value === 'string' ? value.toLowerCase() : '';
-    
-    return this.availableMenuItems.filter(item => 
+
+    return this.availableMenuItems.filter(item =>
       // Must have a name
       item.name &&
       // Exclude the current menu item

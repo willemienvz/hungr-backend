@@ -1,0 +1,48 @@
+<div [class]="cardClass">
+  <!-- Header with title and info icon -->
+  <div class="card-header">
+    <h6 class="card-title">{{ title }}</h6>
+    <i 
+      class="material-icons info-icon" 
+      (mouseenter)="openTooltip()" 
+      (mouseleave)="closeTooltip()"
+    >
+      information
+      <app-tooltip 
+        [text]="tooltipText" 
+        *ngIf="isTooltipOpen" 
+        [isVisible]="isTooltipOpen"
+      ></app-tooltip>
+    </i>
+  </div>
+
+  <!-- Subtitle (time period) -->
+  <label class="card-subtitle" *ngIf="subtitle">{{ subtitle }}</label>
+
+  <!-- Content based on card type -->
+  <div class="card-content">
+    <!-- Numeric type with trend -->
+    <div class="numeric-content" *ngIf="type === 'numeric'">
+      <div class="value-trend-row">
+        <p class="stat-value">{{ value }}</p>
+        <p class="trend-value" [style.color]="trendColor" *ngIf="trend">
+          {{ trend }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Colored block type -->
+    <div class="colored-block-content" *ngIf="type === 'colored-block'">
+      <div class="colored-block" [style.background-color]="blockColor">
+        <span class="block-value">{{ value }}</span>
+      </div>
+    </div>
+
+    <!-- Text block type -->
+    <div class="text-block-content" *ngIf="type === 'text-block'">
+      <div class="colored-block" [style.background-color]="blockColor">
+        <span class="block-value">{{ value }}</span>
+      </div>
+    </div>
+  </div>
+</div>

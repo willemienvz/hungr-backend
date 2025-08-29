@@ -1,6 +1,6 @@
 .reviews-container {
-  padding: 0 24px;
-  max-width: 1200px;
+  padding: 24px 24px;
+
   margin: 0 auto;
 
   .reviews-controls {
@@ -17,6 +17,7 @@
 
     .search-container {
       flex: 3 1 75%;
+
       .search-input {
         position: relative;
         display: flex;
@@ -50,18 +51,28 @@
         }
       }
     }
+
     .filter-dropdown {
       flex: 1 1 25%;
       display: flex;
       align-items: center;
       gap: 10px;
-      mat-select { width: 100%; font-family: var(--hungr-font-family); }
-      .filter-icon { color: #9a9a9a; font-size: 20px; }
+
+      mat-select {
+        width: 100%;
+        font-family: var(--hungr-font-family);
+      }
+
+      .filter-icon {
+        color: #9a9a9a;
+        font-size: 20px;
+      }
     }
   }
 
   .reviews-content {
     font-family: var(--hungr-font-family);
+
     .loading {
       display: flex;
       flex-direction: column;
@@ -86,8 +97,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .reviews-list {
@@ -196,12 +212,13 @@
             }
           }
 
-            .review-menu-item, .review-scope {
-              display: inline-flex;
-              align-items: center;
-              gap: 4px;
-              margin-left: 10px;
-            }
+          .review-menu-item,
+          .review-scope {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 10px;
+          }
         }
 
         .moderation-notes {
@@ -231,7 +248,9 @@
           border-top: 1px solid #f0f0f0;
           justify-content: flex-end;
 
-          .btnPrimary, .btnSecondary, .btnOutline {
+          .btnPrimary,
+          .btnSecondary,
+          .btnOutline {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -282,6 +301,40 @@
         .page-indicator {
           font-family: var(--hungr-font-family);
           color: #666;
+        }
+
+        .pagination-btn {
+          background: transparent;
+          border: none;
+          padding: 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+          }
+
+          &:active {
+            background-color: rgba(0, 0, 0, 0.1);
+          }
+
+          .material-icons {
+            font-size: 20px;
+            color: #666;
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+
+            .material-icons {
+              color: #ccc;
+            }
+          }
         }
 
         .btnSecondary {
@@ -348,4 +401,4 @@
       }
     }
   }
-} 
+}

@@ -45,22 +45,28 @@
       </td>
       <td class="actions-cell">
         <div class="action-buttons">
-          <mat-slide-toggle 
+          <mat-slide-toggle
             *ngIf="tableType !== 'active' && showToggle"
-            [checked]="special.active" 
+            [checked]="special.active"
             [disabled]="tableType === 'draft'"
             (change)="toggleStatus.emit({special, index: i})"
             class="toggle-switch">
           </mat-slide-toggle>
-          <a class="view-link" title="View" (click)="openViewDialog(special)">
-            <i class="material-icons">visibility</i>
-          </a>
-          <a class="edit-link" [routerLink]="['/specials/edit-special', special.specialID]" title="Edit">
-            <i class="material-icons">edit</i>
-          </a>
-          <a class="delete-link" (click)="deleteSpecial.emit({specialId: special.specialID, index: i})" title="Delete">
-            <i class="material-icons">delete</i>
-          </a>
+          <app-action-button
+            type="view"
+            title="View"
+            (actionClick)="openViewDialog(special)">
+          </app-action-button>
+          <app-action-button
+            type="edit"
+            title="Edit"
+            [routerLink]="['/specials/edit-special', special.specialID]">
+          </app-action-button>
+          <app-action-button
+            type="delete"
+            title="Delete"
+            (actionClick)="deleteSpecial.emit({specialId: special.specialID, index: i})">
+          </app-action-button>
         </div>
       </td>
     </tr>

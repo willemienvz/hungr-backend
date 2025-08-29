@@ -1,54 +1,30 @@
-<div class="inner-page">
-    <div class="block">
-        <div class="container">
-            <div class="row">
-                <h6 class="heading">Add a new restaurant</h6>
-                <a class="btnSecondary" routerLink="/restaurants/add-new-restaurant">+ Add restaurant</a>
-            </div>
-        </div>
-    </div>
+<app-page-layout
+  title="Restaurant Management"
+  subtitle="Manage your restaurant locations and settings"
+  [actions]="[
+    {
+      label: '+ Add Restaurant',
+      type: 'primary',
+      onClick: navigateToAddRestaurant.bind(this)
+    }
+  ]"
+  [loading]="isLoading">
 
-    <div class="block">
-        <div class="container">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 10%;"></th>
-                        <th style="width: 30%;">Restaurant Name</th>
-                        <th style="width: 30%;">Location</th>
-                        <th style="width: 10%;">Status</th>
-                        <th style="width: 20%;"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let restaurant of restuarants; let i = index">
-                        <td>{{ i + 1 }}</td>
-                        <td>{{ restaurant.restaurantName }}</td>
-                        <td>{{ restaurant.city }}</td>
-                        <td [style.color]="restaurant.status ? '#1FCC96' : '#9A9A9A'">
-                            {{ restaurant.status ? 'Active' : 'Inactive' }}
-                        </td>
-                        <td style="text-align: right;">
-                            <a (click)="viewRestaurant(restaurant.restaurantID, i)">
-                                <i class="material-icons">visibility</i>
-                            </a>
-                            <a routerLink="/restaurants/edit-restaurant" [queryParams]="{ id: restaurant.restaurantID}">
-                                <i class="material-icons">edit</i>
-                            </a>
-                            <a (click)="openDialog(restaurant.restaurantID, i, restaurant.restaurantName)">
-                                <i class="material-icons">delete</i>
-                            </a>
-                        </td>
-                        <td>
-
-                        </td>
-                        <td>
+  <!-- Restaurants Table -->
+  <app-content-block title="Restaurants">
+    <app-data-table
+      [data]="restuarants"
+      [columns]="restaurantColumns"
+      [actions]="restaurantActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No restaurants found"
+      (actionClick)="onRestaurantAction($event)"
+      (rowClick)="onRowClick($event)">
 
 
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+
+    </app-data-table>
+  </app-content-block>
+
+</app-page-layout>

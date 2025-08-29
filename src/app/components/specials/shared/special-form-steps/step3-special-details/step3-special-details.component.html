@@ -1,10 +1,10 @@
-<div class="step3-container openTop">
+<div class="step3-container block-open-top">
   <ng-content select="[header]"></ng-content>
 
-  <div class="block rowSpecial openTop">
+  <div class="block rowSpecial block-open-top">
     <form [formGroup]="specialForm">
       <!-- Percentage Discount -->
-      <div *ngIf="selectedSpecialType === 1"  class="inputHolder">
+      <div *ngIf="selectedSpecialType === SpecialType.PERCENTAGE_DISCOUNT"  class="inputHolder">
         <p class="section-title">Select Items and Percentage</p>
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
@@ -58,7 +58,7 @@
       </div>
 
       <!-- Price Discount (Add Mode) -->
-      <div *ngIf="selectedSpecialType === 2 && !editMode" class="inputHolder">
+      <div *ngIf="selectedSpecialType === SpecialType.PRICE_DISCOUNT && !editMode" class="inputHolder">
         <p class="section-title">Select Items and Prices</p>
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
@@ -106,7 +106,7 @@
       </div>
 
       <!-- Price Discount (Edit Mode) -->
-      <div *ngIf="selectedSpecialType === 2 && editMode"  class="inputHolder">
+      <div *ngIf="selectedSpecialType === SpecialType.PRICE_DISCOUNT && editMode"  class="inputHolder">
         <p class="section-title">Select Items and Prices</p>
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
@@ -134,27 +134,76 @@
       </div>
 
       <!-- Category Special -->
-      <div *ngIf="selectedSpecialType === 4"  class="inputHolder">
-        <p class="section-title">Select Category</p>
+      <div *ngIf="selectedSpecialType === SpecialType.CATEGORY_SPECIAL" class="inputHolder">
+        <p class="section-title">Category Special Details</p>
+
+        <!-- Category Selection -->
+        <div class="fieldHolder field field-grow full-width">
+          <label>Select Categories</label>
+          <mat-form-field>
+            <mat-select formControlName="selectedCategories" multiple>
+              <mat-option
+                *ngFor="let category of availableCategories"
+                [value]="category.id"
+              >
+                {{ category.name }} ({{ category.itemCount || 0 }} items)
+              </mat-option>
+            </mat-select>
+            <mat-hint>Select one or more categories for this special</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <!-- Custom Promotional Text for Category Specials -->
+        <div class="fieldHolder field field-grow full-width">
+          <label>Custom Promotional Text (Optional)</label>
+          <mat-form-field>
+            <textarea
+              matInput
+              formControlName="customPromotionalText"
+              placeholder="Enter compelling text to promote this category special..."
+              rows="3"
+              maxlength="500"
+            ></textarea>
+            <mat-hint>Max 500 characters. Use this to highlight the value of your category-wide promotion.</mat-hint>
+            <mat-error *ngIf="specialForm.get('customPromotionalText')?.hasError('maxlength')">
+              Custom text cannot exceed 500 characters
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Discount Amount -->
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
-            <label>Category</label>
+            <label>Discount Type</label>
             <mat-form-field>
-              <mat-select formControlName="featureSpecialUnder">
-                <mat-option
-                  *ngFor="let category of selectedMenu?.categories"
-                  [value]="category.id"
-                >
-                  {{ category.name }}
-                </mat-option>
+              <mat-select formControlName="discountType">
+                <mat-option value="percentage">Percentage Discount</mat-option>
+                <mat-option value="fixed">Fixed Amount Discount</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
+
+          <div class="fieldHolder field field-shrink compact-field" *ngIf="specialForm.get('discountType')?.value === 'percentage'">
+            <label>Percentage discount</label>
+            <mat-form-field>
+              <input
+                matInput
+                type="number"
+                min="0"
+                max="100"
+                formControlName="amount"
+                (keydown.enter)="onAddItem()"
+              />
+              <span matSuffix>%</span>
+            </mat-form-field>
+          </div>
+
           <app-price-input
+            *ngIf="specialForm.get('discountType')?.value === 'fixed'"
             class="compact"
             formControlName="amount"
             placeholder="R 0.00"
-            label="Price"
+            label="Fixed Discount"
             [required]="true"
             (keydown.enter)="onAddItem()">
           </app-price-input>
@@ -162,7 +211,7 @@
       </div>
 
       <!-- Combo Special -->
-      <div *ngIf="selectedSpecialType === 3">
+      <div *ngIf="selectedSpecialType === SpecialType.COMBO_DEAL">
         <h6 class="section-title">Combo Details</h6>
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
@@ -192,6 +241,24 @@
               <span matSuffix>%</span>
             </mat-form-field>
           </div>
+        </div>
+
+        <!-- Custom Promotional Text for Combo Specials -->
+        <div class="fieldHolder field field-grow full-width">
+          <label>Custom Promotional Text (Optional)</label>
+          <mat-form-field>
+            <textarea
+              matInput
+              formControlName="customPromotionalText"
+              placeholder="Enter compelling text to promote this combo deal..."
+              rows="3"
+              maxlength="500"
+            ></textarea>
+            <mat-hint>Max 500 characters. Use this to highlight the value and appeal of your combo deal.</mat-hint>
+            <mat-error *ngIf="specialForm.get('customPromotionalText')?.hasError('maxlength')">
+              Custom text cannot exceed 500 characters
+            </mat-error>
+          </mat-form-field>
         </div>
       </div>
       

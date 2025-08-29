@@ -2,21 +2,26 @@
   .headerBlock {
     margin-bottom: 20px;
   }
+
   .block {
     width: 100%;
     position: relative;
+    /* Uses centralized block styling */
   }
+
   .rowSpecial {
     justify-content: center;
     align-items: center;
     display: flex;
     flex-direction: column;
+
     form {
       width: 40%;
       justify-content: center;
       align-items: center;
       display: flex;
       flex-direction: column;
+
       .formGroup {
         margin-bottom: 20px;
         gap: 8px;
@@ -48,19 +53,22 @@
 
 .dateRow {
   width: 100%;
-  display:flex;
+  display: flex;
   flex-direction: row;
   gap: 1em;
+
   .row {
     gap: 1em;
     width: 100%;
     justify-content: center;
     align-items: center;
   }
+
   .col {
     gap: 5px !important;
-    width:100%;
+    width: 100%;
   }
+
   input {
     width: 100%;
     border: 1px solid var(--hungr-dark-grey);
@@ -70,4 +78,4 @@
     line-height: 38px;
     font-family: "Poppins", sans-serif;
   }
-} 
+}

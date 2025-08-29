@@ -1,98 +1,49 @@
-<div class="inner-page">
-  <app-content-block 
-    title="Add a new menu"
-    [showActions]="true"
-    [actions]="[{ label: '+ ADD NEW MENU', class: 'btnSecondary' }]"
-    (actionClick)="navigateToAddMenu()">
-  </app-content-block>
-  
-  <app-content-block title="Menus">
-    <div class="userTable" *ngIf="activeMenus.length > 0">
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Menu Name</th>
-            <th>Location</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let menu of activeMenus; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ menu.menuName }}</td>
-            <td>{{ menu.location }}</td>
-            <td>
-              <div class="toggle-container">
-                <label [style.color]="menu.Status ? '#16D3D2' : '#444444'">{{
-                  menu.Status ? "Active" : "Inactive"
-                }}</label>
-                <mat-slide-toggle
-                  (change)="updateMenuStatus(menu)"
-                  [(ngModel)]="menu.Status"
-                  color="#16D3D2"
-                  name="menuStatus"
-                ></mat-slide-toggle>
-              </div>
-            </td>
-            <td style="text-align: right" class="actionCol">
-              <a (click)="viewMenuDetails(menu)">
-                <i class="material-icons">visibility</i>
-              </a>
-              <a [routerLink]="['/menus/edit-menu', menu.menuID, 1]">
-                <i class="material-icons">edit</i>
-              </a>
-              <a class="delete-link" (click)="deleteMenu(menu.menuID, menu.menuName)">
-                <i class="material-icons">delete</i>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="no-menus" *ngIf="activeMenus.length === 0">
-      <p>No menus available</p>
-    </div>
+<app-page-layout
+  title="Menu Management"
+  subtitle="Create and manage your restaurant menus"
+  [actions]="[
+    {
+      label: '+ ADD MENU',
+      type: 'primary',
+      onClick: navigateToAddMenu.bind(this)
+    }
+  ]"
+  [loading]="isLoading">
+
+
+
+  <!-- Active Menus Section -->
+  <app-content-block title="Active Menus">
+    <app-data-table
+      [data]="activeMenus"
+      [columns]="menuColumns"
+      [actions]="menuActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No active menus found"
+      (actionClick)="onMenuAction($event)"
+      (rowClick)="onRowClick($event)">
+
+
+
+    </app-data-table>
   </app-content-block>
 
+  <!-- Draft Menus Section -->
   <app-content-block title="Menu Drafts">
-    <div class="userTable" *ngIf="draftMenus.length > 0">
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Menu Name</th>
-            <th>Location</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let menu of draftMenus; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ menu.menuName }}</td>
-            <td>{{ menu.location }}</td>
-            <td>Draft</td>
-            <td style="text-align: right" class="actionCol">
-              <a (click)="viewMenuDetails(menu)">
-                <i class="material-icons">visibility</i>
-              </a>
-              <a [routerLink]="['/menus/edit-menu', menu.menuID, 1]">
-                <i class="material-icons">edit</i>
-              </a>
-              <a class="delete-link" (click)="deleteMenu(menu.menuID, menu.menuName)">
-                <i class="material-icons">delete</i>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="no-menus" *ngIf="draftMenus.length === 0">
-      <p>No drafts available</p>
-    </div>
-  </app-content-block>
-</div>
+    <app-data-table
+      [data]="draftMenus"
+      [columns]="draftMenuColumns"
+      [actions]="draftMenuActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No draft menus found"
+      (actionClick)="onDraftMenuAction($event)"
+      (rowClick)="onDraftRowClick($event)">
 
-<app-loading [isLoading]="isSaving"></app-loading>
+
+
+    </app-data-table>
+  </app-content-block>
+
+</app-page-layout>

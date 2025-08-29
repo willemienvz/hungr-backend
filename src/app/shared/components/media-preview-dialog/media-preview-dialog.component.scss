@@ -250,14 +250,5 @@
   }
 }
 
-// Override Material Dialog panel styles
-::ng-deep .media-preview-dialog-panel .mat-mdc-dialog-container {
-  padding: 0 !important;
-  border-radius: 16px !important;
-  overflow: visible !important;
-  max-width: 95vw !important;
-}
-
-::ng-deep .media-preview-dialog-panel .mat-mdc-dialog-surface {
-  border-radius: 16px !important;
-} 
+// Note: Dialog styling is now handled by unified global styles
+// This modal uses the special media-preview-dialog-panel class for custom max-width 

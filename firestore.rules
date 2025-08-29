@@ -7,6 +7,42 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ===== HELPER FUNCTIONS FOR ROLE-BASED ACCESS =====
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Get current user's data
+    function getCurrentUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    // Check if user has admin role
+    function isAdmin() {
+      return isAuthenticated() && getCurrentUser().role == 'admin';
+    }
+    
+    // Check if user has specific permission
+    function hasPermission(permission) {
+      return isAuthenticated() && getCurrentUser().permissions[permission] == true;
+    }
+    
+    // Check if user is team owner (has no parentId or is admin)
+    function isTeamOwner() {
+      return isAuthenticated() && 
+        (getCurrentUser().parentId == '' || getCurrentUser().parentId == null || isAdmin());
+    }
+    
+    // Check if user belongs to the same team (same parentId or is admin)
+    function isTeamMember(targetUserId) {
+      return isAuthenticated() && 
+        (getCurrentUser().parentId == get(/databases/$(database)/documents/users/$(targetUserId)).data.parentId || isAdmin());
+    }
+
+    // ===== EXISTING COLLECTIONS (PRESERVED) =====
+
     // Raw analytics events: allow public create (no update/delete)
     match /analytics-events/{eventId} {
       allow create: if true;
@@ -45,12 +81,6 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       allow read: if true;
 
-
-//  && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountType == 'admin';
-      function isAdmin() {
-  return request.auth != null;
-      }
-
       // Anonymous creates allowed with strict validation and whitelisted fields
       function isCreateValid() {
         let allowed = ['menuItemId','customerName','message','rating','status','createdAt','restaurantId','ownerId'];
@@ -65,11 +95,11 @@ service cloud.firestore {
       // Anyone can create if it passes validation (no auth required)
       allow create: if isCreateValid();
 
-      // Only admins may moderate status/notes fields
-      allow update: if isAdmin()
+      // Only users with manageUsers permission may moderate status/notes fields
+      allow update: if hasPermission('manageUsers')
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status','moderatedBy','moderatedAt','moderationNotes']);
 
-      allow delete: if isAdmin();
+      allow delete: if hasPermission('manageUsers');
     }
     
     // Review stats collection
@@ -80,106 +110,125 @@ service cloud.firestore {
     
     // Media collection - rules for media library
     match /media/{mediaId} {
-      allow read: if request.auth != null;
+      allow read: if isAuthenticated();
       // Authenticated users can create media docs with required fields
-      allow create: if request.auth != null 
+      allow create: if isAuthenticated() 
         && request.resource.data.fileName is string && request.resource.data.fileName.size() > 0
         && request.resource.data.originalName is string && request.resource.data.originalName.size() > 0
         && request.resource.data.fileSize is int && request.resource.data.fileSize > 0
         && request.resource.data.fileSize <= 10485760 // 10MB max
         && request.resource.data.mimeType is string && request.resource.data.mimeType.matches('image/.*');
       // Authenticated users can update
-      allow update: if request.auth != null;
+      allow update: if isAuthenticated();
       // Authenticated users can delete
-      allow delete: if request.auth != null;
+      allow delete: if isAuthenticated();
     }
     
     // Media usage collection - tracks where media is used
     match /media_usage/{usageId} {
-      allow read: if request.auth != null;
+      allow read: if isAuthenticated();
       // Authenticated users can create with basic validation
-      allow create: if request.auth != null
+      allow create: if isAuthenticated()
         && request.resource.data.mediaId is string
         && request.resource.data.componentId is string
         && request.resource.data.componentType is string
         && request.resource.data.componentName is string
         && request.resource.data.usageDate != null;
-      allow update: if request.auth != null;
-      allow delete: if request.auth != null;
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
     }
 
-    // Specials collection - authenticated users can manage specials
+    // Specials collection - users with addSpecials permission can manage
     match /specials/{specialId} {
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
-      allow delete: if request.auth != null;
+      allow create: if hasPermission('addSpecials');
+      allow update: if hasPermission('addSpecials');
+      allow delete: if hasPermission('addSpecials');
     }
 
-    // Restaurants collection - authenticated users can manage restaurants
+    // Restaurants collection - users with editRestaurants permission can manage
     match /restuarants/{restaurantId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
-      allow delete: if request.auth != null;
+      allow read: if isAuthenticated();
+      allow create: if hasPermission('editRestaurants');
+      allow update: if hasPermission('editRestaurants');
+      allow delete: if hasPermission('editRestaurants');
     }
 
-    // Orders collection - allow read for authenticated users; writes are system-managed (deny client write by default)
+    // Orders collection - allow read for authenticated users; writes are system-managed
     match /orders/{orderId} {
-      allow read: if request.auth != null;
+      allow read: if isAuthenticated();
       allow write: if false;
     }
 
-    // Branding collections (owner-managed)
+    // Branding collections - users with editBranding permission can manage
     match /branding/{brandingId} {
-      // Allow read for anyone, but write only by authenticated users
       allow read: if true;
-
-      // Create: authenticated users can create
-      allow create: if request.auth != null;
-
-      // Update: authenticated users can update
-      allow update: if request.auth != null;
-
-      // Delete: authenticated users can delete
-      allow delete: if request.auth != null;
+      allow create: if hasPermission('editBranding');
+      allow update: if hasPermission('editBranding');
+      allow delete: if hasPermission('editBranding');
     }
 
-    // Menus collection - allow authenticated users to manage menus
+    // Menus collection - users with appropriate permissions can manage
     match /menus/{menuId} {
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
-      allow delete: if request.auth != null;
+      allow create: if hasPermission('createMenus');
+      allow update: if hasPermission('editMenus');
+      allow delete: if hasPermission('editMenus');
     }
 
     match /branding-preview/{previewId} {
-      // Allow read for anyone, but write only by authenticated users
       allow read: if true;
-
-      // Create: authenticated users can create
-      allow create: if request.auth != null;
-
-      // Update: authenticated users can update
-      allow update: if request.auth != null;
-
-      // Delete: authenticated users can delete
-      allow delete: if request.auth != null;
+      allow create: if hasPermission('editBranding');
+      allow update: if hasPermission('editBranding');
+      allow delete: if hasPermission('editBranding');
     }
 
-    // Users collection - allow users to manage their own profile doc
+    // ===== ENHANCED USER MANAGEMENT =====
+
+    // Users collection - enhanced for team management
     match /users/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
-      allow update: if request.auth != null && request.auth.uid == uid;
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      // Users can read their own profile or team members' profiles (if they have manageUsers permission)
+      allow read: if isAuthenticated() && 
+        (request.auth.uid == uid || (hasPermission('manageUsers') && isTeamMember(uid)));
+      
+      // Users can create their own profile during signup
+      allow create: if isAuthenticated() && request.auth.uid == uid;
+      
+      // Users can update their own profile or team members' profiles (if they have manageUsers permission)
+      allow update: if isAuthenticated() && 
+        (request.auth.uid == uid || (hasPermission('manageUsers') && isTeamMember(uid)));
+      
+      // Only team owners or admins can delete users
+      allow delete: if isAuthenticated() && 
+        (isTeamOwner() || isAdmin()) && isTeamMember(uid);
+    }
+
+    // ===== NEW COLLECTIONS FOR USER MANAGEMENT =====
+
+    // Invitations collection - for managing user invitations
+    match /invitations/{invitationToken} {
+      // Only team owners or admins can create invitations
+      allow create: if isAuthenticated() && (isTeamOwner() || isAdmin());
+      
+      // Only the inviter or the invited user can read the invitation
+      allow read: if isAuthenticated() && 
+        (resource.data.invitedBy == request.auth.uid || 
+         resource.data.email == getCurrentUser().email);
+      
+      // Only the invited user can update (accept) the invitation
+      allow update: if isAuthenticated() && 
+        resource.data.email == getCurrentUser().email &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'acceptedAt']);
+      
+      // Only team owners or admins can delete invitations
+      allow delete: if isAuthenticated() && (isTeamOwner() || isAdmin());
     }
 
     // Notification collection - allow authenticated users to manage notifications
     match /notification/{notifId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
     }
   }
 }

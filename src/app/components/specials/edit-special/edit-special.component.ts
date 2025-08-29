@@ -1,39 +1,40 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
-import { finalize, startWith, map } from 'rxjs/operators';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { catchError, finalize, startWith, map } from 'rxjs/operators';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
 import { ToastrService } from 'ngx-toastr';
+import { of, Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
 import { MediaLibraryService } from '../../../shared/services/media-library.service';
 import { SpecialsService } from '../../../shared/services/specials.service';
 import { MediaItem } from '../../../shared/types/media';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
-import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption } from '../shared/special-types.constants';
-import { Observable } from 'rxjs';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { SPECIAL_TYPE_OPTIONS, SpecialTypeOption, SpecialType } from '../shared/special-types.constants';
+import { AddedItem } from '../../../types/special';
 
 @Component({
   selector: 'app-edit-special',
   templateUrl: './edit-special.component.html',
   styleUrls: ['./edit-special.component.scss'],
 })
-export class EditSpecialComponent implements OnInit {
+export class EditSpecialComponent implements OnInit, OnDestroy {
   isSaving: boolean = false;
   currentStep = 1;
-  selectedSpecialType: number = 1;
+  selectedSpecialType: SpecialType = SpecialType.PERCENTAGE_DISCOUNT;
   specialForm: FormGroup;
   specialTypes: SpecialTypeOption[] = SPECIAL_TYPE_OPTIONS;
   weekdays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   selectedDays: string[] = [];
   menus: Menu[] = [];
   selectedMenu: Menu | null = null;
-  addedItems: { name: string; amount: string }[] = [];
+  addedItems: AddedItem[] = [];
   uploadedImageUrl: string | null = null;
   owner: string = '';
   specialId: string = '';
@@ -100,6 +101,10 @@ export class EditSpecialComponent implements OnInit {
     this.fetchMenus();
     this.trackFormChanges();
     this.setupMenuItemAutocomplete();
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup subscriptions if any
   }
 
   private trackFormChanges() {
@@ -172,7 +177,7 @@ export class EditSpecialComponent implements OnInit {
         this.uploadedImageUrl = special.imageUrl || null;
         this.selectedMediaItem = special.mediaItem || null;
         this.mediaId = special.mediaId || null;
-        this.selectedSpecialType = special.typeSpecial || 1;
+        this.selectedSpecialType = special.typeSpecial || SpecialType.PERCENTAGE_DISCOUNT;
 
         // Try setting selectedMenu after menus are loaded
         if (this.menus.length > 0) {
@@ -268,35 +273,37 @@ export class EditSpecialComponent implements OnInit {
   addItem(): void {
     const selectedType = this.selectedSpecialType;
 
-    if (selectedType === 1) {
+    if (selectedType === SpecialType.PERCENTAGE_DISCOUNT) {
       // Percentage Discount
       const selectedItemName =
         this.specialForm.get('typeSpecialDetails')?.value;
       const percentage = this.specialForm.get('percentage')?.value;
 
       if (selectedItemName && percentage) {
-        this.addedItems.push({ 
-          name: selectedItemName, 
-          amount: `${percentage}%` 
+        this.addedItems.push({
+          name: selectedItemName,
+          itemId: this.selectedMenuItem?.itemId, // Add itemId if available
+          amount: `${percentage}%`
         });
         this.specialForm.get('typeSpecialDetails')?.reset();
         this.specialForm.get('percentage')?.reset();
       }
-    } else if (selectedType === 2) {
+    } else if (selectedType === SpecialType.PRICE_DISCOUNT) {
       // Price Discount
       const selectedItemName =
         this.specialForm.get('typeSpecialDetails')?.value;
       const amount = this.specialForm.get('amount')?.value;
 
       if (selectedItemName && amount) {
-        this.addedItems.push({ 
-          name: selectedItemName, 
+        this.addedItems.push({
+          name: selectedItemName,
+          itemId: this.selectedMenuItem?.itemId, // Add itemId if available
           amount: amount
         });
         this.specialForm.get('typeSpecialDetails')?.reset();
         this.specialForm.get('amount')?.reset();
       }
-    } else if (selectedType === 4) {
+    } else if (selectedType === SpecialType.CATEGORY_SPECIAL) {
       // Category Special
       const categoryName = this.specialForm.get('featureSpecialUnder')?.value;
       const amount = this.specialForm.get('amount')?.value;
@@ -304,20 +311,38 @@ export class EditSpecialComponent implements OnInit {
       if (categoryName && amount) {
         this.addedItems.push({
           name: `Category: ${categoryName}`,
+          categoryId: categoryName, // Add categoryId for category specials
           amount: amount,
         });
         this.specialForm.get('featureSpecialUnder')?.reset();
         this.specialForm.get('amount')?.reset();
       }
-    } else if (selectedType === 3) {
+    } else if (selectedType === SpecialType.COMBO_DEAL) {
       // Combo Special
-      const comboItems = this.specialForm.get('typeSpecialDetails')?.value; // Array of items
+      const comboItemNames = this.specialForm.get('typeSpecialDetails')?.value;
       const percentage = this.specialForm.get('percentage')?.value;
 
-      if (Array.isArray(comboItems) && comboItems.length > 0 && percentage) {
-        const comboItemNames = comboItems.join(', ');
+      if (Array.isArray(comboItemNames) && comboItemNames.length > 0 && percentage) {
+        // Get the actual menu items to extract their IDs
+        const comboItems = comboItemNames.map(itemName => {
+          const menuItem = this.selectedMenu?.items.find(item => item.name === itemName);
+          return menuItem;
+        }).filter(item => item !== undefined);
+
+        // Extract item IDs - menu items should always have itemId
+        const comboItemIds = comboItems.map(item => {
+          if (!item.itemId) {
+            console.error('Menu item missing itemId:', item);
+            throw new Error(`Menu item "${item.name}" is missing itemId`);
+          }
+          return item.itemId;
+        });
+        const displayNames = comboItemNames.join(', ');
+
         this.addedItems.push({
-          name: `Combo: ${comboItemNames}`,
+          name: `Combo: ${displayNames}`,
+          comboItemIds: comboItemIds, // Store item IDs or names as fallback
+          comboItemNames: comboItemNames, // Store names for display/backward compatibility
           amount: `${percentage}%`,
         });
         this.specialForm.get('typeSpecialDetails')?.reset();
@@ -368,12 +393,12 @@ export class EditSpecialComponent implements OnInit {
   isStep1Invalid(): boolean {
     const dateFrom = this.specialForm.get('dateFrom')?.value;
     const dateTo = this.specialForm.get('dateTo')?.value;
-    
+
     return (
-      this.specialForm.get('specialTitle')?.invalid || 
-      this.specialForm.get('menu')?.invalid || 
-      this.specialForm.get('typeSpecial')?.invalid || 
-      !dateFrom || 
+      this.specialForm.get('specialTitle')?.invalid ||
+      this.specialForm.get('menu')?.invalid ||
+      this.specialForm.get('typeSpecial')?.invalid ||
+      !dateFrom ||
       !dateTo ||
       dateFrom.toString().trim() === '' ||
       dateTo.toString().trim() === '' ||
@@ -397,7 +422,7 @@ export class EditSpecialComponent implements OnInit {
 
   onSpecialTypeChange() {
     this.selectedSpecialType = this.specialForm.get('typeSpecial')?.value;
-    
+
     // Reset/clear all type-specific form controls when special type changes
     this.specialForm.patchValue({
       typeSpecialDetails: [],
@@ -406,11 +431,11 @@ export class EditSpecialComponent implements OnInit {
       amount: '',
       featureSpecialUnder: ''
     });
-    
+
     // Clear autocomplete control
     this.menuItemAutocompleteControl.setValue('');
     this.selectedMenuItem = null;
-    
+
     // Clear added items from previous type
     this.addedItems = [];
   }
@@ -446,7 +471,7 @@ export class EditSpecialComponent implements OnInit {
 
   private filterMenuItems(value: string): any[] {
     if (!this.selectedMenu?.items) return [];
-    
+
     const filterValue = typeof value === 'string' ? value.toLowerCase() : '';
     return this.selectedMenu.items.filter(item =>
       item.name.toLowerCase().includes(filterValue)

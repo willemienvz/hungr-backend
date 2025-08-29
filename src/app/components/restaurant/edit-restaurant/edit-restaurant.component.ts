@@ -53,12 +53,14 @@ export class EditRestaurantComponent {
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user')!);
     this.OwnerID = this.user.uid;
-    this.route.queryParams.subscribe((params) => {
-      this.currentRestaurantID = params['id'];
+    this.route.params.subscribe((params) => {
+      this.currentRestaurantID = params['restaurantID'];
+      if (this.currentRestaurantID) {
+        this.fetchRestaurant(this.currentRestaurantID);
+      }
     });
     this.fetchMenus();
     this.fetchUsers();
-    this.fetchRestaurant(this.currentRestaurantID);
     this.setupFormTracking();
   }
 
@@ -168,7 +170,7 @@ export class EditRestaurantComponent {
   private fetchRestaurant(id: string) {
     this.firestore
       .collection<Restaurant>('restuarants', (ref) =>
-        ref.where('restaurantID', '==', this.currentRestaurantID)
+        ref.where('restaurantID', '==', id)
       )
       .valueChanges()
       .subscribe((restaurant) => {

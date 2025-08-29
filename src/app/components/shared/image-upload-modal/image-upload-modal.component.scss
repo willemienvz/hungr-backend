@@ -28,7 +28,7 @@
       right: 25px;
       top: 25px;
       cursor: pointer;
-      border:none;
+      border: none;
       background: transparent;
       font-size: 28px;
       font-weight: bold;
@@ -49,19 +49,19 @@
       margin-bottom: 8px;
       font-size: 14px;
       align-items: center;
-        gap: 1rem;
+      gap: 1rem;
 
       .info-label {
         color: #666;
         font-weight: 500;
-        text-align:right;
-        width:200px;
+        text-align: right;
+        width: 200px;
       }
 
       .info-value {
         color: #1a1a1a;
         font-weight: 600;
-        width:200px;
+        width: 200px;
       }
     }
   }
@@ -213,13 +213,13 @@
           }
         }
 
-          .upload-media-btn {
-      margin: 1rem auto 0;
+        .upload-media-btn {
+          margin: 1rem auto 0;
 
-      i {
-        font-size: 18px;
-      }
-    }
+          i {
+            font-size: 18px;
+          }
+        }
       }
     }
 
@@ -278,7 +278,7 @@
     gap: 12px;
     margin-bottom: 24px;
 
-  
+
 
     .clear-all-btn {
       background: #ff6b6b;
@@ -328,13 +328,5 @@
   justify-content: center;
 }
 
-// Override Material Dialog panel styles specifically for image upload modal
-::ng-deep .image-upload-modal-panel .mat-mdc-dialog-container {
-  padding: 0 !important;
-  border-radius: 16px !important;
-  overflow: visible !important;
-}
-
-::ng-deep .image-upload-modal-panel .mat-mdc-dialog-surface {
-  border-radius: 16px !important;
-} 
+// Note: Dialog styling is now handled by unified global styles
+// This modal uses the special image-upload-modal-panel class for any custom overrides 

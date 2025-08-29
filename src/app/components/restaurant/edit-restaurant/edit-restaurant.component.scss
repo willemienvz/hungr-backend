@@ -14,9 +14,7 @@
   gap: 15px;
 
   .block {
-    gap: 25px;
-    display: flex;
-    flex-direction: column;
+    /* Uses centralized block styling with default flex column layout */
   }
 }
 
@@ -30,6 +28,7 @@
   position: relative;
   align-items: center;
   text-align: center;
+
   span {
     position: absolute;
     right: 10px;
@@ -91,6 +90,7 @@
   font-size: 20px;
   font-weight: 700;
 }
+
 label {
   color: #9a9a9a;
   font-weight: 400;

@@ -264,7 +264,7 @@
 
   button {
     margin-top: 8px;
-    
+
     mat-icon {
       color: white;
     }
@@ -383,7 +383,7 @@
     gap: 8px;
     width: 100%;
   }
-  
+
   .search-input {
     width: 100%;
     height: 38px;
@@ -395,12 +395,12 @@
     background-color: #fff;
     transition: border-color 0.2s ease;
     box-sizing: border-box;
-    
+
     &:focus {
       outline: none;
       border-color: var(--hungr-secondary-color);
     }
-    
+
     &::placeholder {
       color: #999;
       font-style: italic;
@@ -839,7 +839,7 @@ mat-progress-bar {
     background-color: #ccc;
     cursor: not-allowed;
   }
-  
+
   mat-icon {
     color: white;
   }
@@ -903,6 +903,7 @@ mat-progress-bar {
 
 // Accessibility
 @include reduced-motion {
+
   .upload-area,
   .media-item,
   .image-preview-item,
@@ -920,15 +921,7 @@ mat-progress-bar {
 .btnSecondary:focus {
   outline: 2px solid var(--hungr-secondary-color);
   outline-offset: 2px;
-} 
-
-// Override Material dialog container for this modal so content isn't clipped
-::ng-deep .media-upload-modal .mat-mdc-dialog-container {
-  padding: 0 !important;
-  border-radius: 12px !important;
-  overflow: visible !important;
 }
 
-::ng-deep .media-upload-modal .mat-mdc-dialog-surface {
-  border-radius: 12px !important;
-}
+// Note: Dialog styling is now handled by unified global styles
+// This modal uses the special media-upload-modal class for custom padding overrides

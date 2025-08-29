@@ -4,6 +4,7 @@ import { AuthGuard } from './shared/guard/auth.guard';
 import { SignInComponent } from './components/sign-in/sign-in.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { OverviewComponent } from './components/dashboard/overview/overview.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
@@ -61,7 +62,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        component: DashboardComponent,
+        component: OverviewComponent,
         data: { title: 'Overview Dashboard' },
       },
       {
@@ -142,7 +143,7 @@ const routes: Routes = [
         },
       },
       {
-        path: 'restaurants/edit-restaurant',
+        path: 'restaurants/edit-restaurant/:restaurantID',
         component: EditRestaurantComponent,
         data: {
           title:
@@ -221,4 +222,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

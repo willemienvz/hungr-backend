@@ -11,7 +11,7 @@
             }}</span>
         <i class="material-icons" (click)="togglePopupMenu(i)">more_vert</i>
         <div class="popup-menu" *ngIf="isPopupMenuOpen[i]">
-            <a routerLink="/restaurants/edit-restaurant" [queryParams]="{ id: restaurant.restaurantID}">Edit</a>
+            <a [routerLink]="['/restaurants/edit-restaurant', restaurant.restaurantID]">Edit</a>
             <a (click)="confirmDeleteRestaurant(restaurant.restaurantID, i, restaurant.restaurantName)">Delete</a>
             <i class="material-icons closeBtn" (click)="togglePopupMenu(i)">close</i>
         </div>

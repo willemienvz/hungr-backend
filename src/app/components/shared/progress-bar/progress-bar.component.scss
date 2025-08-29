@@ -8,13 +8,13 @@
   right: 0;
   top: 2px;
   z-index: 1000;
-  
+
   i {
-    color: var(--hungr-dark-grey );
+    color: var(--hungr-dark-grey);
     font-size: 20px;
     cursor: help;
     transition: color 0.3s ease;
-    
+
     &:hover {
       color: var(--hungr-tertiary-color);
     }
@@ -93,7 +93,8 @@
 }
 
 .step.active .circle {
-  background-color: #4caf50; /* Green for active step */
+  background-color: #4caf50;
+  /* Green for active step */
 }
 
 .step.completed .circle {
@@ -109,6 +110,7 @@
   display: flex;
   gap: 26px;
 }
+
 .step-indicator {
   border-radius: 50%;
   display: flex;
@@ -120,31 +122,33 @@
   background-color: #fff;
   position: relative;
   z-index: 5;
-  
+
   /* KB - Add clickable styles for completed steps */
   &.clickable {
     cursor: pointer;
-    
+
     &:hover {
       transform: scale(1.1);
       border-color: var(--hungr-tertiary-color);
       box-shadow: 0 2px 8px rgba(22, 211, 210, 0.3);
     }
-    
+
     &:active {
       transform: scale(1.05);
     }
   }
-  
+
   /* KB - Non-clickable steps should have default cursor */
   &:not(.clickable) {
     cursor: default;
   }
 }
+
 .step-indicator:focus {
   outline: 2px solid #4a90e2;
   outline-offset: 2px;
 }
+
 .step-indicator.active {
   background-color: rgba(255, 255, 255, 1);
   border: 2px solid var(--hungr-tertiary-color);
@@ -181,7 +185,7 @@
 }
 
 .completed {
-  background-color:  var(--hungr-tertiary-color);
+  background-color: var(--hungr-tertiary-color);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -195,23 +199,8 @@
   left: 0;
   top: 2px;
   z-index: 1000;
-  
+
   .backLink {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #444;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    
-    &:hover {
-      color: var(--hungr-tertiary-color);
-    }
-    
-    i {
-      font-size: 18px;
-    }
+    /* Using default centralized back link styles */
   }
 }

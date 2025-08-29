@@ -1,0 +1,47 @@
+<button
+  *ngIf="!routerLink"
+  [type]="buttonType"
+  [class]="buttonClass"
+  [disabled]="disabled || loading"
+  [style.min-width]="minWidth"
+  (click)="onClick($event)">
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-spinner">
+    <i class="material-icons">hourglass_empty</i>
+  </div>
+
+  <!-- Left icon -->
+  <i *ngIf="icon && iconPosition === 'left' && !loading" class="material-icons left-icon">
+    {{ icon }}
+  </i>
+
+  <!-- Button content -->
+  <span>{{ label }}</span>
+
+  <!-- Right icon -->
+  <i *ngIf="icon && iconPosition === 'right' && !loading" class="material-icons right-icon">
+    {{ icon }}
+  </i>
+</button>
+
+<a
+  *ngIf="routerLink"
+  [routerLink]="routerLink"
+  [queryParams]="queryParams"
+  [class]="buttonClass"
+  [style.min-width]="minWidth">
+
+  <!-- Left icon -->
+  <i *ngIf="icon && iconPosition === 'left'" class="material-icons left-icon">
+    {{ icon }}
+  </i>
+
+  <!-- Link content -->
+  <span>{{ label }}</span>
+
+  <!-- Right icon -->
+  <i *ngIf="icon && iconPosition === 'right'" class="material-icons right-icon">
+    {{ icon }}
+  </i>
+</a>

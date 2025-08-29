@@ -20,50 +20,35 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  flex:1;
+  flex: 1;
 }
 
 .white-box {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
 
-    border: 1px solid var(--hungr-light-grey);
+  border: 1px solid var(--hungr-light-grey);
 }
 
 // Success Header Block
 .success-header-block {
-    position:relative;
+  position: relative;
 
-    .back-button-container {
+  .back-button-container {
 
-        position: absolute;
-        left: 10px;
-        top: 20px;
-        z-index: 1000;
-        
-        .backLink {
-            background:transparent;
-            border:none;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: #444;
-          text-decoration: none;
-          font-size: 14px;
-          font-weight: 500;
-          transition: color 0.3s ease;
-          
-          &:hover {
-            color: var(--hungr-tertiary-color);
-          }
-          
-          i {
-            font-size: 18px;
-          }
-        }
-      }
-      
+    position: absolute;
+    left: 10px;
+    top: 20px;
+    z-index: 1000;
+
+    .backLink {
+      /* Using default centralized back link styles */
+      background: transparent;
+      border: none;
+    }
+  }
+
 
   .success-message {
     h6 {
@@ -89,7 +74,7 @@
 
   flex:1;
 
-  > p {
+  >p {
     font-size: 14px;
     color: #666;
     line-height: 1.5;
@@ -102,22 +87,22 @@
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     p {
       font-size: 14px;
       color: #333;
-    
+
       font-weight: 500;
       font-family: var(--hungr-font-family);
     }
 
-    
+
   }
 
-  > p {
+  >p {
     a {
       color: #16d3d2;
       text-decoration: underline;
@@ -152,9 +137,10 @@
   text-align: center;
   width: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
+
   h6 {
     font-size: 18px;
     font-weight: 600;
@@ -164,12 +150,13 @@
   }
 }
 
-.phone-mockup {
+.preview-container {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
-  flex:1;
+  flex: 1;
+  width: 100%;
 }
 
 .phone-frame {
@@ -178,8 +165,8 @@
   background: #000;
   border-radius: 30px;
   padding: 8px;
-  
   position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 
   // Notch
   &::before {
@@ -195,13 +182,43 @@
     z-index: 2;
   }
 
-  .phone-screen {
+  .preview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 22px;
+    background: #f8f8f8;
+    position: relative;
+    z-index: 1;
+  }
+
+  .preview-placeholder {
     width: 100%;
     height: 100%;
     background: #f8f8f8;
     border-radius: 22px;
     position: relative;
-    overflow: hidden;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .placeholder-content {
+      text-align: center;
+      color: #999;
+
+      i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+      }
+
+      p {
+        font-size: 14px;
+        margin: 0;
+        font-family: var(--hungr-font-family);
+      }
+    }
   }
 }
 
@@ -211,20 +228,22 @@
   margin-top: 20px;
 
   display: flex;
-  align-items:center;
+  align-items: center;
   justify-content: center;
 
   ::ng-deep .step-navigation {
     .step-buttons {
-        margin-top:0 !important;
-        padding-top:0 !important;
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+
       .left-buttons {
         display: flex;
-        align-items:center;
+        align-items: center;
         justify-content: center;
         gap: 20px;
-        
-        .btnGray, .btnPrimary {
+
+        .btnGray,
+        .btnPrimary {
           min-width: 150px;
           padding: 12px 24px;
           font-weight: 600;
@@ -258,4 +277,4 @@
     width: 250px;
     height: 500px;
   }
-} 
+}

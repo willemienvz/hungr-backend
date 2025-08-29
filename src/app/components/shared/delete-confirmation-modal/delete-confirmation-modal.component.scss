@@ -122,13 +122,5 @@
   }
 }
 
-// Override Material Dialog panel styles specifically for delete confirmation modal
-::ng-deep .delete-confirmation-modal-panel .mat-mdc-dialog-container {
-  padding: 0 !important;
-  border-radius: 16px !important;
-  overflow: visible !important;
-}
-
-::ng-deep .delete-confirmation-modal-panel .mat-mdc-dialog-surface {
-  border-radius: 16px !important;
-} 
+// Note: Dialog styling is now handled by unified global styles
+// This modal uses the special delete-confirmation-modal-panel class for any custom overrides 

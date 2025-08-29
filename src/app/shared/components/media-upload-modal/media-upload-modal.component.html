@@ -4,9 +4,12 @@
     <h2 mat-dialog-title>
       {{ isLegacyMode ? 'Upload Images' : 'Media Library' }}
     </h2>
-    <button mat-icon-button (click)="closeModal()" aria-label="Close modal">
-      <mat-icon>close</mat-icon>
-    </button>
+    <app-action-button
+      type="custom"
+      customIcon="close"
+      title="Close modal"
+      (actionClick)="closeModal()">
+    </app-action-button>
   </div>
 
   <!-- Content -->
@@ -64,9 +67,12 @@
                   <p>Dimensions: {{ imageDimensions.width }}x{{ imageDimensions.height }}px</p>
                 </div>
               </div>
-              <button mat-icon-button (click)="removeFile()" aria-label="Remove file">
-                <mat-icon>close</mat-icon>
-              </button>
+              <app-action-button
+                type="custom"
+                customIcon="close"
+                title="Remove file"
+                (actionClick)="removeFile()">
+              </app-action-button>
             </div>
           </div>
 

@@ -1,6 +1,7 @@
 import { Category } from "./category";
 
 export interface MenuItem {
+  itemId: string;
   categoryId: number;
   name: string;
   description: string;
@@ -13,9 +14,9 @@ export interface MenuItem {
   labels: string[];
   showLabelInput: boolean;
   displayDetails: {
-      preparation: boolean;
-      variation: boolean;
-      pairing: boolean;
-      side: boolean;
+    preparation: boolean;
+    variation: boolean;
+    pairing: boolean;
+    side: boolean;
   };
 }
