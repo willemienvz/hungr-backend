@@ -10,4 +10,5 @@ export interface Restaurant {
     status:boolean;
     streetAdress:string;
     zip:string;
+    assignedUsers?: string[]; // Array of user IDs assigned to this restaurant
  }

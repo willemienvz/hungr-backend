@@ -37,4 +37,5 @@ export interface User {
     invitationToken?: string;
     invitedAt?: Date;
     invitedBy?: string;
+    assignedRestaurants?: string[]; // Array of restaurant IDs this user is assigned to
 }

@@ -1,12 +1,12 @@
 <div class="inner-page">
-  <form #userForm="ngForm" (ngSubmit)="addRestaurant()">
-    <div class="row" style="align-items: unset; justify-content: unset">
-      <div class="block" style="height: 100%">
+  <form #userForm="ngForm" (ngSubmit)="onSubmit()">
+    <div class="col">
+      <div class="block">
         <a class="backLink" (click)="navigateWithUnsavedChangesCheck('/restaurants')"
           ><i class="material-icons">chevron_left</i> Back</a
         >
-        <h6>Add Restaurant Details</h6>
-        <div class="block-row">
+        <h6>{{ mode === 'add' ? 'Add Restaurant Details' : 'Edit Restaurant Details' }}</h6>
+        <div class="row">
           <div class="col">
             <div class="formGroup">
               <label>Restaurant Name</label>
@@ -76,16 +76,15 @@
           </div>
         </div>
       </div>
-
+    </div>
+    
+    <div class="col">
       <div class="block" style="gap: 0">
         <h6 style="margin-bottom: 10px">Assign menu</h6>
-        <p style="color: #9a9a9a; margin-bottom: 8px">
-          Please assign a menu to this restaurant.
-        </p>
-        <div
-          class="block-row"
-          style="justify-content: flex-start; align-items: flex-start"
+        <label style="color: #9a9a9a; margin-bottom: 8px"
+          >Please assign a menu to this restaurant.</label
         >
+        <div class="rowMenu">
           <mat-form-field appearance="fill" style="width: 32%">
             <mat-select
               [(ngModel)]="selectedMenu"
@@ -97,23 +96,21 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <p class="font-small">
+          <p>
             Need to create a new menu for this restaurant?
             <a
               (click)="onAddMenuClick($event)"
               class="mainLink"
               style="width: 100%; text-align: right"
-              >Add menu</a
+              >Click here</a
             >
           </p>
         </div>
       </div>
 
-      <div class="block contactBlock" style="gap: 0">
+      <div class="block contactBlock" style="margin-bottom: 0">
         <h6 style="margin-bottom: 10px">Users</h6>
-        <p style="color: #9a9a9a; margin-bottom: 8px">
-          Please assign a user to this restaurant
-        </p>
+        <p style="color: #9a9a9a">Please assign a user to this restaurant</p>
         <div class="rowMenu">
           <mat-form-field appearance="fill">
             <mat-select
@@ -145,8 +142,8 @@
         </p>
       </div>
 
-      <div class="rowBottom">
-        <div class="block" style="width: 50%">
+      <div class="blockItemsRow">
+        <div class="block">
           <h6>Restaurant Status</h6>
           <div class="toggle-container">
             <label [style.color]="restaurantStatus ? '#16D3D2' : '#444444'">{{
@@ -159,29 +156,36 @@
             ></mat-slide-toggle>
           </div>
         </div>
-
         <div class="block contactBlock">
           <h6>Number of tables in the restaurant</h6>
           <div class="row" style="align-items: center">
             <p style="width: 60%">Please enter a numerical value</p>
             <input
               style="width: 40%"
-              type="text"
+              type="number"
               class="formControl"
               name="selectedNumberTable"
               [(ngModel)]="selectedNumberTable"
+              min="1"
+              max="100"
+              step="1"
               required
             />
           </div>
         </div>
       </div>
-    </div>
-    <div class="formGroup btnHolder">
-      <a (click)="navigateWithUnsavedChangesCheck('/restaurants')" class="btn btnTertiary">Cancel</a>
-      <button type="button" (click)="saveDraft()" class="btn btnSecondary">
-        Save as draft
-      </button>
-      <button type="submit" class="btn btnSecondary">Save</button>
+
+      <div class="formGroup btnHolder">
+        <a (click)="navigateWithUnsavedChangesCheck('/restaurants')" class="btn btnTertiary">Cancel</a>
+        <button type="button" (click)="saveDraft()" class="btn btnSecondary">
+          Save as draft
+        </button>
+        <button type="submit" class="btn btnSecondary">
+          {{ mode === 'add' ? 'Save' : 'Update' }}
+        </button>
+      </div>
     </div>
   </form>
 </div>
+
+<p class="success-message" *ngIf="isSaving">Saved</p>

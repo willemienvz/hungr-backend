@@ -216,6 +216,7 @@ export class RestaurantComponent {
 
   // Method to navigate to add restaurant page
   navigateToAddRestaurant() {
-    this.navigateWithUnsavedChangesCheck(['/restaurants/add-restaurant']);
+    // No need to check for unsaved changes when adding a new restaurant
+    this.router.navigate(['/restaurants/add-new-restaurant']);
   }
 }

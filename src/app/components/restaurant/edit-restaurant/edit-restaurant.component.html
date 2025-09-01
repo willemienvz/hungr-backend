@@ -2,10 +2,10 @@
   <form #userForm="ngForm" (ngSubmit)="editRestaurant()">
     <div class="col">
       <div class="block">
-        <a class="backLink" (click)="navigateWithUnsavedChangesCheck('/settings/general')"
+        <a class="backLink" (click)="navigateWithUnsavedChangesCheck('/restaurants')"
           ><i class="material-icons">chevron_left</i> Back</a
         >
-        <h6>Edit Restaurant Details</h6>B
+        <h6>Edit Restaurant Details</h6>
         <div class="row">
           <div class="col">
             <div class="formGroup">
@@ -172,7 +172,7 @@
       </div>
 
       <div class="formGroup btnHolder">
-        <a (click)="navigateWithUnsavedChangesCheck('/settings/general')" class="btn btnTertiary">Cancel</a>
+        <a (click)="navigateWithUnsavedChangesCheck('/restaurants')" class="btn btnTertiary">Cancel</a>
         <button type="button" (click)="saveDraft()" class="btn btnSecondary">
           Save as draft
         </button>

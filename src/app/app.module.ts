@@ -47,8 +47,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SummaryComponent } from './components/restaurant/summary/summary.component';
-import { AddComponent } from './components/restaurant/add/add.component';
-import { EditRestaurantComponent } from './components/restaurant/edit-restaurant/edit-restaurant.component';
+import { RestaurantFormComponent } from './components/restaurant/restaurant-form/restaurant-form.component';
+import { AddRestaurantComponent } from './components/restaurant/add-restaurant/add-restaurant.component';
 import { BrandingComponent } from './components/settings/branding/branding.component';
 import { NgxColorsModule } from 'ngx-colors';
 import { MenusComponent } from './components/menus/menus.component';
@@ -174,8 +174,8 @@ import { PermissionService } from './shared/services/permission.service';
     DeleteQrComponent,
     AddQrComponent,
     SummaryComponent,
-    AddComponent,
-    EditRestaurantComponent,
+    RestaurantFormComponent,
+    AddRestaurantComponent,
     BrandingComponent,
     MenusComponent,
     AddMenuComponent,

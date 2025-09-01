@@ -112,7 +112,7 @@ export class ManageUsersComponent implements OnInit {
   pageActions: any[] = [
     {
       label: '+ Add User',
-      type: 'secondary' as const,
+      type: 'primary' as const,
       onClick: () => this.addUser.openPopup()
     }
   ];

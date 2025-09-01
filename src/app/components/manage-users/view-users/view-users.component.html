@@ -1,5 +1,5 @@
 <div class="popup" *ngIf="showPopup">
-  <div class="popup-content user-detail-modal">
+  <div class="popup-content user-detail-modal" *ngIf="!isEditMode">
     <div class="modal-header">
       <h3>User Details</h3>
       <i class="material-icons popup-close" (click)="closePopup()">close</i>
@@ -106,7 +106,9 @@
     
     <div class="authBlock">
       <form #editForm="ngForm" (ngSubmit)="updateUser(user)">
-        <div class="row">
+        <div class="section">
+          <h4>Basic Information</h4>
+          <div class="row">
           <div class="formGroup">
             <label>Name</label>
             <input
@@ -128,8 +130,8 @@
               disabled
             />
           </div>
-        </div>
-        <div class="row">
+          </div>
+          <div class="row">
           <div class="formGroup">
             <label>Surname</label>
             <input
@@ -149,6 +151,7 @@
               [(ngModel)]="user.cellphoneNumber"
               required
             />
+          </div>
           </div>
         </div>
 

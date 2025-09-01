@@ -12,8 +12,8 @@ import { GeneralComponent } from './components/settings/general/general.componen
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { ConfirmUserComponent } from './components/manage-users/confirm-user/confirm-user.component';
 import { QrCodesComponent } from './components/qr-codes/qr-codes.component';
-import { AddComponent } from './components/restaurant/add/add.component';
-import { EditRestaurantComponent } from './components/restaurant/edit-restaurant/edit-restaurant.component';
+import { RestaurantFormComponent } from './components/restaurant/restaurant-form/restaurant-form.component';
+import { AddRestaurantComponent } from './components/restaurant/add-restaurant/add-restaurant.component';
 import { BrandingComponent } from './components/settings/branding/branding.component';
 import { MenusComponent } from './components/menus/menus.component';
 import { AddMenuComponent } from './components/menus/add-menu/add-menu.component';
@@ -136,7 +136,7 @@ const routes: Routes = [
       },
       {
         path: 'restaurants/add-new-restaurant',
-        component: AddComponent,
+        component: AddRestaurantComponent,
         data: {
           title:
             'Restaurant<span class="submenuHeading">/Create a New Restaurant</span>',
@@ -144,10 +144,11 @@ const routes: Routes = [
       },
       {
         path: 'restaurants/edit-restaurant/:restaurantID',
-        component: EditRestaurantComponent,
+        component: RestaurantFormComponent,
         data: {
           title:
             'Restaurant<span class="submenuHeading">/Edit a Restaurant</span>',
+          mode: 'edit'
         },
       },
       {

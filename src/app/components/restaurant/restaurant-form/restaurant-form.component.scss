@@ -1,0 +1,228 @@
+.inner-page {
+  form {
+    width: 100%;
+    flex-direction: column;
+    gap: 15px;
+    display: flex;
+  }
+}
+
+.col {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .block {
+    /* Uses centralized block styling with default flex column layout */
+  }
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+  align-items: flex-start;
+
+  .formGroup {
+    width: 100%;
+  }
+}
+
+.selectedOption {
+  width: 100%;
+  padding: 12px;
+  background-color: #f3f4f5;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  align-items: center;
+  text-align: center;
+
+  span {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+  }
+}
+
+.col .contactBlock {
+  gap: 0;
+
+  h6 {
+    margin-bottom: 20px;
+  }
+
+  .rowMenu {
+    margin-top: 15px;
+  }
+}
+
+.tableNum {
+  color: #181818;
+  width: 84px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: 56px;
+  background-color: #f3f4f5;
+}
+
+.toggle-container {
+  background-color: #f3f4f5;
+}
+
+.btnHolder {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-direction: row;
+}
+
+.success-message {
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+label {
+  color: #9a9a9a;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 20.25px;
+  letter-spacing: -0.1%;
+}
+
+.rowMenu {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-direction: row;
+  width: 100%;
+
+  p {
+    color: #9a9a9a;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  mat-form-field {
+    width: 32%;
+  }
+}
+
+.blockItems {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-direction: row;
+  width: 100%;
+}
+
+.blockItemsRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-direction: row;
+  width: 100%;
+
+  .block {
+    width: calc(50% - 20px);
+  }
+}
+
+.col2row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  flex-direction: row;
+  gap: 15px;
+
+  .col {
+    flex: 1;
+    display: flex;
+  }
+}
+
+input {
+  height: 38px !important;
+}
+
+/* Number input specific styling */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pLinkText {
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18.2px;
+  letter-spacing: -0.1%;
+  color: #9a9a9a;
+  margin-top: 41px;
+
+  .mainLink {
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 18.2px;
+    letter-spacing: -0.1%;
+    color: #9a9a9a;
+  }
+}
+
+.block-row {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  p {
+    margin-top: 10px;
+  }
+}
+
+/* Import design tokens */
+@import "../../../../styles/_design-tokens";
+
+/* Back Link styling - Now centralized in _design-tokens.scss */
+.backLink {
+  /* Using large variant for this component */
+  @include backLink-large;
+}
+
+/* Block styling now uses centralized definition from design tokens */
+/* Block row styling now uses .block.block-row from design tokens */
+
+.font-small {
+  color: #9a9a9a;
+}
+
+/* Material Design overrides */
+::ng-deep mat-mdc-text-field-wrapper {
+  height: 50px !important;
+}
+
+::ng-deep .mat-mdc-form-field-infix {
+  height: 38px !important;
+  justify-content: center;
+  align-items: center;
+  display: flex !important;
+}

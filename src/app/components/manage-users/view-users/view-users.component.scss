@@ -47,7 +47,7 @@ h3 {
 .popup-content {
   background: white;
   border-radius: 12px;
-  max-width: 600px;
+  max-width: 1000px;
   min-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
@@ -336,7 +336,7 @@ h3 {
 .role-selection {
   .role-options {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
 
     .role-option {
@@ -346,6 +346,7 @@ h3 {
       cursor: pointer;
       transition: all 0.2s ease;
       background-color: #ffffff;
+      flex: .5;
 
       &:hover {
         border-color: #16d3d2;
