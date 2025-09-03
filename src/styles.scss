@@ -551,6 +551,9 @@ textarea {
   overflow: visible !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
   background: var(--color-bg-primary) !important;
+  /* Disable transform transitions */
+  transform: none !important;
+  transition: none !important;
 }
 
 /* Dialog Surface (inner container) */
@@ -559,6 +562,9 @@ textarea {
   padding: 0 !important;
   background: var(--color-bg-primary) !important;
   position: relative !important;
+  /* Disable transform transitions */
+  transform: none !important;
+  transition: none !important;
 }
 
 /* Dialog Title Styles */
@@ -573,7 +579,7 @@ textarea {
   margin: 0 !important;
   text-align: left !important;
   letter-spacing: var(--letter-spacing-normal) !important;
-  border-bottom: 1px solid var(--color-border-light) !important;
+  
 }
 
 /* Dialog Content Styles */
@@ -718,6 +724,36 @@ textarea {
 /* Special view dialogs (can be wider for content) */
 .special-view-dialog-panel .mat-mdc-dialog-container {
   max-width: 800px !important;
+}
+
+/* ===============================================
+   GLOBAL TRANSFORM TRANSITION DISABLE
+   Ensures no transform animations on any dialogs
+   =============================================== */
+
+/* Disable transform transitions on all Material Dialog elements */
+.mat-mdc-dialog-container,
+.mat-mdc-dialog-container *,
+.mdc-dialog,
+.mdc-dialog *,
+.cdk-overlay-pane,
+.cdk-overlay-pane * {
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Specific Material Dialog transform disable */
+.mat-mdc-dialog-container .mdc-dialog__surface,
+.mat-mdc-dialog-container .mdc-dialog__container,
+.mat-mdc-dialog-container .mdc-dialog__scrim {
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Overlay transform disable */
+.cdk-overlay-container .cdk-overlay-pane {
+  transform: none !important;
+  transition: none !important;
 }
 
 .btnTertiary {

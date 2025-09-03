@@ -845,6 +845,22 @@ mat-progress-bar {
   }
 }
 
+// Enhanced Mode Action Buttons
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 24px;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+}
+
 // Legacy Action Buttons
 .modal-buttons {
   display: flex;
@@ -925,3 +941,21 @@ mat-progress-bar {
 
 // Note: Dialog styling is now handled by unified global styles
 // This modal uses the special media-upload-modal class for custom padding overrides
+
+// Disable transform transition on Material Dialog container
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+  transform: none !important;
+  transition: none !important;
+}
+
+// Also disable any transform animations on the dialog backdrop
+::ng-deep .mat-mdc-dialog-container {
+  transform: none !important;
+  transition: none !important;
+}
+
+// Ensure no transform animations on the dialog itself
+::ng-deep .mdc-dialog {
+  transform: none !important;
+  transition: none !important;
+}

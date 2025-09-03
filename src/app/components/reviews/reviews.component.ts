@@ -36,16 +36,21 @@ export class ReviewsComponent implements OnInit {
     { value: 'rejected', label: 'Rejected' }
   ];
 
+  private reviewsSubject$ = new BehaviorSubject<Review[]>([]);
+  private pendingReviewsSubject$ = new BehaviorSubject<Review[]>([]);
+  private approvedReviewsSubject$ = new BehaviorSubject<Review[]>([]);
+  private rejectedReviewsSubject$ = new BehaviorSubject<Review[]>([]);
+
   constructor(
     private reviewsService: ReviewsService,
     private authService: AuthService,
     private firestore: AngularFirestore
   ) {
-    // Scope by owner
-    this.reviews$ = this.reviewsService.getReviews();
-    this.pendingReviews$ = this.reviewsService.getPendingReviews();
-    this.approvedReviews$ = this.reviewsService.getApprovedReviews();
-    this.rejectedReviews$ = this.reviewsService.getReviewsByStatus('rejected');
+    // Use subjects that we can update without recreating observables
+    this.reviews$ = this.reviewsSubject$.asObservable();
+    this.pendingReviews$ = this.pendingReviewsSubject$.asObservable();
+    this.approvedReviews$ = this.approvedReviewsSubject$.asObservable();
+    this.rejectedReviews$ = this.rejectedReviewsSubject$.asObservable();
 
     // Set up filtered reviews with search
     this.filteredReviews$ = this.getFilteredReviews();
@@ -56,7 +61,7 @@ export class ReviewsComponent implements OnInit {
       })
     );
     this.totalPages$ = this.filteredReviews$.pipe(
-      map(reviews => Math.max(1, Math.ceil(reviews.length / this.pageSize)))
+      map(reviews => reviews.length > 0 ? Math.ceil(reviews.length / this.pageSize) : 0)
     );
   }
 
@@ -65,17 +70,29 @@ export class ReviewsComponent implements OnInit {
     this.authService.getCurrentUserId().then(uid => {
       if (uid) {
         this.currentUserId = uid;
-        // Recreate streams with owner filter
-        this.reviews$ = this.reviewsService.getReviews({ ownerId: uid });
-        this.pendingReviews$ = this.reviewsService.getReviews({ status: 'pending', ownerId: uid });
-        this.approvedReviews$ = this.reviewsService.getReviews({ status: 'approved', ownerId: uid });
-        this.rejectedReviews$ = this.reviewsService.getReviews({ status: 'rejected', ownerId: uid });
-        // Update filtered stream
-        this.filteredReviews$ = this.getFilteredReviews();
+        
+        // Subscribe to the service observables and update our subjects
+        this.reviewsService.getReviews({ ownerId: uid }).subscribe(reviews => {
+          this.reviewsSubject$.next(reviews);
+        });
+        
+        this.reviewsService.getReviews({ status: 'pending', ownerId: uid }).subscribe(reviews => {
+          this.pendingReviewsSubject$.next(reviews);
+        });
+        
+        this.reviewsService.getReviews({ status: 'approved', ownerId: uid }).subscribe(reviews => {
+          this.approvedReviewsSubject$.next(reviews);
+        });
+        
+        this.reviewsService.getReviews({ status: 'rejected', ownerId: uid }).subscribe(reviews => {
+          this.rejectedReviewsSubject$.next(reviews);
+        });
+        
         this.loadRestaurantsForOwner(uid);
         this.loadMenuItemsForOwner(uid);
       }
       this.loadReviews();
+      this.loading = false;
     });
   }
 
@@ -87,8 +104,7 @@ export class ReviewsComponent implements OnInit {
 
   setFilter(filter: ReviewStatus | 'all'): void {
     this.currentFilter = filter;
-    // Recreate filtered stream so new tab's base observable is used
-    this.filteredReviews$ = this.getFilteredReviews();
+    // The filtered reviews will automatically update since they depend on the subjects
     this.loadReviews();
   }
 

@@ -136,10 +136,10 @@
   padding: var(--spacing-sm);
   border-radius: var(--border-radius-md);
   background-color: var(--color-background-secondary);
-  transition: transform 0.2s ease;
+  /* Transform transitions removed for consistency with modal system */
 
   &:hover {
-    transform: translateY(-2px);
+    /* Transform removed for consistency */
   }
 
   .media-thumbnail {
@@ -309,10 +309,11 @@
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   background-color: var(--color-background-secondary);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
+  /* Transform transitions removed for consistency with modal system */
 
   &:hover {
-    transform: translateY(-2px);
+    /* Transform removed for consistency */
     box-shadow: var(--shadow-md);
   }
 

@@ -35,6 +35,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { LoadingComponent } from './components/shared/loading/loading.component';
 import { AddUserDialogComponent } from './components/manage-users/add-user-dialog/add-user-dialog.component';
+import { UserFormComponent } from './components/manage-users/user-form/user-form.component';
 import { ConfirmUserComponent } from './components/manage-users/confirm-user/confirm-user.component';
 import { QrCodesComponent } from './components/qr-codes/qr-codes.component';
 import { EditQrComponent } from './components/qr-codes/edit-qr/edit-qr.component';
@@ -167,6 +168,7 @@ import { PermissionService } from './shared/services/permission.service';
     ManageUsersComponent,
     LoadingComponent,
     AddUserDialogComponent,
+    UserFormComponent,
     ConfirmUserComponent,
     QrCodesComponent,
     EditQrComponent,

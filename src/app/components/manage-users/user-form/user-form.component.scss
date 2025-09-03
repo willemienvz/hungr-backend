@@ -1,0 +1,41 @@
+.authBlock {
+  h3 { margin: 0 0 8px 0; }
+  p { color: #9A9A9A; margin: 0 0 16px 0; }
+}
+
+.section { margin-top: 20px; }
+
+.row {
+  display: flex;
+  gap: 15px;
+}
+
+.formGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formControl { height: 38px; }
+
+.role-selection { margin-top: 10px; }
+.role-options { display: flex; gap: 10px; flex-wrap: wrap; }
+.role-option {
+  border: 1px solid #DEDEDE;
+  border-radius: 8px;
+  padding: 12px;
+  width: 220px;
+  cursor: pointer;
+}
+.role-option.selected { border-color: #16D3D2; }
+.role-header { display: flex; justify-content: space-between; align-items: center; }
+.role-name { font-weight: 600; }
+.role-description { color: #9A9A9A; font-size: 12px; margin-top: 6px; }
+
+.permissions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.permission-item { display: flex; align-items: center; }
+.permission-checkbox { display: flex; align-items: center; gap: 8px; }
+
+.btnHolder { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+

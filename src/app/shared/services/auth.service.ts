@@ -239,16 +239,6 @@ export class AuthService {
       accountType: 'admin',
       subscriptionType: formData.billingOption,
       parentId: '',
-      about: {
-        aboutText: '',
-        businessHours: '',
-        email: '',
-        cellphone: '',
-        isBusinessHoursVisible: false,
-        isContactDetailsVisible: false,
-        mainImageUrl: '',
-        additionalImageUrl: '',
-      },
     };
     console.log('userData', userData);
     return userRef.set(userData, {
@@ -284,16 +274,7 @@ export class AuthService {
       accountType: 'editor',
       subscriptionType: '',
       parentId: parentId,
-      about: {
-        aboutText: '',
-        businessHours: '',
-        email: '',
-        cellphone: '',
-        isBusinessHoursVisible: false,
-        isContactDetailsVisible: false,
-        mainImageUrl: '',
-        additionalImageUrl: '',
-      },
+      // about field removed - now stored per restaurant in aboutPages collection
     };
     return userRef.set(userData, {
       merge: true,

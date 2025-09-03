@@ -105,7 +105,7 @@ export class OverviewComponent implements OnInit {
 
   fetchRestaurants() {
     this.restaurant$ = this.firestore
-      .collection('restaurants', (ref) => ref.where('ownerID', '==', this.userDataID))
+      .collection('restuarants', (ref) => ref.where('ownerID', '==', this.userDataID))
       .valueChanges();
 
     this.restaurant$.subscribe({

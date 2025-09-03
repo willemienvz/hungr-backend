@@ -26,7 +26,7 @@
   </div>
 
   <!-- Filters and Controls Section -->
-  <app-content-block title="Filters & Search">
+  <app-content-block [showHeader]="false">
     <div class="media-filters">
       <!-- Search Bar -->
       <div class="filter-group">
@@ -102,7 +102,7 @@
   </div>
 
   <!-- Media Display Section -->
-  <app-content-block title="Media Files">
+  <app-content-block>
     <div class="media-content">
       <ng-container *ngIf="!loading; else loadingTemplate">
         <ng-container *ngIf="filteredMedia.length > 0; else emptyTemplate">

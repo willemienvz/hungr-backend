@@ -30,7 +30,7 @@ export interface User {
     userInsights: boolean;
     aboutUsDisplayed: boolean;
     parentId: string;
-    about: About;
+    about?: About; // Temporarily kept for backward compatibility during migration
     role?: UserRole;
     permissions?: UserPermissions;
     invitationAccepted?: boolean;

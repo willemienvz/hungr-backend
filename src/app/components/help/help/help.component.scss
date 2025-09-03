@@ -290,10 +290,10 @@
 }
 
 .rotate-icon {
-  transition: transform 0.3s ease;
+  /* Transform transitions removed for consistency with modal system */
 
   &.open {
-    transform: rotate(180deg);
+    /* Transform removed for consistency */
   }
 }
 

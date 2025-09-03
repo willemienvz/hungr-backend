@@ -118,7 +118,8 @@
           </div>
         </div>
       </ng-container>
-      <div class="review-pagination" *ngIf="(totalPages$ | async) as totalPages">
+      <ng-container *ngIf="(totalPages$ | async) as totalPages">
+        <div class="review-pagination" *ngIf="totalPages > 1">
         <ng-container *ngIf="(pageIndex$ | async) as pageIndex">
           <button class="pagination-btn" (click)="goToPage(1, totalPages)">
             <i class="material-icons">first_page</i>
@@ -134,7 +135,8 @@
             <i class="material-icons">last_page</i>
           </button>
         </ng-container>
-      </div>
+        </div>
+      </ng-container>
 
       <ng-template #noReviews>
         <div class="no-reviews">

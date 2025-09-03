@@ -193,7 +193,7 @@ export class ManageUsersComponent implements OnInit {
 
   editUser(user: User, index: number) {
     if (this.editDialog) {
-      this.editDialog.openPopup(user);
+      this.editDialog.openEdit(user);
     } else {
       console.error('editDialog not available');
     }

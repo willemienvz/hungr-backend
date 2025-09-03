@@ -597,8 +597,18 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
       };
       this.dialogRef.close(legacyResult);
     } else {
-      // Return enhanced format result - could be MediaItem or ImageUploadResult
-      this.dialogRef.close(result);
+      // Return enhanced format result - wrap MediaItem in result object
+      if (result && typeof result === 'object' && 'id' in result && 'url' in result) {
+        // This is a MediaItem, wrap it in result object
+        const enhancedResult = {
+          action: 'save',
+          mediaItem: result
+        };
+        this.dialogRef.close(enhancedResult);
+      } else {
+        // Already a result object, pass through
+        this.dialogRef.close(result);
+      }
     }
   }
 
@@ -629,5 +639,10 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
 
   get formatString(): string {
     return this.validationConfig.allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(' / ');
+  }
+
+  get canSave(): boolean {
+    // Can save if there's a selected file to upload, a selected media item from library, or existing images
+    return !!(this.selectedFile || this.selectedMediaItem || this.existingImageUrls.length > 0);
   }
 } 

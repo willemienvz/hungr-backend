@@ -121,7 +121,7 @@
           <!-- Search Bar -->
           <div class="search-container">
             <div class="field-holder">
-              <label>Search media library</label>
+       
               <input type="text" 
                      [(ngModel)]="searchQuery"
                      (input)="onSearchChange($any($event.target).value)"
@@ -269,6 +269,26 @@
       [value]="uploadProgress" 
       mode="determinate">
     </mat-progress-bar>
+  </div>
+
+  <!-- Action Buttons for Enhanced Mode -->
+  <div class="modal-actions" *ngIf="!isLegacyMode">
+    <div class="action-buttons">
+      <app-action-button
+        type="custom"
+        customIcon="close"
+        title="Cancel"
+        (actionClick)="closeModal()">
+      </app-action-button>
+      
+      <app-action-button
+        type="custom"
+        customIcon="save"
+        title="Save and Close"
+        [disabled]="!canSave"
+        (actionClick)="onSave()">
+      </app-action-button>
+    </div>
   </div>
 
   <!-- Legacy Action Buttons -->

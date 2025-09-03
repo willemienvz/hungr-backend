@@ -90,10 +90,10 @@
 /* KB: CDK drag and drop styling for menu item reordering */
 .menu-items-container {
   .menu-item-drag-container {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    /* Transform transitions removed for consistency with modal system */
     
     &.cdk-drag-animating {
-      transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+      /* Transform transitions removed for consistency */
     }
   }
 }
@@ -121,6 +121,6 @@
 
 .cdk-drop-list-dragging {
   .menu-item-drag-container:not(.cdk-drag-placeholder) {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    /* Transform transitions removed for consistency with modal system */
   }
 }

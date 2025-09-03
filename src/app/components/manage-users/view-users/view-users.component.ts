@@ -45,6 +45,13 @@ export class ViewUsersComponent {
     this.isEditMode = false; // Start in view mode
   }
 
+  openEdit(user: any) {
+    this.user = { ...user };
+    this.initializeRoleAndPermissions();
+    this.showPopup = true;
+    this.isEditMode = true; // Open directly in edit mode
+  }
+
   closePopup() {
     this.showPopup = false;
     this.isEditMode = false;
@@ -65,7 +72,7 @@ export class ViewUsersComponent {
     this.isEditMode = false;
   }
 
-  updateUser(updatedUser: User) {
+  updateUser(updatedUser: Partial<User>) {
     this.isSaving = true;
     const userRef: AngularFirestoreDocument<User> = this.firestore.doc(
       `users/${updatedUser.uid}`

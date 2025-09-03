@@ -78,7 +78,7 @@ export class AddUserDialogComponent {
     }
   }
 
-  private sendInvitation(userData: any) {
+  public sendInvitation(userData: any) {
     // Generate a secure invitation token
     const invitationToken = this.generateInvitationToken();
 

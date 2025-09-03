@@ -1,171 +1,340 @@
 <div class="container">
-  <div class="outerCol">
+  <!-- Restaurant Selection Section - Full Width -->
+  <div class="restaurant-selector-container">
+    <div class="block restaurantBlock">
+      <div class="section-header">
+        <h6 class="section-title">
+          <i class="material-symbols-outlined">store</i>
+          Select Restaurant
+        </h6>
+        <p class="section-description">Choose which restaurant's about page you want to edit.</p>
+      </div>
+      <div class="formGroup">
+        <label class="field-label">
+          <i class="material-symbols-outlined">restaurant</i>
+          Restaurant
+        </label>
+        <select
+          class="formControl enhanced-select"
+          [(ngModel)]="selectedRestaurantId"
+          (change)="onRestaurantChange(selectedRestaurantId)"
+          [disabled]="isLoadingRestaurants"
+        >
+          <option value="" disabled>Select a restaurant...</option>
+          <option 
+            *ngFor="let restaurant of restaurants" 
+            [value]="restaurant.restaurantID"
+            [disabled]="!restaurant.status"
+          >
+            {{ restaurant.restaurantName }} - {{ restaurant.city }}, {{ restaurant.province }}
+            {{ !restaurant.status ? ' (Inactive)' : '' }}
+          </option>
+        </select>
+        <div *ngIf="isLoadingRestaurants" class="loading-indicator">
+          <i class="material-symbols-outlined rotating">refresh</i>
+          Loading restaurants...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Page Settings (only show when restaurant is selected) -->
+  <div class="settings-container" *ngIf="selectedRestaurantId">
+    <div class="outerCol">
+    <!-- About Text Section -->
     <div class="block aboutBlock">
-      <div class="headerRow">
-        <h6>About Us</h6>
+      <div class="section-header">
+        <h6 class="section-title">
+          <i class="material-symbols-outlined">restaurant</i>
+          About Us
+        </h6>
+        <p class="section-description">Tell your customers about your restaurant, story, and what makes you special.</p>
+      </div>
+      <div class="formGroup">
         <textarea
           matInput
           [(ngModel)]="aboutText"
-          placeholder="Please add a description of your restaurant here"
+          placeholder="Share your restaurant's story, mission, and what makes your dining experience unique..."
           (input)="markAsChanged()"
+          class="enhanced-textarea"
         ></textarea>
       </div>
     </div>
+
+    <!-- Images Section -->
     <div class="block imgBlock">
-      <h6>Images</h6>
-      <section class="image-container">
-        <div class="additional-images">
-          <p class="text">Main Image</p>
+      <div class="section-header">
+        <h6 class="section-title">
+          <i class="material-symbols-outlined">photo_library</i>
+          Restaurant Images
+        </h6>
+        <p class="section-description">Upload high-quality images to showcase your restaurant and atmosphere.</p>
+      </div>
+      
+      <!-- Main Image -->
+      <section class="image-section">
+        <div class="image-header">
+          <div class="image-info">
+            <h6 class="image-title">Hero Image</h6>
+            <p class="image-description">This will be the main image displayed prominently on your about page.</p>
+          </div>
+          <div class="image-preview" *ngIf="mainImageUrl">
+            <img [src]="mainImageUrl" alt="Main restaurant image" class="preview-thumbnail" />
+          </div>
         </div>
-        <div class="hold">
+        <div class="image-actions">
           <button 
-            class="add-image-button" 
+            class="btn-upload" 
             type="button"
             (click)="openMainImageUpload()"
             [disabled]="isSaving">
             <i class="material-symbols-outlined">{{ isSaving ? 'hourglass_empty' : 'upload' }}</i>
-            <span>{{ mainImageUrl ? 'Change Image' : 'Upload Image' }}</span>
+            <span>{{ mainImageUrl ? 'Change Image' : 'Upload Hero Image' }}</span>
           </button>
-          <i
-            class="material-symbols-outlined deleteIcon"
+          <button
+            *ngIf="mainImageUrl"
+            class="btn-remove"
+            type="button"
             (click)="removeMainImg()"
-            [style.display]="mainImageUrl ? 'inline' : 'none'"
-            >delete</i
-          >
+            title="Remove image">
+            <i class="material-symbols-outlined">delete</i>
+          </button>
         </div>
       </section>
-      <section class="image-container">
-        <div class="additional-images">
-          <p class="text">Additional Images</p>
+
+      <!-- Additional Images -->
+      <section class="image-section">
+        <div class="image-header">
+          <div class="image-info">
+            <h6 class="image-title">Additional Images</h6>
+            <p class="image-description">Add more images to showcase your restaurant's atmosphere, food, or team.</p>
+          </div>
         </div>
-        <div class="hold">
+        
+        <!-- Display existing additional images -->
+        <div class="additional-images-grid" *ngIf="additionalImageUrls.length > 0">
+          <div class="additional-image-item" *ngFor="let imageUrl of additionalImageUrls; let i = index">
+            <div class="image-preview">
+              <img [src]="imageUrl" [alt]="'Additional restaurant image ' + (i + 1)" class="preview-thumbnail" />
+            </div>
+            <div class="image-actions">
+              <button
+                class="btn-remove"
+                type="button"
+                (click)="removeAdditionalImg(i)"
+                title="Remove image">
+                <i class="material-symbols-outlined">delete</i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="image-actions">
           <button 
-            class="add-image-button" 
+            class="btn-upload" 
             type="button"
             (click)="openAdditionalImageUpload()"
             [disabled]="isSaving">
             <i class="material-symbols-outlined">{{ isSaving ? 'hourglass_empty' : 'upload' }}</i>
-            <span>{{ additionalImageUrl ? 'Change Image' : 'Upload Image' }}</span>
+            <span>{{ additionalImageUrls.length > 0 ? 'Add More Images' : 'Upload Additional Images' }}</span>
           </button>
-          <i
-            class="material-symbols-outlined deleteIcon"
-            (click)="removeSecImg()"
-            [style.display]="additionalImageUrl ? 'inline' : 'none'"
-            >delete</i
-          >
+          <button
+            *ngIf="additionalImageUrls.length > 0"
+            class="btn-remove"
+            type="button"
+            (click)="removeAllAdditionalImgs()"
+            title="Remove all additional images">
+            <i class="material-symbols-outlined">delete_sweep</i>
+            Remove All
+          </button>
+        </div>
+        
+        <!-- Image count info -->
+        <div class="image-count-info" *ngIf="additionalImageUrls.length > 0">
+          <p class="image-count-text">
+            <i class="material-symbols-outlined">photo_library</i>
+            {{ additionalImageUrls.length }} additional image{{ additionalImageUrls.length !== 1 ? 's' : '' }} uploaded
+          </p>
         </div>
       </section>
     </div>
-    <div class="block">
-      <div class="row rowspace">
-        <h6>Business Hours</h6>
-        <div class="rowToggle">
-          <label
-            [ngStyle]="{
-              color: isBusinessHoursVisible ? '#16d3d2' : 'gray',
-              fontWeight: '200'
-            }"
-            >This section is visible on your menu.</label
-          >
-          <mat-slide-toggle
-            [(ngModel)]="isBusinessHoursVisible"
-            color="primary"
-          ></mat-slide-toggle>
-        </div>
-      </div>
-      <div class="row">
-        <div class="formGroup">
-          <textarea matInput [(ngModel)]="businessHours" (input)="markAsChanged()"></textarea>
-        </div>
-      </div>
-    </div>
-    <div class="block">
-      <div class="row rowspace">
-        <h6>Contact Details</h6>
-        <div class="rowToggle">
-          <label
-            [ngStyle]="{
-              color: isContactDetailsVisible ? '#16d3d2' : 'gray',
-              fontWeight: '200'
-            }"
-            >This section is visible on your menu.</label
-          >
-          <mat-slide-toggle
-            [(ngModel)]="isContactDetailsVisible"
-            color="primary"
-          ></mat-slide-toggle>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="formGroup">
-            <label>Email address</label>
-            <input
-              type="email"
-              class="formControl"
-              placeholder="email@address.co.za"
-              [(ngModel)]="email"
-              (input)="markAsChanged()"
-            />
-          </div>
-        </div>
-        <div class="col">
-          <div class="formGroup">
-            <label>Cellphone number</label>
-            <input
-              type="tel"
-              class="formControl"
-              placeholder="+27 (0)12 345 6789"
-              [(ngModel)]="cellphone"
-              (input)="markAsChanged()"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="outerColSmall">
-    <div class="block btnBlock">
-      <p>Would you like to save or discard the changes you have made?</p>
-      <div class="row">
-        <a class="btnTertiary">Discard</a>
-        <a class="btnSecondary" (click)="update()">Save Changes</a>
-      </div>
-    </div>
-    <div class="block" style="min-height: 800px">
-      <div class="row">
-        <h6 class="heading">Real-time Preview</h6>
-      </div>
-      <div class="preview">
-        <div class="innerPart">
-          <img [src]="mainImageUrl" alt="" class="mainImg" />
-          <div class="about">
-            <h6>ABOUT US</h6>
-            <p class="about-text" [innerHTML]="aboutText"></p>
-          </div>
 
-          <img [src]="additionalImageUrl" alt="" class="mainImg" />
-          <div
-            class="hours"
-            *ngIf="isContactDetailsVisible && isBusinessHoursVisible"
-          >
-            <h6>DETAILS</h6>
-            <p *ngIf="isBusinessHoursVisible"><strong>Opening Hours</strong></p>
-            <p *ngIf="isBusinessHoursVisible" class="about-text">
-              {{ businessHours }}
+    <!-- Business Hours Section -->
+    <div class="block hoursBlock">
+      <div class="section-header">
+        <div class="section-title-row">
+          <h6 class="section-title">
+            <i class="material-symbols-outlined">schedule</i>
+            Business Hours
+          </h6>
+          <div class="visibility-toggle">
+            <mat-slide-toggle
+              [(ngModel)]="isBusinessHoursVisible"
+              color="primary"
+              (change)="markAsChanged()">
+            </mat-slide-toggle>
+            <label class="toggle-label" [class.active]="isBusinessHoursVisible">
+              {{ isBusinessHoursVisible ? 'Visible on menu' : 'Hidden from menu' }}
+            </label>
+          </div>
+        </div>
+        <p class="section-description">Set your restaurant's operating hours and let customers know when you're open.</p>
+      </div>
+      <div class="formGroup">
+        <textarea 
+          matInput 
+          [(ngModel)]="businessHours" 
+          (input)="markAsChanged()"
+          placeholder="Example: Monday - Friday: 11:00 AM - 10:00 PM&#10;Saturday - Sunday: 12:00 PM - 11:00 PM"
+          class="enhanced-textarea hours-textarea">
+        </textarea>
+      </div>
+    </div>
+
+    <!-- Contact Details Section -->
+    <div class="block contactBlock">
+      <div class="section-header">
+        <div class="section-title-row">
+          <h6 class="section-title">
+            <i class="material-symbols-outlined">contact_phone</i>
+            Contact Details
+          </h6>
+          <div class="visibility-toggle">
+            <mat-slide-toggle
+              [(ngModel)]="isContactDetailsVisible"
+              color="primary"
+              (change)="markAsChanged()">
+            </mat-slide-toggle>
+            <label class="toggle-label" [class.active]="isContactDetailsVisible">
+              {{ isContactDetailsVisible ? 'Visible on menu' : 'Hidden from menu' }}
+            </label>
+          </div>
+        </div>
+        <p class="section-description">Provide contact information so customers can reach you for reservations or questions.</p>
+      </div>
+      <div class="contact-fields">
+        <div class="formGroup">
+          <label class="field-label">
+            <i class="material-symbols-outlined">email</i>
+            Email Address
+          </label>
+          <input
+            type="email"
+            class="formControl enhanced-input"
+            placeholder="restaurant@example.com"
+            [(ngModel)]="email"
+            (input)="markAsChanged()"
+          />
+        </div>
+        <div class="formGroup">
+          <label class="field-label">
+            <i class="material-symbols-outlined">phone</i>
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            class="formControl enhanced-input"
+            placeholder="+27 (0)12 345 6789"
+            [(ngModel)]="cellphone"
+            (input)="markAsChanged()"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Right Column - Preview and Actions -->
+  <div class="outerColSmall" *ngIf="selectedRestaurantId">
+    <!-- Save Actions -->
+    <div class="block btnBlock">
+      <div class="save-header">
+        <h6 class="save-title">
+          <i class="material-symbols-outlined">save</i>
+          Save Changes
+        </h6>
+        <p class="save-description">Review your changes and save them to update your about page.</p>
+      </div>
+      <div class="save-actions">
+        <button class="btn-discard" (click)="discardChanges()" [disabled]="!hasUnsavedChanges">
+          <i class="material-symbols-outlined">undo</i>
+          Discard Changes
+        </button>
+        <button class="btn-save" (click)="update()" [disabled]="!hasUnsavedChanges || isSaving">
+          <i class="material-symbols-outlined">{{ isSaving ? 'hourglass_empty' : 'save' }}</i>
+          {{ isSaving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="block previewBlock">
+      <div class="preview-header">
+        <h6 class="preview-title">
+          <i class="material-symbols-outlined">visibility</i>
+          Preview
+        </h6>
+        <p class="preview-description">This is how your about page will appear to customers.</p>
+      </div>
+      
+      <!-- Restaurant Info Preview -->
+      <div class="preview-content">
+        <div class="preview-restaurant-info">
+          <h4 class="preview-restaurant-name">{{ selectedRestaurant?.restaurantName || 'Restaurant Name' }}</h4>
+          <p class="preview-restaurant-location">
+            {{ selectedRestaurant?.streetAdress || 'Street Address' }}, 
+            {{ selectedRestaurant?.city || 'City' }}, 
+            {{ selectedRestaurant?.province || 'Province' }}
+          </p>
+        </div>
+        
+        <!-- About Text Preview -->
+        <div class="preview-section" *ngIf="aboutText">
+          <h5 class="preview-section-title">About Us</h5>
+          <p class="preview-text">{{ aboutText | slice:0:150 }}{{ aboutText.length > 150 ? '...' : '' }}</p>
+        </div>
+        
+        <!-- Images Preview -->
+        <div class="preview-section" *ngIf="mainImageUrl || additionalImageUrls.length > 0">
+          <h5 class="preview-section-title">Images</h5>
+          <div class="preview-images-info">
+            <p *ngIf="mainImageUrl" class="preview-image-item">
+              <i class="material-symbols-outlined">photo</i>
+              Hero image uploaded
             </p>
-            <br />
-            <div *ngIf="isContactDetailsVisible" class="contactDetails">
-              <p><strong>Contact Details</strong></p>
-              <a *ngIf="cellphone" href="tel:{{ cellphone }}">{{
-                cellphone
-              }}</a>
-              <a *ngIf="email" href="mailto:{{ email }}">{{ email }}</a>
-            </div>
+            <p *ngIf="additionalImageUrls.length > 0" class="preview-image-item">
+              <i class="material-symbols-outlined">photo_library</i>
+              {{ additionalImageUrls.length }} additional image{{ additionalImageUrls.length !== 1 ? 's' : '' }}
+            </p>
+          </div>
+        </div>
+        
+        <!-- Business Hours Preview -->
+        <div class="preview-section" *ngIf="businessHours && isBusinessHoursVisible">
+          <h5 class="preview-section-title">Business Hours</h5>
+          <p class="preview-text">{{ businessHours | slice:0:100 }}{{ businessHours.length > 100 ? '...' : '' }}</p>
+        </div>
+        
+        <!-- Contact Details Preview -->
+        <div class="preview-section" *ngIf="(email || cellphone) && isContactDetailsVisible">
+          <h5 class="preview-section-title">Contact Information</h5>
+          <div class="preview-contact-info">
+            <p *ngIf="email" class="preview-contact-item">
+              <i class="material-symbols-outlined">email</i>
+              {{ email }}
+            </p>
+            <p *ngIf="cellphone" class="preview-contact-item">
+              <i class="material-symbols-outlined">phone</i>
+              {{ cellphone }}
+            </p>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+
+
+
+
+
 <app-loading [isLoading]="isSaving"></app-loading>
