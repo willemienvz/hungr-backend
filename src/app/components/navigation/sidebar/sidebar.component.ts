@@ -1,25 +1,30 @@
-import { Component, computed, input, OnInit } from '@angular/core';
+import { Component, computed, input, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, Event } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { User } from '../../../shared/services/user';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ReviewsService } from '../../../shared/services/reviews.service';
+import { MobileMenuService } from '../../../shared/services/mobile-menu.service';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   accountType1: boolean;
   userProfile: User;
   currentRoute: string;
   pendingReviewsCount: number = 0;
+  isMobileMenuOpen = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private firestore: AngularFirestore, 
     private router: Router,
-    private reviewsService: ReviewsService
+    private reviewsService: ReviewsService,
+    private mobileMenuService: MobileMenuService
   ){
     this.fetchUsers();
     this.loadPendingReviewsCount();
@@ -46,6 +51,18 @@ private fetchUsers() {
     ).subscribe((event: NavigationEnd) => {
       this.currentRoute = event.urlAfterRedirects;
     });
+
+    // Subscribe to mobile menu state
+    this.mobileMenuService.isMobileMenuOpen$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(isOpen => {
+      this.isMobileMenuOpen = isOpen;
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   isMenusRouteActive(): boolean {

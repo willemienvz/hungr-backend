@@ -2,11 +2,11 @@
     <div class="popup-content">
       <i class="material-icons popup-close" (click)="closePopup()">close</i>
       <div class="authBlock">
-        <h3>QR Code Name</h3>
+        <h3>QR Code</h3>
       </div>
       <div class="row">
         <div class="col">
-          <qrcode [qrdata]="getCurrentCode(currentMenu.restaurantID)" (qrCodeURL)="onChangeURL($event)" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+          <qrcode [qrdata]="getCurrentCode(currentMenu.menuID)" (qrCodeURL)="onChangeURL($event)" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
         </div>
         <div class="col">
           <div>

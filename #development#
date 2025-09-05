@@ -1,5 +1,3 @@
-
-	cd ../frontend && npm run build
-cd ../frontend && npm run build
-cd ../frontend && npx tsc --noEmit
-cd /home/kb/Projects/hungr/backend && ng build --configuration development
+ng build --dry-run
+npx tsc --noEmit
+ng build --dry-run

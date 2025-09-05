@@ -187,3 +187,42 @@ border-radius: 50%;
     gap: 10px;
 }
 
+// Mobile Responsive Styles
+@media (max-width: 768px) {
+    .navbar {
+        padding: 12px 20px; // Reduce padding on mobile
+        
+        .inner:first-of-type {
+            gap: 20px; // Reduce gap on mobile
+        }
+        
+        .breadcrumb-container {
+            display: none; // Hide breadcrumbs on mobile
+        }
+        
+        .search-bar {
+            display: none; // Hide search on mobile
+        }
+    }
+    
+    .hamburger-menu {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        margin-right: 10px;
+        
+        i {
+            font-size: 24px;
+            color: #444444;
+        }
+    }
+    
+    .profiledd {
+        min-width: 300px; // Reduce width on mobile
+        right: 10px; // Add some margin from edge
+    }
+}
+

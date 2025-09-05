@@ -5,4 +5,10 @@
     padding-left: 255px;
     padding-top: 85px;
     background-color: #F3F4F5;
+    
+    // Mobile responsive padding
+    @media (max-width: 768px) {
+        padding-left: 0; // Remove fixed padding on mobile
+        padding-top: 85px;
+    }
 }

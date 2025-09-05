@@ -1,5 +1,9 @@
 <nav class="navbar">
     <div class="inner">
+        <!-- Hamburger Menu Button (Mobile Only) -->
+        <div class="hamburger-menu" (click)="toggleMobileMenu()" *ngIf="isMobile">
+            <i class="material-icons">menu</i>
+        </div>
         <img src="../../../assets/images/shared/logo.png" alt="" style="width: 150px;" />
         <div class="breadcrumb-container">
             <!-- Debug info -->

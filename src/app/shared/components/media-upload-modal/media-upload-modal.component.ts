@@ -83,6 +83,11 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
   error: string | null = null;
   isDragOver = false;
 
+  // Validation state tracking
+  get isValidationValid(): boolean {
+    return !this.error && this.selectedFile && this.uploadForm.valid;
+  }
+
   // Component info for upload
   componentType = 'media-library';
   componentId = 'media-upload-modal';
@@ -91,6 +96,15 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
   // Form properties
   uploadForm: FormGroup;
   categories: string[] = ['Logos', 'Banners', 'Menu Items', 'Specials', 'Branding', 'Other'];
+  categoryOptions: Array<{value: string, label: string}> = [
+    { value: 'Logos', label: 'Logos' },
+    { value: 'Banners', label: 'Banners' },
+    { value: 'Menu Items', label: 'Menu Items' },
+    { value: 'Specials', label: 'Specials' },
+    { value: 'Branding', label: 'Branding' },
+    { value: 'Other', label: 'Other' },
+    { value: 'custom', label: 'Custom Category' }
+  ];
 
   // Media library selection
   showMediaLibrary = false;
@@ -130,8 +144,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     this.uploadForm = this.formBuilder.group({
       category: [''],
       customCategory: [{ value: '', disabled: true }],
-      description: [''],
-      isPublic: [true]
+      description: ['']
     });
 
     this.initializeComponent();
@@ -444,8 +457,8 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
 
   // Upload methods
   async uploadMedia(): Promise<void> {
-    if (!this.selectedFile || !this.uploadForm.valid) {
-      return;
+    if (!this.selectedFile || !this.uploadForm.valid || this.error) {
+      return; // Now checks validation errors
     }
 
     this.uploading = true;
@@ -456,7 +469,7 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
         file: this.selectedFile,
         category: this.uploadForm.get('category')?.value || this.uploadForm.get('customCategory')?.value,
         description: this.uploadForm.get('description')?.value,
-        isPublic: this.uploadForm.get('isPublic')?.value,
+        isPublic: true, // Always public since toggle was removed
         componentType: this.componentType,
         componentId: this.componentId,
         fieldName: this.fieldName
@@ -512,8 +525,76 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
   }
 
   selectExistingMedia(mediaItem: MediaItem): void {
+    if (!this.isMediaItemValid(mediaItem)) {
+      // Show error message or prevent selection
+      this.error = `This media item doesn't meet the current requirements. ${this.getValidationMessage(mediaItem)}`;
+      return;
+    }
+    
     this.selectedMediaItem = mediaItem;
     this.closeWithResult(mediaItem);
+  }
+
+  isMediaItemValid(mediaItem: MediaItem): boolean {
+    // Check file type
+    if (!this.validationConfig.allowedTypes.includes(mediaItem.mimeType)) {
+      return false;
+    }
+    
+    // Check file size
+    if (mediaItem.fileSize > this.validationConfig.maxFileSize) {
+      return false;
+    }
+    
+    // Check dimensions if required
+    if (this.validationConfig.requiredDimensions && mediaItem.metadata?.width && mediaItem.metadata?.height) {
+      const { width, height } = this.validationConfig.requiredDimensions;
+      if (mediaItem.metadata.width !== width || mediaItem.metadata.height !== height) {
+        return false;
+      }
+    }
+    
+    // Check max dimensions if specified
+    if (this.validationConfig.maxDimensions && mediaItem.metadata?.width && mediaItem.metadata?.height) {
+      const { width, height } = this.validationConfig.maxDimensions;
+      if (mediaItem.metadata.width > width || mediaItem.metadata.height > height) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  getValidationMessage(mediaItem: MediaItem): string {
+    const messages: string[] = [];
+    
+    // Check file type
+    if (!this.validationConfig.allowedTypes.includes(mediaItem.mimeType)) {
+      messages.push(`File type ${mediaItem.mimeType} not allowed. Allowed: ${this.validationConfig.allowedTypes.join(', ')}`);
+    }
+    
+    // Check file size
+    if (mediaItem.fileSize > this.validationConfig.maxFileSize) {
+      messages.push(`File size ${(mediaItem.fileSize / (1024 * 1024)).toFixed(1)}MB exceeds maximum ${(this.validationConfig.maxFileSize / (1024 * 1024)).toFixed(1)}MB`);
+    }
+    
+    // Check dimensions if required
+    if (this.validationConfig.requiredDimensions && mediaItem.metadata?.width && mediaItem.metadata?.height) {
+      const { width, height } = this.validationConfig.requiredDimensions;
+      if (mediaItem.metadata.width !== width || mediaItem.metadata.height !== height) {
+        messages.push(`Dimensions ${mediaItem.metadata.width}x${mediaItem.metadata.height}px don't match required ${width}x${height}px`);
+      }
+    }
+    
+    // Check max dimensions if specified
+    if (this.validationConfig.maxDimensions && mediaItem.metadata?.width && mediaItem.metadata?.height) {
+      const { width, height } = this.validationConfig.maxDimensions;
+      if (mediaItem.metadata.width > width || mediaItem.metadata.height > height) {
+        messages.push(`Dimensions ${mediaItem.metadata.width}x${mediaItem.metadata.height}px exceed maximum ${width}x${height}px`);
+      }
+    }
+    
+    return messages.join('. ');
   }
 
   // Form methods

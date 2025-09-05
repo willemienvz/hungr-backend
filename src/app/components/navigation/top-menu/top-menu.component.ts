@@ -7,6 +7,7 @@ import { filter } from 'rxjs';
 import { Notification } from '../../../shared/services/notification';
 import { NotificationsService } from '../../../shared/services/notifications.service';
 import { BreadcrumbService, Breadcrumb } from '../../../shared/services/breadcrumb.service';
+import { MobileMenuService } from '../../../shared/services/mobile-menu.service';
 
 @Component({
   selector: 'app-top-menu',
@@ -26,7 +27,8 @@ export class TopMenuComponent implements OnInit{
     public router: Router, 
     private activatedRoute: ActivatedRoute, 
     private notificationService: NotificationsService,
-    private breadcrumbService: BreadcrumbService
+    private breadcrumbService: BreadcrumbService,
+    private mobileMenuService: MobileMenuService
   ) {
     this.fetchUsers();
     this.fetchNotifications();
@@ -40,12 +42,30 @@ export class TopMenuComponent implements OnInit{
   isSearchBarExpanded = false;
   isProfileExpanded = false;
   isNotificationsExpanded = false;
+  isMobileMenuOpen = false;
+
+  // Mobile detection
+  get isMobile(): boolean {
+    return window.innerWidth <= 768;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    // Close mobile menu when resizing to desktop
+    if (event.target.innerWidth > 768) {
+      this.isMobileMenuOpen = false;
+    }
+  }
 
   @HostListener('document:click', ['$event'])
   onClick(event: Event) {
     if (!(event.target as HTMLElement).closest('.search-bar')) {
       this.isSearchBarExpanded = false; 
     }
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuService.toggleMobileMenu();
   }
 
   ngOnInit(): void {

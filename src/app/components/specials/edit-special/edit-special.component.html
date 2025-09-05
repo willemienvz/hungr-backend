@@ -31,6 +31,7 @@
     <app-step-navigation
       [nextDisabled]="isStep1Invalid()"
       [isSaving]="isSaving"
+      [cancelRoute]="'/specials'"
       (next)="nextStep()"
     ></app-step-navigation>
   </div>
@@ -81,6 +82,7 @@
       [showNext]="showNextButton"
       [isSaving]="isSaving"
       [nextDisabled]="isStep2Invalid()"
+      [cancelRoute]="'/specials'"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
       (next)="nextStep()"
@@ -135,6 +137,7 @@
       [showDraft]="true"
       [showNext]="showNextButton"
       [isSaving]="isSaving"
+      [cancelRoute]="'/specials'"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
       (next)="nextStep()"
@@ -182,6 +185,7 @@
       [showDraft]="true"
       [showNext]="showNextButton"
       [isSaving]="isSaving"
+      [cancelRoute]="'/specials'"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
       (next)="nextStep()"
@@ -222,6 +226,7 @@
       [showNext]="false"
       [submitText]="'Update Special'"
       [isSaving]="isSaving"
+      [cancelRoute]="'/specials'"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
       (submit)="updateSpecial()"

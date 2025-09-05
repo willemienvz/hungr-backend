@@ -22,11 +22,11 @@ export class ViewQrComponent implements OnInit {
   ngOnInit() {
     
   }
-  getCurrentCode(name:string){
-    return this.qrCodeDownloadLink = environment.menuUrl + '' +  name;
+  getCurrentCode(menuId: string){
+    return this.qrCodeDownloadLink = environment.menuUrl + menuId;
   }
   onChangeURL(url: SafeUrl) {
-    this.qrCodeDownloadLink = environment.menuUrl + '' +  url;
+    this.qrCodeDownloadLink = environment.menuUrl + url;
   }
   openPopup(menuID:string) {
     this.selectedID = menuID;

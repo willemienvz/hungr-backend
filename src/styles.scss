@@ -1143,8 +1143,126 @@ input[type="submit"]:disabled {
   justify-content: center;
   align-items: center;
   display: flex !important;
+}
 
+// Override fixed height for textarea elements in mat-form-field
+.mat-mdc-form-field-infix textarea {
+  height: auto !important;
+  min-height: 60px; // Base height for textarea
+  padding: 0 !important; // Remove padding on inner textarea element
+  background-color: transparent !important; // Remove grey background on focus
+}
 
+// Remove grey background on focus for textarea elements
+.mat-mdc-form-field-infix textarea:focus {
+  background-color: transparent !important;
+  outline: none !important;
+}
+
+// Remove grey background for mat-form-field containing textarea
+.mat-mdc-form-field:has(textarea) .mdc-text-field--filled {
+  background-color: transparent !important;
+}
+
+.mat-mdc-form-field:has(textarea) .mdc-text-field--filled:focus-within {
+  background-color: transparent !important;
+}
+
+/* ===============================================
+   MOBILE RESPONSIVE GRID UTILITIES
+   Global responsive grid system for mobile
+   =============================================== */
+
+// Mobile responsive grid utilities
+@media (max-width: 768px) {
+  // Stats grids - single column on mobile
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  // Charts grids - single column on mobile
+  .charts-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  // General responsive grids
+  .responsive-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  // Two-column grids become single column
+  .grid-2-col {
+    grid-template-columns: 1fr !important;
+  }
+  
+  // Auto-fit grids with minimum width
+  .auto-fit-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  // Media grids - smaller items on mobile
+  .media-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    gap: 12px !important;
+  }
+  
+  // Form grids - single column
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  // Content grids - single column
+  .content-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+// Ensure proper spacing for textarea in mat-form-field
+.mat-mdc-form-field:has(textarea) .mat-mdc-form-field-infix {
+  height: auto !important;
+  min-height: 60px;
+  padding: 8px 0 !important;
+  align-items: flex-start !important; // Align textarea to top instead of center
+}
+
+// Fix border radius on filled MDC inputs to be rounded on all corners
+.mdc-text-field--filled .mdc-text-field__ripple {
+  border-radius: 4px 4px 4px 4px !important; // All corners rounded
+}
+
+.mdc-text-field--filled .mdc-line-ripple {
+  border-radius: 4px 4px 4px 4px !important; // All corners rounded
+}
+
+// Ensure filled inputs have consistent border radius
+.mat-mdc-form-field.mat-mdc-form-field-type-mat-input .mdc-text-field--filled {
+  border-radius: 4px !important;
+}
+
+// Specific height adjustments based on rows attribute
+.mat-mdc-form-field-infix textarea[rows="1"] {
+  min-height: 40px;
+}
+
+.mat-mdc-form-field-infix textarea[rows="2"] {
+  min-height: 60px;
+}
+
+.mat-mdc-form-field-infix textarea[rows="3"] {
+  min-height: 80px;
+}
+
+.mat-mdc-form-field-infix textarea[rows="4"] {
+  min-height: 100px;
+}
+
+.mat-mdc-form-field-infix textarea[rows="5"] {
+  min-height: 120px;
 }
 
 .mat-mdc-select {

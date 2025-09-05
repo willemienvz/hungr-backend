@@ -272,62 +272,71 @@
       <div class="preview-header">
         <h6 class="preview-title">
           <i class="material-symbols-outlined">visibility</i>
-          Preview
+          Live Preview
         </h6>
-        <p class="preview-description">This is how your about page will appear to customers.</p>
+        <p class="preview-description">See how your about page will appear to customers in real-time.</p>
       </div>
       
-      <!-- Restaurant Info Preview -->
-      <div class="preview-content">
-        <div class="preview-restaurant-info">
-          <h4 class="preview-restaurant-name">{{ selectedRestaurant?.restaurantName || 'Restaurant Name' }}</h4>
-          <p class="preview-restaurant-location">
-            {{ selectedRestaurant?.streetAdress || 'Street Address' }}, 
-            {{ selectedRestaurant?.city || 'City' }}, 
-            {{ selectedRestaurant?.province || 'Province' }}
-          </p>
+      <!-- Menu Selection for Preview -->
+      <div class="formGroup" *ngIf="menus.length > 0">
+        <label class="field-label">
+          <i class="material-symbols-outlined">restaurant_menu</i>
+          Select Menu to Preview
+        </label>
+        <select
+          class="formControl enhanced-select"
+          [(ngModel)]="selectedMenuId"
+          (change)="onMenuSelectionChange($event)"
+          [disabled]="isLoadingMenus"
+        >
+          <option value="" disabled>Select a menu...</option>
+          <option *ngFor="let menu of menus" [value]="menu.menuID || menu.menuId || menu.id || menu._id">
+            {{ menu.menuName || menu.name || 'Unnamed Menu' }}
+          </option>
+        </select>
+        <div *ngIf="isLoadingMenus" class="loading-indicator">
+          <i class="material-symbols-outlined rotating">refresh</i>
+          Loading menus...
         </div>
-        
-        <!-- About Text Preview -->
-        <div class="preview-section" *ngIf="aboutText">
-          <h5 class="preview-section-title">About Us</h5>
-          <p class="preview-text">{{ aboutText | slice:0:150 }}{{ aboutText.length > 150 ? '...' : '' }}</p>
+      </div>
+
+      <!-- Iframe Preview -->
+      <div class="preview-content" *ngIf="selectedMenuId">
+        <div class="preview-controls">
+          <button 
+            class="btn-refresh" 
+            type="button"
+            (click)="refreshPreview()"
+            title="Refresh preview">
+            <i class="material-symbols-outlined">refresh</i>
+            Refresh Preview
+          </button>
         </div>
-        
-        <!-- Images Preview -->
-        <div class="preview-section" *ngIf="mainImageUrl || additionalImageUrls.length > 0">
-          <h5 class="preview-section-title">Images</h5>
-          <div class="preview-images-info">
-            <p *ngIf="mainImageUrl" class="preview-image-item">
-              <i class="material-symbols-outlined">photo</i>
-              Hero image uploaded
-            </p>
-            <p *ngIf="additionalImageUrls.length > 0" class="preview-image-item">
-              <i class="material-symbols-outlined">photo_library</i>
-              {{ additionalImageUrls.length }} additional image{{ additionalImageUrls.length !== 1 ? 's' : '' }}
-            </p>
-          </div>
+        <div class="phonePreviewContainer">
+          <iframe
+            #previewIframe
+            [src]="getPreviewUrl()"
+            frameborder="0"
+            class="previewIframe"
+            title="About Page Preview"
+          ></iframe>
         </div>
-        
-        <!-- Business Hours Preview -->
-        <div class="preview-section" *ngIf="businessHours && isBusinessHoursVisible">
-          <h5 class="preview-section-title">Business Hours</h5>
-          <p class="preview-text">{{ businessHours | slice:0:100 }}{{ businessHours.length > 100 ? '...' : '' }}</p>
+      </div>
+
+      <!-- No Menu Available Message -->
+      <div class="preview-content" *ngIf="menus.length === 0 && selectedRestaurantId">
+        <div class="no-menu-message">
+          <i class="material-symbols-outlined">restaurant_menu</i>
+          <p>No active menus available for this restaurant.</p>
+          <p class="message-hint">Please create and activate a menu first to see the preview.</p>
         </div>
-        
-        <!-- Contact Details Preview -->
-        <div class="preview-section" *ngIf="(email || cellphone) && isContactDetailsVisible">
-          <h5 class="preview-section-title">Contact Information</h5>
-          <div class="preview-contact-info">
-            <p *ngIf="email" class="preview-contact-item">
-              <i class="material-symbols-outlined">email</i>
-              {{ email }}
-            </p>
-            <p *ngIf="cellphone" class="preview-contact-item">
-              <i class="material-symbols-outlined">phone</i>
-              {{ cellphone }}
-            </p>
-          </div>
+      </div>
+
+      <!-- No Restaurant Selected Message -->
+      <div class="preview-content" *ngIf="!selectedRestaurantId">
+        <div class="no-restaurant-message">
+          <i class="material-symbols-outlined">store</i>
+          <p>Please select a restaurant to see the preview.</p>
         </div>
       </div>
     </div>

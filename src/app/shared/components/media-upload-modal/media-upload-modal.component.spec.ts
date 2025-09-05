@@ -35,7 +35,6 @@ describe('MediaUploadModalComponent', () => {
     uploadedAt: new Date(),
     uploadedBy: 'test-user',
     usage: [],
-    tags: ['test'],
     isPublic: true
   };
 
@@ -206,18 +205,6 @@ describe('MediaUploadModalComponent', () => {
     expect(component.error).toBeNull();
   });
 
-  it('should handle tag addition and removal', () => {
-    const mockChipInputEvent = {
-      value: 'new-tag',
-      chipInput: { clear: jasmine.createSpy('clear') }
-    };
-
-    component.addTag(mockChipInputEvent as any);
-    expect(component.uploadForm.get('tags')?.value).toContain('new-tag');
-
-    component.removeTag('new-tag');
-    expect(component.uploadForm.get('tags')?.value).not.toContain('new-tag');
-  });
 
   it('should handle category change', () => {
     const customCategoryControl = component.uploadForm.get('customCategory');
@@ -264,9 +251,7 @@ describe('MediaUploadModalComponent', () => {
     component.selectedFile = mockFile;
     component.uploadForm.patchValue({
       category: 'Test',
-      tags: ['test'],
-      description: 'Test description',
-      isPublic: true
+      description: 'Test description'
     });
 
     mockMediaLibraryService.uploadMedia.and.returnValue(Promise.resolve(mockMediaItem));
@@ -277,7 +262,6 @@ describe('MediaUploadModalComponent', () => {
     expect(mockMediaLibraryService.uploadMedia).toHaveBeenCalledWith({
       file: mockFile,
       category: 'Test',
-      tags: ['test'],
       description: 'Test description',
       isPublic: true,
       componentType: 'test',
@@ -291,9 +275,7 @@ describe('MediaUploadModalComponent', () => {
     component.selectedFile = mockFile;
     component.uploadForm.patchValue({
       category: 'Test',
-      tags: [],
-      description: '',
-      isPublic: true
+      description: ''
     });
 
     mockMediaLibraryService.uploadMedia.and.returnValue(Promise.reject(new Error('Upload failed')));
@@ -448,5 +430,206 @@ describe('MediaUploadModalComponent', () => {
 
     expect(component['destroy$'].next).toHaveBeenCalled();
     expect(component['destroy$'].complete).toHaveBeenCalled();
+  });
+
+  describe('Media Item Validation', () => {
+    const validMediaItem: MediaItem = {
+      id: 'valid-id',
+      fileName: 'valid-image.jpg',
+      originalName: 'valid-image.jpg',
+      fileSize: 1024 * 1024, // 1MB
+      mimeType: 'image/jpeg',
+      url: 'https://example.com/valid-image.jpg',
+      uploadedAt: new Date(),
+      uploadedBy: 'test-user',
+      usage: [],
+      isPublic: true,
+      metadata: {
+        width: 150,
+        height: 50
+      }
+    };
+
+    const invalidMediaItem: MediaItem = {
+      id: 'invalid-id',
+      fileName: 'invalid-image.jpg',
+      originalName: 'invalid-image.jpg',
+      fileSize: 10 * 1024 * 1024, // 10MB
+      mimeType: 'image/gif',
+      url: 'https://example.com/invalid-image.jpg',
+      uploadedAt: new Date(),
+      uploadedBy: 'test-user',
+      usage: [],
+      isPublic: true,
+      metadata: {
+        width: 200,
+        height: 100
+      }
+    };
+
+    beforeEach(() => {
+      component.validationConfig = {
+        allowedTypes: ['image/png', 'image/jpeg'],
+        maxFileSize: 5 * 1024 * 1024, // 5MB
+        maxDimensions: { width: 1920, height: 1080 },
+        minDimensions: { width: 100, height: 100 },
+        requiredDimensions: { width: 150, height: 50 }
+      };
+    });
+
+    it('should validate media item as valid when all criteria are met', () => {
+      const result = component.isMediaItemValid(validMediaItem);
+      expect(result).toBeTrue();
+    });
+
+    it('should validate media item as invalid when file type is not allowed', () => {
+      const result = component.isMediaItemValid(invalidMediaItem);
+      expect(result).toBeFalse();
+    });
+
+    it('should validate media item as invalid when file size exceeds limit', () => {
+      const largeMediaItem = { ...validMediaItem, fileSize: 10 * 1024 * 1024 };
+      const result = component.isMediaItemValid(largeMediaItem);
+      expect(result).toBeFalse();
+    });
+
+    it('should validate media item as invalid when dimensions do not match required dimensions', () => {
+      const wrongDimensionsMediaItem = { 
+        ...validMediaItem, 
+        metadata: { width: 200, height: 100 } 
+      };
+      const result = component.isMediaItemValid(wrongDimensionsMediaItem);
+      expect(result).toBeFalse();
+    });
+
+    it('should validate media item as invalid when dimensions exceed maximum', () => {
+      const oversizedMediaItem = { 
+        ...validMediaItem, 
+        metadata: { width: 2000, height: 1500 } 
+      };
+      const result = component.isMediaItemValid(oversizedMediaItem);
+      expect(result).toBeFalse();
+    });
+
+    it('should return appropriate validation message for invalid file type', () => {
+      const message = component.getValidationMessage(invalidMediaItem);
+      expect(message).toContain('File type image/gif not allowed');
+      expect(message).toContain('Allowed: image/png, image/jpeg');
+    });
+
+    it('should return appropriate validation message for file size', () => {
+      const largeMediaItem = { ...validMediaItem, fileSize: 10 * 1024 * 1024 };
+      const message = component.getValidationMessage(largeMediaItem);
+      expect(message).toContain('File size 10.0MB exceeds maximum 5.0MB');
+    });
+
+    it('should return appropriate validation message for wrong dimensions', () => {
+      const wrongDimensionsMediaItem = { 
+        ...validMediaItem, 
+        metadata: { width: 200, height: 100 } 
+      };
+      const message = component.getValidationMessage(wrongDimensionsMediaItem);
+      expect(message).toContain('Dimensions 200x100px don\'t match required 150x50px');
+    });
+
+    it('should return appropriate validation message for oversized dimensions', () => {
+      const oversizedMediaItem = { 
+        ...validMediaItem, 
+        metadata: { width: 2000, height: 1500 } 
+      };
+      const message = component.getValidationMessage(oversizedMediaItem);
+      expect(message).toContain('Dimensions 2000x1500px exceed maximum 1920x1080px');
+    });
+
+    it('should return multiple validation messages for multiple issues', () => {
+      const message = component.getValidationMessage(invalidMediaItem);
+      expect(message).toContain('File type image/gif not allowed');
+      expect(message).toContain('File size 10.0MB exceeds maximum 5.0MB');
+      expect(message).toContain('Dimensions 200x100px don\'t match required 150x50px');
+    });
+
+    it('should handle media item without metadata gracefully', () => {
+      const mediaItemWithoutMetadata = { ...validMediaItem, metadata: undefined };
+      const result = component.isMediaItemValid(mediaItemWithoutMetadata);
+      expect(result).toBeTrue(); // Should be valid if no dimension requirements
+    });
+
+    it('should handle validation config without required dimensions', () => {
+      component.validationConfig.requiredDimensions = null;
+      const wrongDimensionsMediaItem = { 
+        ...validMediaItem, 
+        metadata: { width: 200, height: 100 } 
+      };
+      const result = component.isMediaItemValid(wrongDimensionsMediaItem);
+      expect(result).toBeTrue(); // Should be valid if no required dimensions
+    });
+  });
+
+  describe('Media Selection with Validation', () => {
+    const validMediaItem: MediaItem = {
+      id: 'valid-id',
+      fileName: 'valid-image.jpg',
+      originalName: 'valid-image.jpg',
+      fileSize: 1024 * 1024,
+      mimeType: 'image/jpeg',
+      url: 'https://example.com/valid-image.jpg',
+      uploadedAt: new Date(),
+      uploadedBy: 'test-user',
+      usage: [],
+      isPublic: true,
+      metadata: { width: 150, height: 50 }
+    };
+
+    const invalidMediaItem: MediaItem = {
+      id: 'invalid-id',
+      fileName: 'invalid-image.jpg',
+      originalName: 'invalid-image.jpg',
+      fileSize: 10 * 1024 * 1024,
+      mimeType: 'image/gif',
+      url: 'https://example.com/invalid-image.jpg',
+      uploadedAt: new Date(),
+      uploadedBy: 'test-user',
+      usage: [],
+      isPublic: true,
+      metadata: { width: 200, height: 100 }
+    };
+
+    beforeEach(() => {
+      component.validationConfig = {
+        allowedTypes: ['image/png', 'image/jpeg'],
+        maxFileSize: 5 * 1024 * 1024,
+        maxDimensions: { width: 1920, height: 1080 },
+        minDimensions: { width: 100, height: 100 },
+        requiredDimensions: { width: 150, height: 50 }
+      };
+    });
+
+    it('should select valid media item and close dialog', () => {
+      component.selectExistingMedia(validMediaItem);
+      
+      expect(component.selectedMediaItem).toEqual(validMediaItem);
+      expect(component.error).toBeNull();
+      expect(mockDialogRef.close).toHaveBeenCalledWith(validMediaItem);
+    });
+
+    it('should not select invalid media item and show error', () => {
+      component.selectExistingMedia(invalidMediaItem);
+      
+      expect(component.selectedMediaItem).toBeNull();
+      expect(component.error).toContain('This media item doesn\'t meet the current requirements');
+      expect(component.error).toContain('File type image/gif not allowed');
+      expect(mockDialogRef.close).not.toHaveBeenCalled();
+    });
+
+    it('should clear previous error when selecting valid media after invalid', () => {
+      // First select invalid media
+      component.selectExistingMedia(invalidMediaItem);
+      expect(component.error).toBeTruthy();
+      
+      // Then select valid media
+      component.selectExistingMedia(validMediaItem);
+      expect(component.error).toBeNull();
+      expect(mockDialogRef.close).toHaveBeenCalledWith(validMediaItem);
+    });
   });
 }); 

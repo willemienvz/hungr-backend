@@ -6,6 +6,7 @@ import { finalize } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastrService } from 'ngx-toastr';
 import { Papa } from 'ngx-papaparse';
+import * as XLSX from 'xlsx';
 import { Category } from '../../../shared/services/category';
 import { Restaurant } from '../../../shared/services/restaurant';
 
@@ -91,10 +92,11 @@ export class MenuService {
     return !!selectedRestaurant.trim();
   }
 
-  // Price formatting
+  // Price formatting - simplified to only add currency prefix if missing
   formatPriceInput(inputValue: string): string {
+    if (!inputValue) return 'R 0.00';
     if (!inputValue.startsWith('R ')) {
-      inputValue = 'R ' + inputValue.replace(/^R\s*/, '');
+      return 'R ' + inputValue.replace(/^R\s*/, '');
     }
     return inputValue;
   }
@@ -536,8 +538,9 @@ export class MenuService {
   }
 
   downloadTemplate(existingMenuItems?: MenuItemInterface[], categories?: Category[]) {
-    const headers = 'name,description,price,category,preparations,variations,pairings,sides,labels';
-    const rows: string[] = [headers];
+    // Define headers with all 11 fields including allergens and sauces
+    const headers = ['name', 'description', 'price', 'category', 'preparations', 'variations', 'pairings', 'sides', 'labels', 'allergens', 'sauces'];
+    const data: any[] = [headers];
 
     // Add existing menu items if provided
     if (existingMenuItems && existingMenuItems.length > 0 && categories) {
@@ -551,50 +554,78 @@ export class MenuService {
           : '';
 
         // Convert arrays to pipe-separated strings
-        const preparations = item.preparations.join('|');
-        const variations = item.variations.join('|');
+        const preparations = item.preparations.map(p => typeof p === 'string' ? p : p.name).join('|');
+        const variations = item.variations.map(v => typeof v === 'string' ? v : v.name).join('|');
         const pairings = item.pairings.join('|');
-        const sides = item.sides.join('|');
+        const sides = item.sides.map(s => typeof s === 'string' ? s : s.name).join('|');
         const labels = item.labels.join('|');
-
-        // Escape commas and quotes in CSV values
-        const escapeCsvValue = (value: string) => {
-          if (value.includes(',') || value.includes('"') || value.includes('\n')) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        };
+        const allergens = item.allergens.join('|');
+        const sauces = item.sauces.map(s => typeof s === 'string' ? s : s.name).join('|');
 
         const row = [
-          escapeCsvValue(item.name),
-          escapeCsvValue(item.description),
-          escapeCsvValue(item.price),
-          escapeCsvValue(categoryName),
-          escapeCsvValue(preparations),
-          escapeCsvValue(variations),
-          escapeCsvValue(pairings),
-          escapeCsvValue(sides),
-          escapeCsvValue(labels),
-        ].join(',');
+          item.name,
+          item.description,
+          item.price,
+          categoryName,
+          preparations,
+          variations,
+          pairings,
+          sides,
+          labels,
+          allergens,
+          sauces
+        ];
 
-        rows.push(row);
+        data.push(row);
       });
     }
 
     // Add sample row if no existing items or as an example
     if (!existingMenuItems || existingMenuItems.length === 0) {
-      rows.push('Sample Item,Sample Description,R 25.00,Appetizers,Grilled|Fried,Small|Large,Wine|Beer,Fries|Salad,Spicy');
-    } else {
-      // Add an empty sample row for reference when there are existing items
-    //   rows.push(',,R ,,,,,,"Add new items below this line"');
+      data.push([
+        'Sample Item',
+        'Sample Description', 
+        'R 25.00',
+        'Appetizers',
+        'Grilled|Fried',
+        'Small|Large',
+        'Wine|Beer',
+        'Fries|Salad',
+        'Spicy',
+        'Nuts|Dairy',
+        'Hot Sauce|BBQ'
+      ]);
     }
 
-    const csvContent = rows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    
+    // Set column widths for better readability
+    const colWidths = [
+      { wch: 20 }, // name
+      { wch: 30 }, // description
+      { wch: 12 }, // price
+      { wch: 15 }, // category
+      { wch: 20 }, // preparations
+      { wch: 15 }, // variations
+      { wch: 15 }, // pairings
+      { wch: 15 }, // sides
+      { wch: 15 }, // labels
+      { wch: 15 }, // allergens
+      { wch: 15 }  // sauces
+    ];
+    ws['!cols'] = colWidths;
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Menu Template');
+
+    // Generate and download XLSX file
+    const xlsxBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'menu-template.csv';
+    a.download = 'menu-template.xlsx';
     a.click();
     window.URL.revokeObjectURL(url);
   }
@@ -608,9 +639,7 @@ export class MenuService {
       if (fileExtension === 'csv') {
         this.parseCsvFile(file, categories).then(resolve).catch(reject);
       } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
-        // For now, show error that Excel support needs to be added
-        this.toastr.error('Excel file support coming soon. Please use CSV format.');
-        reject(new Error('Excel files not yet supported'));
+        this.parseXlsxFile(file, categories).then(resolve).catch(reject);
       } else {
         this.toastr.error('Unsupported file format. Please use CSV or Excel files.');
         reject(new Error('Unsupported file format'));
@@ -639,6 +668,56 @@ export class MenuService {
           reject(error);
         }
       });
+    });
+  }
+
+  private parseXlsxFile(file: File, categories: Category[]): Promise<MenuItemInterface[]> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          // Get the first worksheet
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          
+          // Convert worksheet to JSON array
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          
+          if (jsonData.length < 2) {
+            throw new Error('Excel file must contain at least a header row and one data row');
+          }
+          
+          // Convert to the same format as CSV data
+          const headers = jsonData[0] as string[];
+          const rows = jsonData.slice(1) as any[][];
+          
+          const csvData = rows.map(row => {
+            const obj: any = {};
+            headers.forEach((header, index) => {
+              obj[header] = row[index] || '';
+            });
+            return obj;
+          });
+          
+          const menuItems = this.convertCsvDataToMenuItems(csvData, categories);
+          resolve(menuItems);
+        } catch (error) {
+          console.error('Error parsing XLSX file:', error);
+          this.toastr.error('Error parsing Excel file. Please check the format.');
+          reject(error);
+        }
+      };
+      
+      reader.onerror = () => {
+        this.toastr.error('Error reading Excel file.');
+        reject(new Error('File read error'));
+      };
+      
+      reader.readAsArrayBuffer(file);
     });
   }
 
@@ -671,6 +750,7 @@ export class MenuService {
       const pairings = parseArray(row.pairings);
       const sides = parseArray(row.sides);
       const labels = parseArray(row.labels);
+      const allergens = parseArray(row.allergens);
       const sauces = parseArray(row.sauces);
 
       const menuItem: MenuItemInterface = {
@@ -686,7 +766,7 @@ export class MenuService {
         pairings: pairings,
         pairingIds: [],
         sides: sides,
-        allergens: [], // Initialize allergens as empty array
+        allergens: allergens,
         labels: labels,
         showLabelInput: false,
         displayDetails: {
@@ -694,7 +774,7 @@ export class MenuService {
           variation: variations.length > 0,
           pairing: pairings.length > 0,
           side: sides.length > 0,
-          allergen: false,
+          allergen: allergens.length > 0,
           sauce: sauces.length > 0,
         },
         sauces: sauces,

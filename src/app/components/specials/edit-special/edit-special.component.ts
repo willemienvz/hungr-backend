@@ -210,15 +210,21 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
   updateSpecial() {
     this.isSaving = true;
     const formValue = this.specialForm.getRawValue();
-    const data = {
+    
+    // Prepare data object, filtering out undefined values to prevent Firebase errors
+    const data: any = {
       ...formValue,
       addedItems: this.addedItems,
       selectedDays: this.selectedDays,
-      imageUrl: this.uploadedImageUrl,
       OwnerID: this.owner,
       active: true,
-      isDraft: false,
+      isDraft: false
     };
+
+    // Only include imageUrl if it has a valid value
+    if (this.uploadedImageUrl) {
+      data.imageUrl = this.uploadedImageUrl;
+    }
 
     // Use the new SpecialsService with media library integration
     this.specialsService.updateSpecial(this.specialId, data).subscribe({
@@ -364,13 +370,46 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
   openImageUploadModal() {
     const dialogRef = this.mediaUploadModalService.openSpecialImageUpload(this.specialId);
 
-    dialogRef.afterClosed().subscribe((result: MediaItem | undefined) => {
-      if (result) {
-        this.selectedMediaItem = result;
-        this.mediaId = result.id;
-        this.uploadedImageUrl = result.url;
-        this.markAsChanged();
-        this.toastr.success('Image uploaded successfully!');
+    dialogRef.afterClosed().subscribe({
+      next: (result: any) => {
+        if (result) {
+          // Handle different result formats from the modal
+          let mediaItem: MediaItem | null = null;
+          
+          if (result.id && result.url) {
+            // Direct MediaItem result
+            mediaItem = result;
+          } else if (result.mediaItem) {
+            // Enhanced format with mediaItem property
+            mediaItem = result.mediaItem;
+          } else if (result.action === 'save' && result.existingMediaUrl) {
+            // Existing image kept (no new upload)
+            this.uploadedImageUrl = result.existingMediaUrl;
+            this.markAsChanged();
+            this.toastr.success('Image updated successfully!');
+            return;
+          } else if (result.action === 'remove') {
+            // Image was removed
+            this.selectedMediaItem = null;
+            this.mediaId = null;
+            this.uploadedImageUrl = null;
+            this.markAsChanged();
+            this.toastr.success('Image removed successfully!');
+            return;
+          }
+
+          if (mediaItem) {
+            this.selectedMediaItem = mediaItem;
+            this.mediaId = mediaItem.id;
+            this.uploadedImageUrl = mediaItem.url;
+            this.markAsChanged();
+            this.toastr.success('Image uploaded successfully!');
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Error in image upload modal:', error);
+        this.toastr.error('Failed to open image upload modal. Please try again.');
       }
     });
   }

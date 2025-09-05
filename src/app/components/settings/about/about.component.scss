@@ -445,7 +445,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
       color: #1f2937;
       margin: 0 0 8px 0;
@@ -453,16 +453,104 @@
 
       i {
         color: #16d3d2;
-        font-size: 18px;
+        font-size: 20px;
       }
     }
 
     .preview-description {
       color: #6b7280;
-      font-size: 13px;
-      line-height: 1.4;
+      font-size: 14px;
+      line-height: 1.5;
       margin: 0;
       font-family: 'Poppins', sans-serif;
+    }
+  }
+
+  .preview-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+
+    .preview-controls {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+      
+      .btn-refresh {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        color: #374151;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          background: #e5e7eb;
+          border-color: #9ca3af;
+        }
+        
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+
+    .phonePreviewContainer {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background: white;
+      min-height: 400px;
+
+      .previewIframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        min-height: 400px;
+      }
+    }
+
+    .no-menu-message,
+    .no-restaurant-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      color: #6b7280;
+      min-height: 400px;
+
+      i {
+        font-size: 48px;
+        color: #d1d5db;
+        margin-bottom: 16px;
+      }
+
+      p {
+        margin: 8px 0;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .message-hint {
+        font-size: 14px;
+        color: #9ca3af;
+        font-weight: 400;
+      }
     }
   }
 }
@@ -593,15 +681,14 @@
   }
 }
 
-// Loading Indicator
+// Loading indicator
 .loading-indicator {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
   color: #6b7280;
   font-size: 14px;
-  font-family: 'Poppins', sans-serif;
+  margin-top: 8px;
 
   .rotating {
     animation: rotate 1s linear infinite;

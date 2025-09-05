@@ -78,37 +78,35 @@
 
           <!-- Upload Form -->
           <form [formGroup]="uploadForm" *ngIf="selectedFile" class="upload-form">
-            <mat-form-field appearance="outline">
-              <mat-label>Category</mat-label>
-              <mat-select formControlName="category" (selectionChange)="onCategoryChange()">
-                <mat-option *ngFor="let category of categories" [value]="category">
-                  {{ category }}
-                </mat-option>
-                <mat-option value="custom">Custom Category</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <app-form-select
+              label="Category"
+              [options]="categoryOptions"
+              formControlName="category"
+              (selectionChange)="onCategoryChange()">
+            </app-form-select>
 
-            <mat-form-field appearance="outline" *ngIf="uploadForm.get('category')?.value === 'custom'">
-              <mat-label>Custom Category</mat-label>
-              <input matInput formControlName="customCategory">
-            </mat-form-field>
+            <app-form-input
+              *ngIf="uploadForm.get('category')?.value === 'custom'"
+              label="Custom Category"
+              placeholder="Enter custom category"
+              formControlName="customCategory">
+            </app-form-input>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Description</mat-label>
-              <textarea matInput formControlName="description" rows="3"></textarea>
-            </mat-form-field>
+            <app-form-textarea
+              label="Description"
+              placeholder="Enter description..."
+              [rows]="3"
+              formControlName="description">
+            </app-form-textarea>
 
-            <mat-slide-toggle formControlName="isPublic">
-              Make this media publicly accessible
-            </mat-slide-toggle>
 
             <div class="form-actions">
               <button class="btnTertiary" (click)="closeModal()">Cancel</button>
-              <button class="btnSecondary" 
+              <button class="btnPrimary" 
                       (click)="uploadMedia()"
-                      [disabled]="uploading || !uploadForm.valid">
+                      [disabled]="uploading || !isValidationValid">
                 <mat-spinner diameter="20" *ngIf="uploading"></mat-spinner>
-                {{ uploading ? 'Uploading...' : 'Upload' }}
+                {{ uploading ? 'Uploading...' : 'Upload Media' }}
               </button>
             </div>
           </form>
@@ -134,16 +132,23 @@
           <div class="media-grid" *ngIf="!mediaLibraryLoading">
             <div *ngFor="let media of mediaItems" 
                  class="media-item"
+                 [class.disabled]="!isMediaItemValid(media)"
+                 [class.valid]="isMediaItemValid(media)"
+                 [matTooltip]="!isMediaItemValid(media) ? getValidationMessage(media) : ''"
+                 [matTooltipDisabled]="isMediaItemValid(media)"
+                 matTooltipPosition="above"
                  (click)="selectExistingMedia(media)">
               <img [src]="media.thumbnailUrl || media.url" 
                    [alt]="media.originalName"
                    class="media-thumbnail">
-              <div class="media-info">
-                <h4>{{ media.originalName }}</h4>
-                <p>{{ media.fileSize | fileSize }}</p>
-                <p *ngIf="media.category">{{ media.category }}</p>
+              <div class="media-overlay" *ngIf="!isMediaItemValid(media)">
+                <div class="overlay-content">
+                  <mat-icon class="overlay-icon">block</mat-icon>
+                  <p class="overlay-text">Not Suitable</p>
+                  <p class="overlay-subtext">Doesn't meet requirements</p>
+                </div>
               </div>
-              <div class="media-overlay">
+              <div class="media-overlay" *ngIf="isMediaItemValid(media)">
                 <div class="overlay-content">
                   <mat-icon class="overlay-icon">check_circle</mat-icon>
                   <p class="overlay-text">Select Media</p>
@@ -271,25 +276,6 @@
     </mat-progress-bar>
   </div>
 
-  <!-- Action Buttons for Enhanced Mode -->
-  <div class="modal-actions" *ngIf="!isLegacyMode">
-    <div class="action-buttons">
-      <app-action-button
-        type="custom"
-        customIcon="close"
-        title="Cancel"
-        (actionClick)="closeModal()">
-      </app-action-button>
-      
-      <app-action-button
-        type="custom"
-        customIcon="save"
-        title="Save and Close"
-        [disabled]="!canSave"
-        (actionClick)="onSave()">
-      </app-action-button>
-    </div>
-  </div>
 
   <!-- Legacy Action Buttons -->
   <div class="modal-buttons" *ngIf="isLegacyMode">
@@ -299,7 +285,7 @@
     <button type="button" 
             class="btnSecondary" 
             (click)="uploadMedia()"
-            [disabled]="uploading || !selectedFile">
+            [disabled]="uploading || !isValidationValid">
       SAVE
     </button>
   </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { Observable, finalize } from 'rxjs';
 import { AuthService } from '../../../shared/services/auth.service';
@@ -12,6 +12,7 @@ import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsa
 import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
 import { MediaLibraryService } from '../../../shared/services/media-library.service';
 import { MediaItem } from '../../../shared/types/media';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-about',
@@ -19,6 +20,8 @@ import { MediaItem } from '../../../shared/types/media';
   styleUrl: './about.component.scss',
 })
 export class AboutComponent {
+  @ViewChild('previewIframe') previewIframe: ElementRef;
+
   aboutText: string = '';
   businessHours: string = '';
   email: string = '';
@@ -43,6 +46,16 @@ export class AboutComponent {
   selectedRestaurantId: string = '';
   selectedRestaurant: Restaurant | null = null;
   isLoadingRestaurants: boolean = false;
+
+  // Menu selection for preview
+  menus: any[] = [];
+  selectedMenuId: string = '';
+  isLoadingMenus: boolean = false;
+
+  // Preview URL management
+  private readonly previewUrlBase = 'https://main.d1ovxejc04tu3k.amplifyapp.com/menu/';
+  private cachedPreviewUrl: SafeResourceUrl | null = null;
+  private lastSelectedMenuId: string | null = null;
   
   constructor(
     private storage: AngularFireStorage,
@@ -52,7 +65,8 @@ export class AboutComponent {
     private dialog: MatDialog,
     private toastr: ToastrService,
     private mediaUploadModalService: MediaUploadModalService,
-    private mediaLibraryService: MediaLibraryService
+    private mediaLibraryService: MediaLibraryService,
+    private sanitizer: DomSanitizer
   ) {
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
@@ -151,7 +165,129 @@ export class AboutComponent {
     
     if (this.selectedRestaurant) {
       this.loadAboutData();
+      this.fetchMenus(); // Fetch menus when restaurant changes
     }
+  }
+
+  private fetchMenus() {
+    if (!this.selectedRestaurantId) return;
+    
+    this.isLoadingMenus = true;
+    
+    // Fetch active menus for the selected restaurant
+    // Note: Removed orderBy to avoid index requirement - can be added back after creating the index
+    this.firestore.collection('menus', ref => 
+      ref.where('restaurantID', '==', this.selectedRestaurantId)
+         .where('status', '==', 'active')
+    ).valueChanges().subscribe({
+      next: (menus: any[]) => {
+        console.log('Found menus for restaurant:', menus);
+        console.log('Sample menu structure:', menus.length > 0 ? menus[0] : 'No menus');
+        
+        // Sort menus by creation date manually to avoid index requirement
+        this.menus = menus.sort((a, b) => {
+          const dateA = a.createdAt?.toDate?.() || a.createdAt || new Date(0);
+          const dateB = b.createdAt?.toDate?.() || b.createdAt || new Date(0);
+          return dateB.getTime() - dateA.getTime(); // Most recent first
+        });
+        this.isLoadingMenus = false;
+        
+        // Auto-select the first menu if available
+        if (this.menus.length > 0 && !this.selectedMenuId) {
+          // Try different possible field names for menu ID
+          const firstMenu = this.menus[0];
+          this.selectedMenuId = firstMenu.menuID || firstMenu.menuId || firstMenu.id || firstMenu._id;
+          console.log('First menu object:', firstMenu);
+          console.log('Auto-selected first menu:', this.selectedMenuId);
+          
+          // Log all possible ID fields for debugging
+          console.log('Available ID fields:', {
+            menuID: firstMenu.menuID,
+            menuId: firstMenu.menuId,
+            id: firstMenu.id,
+            _id: firstMenu._id
+          });
+          
+          // Force preview URL update after auto-selection
+          setTimeout(() => {
+            this.getPreviewUrl();
+          }, 100);
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching menus:', error);
+        this.isLoadingMenus = false;
+        
+        // Provide more specific error messages
+        if (error.code === 'permission-denied') {
+          this.toastr.error('Permission denied: Unable to access menu data');
+        } else if (error.message && error.message.includes('index')) {
+          this.toastr.error('Database index issue: Please contact support');
+        } else {
+          this.toastr.error('Failed to load menus. Please try again.');
+        }
+      }
+    });
+  }
+
+  getPreviewUrl(): SafeResourceUrl {
+    console.log('getPreviewUrl called with selectedMenuId:', this.selectedMenuId);
+    console.log('Available menus:', this.menus);
+    
+    // Only update the URL if the menu selection has changed
+    if (this.selectedMenuId !== this.lastSelectedMenuId) {
+      console.log('Updating preview URL due to menu change:', {
+        oldId: this.lastSelectedMenuId,
+        newId: this.selectedMenuId
+      });
+
+      this.lastSelectedMenuId = this.selectedMenuId;
+
+      if (this.selectedMenuId) {
+        const url = `${this.previewUrlBase}${this.selectedMenuId}/about`;
+        console.log('Generated preview URL:', url);
+        this.cachedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      } else if (this.menus.length > 0) {
+        // If no menu is selected but menus are available, select the first one
+        const firstMenu = this.menus[0];
+        this.selectedMenuId = firstMenu.menuID || firstMenu.menuId || firstMenu.id || firstMenu._id;
+        if (this.selectedMenuId) {
+          const url = `${this.previewUrlBase}${this.selectedMenuId}/about`;
+          console.log('Auto-generated preview URL:', url);
+          this.cachedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        } else {
+          console.warn('Could not determine menu ID from first menu:', firstMenu);
+          this.cachedPreviewUrl = null;
+        }
+      } else {
+        console.log('No menus available, setting cachedPreviewUrl to null');
+        this.cachedPreviewUrl = null;
+      }
+    }
+
+    console.log('Returning cachedPreviewUrl:', this.cachedPreviewUrl);
+    return this.cachedPreviewUrl || this.sanitizer.bypassSecurityTrustResourceUrl('');
+  }
+
+  onMenuSelectionChange(event: any) {
+    if (event.value === this.selectedMenuId) {
+      console.log('Same menu selected, skipping update');
+      return;
+    }
+
+    console.log('Selected menu:', event.value);
+    this.selectedMenuId = event.value;
+    
+    // Force preview URL update
+    setTimeout(() => {
+      this.getPreviewUrl();
+    }, 100);
+  }
+
+  // Method to manually refresh the preview
+  refreshPreview() {
+    console.log('Manually refreshing preview...');
+    this.getPreviewUrl();
   }
 
   private loadAboutData() {
@@ -253,14 +389,19 @@ export class AboutComponent {
       // Update about with media library reference
       this.mainImageUrl = mediaItem.url;
       
-      // Track usage in media library
-      await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
-        componentType: 'other',
-        componentId: 'main-image',
-        componentName: 'About',
-        usageDate: new Date(),
-        fieldName: 'mainImage'
-      });
+      // Track usage in media library - handle permission errors gracefully
+      try {
+        await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
+          componentType: 'other',
+          componentId: 'main-image',
+          componentName: 'About',
+          usageDate: new Date(),
+          fieldName: 'mainImage'
+        });
+      } catch (trackingError) {
+        console.warn('Could not track media usage (permission issue):', trackingError);
+        // Continue with the upload even if tracking fails
+      }
 
       this.isSaving = false;
       this.markAsChanged(); // Add this to enable save button
@@ -279,14 +420,19 @@ export class AboutComponent {
       // Add new image to the array
       this.additionalImageUrls.push(mediaItem.url);
       
-      // Track usage in media library
-      await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
-        componentType: 'other',
-        componentId: 'additional-image',
-        componentName: 'About',
-        usageDate: new Date(),
-        fieldName: 'additionalImage'
-      });
+      // Track usage in media library - handle permission errors gracefully
+      try {
+        await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
+          componentType: 'other',
+          componentId: 'additional-image',
+          componentName: 'About',
+          usageDate: new Date(),
+          fieldName: 'additionalImage'
+        });
+      } catch (trackingError) {
+        console.warn('Could not track media usage (permission issue):', trackingError);
+        // Continue with the upload even if tracking fails
+      }
 
       this.isSaving = false;
       this.markAsChanged(); // Add this to enable save button

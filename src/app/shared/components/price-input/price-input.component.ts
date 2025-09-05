@@ -37,10 +37,17 @@ export class PriceInputComponent implements ControlValueAccessor {
     this.valueChange.emit(val);
   }
 
+  // Get numeric value for the number input (without "R " prefix)
+  get numericValue(): string {
+    if (!this._value) return '';
+    const numericStr = this._value.replace(/[^0-9.]/g, '');
+    return numericStr;
+  }
+
   // ControlValueAccessor implementation
   writeValue(value: string): void {
     if (value !== undefined && value !== null) {
-      this._value = this.formatPrice(value);
+      this._value = value;
     }
   }
 
@@ -60,61 +67,18 @@ export class PriceInputComponent implements ControlValueAccessor {
     const target = event.target as HTMLInputElement;
     const inputValue = target.value;
     
-    // Format the price and update the input
-    const formattedValue = this.formatPrice(inputValue);
-    target.value = formattedValue;
-    this.value = formattedValue;
+    // Store the numeric value without formatting during typing
+    this.value = inputValue;
   }
 
   onBlur(): void {
+    // Format with currency prefix only on blur
+    if (this.value && !this.value.startsWith('R ')) {
+      this.value = `R ${this.value}`;
+    }
     this.onTouched();
   }
 
-  onKeypress(event: KeyboardEvent): boolean {
-    // Allow: backspace, delete, tab, escape, enter, home, end, left, right arrows
-    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
-    
-    // Allow decimal point (only one)
-    if (event.key === '.' && !(event.target as HTMLInputElement).value.includes('.')) {
-      return true;
-    }
-    
-    // Allow allowed keys
-    if (allowedKeys.includes(event.key)) {
-      return true;
-    }
-    
-    // Allow numbers 0-9
-    if (event.key >= '0' && event.key <= '9') {
-      return true;
-    }
-    
-    // Block everything else
-    event.preventDefault();
-    return false;
-  }
-
-  private formatPrice(inputValue: string): string {
-    if (!inputValue) return 'R 0.00';
-    
-    // Remove all non-numeric characters except decimal point
-    let numericValue = inputValue.replace(/[^0-9.]/g, '');
-    
-    // Handle empty input
-    if (!numericValue) return 'R 0.00';
-    
-    // Ensure only one decimal point
-    const parts = numericValue.split('.');
-    if (parts.length > 2) {
-      numericValue = parts[0] + '.' + parts.slice(1).join('');
-    }
-    
-    // Convert to number and format to 2 decimal places
-    const num = parseFloat(numericValue) || 0;
-    const formatted = num.toFixed(2);
-    
-    return `R ${formatted}`;
-  }
 
   // Method to get the numeric value without currency formatting
   getNumericValue(): number {
@@ -125,9 +89,9 @@ export class PriceInputComponent implements ControlValueAccessor {
   // Method to set value programmatically
   setValue(value: number | string): void {
     if (typeof value === 'number') {
-      this.value = this.formatPrice(value.toString());
+      this.value = value.toString();
     } else {
-      this.value = this.formatPrice(value);
+      this.value = value;
     }
   }
 } 

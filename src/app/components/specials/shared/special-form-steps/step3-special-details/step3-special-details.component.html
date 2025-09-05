@@ -164,7 +164,6 @@
               rows="3"
               maxlength="500"
             ></textarea>
-            <mat-hint>Max 500 characters. Use this to highlight the value of your category-wide promotion.</mat-hint>
             <mat-error *ngIf="specialForm.get('customPromotionalText')?.hasError('maxlength')">
               Custom text cannot exceed 500 characters
             </mat-error>
@@ -254,7 +253,6 @@
               rows="3"
               maxlength="500"
             ></textarea>
-            <mat-hint>Max 500 characters. Use this to highlight the value and appeal of your combo deal.</mat-hint>
             <mat-error *ngIf="specialForm.get('customPromotionalText')?.hasError('maxlength')">
               Custom text cannot exceed 500 characters
             </mat-error>

@@ -8,16 +8,16 @@
     width: 100%;
   }
 
-  .price-input-label {
-    color: #9a9a9a;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 20.25px;
-    letter-spacing: -0.1%;
-    margin: 0;
+  .form-label {
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
 
-    .required-asterisk {
-      color: #ff6b6b;
+    &.required::after {
+      content: '*';
+      color: #d32f2f;
       margin-left: 4px;
     }
   }
@@ -97,7 +97,7 @@
     font-size: 13px;
   }
 
-  .price-input-label {
+  .form-label {
     font-size: 14px;
   }
 }
