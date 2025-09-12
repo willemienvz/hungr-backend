@@ -1,0 +1,31 @@
+<div class="payment-success-container">
+  <div class="success-card">
+    <div class="success-icon">
+ 
+    </div>
+    
+    <h1>Payment Successful!</h1>
+    
+    <p class="success-message">
+      Thank you for your payment. Your subscription has been activated successfully.
+    </p>
+    
+    <div class="payment-details" *ngIf="paymentId">
+      <p><strong>Payment ID:</strong> {{ paymentId }}</p>
+    </div>
+    
+    <div class="action-buttons">
+      <button mat-raised-button color="primary" (click)="goToDashboard()">
+        Go to Dashboard
+      </button>
+      
+      <button mat-button (click)="goToLogin()">
+        Back to Login
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+

@@ -18,5 +18,16 @@ export const environment = {
       },
       yoko:{
         publicKey: '',
+      },
+      payfast: {
+        merchantId: '10013557',
+        merchantKey: 'nn7rftlml9ki3',
+        passphrase: 'T3st1ngT3st1ng',
+        sandboxUrl: 'https://sandbox.payfast.co.za/eng/process',
+        productionUrl: 'https://www.payfast.co.za/eng/process',
+        itnUrl: 'https://us-central1-hungr-firebase.cloudfunctions.net/payfastItn',
+        returnUrl: 'http://localhost:4200/verify-email-address',
+        cancelUrl: 'http://localhost:4200/payment-cancel',
+        notifyUrl: 'https://us-central1-hungr-firebase.cloudfunctions.net/payfastItn'
       }
   };

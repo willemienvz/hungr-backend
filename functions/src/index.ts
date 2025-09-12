@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { reviews } from './reviews';
 import { backfill } from './backfill';
+import { payfastItn } from './payfastItn';
 
 // Initialize Firebase Admin SDK once
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -37,4 +38,7 @@ export const backfillAnalytics = functions
     const result = await backfill.runBackfill({ startDate, endDate, dryRun });
     return result;
   });
+
+// Export PayFast ITN handler
+export { payfastItn };
 

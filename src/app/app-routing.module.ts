@@ -38,6 +38,9 @@ import { Step2Component } from './components/sign-up/step2/step2.component';
 import { TestAuthComponent } from './components/test-auth/test-auth.component';
 import { MediaLibraryComponent } from './components/media-library/media-library.component';
 import { ReviewsComponent } from './components/reviews/reviews.component';
+import { PayFastTestComponent } from './components/test/payfast-test/payfast-test.component';
+import { PaymentSuccessComponent } from './components/payment/payment-success/payment-success.component';
+import { PaymentCancelComponent } from './components/payment/payment-cancel/payment-cancel.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -54,6 +57,9 @@ const routes: Routes = [
   { path: 'confirm-email', component: ConfirmEmailComponent },
   { path: 'action-landing', component: ActionLandingComponent },
   { path: 'test-auth', component: TestAuthComponent },
+  { path: 'test-payfast', component: PayFastTestComponent },
+  { path: 'payment-success', component: PaymentSuccessComponent },
+  { path: 'payment-cancel', component: PaymentCancelComponent },
 
   {
     path: '',

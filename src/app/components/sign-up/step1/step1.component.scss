@@ -1,18 +1,30 @@
+@import "../../../../styles/_design-tokens";
+@import "../../../../styles/_responsive";
+
 .form-container {
   width: 100%;
   display: flex;
   position: relative;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: var(--spacing-5);
   min-height: 100vh;
+  gap:  var(--spacing-10);
 
   .logo {
     position: absolute;
-    top: 17px;
-    left: 46px;
+    top: var(--spacing-4);
+    left: var(--spacing-10);
     width: 150px;
+    
+    @include respond-to-max('sm') {
+      width: 120px;
+      left: var(--spacing-4);
+      position:relative;
+      top:0;
+      left:0;
+    }
   }
 
   &-inner {
@@ -22,12 +34,24 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 62px;
+    gap: var(--spacing-16);
     position: relative;
+    
+    @include respond-to-max('sm') {
+      gap: var(--spacing-10);
+    }
   }
 
   h1 {
-    color: #2e3646;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-4);
+    
+    @include respond-to-max('sm') {
+      font-size: var(--font-size-2xl);
+      margin-bottom: var(--spacing-3);
+    }
   }
 
   form {
@@ -36,7 +60,11 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 40px;
+    gap: var(--spacing-10);
+    
+    @include respond-to-max('sm') {
+      gap: var(--spacing-6);
+    }
 
     .row {
       width: 100%;
@@ -46,6 +74,11 @@
       align-items: flex-start;
       gap: var(--grid-gap-md);
 
+      @include respond-to-max('sm') {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-4);
+      }
+
       .col {
         display: flex;
         flex-direction: column;
@@ -53,9 +86,16 @@
         justify-content: flex-start;
 
         h6 {
-          color: #2e3646;
+          color: var(--color-text-primary);
           text-align: left;
-          margin-bottom: 18px;
+          margin-bottom: var(--spacing-4);
+          font-size: var(--font-size-lg);
+          font-weight: var(--font-weight-semibold);
+          
+          @include respond-to-max('sm') {
+            margin-bottom: var(--spacing-3);
+            font-size: var(--font-size-md);
+          }
         }
 
         .formGroup {
@@ -64,11 +104,17 @@
           flex-direction: column;
           justify-content: flex-start;
           align-items: flex-start;
-          margin-bottom: 25px;
+          margin-bottom: var(--spacing-6);
+
+          @include respond-to-max('sm') {
+            margin-bottom: var(--spacing-4);
+          }
 
           label {
-            color: #9a9a9a;
-
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+            margin-bottom: 0;
+            font-weight: var(--font-weight-medium);
           }
         }
 
@@ -82,10 +128,19 @@
           width: 100%;
           display: flex;
           flex-direction: row;
-          gap: 23px;
+          gap: var(--spacing-6);
+
+          @include respond-to-max('sm') {
+            flex-direction: column;
+            gap: var(--spacing-4);
+          }
 
           .formGroup {
             width: calc(50% - 12px);
+            
+            @include respond-to-max('sm') {
+              width: 100%;
+            }
           }
         }
       }
@@ -103,11 +158,22 @@
 
   .material-icons {
     position: absolute;
-    top: 11px;
-    right: 13px;
-    font-size: 19px;
+    top: var(--spacing-3);
+    right: var(--spacing-3);
+    font-size: var(--font-size-lg);
     cursor: pointer;
-    color: #ebedee;
+    color: var(--color-grey-200);
+    transition: color var(--transition-base);
+    
+    &:hover {
+      color: var(--color-secondary);
+    }
+    
+    @include respond-to-max('sm') {
+      top: var(--spacing-2);
+      right: var(--spacing-2);
+      font-size: var(--font-size-md);
+    }
   }
 }
 
@@ -121,18 +187,26 @@
 
   .material-icons {
     position: absolute;
-    top: 11px;
-    left: 13px;
-    font-size: 19px;
-    color: #000000;
+    top: var(--spacing-3);
+    left: var(--spacing-3);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+    
+    @include respond-to-max('sm') {
+      top: var(--spacing-2);
+      left: var(--spacing-2);
+      font-size: var(--font-size-md);
+    }
   }
 
   input {
-    padding-left: 40px;
+    padding-left: var(--spacing-10);
+    
+    @include respond-to-max('sm') {
+      padding-left: var(--spacing-8);
+    }
   }
 }
-
-@import "../../../../styles/_design-tokens";
 
 /* Back Link styling - Now centralized in _design-tokens.scss */
 .backLink {
@@ -142,20 +216,30 @@
 }
 
 .valid {
-  color: #16d3d2;
+  color: var(--color-secondary) !important;
+  font-weight: var(--font-weight-medium);
 }
 
 .infobox {
   width: 100%;
-  border-radius: 5px;
-  padding: 13px 36px;
+  border-radius: var(--border-radius-base);
+  padding: var(--spacing-3) var(--spacing-8);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--spacing-2);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  
+  @include respond-to-max('sm') {
+    padding: var(--spacing-2) var(--spacing-4);
+  }
 
   .font-small-medium {
     text-align: left;
-    color: #5f6d7e;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
   }
 
   .inner-row {
@@ -163,15 +247,25 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
+    
+    @include respond-to-max('sm') {
+      flex-direction: column;
+    }
 
     p {
       width: 50%;
-      font-family: "Poppins", sans-serif;
-      font-size: 9px;
-      font-weight: 500;
-      line-height: 14px;
-      letter-spacing: -0.001em;
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-normal);
+      letter-spacing: var(--letter-spacing-normal);
       text-align: left;
+      color: var(--color-text-muted);
+      padding: var(--spacing-1) 0;
+      
+      @include respond-to-max('sm') {
+        width: 100%;
+      }
     }
   }
 }

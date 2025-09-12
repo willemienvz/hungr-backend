@@ -143,6 +143,7 @@ import { MediaLibraryComponent } from './components/media-library/media-library.
 import { FileSizePipe } from './shared/pipes/file-size.pipe';
 import { ReviewsComponent } from './components/reviews/reviews.component';
 import { PermissionService } from './shared/services/permission.service';
+import { PayFastTestComponent } from './components/test/payfast-test/payfast-test.component';
 
 @NgModule({
   declarations: [
@@ -247,6 +248,7 @@ import { PermissionService } from './shared/services/permission.service';
     MediaUploadModalComponent,
     MediaPreviewDialogComponent,
     ReviewsComponent,
+    PayFastTestComponent,
   ],
   imports: [
     BrowserModule,

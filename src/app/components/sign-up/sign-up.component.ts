@@ -4,7 +4,7 @@ import { FormDataService } from '../../shared/services/signup/form-data.service'
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { EmailService } from '../../shared/services/email.service';
 import { ToastrService } from 'ngx-toastr';
-import { PayflexService } from '../../shared/services/payflex.service';
+import { PayFastService } from '../../shared/services/payfast.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -25,7 +25,7 @@ export class SignUpComponent {
     private readonly toastr: ToastrService,
     private readonly auth: AngularFireAuth,
     private readonly emailService: EmailService,
-    private readonly payflexService: PayflexService,
+    private readonly payfastService: PayFastService,
   ) {}
 
   onNextStep(formData: any) {
@@ -61,7 +61,18 @@ export class SignUpComponent {
     const formData = this.formDataService.getFormData();
     
     try {
-      await this.payflexService.createOrder(120, formData);
+      // Prepare payment data for Payfast recurring billing
+      const paymentData = {
+        amount: 999, // R999 per month
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        cellphone: formData.cellphone,
+        merchantReference: `Hungr_${formData.email}_${Date.now()}`
+      };
+      
+      // Create recurring payment with Payfast
+      await this.payfastService.createRecurringPayment(paymentData);
     } catch (error) {
       console.error('Error during checkout:', error);
       this.toastr.error('Failed to initiate payment. Please try again.');

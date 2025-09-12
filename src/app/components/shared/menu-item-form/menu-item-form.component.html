@@ -89,18 +89,17 @@
               placeholder="Select Category"
               (selectionChange)="onCategorySelectionChange($event)"
             >
-              <mat-optgroup
-                *ngFor="let category of categories"
-                [label]="category.name"
-              >
-                <mat-option [value]="category.id">{{ category.name }}</mat-option>
+              <ng-container *ngFor="let category of categories">
+                <mat-option [value]="category.id">
+                  {{ category.name }}
+                </mat-option>
                 <mat-option
                   *ngFor="let subcategory of category.subcategories"
                   [value]="subcategory.id"
                 >
                   &nbsp;&nbsp;{{ subcategory.name }}
                 </mat-option>
-              </mat-optgroup>
+              </ng-container>
             </mat-select>
           </mat-form-field>
           </div> 

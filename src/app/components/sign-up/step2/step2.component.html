@@ -2,199 +2,92 @@
   <img class="logo" src="../../../../assets/images/shared/logo.png" alt="" />
   <div class="form-container-inner">
     <h1>Sign Up</h1>
-    <h6>Select your Option</h6>
+    <h6>Choose Your Plan</h6>
     <a class="backLink" (click)="onPrevious()"
       ><span class="material-symbols-outlined"> arrow_back </span>Back</a
     >
     <form [formGroup]="step2Form">
-      <div class="tab-container">
+      <div class="pricing-cards">
+        <!-- Digital Menu Card -->
         <div
-          class="tab"
-          (click)="showAnnual = true"
-          [class.active]="showAnnual"
+          class="pricing-card digital-menu active always-selected"
         >
-          Annual
-        </div>
-        <div
-          class="tab"
-          (click)="showAnnual = false"
-          [class.active]="!showAnnual"
-        >
-          Monthly
-        </div>
-      </div>
-
-      <div *ngIf="showAnnual">
-        <div class="row1">
-          <div
-            class="col"
-            (click)="selectBillingOption('annual1')"
-            [class.active]="billingOption?.value === 'annual1'"
-          >
-            <div class="section">
-              <h6>Option 1 (Digital Menu)</h6>
-              <p>
-                Short description of this option Lorem ipsum dolor sit amet. Ut
-                illo autem et totam esse et tenetur minima ut minima galisum?
-                Sit magnam molestias et fugit quos ad quis expedita!
-              </p>
-              <div class="list">
-                <div class="listitem">
-                  <span class="material-symbols-outlined"> check_box </span>
-                  <p>Feature included</p>
+          <div class="card-header">
+            <h2 class="plan-title blue">DIGITAL MENU</h2>
+          </div>
+          
+          <div class="card-content">
+            <div class="price-section">
+              <div class="price">R999</div>
+              <div class="billing-period">per month</div>
+            </div>
+            
+            <div class="price-description">
+              Charged as a set monthly cost.
+            </div>
+            
+            <div class="signup-btn">SIGN UP</div>
+            
+            <div class="features-list">
+              <div class="feature-item">
+                <div class="check-icon">
+                  <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.31698 13.1111L0.333344 7.21225L1.82925 5.73754L6.31698 10.1617L15.9485 0.666626L17.4445 2.14133L6.31698 13.1111Z" fill="white"/>
+                  </svg>
                 </div>
-                <div class="listitem">
-                  <span class="material-symbols-outlined"> check_box </span>
-                  <p>Feature included</p>
+                <div class="feature-text">Includes 2 user profiles and adding unlimited menus and restaurants.</div>
+              </div>
+              <div class="feature-item">
+                <div class="check-icon">
+                  <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.31698 13.1111L0.333344 7.21225L1.82925 5.73754L6.31698 10.1617L15.9485 0.666626L17.4445 2.14133L6.31698 13.1111Z" fill="white"/>
+                  </svg>
                 </div>
-                <div class="listitem">
-                  <span class="material-symbols-outlined"> check_box </span>
-                  <p>Feature included</p>
-                </div>
-                <div class="listitem">
-                  <span class="material-symbols-outlined"> check_box </span>
-                  <p>Feature included</p>
-                </div>
+                <div class="feature-text">Simply add your credit card details to get started.</div>
               </div>
             </div>
-            <div class="section">
-              <h3>R 000.00</h3>
-              <p class="bigger">per month billed annually</p>
-            </div>
           </div>
-          <!--  <div class="col" (click)="selectBillingOption('annual2')"
-                        [class.active]="billingOption?.value === 'annual2'">
-                        <div class="section">
-                            <h6>Option 2 (Order & Pay)</h6>
-                            <p>Short description of this option Lorem ipsum dolor sit amet. Ut illo autem et totam esse
-                                et
-                                tenetur minima ut minima galisum? Sit magnam molestias et fugit quos ad quis expedita!
-                            </p>
-                            <div class="list">
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="section">
-                            <h3>R 000.00</h3>
-                            <p class="bigger">per month billed annually</p>
-                        </div>
-                    </div> -->
         </div>
-      </div>
 
-      <div *ngIf="!showAnnual">
-        <div class="row1">
-          <div
-            class="col"
-            (click)="selectBillingOption('monthly1')"
-            [class.active]="billingOption?.value === 'monthly1'"
-          >
-            <div class="section">
-              <h6>Option 1 (Digital Menu)</h6>
-              <p>
-                Short description of this option Lorem ipsum dolor sit amet. Ut
-                illo autem et totam esse et tenetur minima ut minima galisum?
-                Sit magnam molestias et fugit quos ad quis expedita!
-              </p>
-              <div class="list">
-                <div class="listitem">
-                  <span class="material-symbols-outlined"> check_box </span>
-                  <p>Feature included</p>
+        <!-- Order & Pay Card -->
+        <div
+          class="pricing-card order-pay coming-soon unselectable"
+        >
+          <div class="card-header">
+            <h2 class="plan-title red">ORDER & PAY</h2>
+          </div>
+          
+          <div class="card-content">
+            <div class="price-section">
+              <div class="price">4.5%</div>
+              <div class="billing-period">transaction fee</div>
+            </div>
+            
+            <div class="price-description">
+              Charged per transaction processed through the Hungr platform.
+            </div>
+            
+            <div class="coming-soon-badge">COMING SOON</div>
+            
+            <div class="features-list">
+              <div class="feature-item">
+                <div class="check-icon">
+                  <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.31698 13.1111L0.333344 7.21225L1.82925 5.73754L6.31698 10.1617L15.9485 0.666626L17.4445 2.14133L6.31698 13.1111Z" fill="white"/>
+                  </svg>
                 </div>
-                <div class="listitem">
-                  <span class="material-symbols-outlined"> check_box </span>
-                  <p>Feature included</p>
+                <div class="feature-text">All benefits of Mobile Menu are included without the monthly cost.</div>
+              </div>
+              <div class="feature-item">
+                <div class="check-icon">
+                  <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.31698 13.1111L0.333344 7.21225L1.82925 5.73754L6.31698 10.1617L15.9485 0.666626L17.4445 2.14133L6.31698 13.1111Z" fill="white"/>
+                  </svg>
                 </div>
-                <div class="listitem">
-                  <span class="material-symbols-outlined"> check_box </span>
-                  <p>Feature included</p>
-                </div>
-                <div class="listitem">
-                  <span class="material-symbols-outlined"> check_box </span>
-                  <p>Feature included</p>
-                </div>
+                <div class="feature-text">Set fee for all transactions processed through Hungr.</div>
               </div>
             </div>
-            <div class="section">
-              <h3>R 000.00</h3>
-              <p class="bigger">per month billed monthly</p>
-            </div>
           </div>
-          <!-- <div class="col" (click)="selectBillingOption('monthly2')"
-                        [class.active]="billingOption?.value === 'monthly2'">
-                        <div class="section">
-                            <h6>Option 2 (Order & Pay)</h6>
-                            <p>Short description of this option Lorem ipsum dolor sit amet. Ut illo autem et totam esse
-                                et
-                                tenetur minima ut minima galisum? Sit magnam molestias et fugit quos ad quis expedita!
-                            </p>
-                            <div class="list">
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                                <div class="listitem">
-                                    <span class="material-symbols-outlined">
-                                        check_box
-                                    </span>
-                                    <p>Feature included</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="section">
-                            <h3>R 000.00</h3>
-                            <p class="bigger">per month billed monthly</p>
-                        </div>
-                    </div> -->
         </div>
       </div>
 

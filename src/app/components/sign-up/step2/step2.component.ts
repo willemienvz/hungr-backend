@@ -5,7 +5,7 @@ import { AuthService } from '../../../shared/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 
 import { Router } from '@angular/router';
-import { PayflexService } from '../../../shared/services/payflex.service';
+import { PayFastService, PayFastPaymentData } from '../../../shared/services/payfast.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -15,7 +15,6 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class Step2Component {
   step2Form: FormGroup;
-  showAnnual: boolean = true;
   isSaving: boolean = false;
   private formData = new BehaviorSubject<any>({});
 
@@ -25,10 +24,10 @@ export class Step2Component {
     private readonly fb: FormBuilder,
     private readonly formDataService: FormDataService,
     private readonly authService: AuthService,
-    private readonly payflexService: PayflexService
+    private readonly payfastService: PayFastService
   ) {
     this.step2Form = this.fb.group({
-      billingOption: ['annual1', Validators.required],
+      billingOption: ['digitalMenu', Validators.required], // Default to digital menu option
       agreeToTerms: [false, Validators.requiredTrue],
       receiveMarketingInfo: [false],
     });
@@ -46,8 +45,24 @@ export class Step2Component {
   }
 
   selectBillingOption(option: string) {
+    // Only allow selection of digitalMenu, not orderPay
+    if (option === 'orderPay') {
+      return;
+    }
+    
     if (this.billingOption) {
       this.billingOption.setValue(option);
+      
+      // Update visual selection
+      const cards = document.querySelectorAll('.pricing-card');
+      cards.forEach(card => {
+        card.classList.remove('active');
+      });
+      
+      const selectedCard = document.querySelector(`.pricing-card.${option === 'digitalMenu' ? 'digital-menu' : 'order-pay'}`);
+      if (selectedCard) {
+        selectedCard.classList.add('active');
+      }
     }
   }
 
@@ -70,6 +85,13 @@ export class Step2Component {
     // Store complete form data in localStorage
     localStorage.setItem('formData', JSON.stringify(combinedData));
     
+    // Check if user selected the order & pay option (coming soon)
+    if (step2Data.billingOption === 'orderPay') {
+      // Navigate to a coming soon page or show a notification
+      alert('Thank you for your interest! The Order & Pay solution is coming soon. We will notify you when it becomes available.');
+      return;
+    }
+    
     this.onCheckout();
   }
 
@@ -77,7 +99,18 @@ export class Step2Component {
     this.isSaving = true;
     try {
       const formData = this.formDataService.getFormData();
-      await this.payflexService.createOrder(120, formData);
+      
+      // Create PayFast payment data for R999/month recurring billing
+      const paymentData: PayFastPaymentData = {
+        amount: 999, // R999 per month
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.userEmail,
+        cellphone: formData.cellphone,
+        merchantReference: `Hungr_${formData.userEmail}_${Date.now()}`
+      };
+      
+      await this.payfastService.createRecurringPayment(paymentData);
     } catch (error) {
       console.error('Error during checkout:', error);
       this.isSaving = false;

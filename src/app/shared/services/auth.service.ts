@@ -56,6 +56,24 @@ export class AuthService {
       throw new Error('Unable to check email availability at this time.');
     }
   }
+
+  /**
+   * Gets a user by email from Firestore.
+   * @param email The email to search for.
+   * @returns A Promise<any> containing the user data or null if not found.
+   */
+  async getUserByEmail(email: string): Promise<any> {
+    try {
+      const userQuery = await this.afs.collection('users', ref => ref.where('email', '==', email)).get().toPromise();
+      if (userQuery && !userQuery.empty) {
+        return userQuery.docs[0].data();
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return null;
+    }
+  }
   // Sign in with email/password
   SignIn(email: string, password: string) {
     return this.afAuth

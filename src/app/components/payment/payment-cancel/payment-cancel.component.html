@@ -1,0 +1,35 @@
+<div class="payment-cancel-container">
+  <div class="cancel-card">
+    <div class="cancel-icon">
+    </div>
+    
+    <h1>Payment Cancelled</h1>
+    
+    <p class="cancel-message">
+      Your payment was cancelled. No charges have been made to your account.
+    </p>
+    
+    <div class="payment-details" *ngIf="paymentId">
+      <p><strong>Payment ID:</strong> {{ paymentId }}</p>
+    </div>
+    
+    <div class="action-buttons">
+      <button mat-raised-button color="primary" (click)="retryPayment()">
+        Try Again
+      </button>
+      
+      <button mat-button (click)="goToSignUp()">
+        Back to Sign Up
+      </button>
+      
+      <button mat-button (click)="goToLogin()">
+        Back to Login
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
+

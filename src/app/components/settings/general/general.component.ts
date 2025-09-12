@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 import { NotificationsService } from '../../../shared/services/notifications.service';
 import { MatDialog } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { PayFastService } from '../../../shared/services/payfast.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-general',
@@ -28,16 +30,20 @@ export class GeneralComponent {
   accountForm!: FormGroup;
   userDataID: string = '';
   isSaving: boolean = false;
+  isCancellingSubscription: boolean = false;
   userData$!: Observable<any>;
   hasUnsavedChanges: boolean = false;
   private originalFormValues: any = {};
+  subscriptionData: any = null;
   constructor(
     private router: Router,
     public authService: AuthService,
     private formBuilder: FormBuilder,
     private firestore: AngularFirestore,
     private notificationService: NotificationsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private payfastService: PayFastService,
+    private snackBar: MatSnackBar
   ) {
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
@@ -56,6 +62,9 @@ export class GeneralComponent {
           console.log('currentUserData', this.currentUserData);
           this.updateFormWithUserData();
         });
+        
+        // Load subscription data
+        this.loadSubscriptionData();
       } else {
         console.log('No authenticated user');
         this.router.navigate(['/signin']);
@@ -166,11 +175,91 @@ export class GeneralComponent {
     //TODO
   }
 
-  cancelSubscribtion() {
-    //TODO
+  async cancelSubscription() {
+    if (!this.subscriptionData || !this.subscriptionData.token) {
+      this.snackBar.open('No active subscription found', 'Dismiss', { duration: 5000 });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Cancel Subscription',
+        message: 'Are you sure you want to cancel your subscription? You will lose access to all features at the end of your current billing period.'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result === true) {
+        this.isCancellingSubscription = true;
+        try {
+          const success = await this.payfastService.cancelSubscription(
+            this.subscriptionData.token,
+            'User requested cancellation'
+          );
+
+          if (success) {
+            // Update subscription status in Firestore
+            await this.firestore
+              .collection('subscriptions')
+              .doc(this.subscriptionData.id)
+              .update({
+                status: 'cancelled',
+                cancellationDate: new Date(),
+                cancellationReason: 'User requested cancellation'
+              });
+
+            // Update user subscription status
+            await this.firestore
+              .doc(`users/${this.userDataID}`)
+              .update({
+                subscriptionStatus: 'cancelled',
+                subscriptionPlan: 'none'
+              });
+
+            this.snackBar.open('Subscription cancelled successfully', 'Dismiss', { duration: 5000 });
+            
+            // Reload subscription data
+            this.loadSubscriptionData();
+          } else {
+            this.snackBar.open('Failed to cancel subscription. Please try again or contact support.', 'Dismiss', { duration: 5000 });
+          }
+        } catch (error) {
+          console.error('Error cancelling subscription:', error);
+          this.snackBar.open('An error occurred while cancelling your subscription. Please contact support.', 'Dismiss', { duration: 5000 });
+        } finally {
+          this.isCancellingSubscription = false;
+        }
+      }
+    });
   }
 
   upgrade() {
     //TODO
+  }
+
+  private loadSubscriptionData() {
+    this.firestore
+      .collection('subscriptions', ref =>
+        ref.where('userId', '==', this.userDataID)
+           .where('status', '==', 'active')
+      )
+      .get()
+      .subscribe(querySnapshot => {
+        if (!querySnapshot.empty) {
+          const docData = querySnapshot.docs[0].data() as any;
+          this.subscriptionData = {
+            id: querySnapshot.docs[0].id,
+            ...docData
+          };
+          console.log('Subscription data loaded:', this.subscriptionData);
+        } else {
+          this.subscriptionData = null;
+          console.log('No active subscription found');
+        }
+      }, error => {
+        console.error('Error loading subscription data:', error);
+        this.subscriptionData = null;
+      });
   }
 }

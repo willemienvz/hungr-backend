@@ -3,7 +3,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { PayflexService } from '../../shared/services/payflex.service';
+import { PayFastService } from '../../shared/services/payfast.service';
 
 @Component({
   selector: 'app-verify-email',
@@ -19,7 +19,7 @@ export class VerifyEmailComponent implements OnInit {
     private readonly router: Router,
     private readonly toastr: ToastrService,
     private readonly auth: AngularFireAuth,
-    private readonly payflexService: PayflexService
+    private readonly payfastService: PayFastService
   ) {}
 
   ngOnInit() {
@@ -37,28 +37,52 @@ export class VerifyEmailComponent implements OnInit {
     this.createUserAccount(formData);
 
     // Notify payment success
-    this.payflexService.notifyPaymentSuccess();
+    this.payfastService.notifyPaymentSuccess();
   }
 
   private async createUserAccount(formData: any) {
     try {
-      // Create the user with email and password first
-      const userCredential = await this.auth.createUserWithEmailAndPassword(
-        formData.userEmail,
-        formData.password
-      );
+      // Check if user already exists in Firestore (created by ITN)
+      const existingUser = await this.authService.getUserByEmail(formData.userEmail);
+      
+      if (existingUser) {
+        // User exists in Firestore, create Firebase Auth account
+        const userCredential = await this.auth.createUserWithEmailAndPassword(
+          formData.userEmail,
+          formData.password
+        );
 
-      if (userCredential.user) {
-        // Send verification email
-        await userCredential.user.sendEmailVerification();
-        
-        // Update user profile with additional data
-        await this.authService.SetUserData(userCredential.user, formData);
+        if (userCredential.user) {
+          // Send verification email
+          await userCredential.user.sendEmailVerification();
+          
+          // Update existing user profile with additional data
+          await this.authService.SetUserData(userCredential.user, formData);
 
-        // Clear stored form data
-        localStorage.removeItem('formData');
+          // Clear stored form data
+          localStorage.removeItem('formData');
 
-        this.toastr.success('Account created successfully! Please check your email for verification.');
+          this.toastr.success('Account created successfully! Please check your email for verification.');
+        }
+      } else {
+        // Create new user account (original flow)
+        const userCredential = await this.auth.createUserWithEmailAndPassword(
+          formData.userEmail,
+          formData.password
+        );
+
+        if (userCredential.user) {
+          // Send verification email
+          await userCredential.user.sendEmailVerification();
+          
+          // Update user profile with additional data
+          await this.authService.SetUserData(userCredential.user, formData);
+
+          // Clear stored form data
+          localStorage.removeItem('formData');
+
+          this.toastr.success('Account created successfully! Please check your email for verification.');
+        }
       }
     } catch (error: any) {
       console.error('Error creating account:', error);

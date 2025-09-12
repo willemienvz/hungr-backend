@@ -90,15 +90,17 @@
       <h6 style="margin-bottom: 0; min-width: 120px">HUNGR Plan</h6>
       <div class="rowInner">
         <p>
-          Option 1 (Digital Menu) -
-          {{
-            currentUser?.subscriptionType === "annual1" ? "Annual" : "Monthly"
-          }}
+          Digital Menu Subscription - R999/month
         </p>
         <div class="row btnRow">
-          <!-- <a class="btnTertiary" (click)="cancelSubscribtion()"
-            >cancel subscription</a
-          >-->
+          <button
+            class="btnTertiary"
+            (click)="cancelSubscription()"
+            *ngIf="subscriptionData && subscriptionData.status === 'active'"
+            [disabled]="isCancellingSubscription"
+          >
+            {{ isCancellingSubscription ? 'Cancelling...' : 'Cancel Subscription' }}
+          </button>
           <a class="btnSecondary" href="mailto:support@hungr.co">Change</a>
         </div>
       </div>

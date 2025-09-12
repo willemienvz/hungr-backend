@@ -1398,6 +1398,16 @@ input[type="submit"]:disabled {
   text-align: center;
 }
 
+.logo-top {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+
+  img {
+    width: 150px;
+  }
+}
+
 /* Centered loading container used in analytics dashboards */
 .loading-container {
   display: flex;
