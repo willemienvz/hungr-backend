@@ -2,14 +2,68 @@
   <ng-content select="[header]"></ng-content>
 
   <div class="block rowSpecial block-open-top">
-    <button type="button" class="btnSecondary" (click)="onOpenImageUploadModal()">
+    <!-- Aspect Ratio Instructions -->
+    <div class="aspect-ratio-info">
+      <div class="info-header">
+        <mat-icon>info</mat-icon>
+        <h6>Image Requirements</h6>
+      </div>
+      <div class="info-content">
+        <p><strong>Orientation:</strong> Landscape (wider than tall)</p>
+        <p><strong>Recommended Dimensions:</strong> 1920x1080, 1280x720, or any landscape format</p>
+        <p><strong>File Types:</strong> JPG, PNG, WebP</p>
+        <p><strong>Max Size:</strong> 10MB</p>
+      </div>
+    </div>
+
+    <button type="button" class="btnPrimary" (click)="onOpenImageUploadModal()">
       <mat-icon>upload</mat-icon> Add Image
     </button>
-    <img
-      *ngIf="uploadedImageUrl"
-      style="margin-top: 30px; max-width: 80%"
-      [src]="uploadedImageUrl"
-      alt="Special preview image"
-    />
+    
+    <!-- Media Preview with Delete Option -->
+    <div *ngIf="uploadedImageUrl" class="media-preview-container">
+      <div class="media-preview">
+        <img
+          [src]="uploadedImageUrl"
+          alt="Special preview image"
+          class="preview-image"
+        />
+        <div class="media-actions">
+          <button 
+            type="button" 
+            class="btn-danger btn-sm"
+            (click)="onDeleteMedia()"
+            title="Delete image"
+          >
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" [class.open]="showDeleteModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h6>Delete Image</h6>
+      <button type="button" class="close-btn" (click)="onCancelDelete()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete this image? This action cannot be undone.</p>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btnSecondary" (click)="onCancelDelete()">
+        Cancel
+      </button>
+      <button type="button" class="btn btnPrimary" (click)="onConfirmDelete()" [disabled]="isDeleting">
+        <mat-icon *ngIf="isDeleting">hourglass_empty</mat-icon>
+        {{ isDeleting ? 'Deleting...' : 'Delete' }}
+      </button>
+    </div>
   </div>
 </div> 

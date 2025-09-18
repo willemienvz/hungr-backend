@@ -149,8 +149,10 @@
   <div *ngIf="currentStep === 4">
     <app-step4-add-media
       [uploadedImageUrl]="uploadedImageUrl"
+      [mediaId]="mediaId"
       [isSaving]="isSaving"
       (openImageUploadModal)="openImageUploadModal()"
+      (deleteMedia)="onDeleteMedia()"
     >
       <ng-container header>
         <div class="headerBlock">
@@ -223,6 +225,7 @@
       [showPrevious]="true"
       [showDraft]="true"
       [showSubmit]="true"
+      [showNext]="false"
       [submitText]="'Publish Special'"
       [isSaving]="isSaving"
       (previous)="previousStep()"

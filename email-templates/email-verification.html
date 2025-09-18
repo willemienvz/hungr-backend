@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email Address</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #333;
+            margin-top: 0;
+            font-size: 24px;
+        }
+        .content p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+        .verification-code {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .verification-code h3 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .verification-code .code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 3px;
+        }
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            .content {
+                padding: 20px;
+            }
+            .header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="{{logoUrl}}" alt="Hungr Logo" class="logo">
+            <h1>Welcome to Hungr!</h1>
+        </div>
+        <div class="content">
+            <h2>Verify Your Email Address</h2>
+            <p>Hi {{firstName}},</p>
+            <p>Thank you for signing up with Hungr! To complete your registration and start managing your restaurant's digital presence, please verify your email address.</p>
+            
+            <div class="verification-code">
+                <h3>Your Verification Code:</h3>
+                <div class="code">{{verificationCode}}</div>
+            </div>
+            
+            <p>Or click the button below to verify your email:</p>
+            <a href="{{verificationLink}}" class="button">Verify Email Address</a>
+            
+            <p><strong>Important:</strong> This verification link will expire in 24 hours for security reasons.</p>
+            
+            <p>If you didn't create an account with Hungr, please ignore this email.</p>
+        </div>
+        <div class="footer">
+            <p><strong>Hungr</strong></p>
+            <p>Your Restaurant's Digital Menu Solution</p>
+            <p>If you have any questions, please contact us at support@hungr.com</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+

@@ -45,7 +45,7 @@ export class EmailService {
     const emailData = {
       to: invitationData.email,
       subject: `You're invited to join ${invitationData.restaurantName || 'our team'}!`,
-      templateId: 'invitation-template', // You'll need to create this template in Brevo
+      templateId: 'team-invitation-template', // Updated template ID
       templateData: {
         firstName: invitationData.firstName,
         lastName: invitationData.lastName,
@@ -53,7 +53,13 @@ export class EmailService {
         invitedBy: invitationData.invitedBy,
         restaurantName: invitationData.restaurantName || 'Our Restaurant',
         invitationLink: this.generateInvitationLink(invitationData.invitationToken),
-        expiryDays: 7
+        expiryDays: 7,
+        appName: 'Hungr',
+        logoUrl: 'https://your-domain.com/assets/images/logo.png', // Update with your actual logo URL
+        supportEmail: 'support@hungr.com',
+        isAdmin: invitationData.role.toLowerCase() === 'admin',
+        isEditor: invitationData.role.toLowerCase() === 'editor',
+        isViewer: invitationData.role.toLowerCase() === 'viewer'
       }
     };
 
@@ -113,7 +119,14 @@ export class EmailService {
       templateData: {
         firstName,
         role: this.formatRoleName(role),
-        restaurantName: restaurantName || 'Our Restaurant'
+        restaurantName: restaurantName || 'Our Restaurant',
+        dashboardLink: this.generateDashboardLink(),
+        appName: 'Hungr',
+        logoUrl: 'https://your-domain.com/assets/images/logo.png', // Update with your actual logo URL
+        supportEmail: 'support@hungr.com',
+        isAdmin: role.toLowerCase() === 'admin',
+        isEditor: role.toLowerCase() === 'editor',
+        isViewer: role.toLowerCase() === 'viewer'
       }
     };
 
@@ -141,5 +154,13 @@ export class EmailService {
     // This should match your frontend invitation acceptance route
     const baseUrl = window.location.origin;
     return `${baseUrl}/accept-invitation?token=${token}`;
+  }
+
+  /**
+   * Generate dashboard link
+   */
+  private generateDashboardLink(): string {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/dashboard`;
   }
 }

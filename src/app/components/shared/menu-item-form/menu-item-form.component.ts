@@ -22,20 +22,20 @@ export class MenuItemFormComponent implements OnInit {
   @Input() categories: Category[] = [];
   @Input() availableMenuItems: MenuItemInterface[] = []; // All menu items for pairing selection
   @Input() newPreparation: string = '';
-  @Input() newPreparationPrice: string = 'R 0.00';
+  @Input() newPreparationPrice: string = '';
   @Input() newVariation: string = '';
-  @Input() newVariationPrice: string = 'R 0.00';
+  @Input() newVariationPrice: string = '';
   @Input() newPairing: string = '';
   @Input() newSideName: string = '';
-  @Input() newSidePrice: string = 'R 0.00';
+  @Input() newSidePrice: string = '';
   @Input() newAllergen: string = '';
   @Input() newLabel: string = '';
   @Input() newSauce: string = '';
-  @Input() newSaucePrice: string = 'R 0.00';
+  @Input() newSaucePrice: string = '';
 
   @Output() removeMenuItem = new EventEmitter<number>();
   @Output() toggleDetail = new EventEmitter<{ detailType: DetailType, itemIndex: number }>();
-  @Output() addPreparation = new EventEmitter<{ itemIndex: number, prepData: { name: string, price?: string } }>();
+  @Output() addPreparation = new EventEmitter<{ itemIndex: number, prepData: { name: string } }>();
   @Output() removePreparation = new EventEmitter<{ itemIndex: number, prepIndex: number }>();
   @Output() addVariation = new EventEmitter<{ itemIndex: number, variationData: { name: string, price?: string } }>();
   @Output() removeVariation = new EventEmitter<{ itemIndex: number, variationIndex: number }>();
@@ -81,7 +81,7 @@ export class MenuItemFormComponent implements OnInit {
     placeholder: 'Add a preparation',
     description: 'Add preparation options for patrons to choose from, for example grilled or fried fish.',
     propertyName: 'preparations',
-    showPricing: true,
+    showPricing: false, // Removed pricing for preparations
     customHeading: ''
   };
 
@@ -240,7 +240,7 @@ export class MenuItemFormComponent implements OnInit {
     this.toggleDetail.emit({ detailType, itemIndex: this.itemIndex });
   }
 
-  onAddPreparation(prepData: { name: string, price?: string }) {
+  onAddPreparation(prepData: { name: string }) {
     this.addPreparation.emit({ itemIndex: this.itemIndex, prepData });
   }
 

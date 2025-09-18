@@ -16,7 +16,8 @@
       [restaurantError]="restaurantError"
       [currentStep]="currentStep"
       [addRestaurantLater]="addRestaurantLater"
-      (menuNameChange)="menuName = $event"
+      [isDuplicateMenuName]="isDuplicateMenuName"
+      (menuNameChange)="onMenuNameChange($event)"
       (selectedRestaurantChange)="selectedRestaurant = $event"
       (validateMenuName)="validateMenuName()"
       (validateRestaurant)="validateRestaurant()"
@@ -25,7 +26,7 @@
     ></app-menu-form-step>
     
     <app-step-navigation
-      [nextDisabled]="menuNameError || restaurantError"
+      [nextDisabled]="menuNameError || restaurantError || isDuplicateMenuName"
       [isSaving]="isSaving"
       (next)="nextStep()"
     ></app-step-navigation>
@@ -133,7 +134,6 @@
           [categories]="categories"
           [availableMenuItems]="menuItems"
           [newPreparation]="newPreparation"
-          [newPreparationPrice]="newPreparationPrice"
           [newVariation]="newVariation"
           [newVariationPrice]="newVariationPrice"
           [newPairing]="newPairing"
@@ -165,7 +165,6 @@
 
           (getFile)="getFile($event)"
           (newPreparationChange)="newPreparation = $event"
-          (newPreparationPriceChange)="onNewPreparationPriceChange($event)"
           (newVariationChange)="newVariation = $event"
           (newVariationPriceChange)="onNewVariationPriceChange($event)"
           (newPairingChange)="newPairing = $event"

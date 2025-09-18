@@ -1,18 +1,22 @@
 <div class="block step1-container block-open-top">
   <div class="col2row">
     <div class="col">
-      <div class="formGroup" [ngClass]="{ error: menuNameError }">
-        <label>Menu Name</label>
+      <div class="formGroup" [ngClass]="{ error: menuNameError || isDuplicateMenuName }">
+        <label>Menu Name <span class="required">*</span></label>
         <input
           type="text"
           class="formControl"
+          [class.error]="isDuplicateMenuName"
           placeholder="Name your menu"
           [ngModel]="menuName"
           (ngModelChange)="onMenuNameChange($event)"
           required
           (change)="onValidateMenuName()"
         />
-        <div *ngIf="menuNameError" class="error-text">
+        <div class="error-message" *ngIf="isDuplicateMenuName">
+          A menu with this name already exists. Please choose a different name.
+        </div>
+        <div class="error-message" *ngIf="menuNameError && !isDuplicateMenuName">
           Menu name is required.
         </div>
       </div>

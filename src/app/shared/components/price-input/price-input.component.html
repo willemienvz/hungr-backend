@@ -6,15 +6,13 @@
     
     <div class="input-wrapper" [class.error]="showError" [class.disabled]="disabled">
       <input
-        type="number"
-        step="0.01"
-        min="0"
+        type="text"
         class="price-input"
         [placeholder]="placeholder"
-        [value]="numericValue"
         [disabled]="disabled"
-        (input)="onInput($event)"
+        [(ngModel)]="displayValue"
         (blur)="onBlur()"
+        (keydown)="onKeyDown($event)"
         autocomplete="off"
         spellcheck="false"
       />

@@ -36,15 +36,15 @@ export class EditMenuComponent implements OnInit {
   isPopupMenuOpen: boolean[] = [];
   isAddInputVisible: boolean[] = [];
   newPreparation: string = '';
-  newPreparationPrice: string = 'R 0.00';
+  // Removed newPreparationPrice - preparations no longer have pricing
   newVariation: string = '';
-  newVariationPrice: string = 'R 0.00';
+  newVariationPrice: string = '';
   newPairing: string = '';
   newSideName: string = '';
-  newSidePrice: string = 'R 0.00';
+  newSidePrice: string = '';
   newAllergen: string = '';
   newSauce: string = '';
-  newSaucePrice: string = 'R 0.00';
+  newSaucePrice: string = '';
   newLabel: string = '';
   isSaving: boolean = false;
   tempNum: number = 0;
@@ -52,6 +52,8 @@ export class EditMenuComponent implements OnInit {
   restaurantError: boolean = false;
   addRestaurantLater: boolean = false;
   uploadFilePopUp: boolean = false;
+  isDuplicateMenuName: boolean = false;
+  originalMenuName: string = '';
   
   // Filter properties
   selectedCategoryFilter: number | null = null;
@@ -134,22 +136,11 @@ export class EditMenuComponent implements OnInit {
     this.navigateWithUnsavedChangesCheck(['/menus']);
   }
 
-  addPreparation(data: {itemIndex: number, prepData: {name: string, price?: string}}): void {
+  addPreparation(data: {itemIndex: number, prepData: {name: string}}): void {
     const { itemIndex, prepData } = data;
     
-    // Create preparation item - either string or PreparationItem object based on whether price is provided
-    let prepItem: string | PreparationItem;
-    if (prepData.price && prepData.price !== 'R 0.00') {
-      prepItem = {
-        name: prepData.name,
-        price: prepData.price
-      };
-    } else {
-      prepItem = prepData.name; // Backward compatibility - store as string
-    }
-    
-    // Add to preparations array
-    this.menuItems[itemIndex].preparations.push(prepItem);
+    // Simplified - just add the name as a string
+    this.menuItems[itemIndex].preparations.push(prepData.name);
     this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
@@ -165,7 +156,7 @@ export class EditMenuComponent implements OnInit {
     
     // Create variation item - either string or VariationItem object based on whether price is provided
     let variationItem: string | VariationItem;
-    if (variationData.price && variationData.price !== 'R 0.00') {
+    if (variationData.price && variationData.price !== 'R 0.00' && variationData.price.trim() !== '') {
       variationItem = {
         name: variationData.name,
         price: variationData.price
@@ -176,6 +167,10 @@ export class EditMenuComponent implements OnInit {
     
     // Add to variations array
     this.menuItems[itemIndex].variations.push(variationItem);
+    
+    // Clear the price input after adding
+    this.newVariationPrice = '';
+    
     this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
@@ -216,7 +211,7 @@ export class EditMenuComponent implements OnInit {
     
     // Create side item - either string or SideItem object based on whether price is provided
     let sideItem: string | SideItem;
-    if (sideData.price && sideData.price !== 'R 0.00') {
+    if (sideData.price && sideData.price !== 'R 0.00' && sideData.price.trim() !== '') {
       sideItem = {
         name: sideData.name,
         price: sideData.price
@@ -227,6 +222,10 @@ export class EditMenuComponent implements OnInit {
     
     // Add to sides array
     this.menuItems[itemIndex].sides.push(sideItem);
+    
+    // Clear the price input after adding
+    this.newSidePrice = '';
+    
     this.applyFilters(); // Update filtered view to reflect changes
     this.markAsChanged();
   }
@@ -261,7 +260,7 @@ export class EditMenuComponent implements OnInit {
     
     // Create sauce item - either string or SauceItem object based on whether price is provided
     let sauceItem: string | SauceItem;
-    if (sauceData.price && sauceData.price !== 'R 0.00') {
+    if (sauceData.price && sauceData.price !== 'R 0.00' && sauceData.price.trim() !== '') {
       sauceItem = {
         name: sauceData.name,
         price: sauceData.price
@@ -272,6 +271,10 @@ export class EditMenuComponent implements OnInit {
     
     // Add to sauces array
     this.menuItems[itemIndex].sauces.push(sauceItem);
+    
+    // Clear the price input after adding
+    this.newSaucePrice = '';
+    
     this.markAsChanged();
   }
 
@@ -290,6 +293,7 @@ export class EditMenuComponent implements OnInit {
     this.menuService.loadMenu(this.menuID).subscribe((menu: any) => {
       if (menu) {
         this.menuName = menu.menuName;
+        this.originalMenuName = menu.menuName;
         this.selectedRestaurant = menu.restaurantID;
         
         // Check for ID conflicts in the original data
@@ -315,7 +319,12 @@ export class EditMenuComponent implements OnInit {
         // Display the final category structure for debugging
         this.menuService.displayCategoryStructure(this.categories);
         
-        this.menuItems = menu.items || [];
+        // Convert existing preparations from objects to strings if needed
+        const items = menu.items || [];
+        this.menuItems = items.map(item => ({
+          ...item,
+          preparations: this.menuService.convertPreparationsToStrings(item.preparations || [])
+        }));
         this.addRestaurantLater = menu.addRestaurantLater || false;
         this.initializeArrays();
         this.applyFilters(); // Initialize filters
@@ -350,6 +359,33 @@ export class EditMenuComponent implements OnInit {
 
   validateMenuName() {
     this.menuNameError = !this.menuService.validateMenuName(this.menuName);
+    this.checkDuplicateMenuName(this.menuName);
+  }
+
+  // Add duplicate check method
+  checkDuplicateMenuName(menuName: string): void {
+    if (!menuName || !menuName.trim()) {
+      this.isDuplicateMenuName = false;
+      return;
+    }
+
+    // Don't check if it's the same as the original name (for edit mode)
+    if (menuName.trim().toLowerCase() === this.originalMenuName.toLowerCase()) {
+      this.isDuplicateMenuName = false;
+      return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('user')!);
+    this.menuService.checkDuplicateMenuName(menuName, user.uid, this.menuID)
+      .subscribe((isDuplicate) => {
+        this.isDuplicateMenuName = isDuplicate;
+      });
+  }
+
+  // Add method to handle name changes
+  onMenuNameChange(name: string): void {
+    this.menuName = name;
+    this.checkDuplicateMenuName(name);
   }
 
   validateRestaurant() {
@@ -418,6 +454,12 @@ export class EditMenuComponent implements OnInit {
 
 
   saveMenu() {
+    // Add duplicate name check
+    if (this.isDuplicateMenuName) {
+      this.toastr.error('A menu with this name already exists. Please choose a different name.');
+      return;
+    }
+
     this.isSaving = true;
 
     // Double-check that category IDs are still unique before saving
@@ -663,13 +705,9 @@ export class EditMenuComponent implements OnInit {
         }
       });
       
-      // Search in preparations (handle both string and PreparationItem formats)
+      // Search in preparations (now string array only)
       const matchesPreparations = item.preparations?.some(preparation => {
-        if (typeof preparation === 'string') {
-          return preparation.toLowerCase().includes(searchLower);
-        } else {
-          return preparation.name.toLowerCase().includes(searchLower);
-        }
+        return preparation.toLowerCase().includes(searchLower);
       });
       
       const matchesSearch = matchesNameDescription || matchesLabels || 
@@ -698,10 +736,7 @@ export class EditMenuComponent implements OnInit {
     return this.menuItems.findIndex(item => item.itemId === menuItem.itemId);
   }
 
-  // New price change methods for preparations, variations, and sauces
-  onNewPreparationPriceChange(value: string) {
-    this.newPreparationPrice = value;
-  }
+  // New price change methods for variations and sauces (preparations no longer have pricing)
 
   onNewVariationPriceChange(value: string) {
     this.newVariationPrice = value;

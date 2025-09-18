@@ -5,7 +5,6 @@ import { User } from '../../../shared/services/user';
 import { ConfigService } from '../../../config.service';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { MatDialog } from '@angular/material/dialog';
-import { SuccessAddRestaurantDialogComponent } from '../add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
 import { SaveProgressDialogComponent } from '../../save-progress-dialog/save-progress-dialog.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -24,11 +23,7 @@ export class RestaurantFormComponent implements OnInit {
   newRestaurant: Restaurant = {} as Restaurant;
   restaurant: any = {};
   menus: Menu[] = [];
-  users: User[] = [];
-  assignedUsers: User[] = []; // Only users assigned to this restaurant
   currentUser: User = {} as User;
-  selectedContact: string = 'selected';
-  selectedUser: User = {} as User;
   selectedNumberTable: string = '';
   restaurantStatus: boolean = false;
   user: any;
@@ -36,11 +31,11 @@ export class RestaurantFormComponent implements OnInit {
   tableNums: number[] = [];
   currentRestaurantID: string = '';
   currentRestaurant: Restaurant = {} as Restaurant;
-  selectedUserSurname: string = '';
-  selectedUserName: string = '';
   isSaving: boolean = false;
-  userChanged: boolean = false;
   hasUnsavedChanges: boolean = false;
+  isDuplicateName: boolean = false;
+  originalRestaurantName: string = '';
+  duplicateCheckTimeout: any;
 
   saProvinces: string[] = [
     'Eastern Cape',
@@ -96,7 +91,7 @@ export class RestaurantFormComponent implements OnInit {
     }
     
     this.fetchMenus();
-    this.fetchUsers();
+    this.fetchCurrentUser();
     this.setupFormTracking();
   }
 
@@ -162,91 +157,15 @@ export class RestaurantFormComponent implements OnInit {
       });
   }
 
-  private fetchUsers() {
-    // Fetch only team members (users with parentId == OwnerID) and the current owner
+  private fetchCurrentUser() {
     this.firestore
-      .collection<User>('users', (ref) =>
-        ref.where('parentId', '==', this.OwnerID)
-      )
+      .collection<User>('users', (ref) => ref.where('uid', '==', this.OwnerID))
       .valueChanges()
-      .subscribe((teamUsers) => {
-        // Also fetch the current owner user
-        this.firestore
-          .collection<User>('users', (ref) => ref.where('uid', '==', this.OwnerID))
-          .valueChanges()
-          .subscribe((ownerUsers) => {
-            const currentUser = ownerUsers[0];
-            this.currentUser = currentUser;
-            
-            // Combine team users with current owner (if not already included)
-            let allAvailableUsers = [...teamUsers];
-            if (currentUser && !teamUsers.some(u => u.uid === currentUser.uid)) {
-              allAvailableUsers.push(currentUser);
-            }
-            
-            // Filter users based on restaurant assignment
-            this.filterAvailableUsers(allAvailableUsers);
-            
-            // Debug logging
-            console.log('Total team users found:', allAvailableUsers.length);
-            console.log('Filtered users for dropdown:', this.users.length);
-            console.log('Users in dropdown:', this.users.map(u => `${u.firstName} ${u.Surname} (${u.parentId === this.OwnerID ? 'Team Member' : 'Owner'})`));
-          });
+      .subscribe((users) => {
+        this.currentUser = users[0];
       });
   }
 
-  private filterAvailableUsers(allUsers: User[]) {
-    if (this.mode === 'add') {
-      // For new restaurants, show team members that are not assigned to any restaurant
-      // or are assigned to fewer than 2 restaurants (allowing some flexibility)
-      this.users = allUsers.filter(user => {
-        // Only show team members (users with parentId == OwnerID) and the current owner
-        if (user.parentId !== this.OwnerID && user.uid !== this.OwnerID) {
-          return false;
-        }
-        
-        if (!user.assignedRestaurants || user.assignedRestaurants.length === 0) {
-          return true; // User not assigned to any restaurant
-        }
-        return user.assignedRestaurants.length < 2; // Allow users to be assigned to up to 2 restaurants
-      });
-    } else {
-      // For editing, show team members that are either:
-      // 1. Currently assigned to this restaurant
-      // 2. Not assigned to any restaurant
-      // 3. Assigned to fewer than 2 restaurants
-      this.users = allUsers.filter(user => {
-        // Only show team members (users with parentId == OwnerID) and the current owner
-        if (user.parentId !== this.OwnerID && user.uid !== this.OwnerID) {
-          return false;
-        }
-        
-        if (!user.assignedRestaurants || user.assignedRestaurants.length === 0) {
-          return true; // User not assigned to any restaurant
-        }
-        if (user.assignedRestaurants.includes(this.currentRestaurantID)) {
-          return true; // User is currently assigned to this restaurant
-        }
-        return user.assignedRestaurants.length < 2; // Allow users to be assigned to up to 2 restaurants
-      });
-    }
-  }
-
-  private fetchAssignedUsers(restaurantId: string) {
-    // Fetch users that are currently assigned to this restaurant
-    if (restaurantId) {
-      this.firestore
-        .collection<User>('users', (ref) =>
-          ref.where('assignedRestaurants', 'array-contains', restaurantId)
-        )
-        .valueChanges()
-        .subscribe((users) => {
-          this.assignedUsers = users;
-        });
-    } else {
-      this.assignedUsers = [];
-    }
-  }
 
   private fetchRestaurant(id: string) {
     this.firestore
@@ -263,68 +182,89 @@ export class RestaurantFormComponent implements OnInit {
         this.restaurantStatus = this.currentRestaurant.status;
         this.restaurant.street = this.currentRestaurant.streetAdress;
         this.restaurant.zip = this.currentRestaurant.zip;
-        this.selectedMenu = this.currentRestaurant.menuID;
         
-        if (this.currentRestaurant.mainContactID) {
-          this.fetchUser(this.currentRestaurant.mainContactID);
-        }
+        // Store original restaurant name for duplicate checking
+        this.originalRestaurantName = this.currentRestaurant.restaurantName;
         
-        // Fetch assigned users for this restaurant
-        this.fetchAssignedUsers(id);
+        // Fix: Find the menu object that matches the menuID
+        const menuID = this.currentRestaurant.menuID;
+        this.selectedMenu = this.menus.find(menu => menu.menuID === menuID) || menuID;
       });
   }
 
-  private fetchUser(id: string) {
-    this.firestore
-      .collection<User>('users', (ref) => ref.where('uid', '==', id))
-      .valueChanges()
-      .subscribe((users) => {
-        if (users.length > 0) {
-          this.selectedUserName = users[0].firstName;
-          this.selectedUserSurname = users[0].Surname;
-        }
-      });
-  }
 
   selectMenu(menu: Menu | string) {
     this.selectedMenu = menu;
     this.markAsChanged();
   }
 
-  async onAddUserClick(event: Event) {
-    event.preventDefault();
-
-    const dialogRef = this.dialog.open(SaveProgressDialogComponent);
-
-    const result = await dialogRef.afterClosed().toPromise();
-
-    if (result) {
-      try {
-        if (this.mode === 'add') {
-          await this.addRestaurant();
-        } else {
-          await this.editRestaurant();
-        }
-        this.router.navigate(['/manage-users']);
-      } catch (err) {
-        // Do not navigate if save failed
-      }
-    }
+  onNumberTableInput(event: any) {
+    // Remove any non-numeric characters
+    const value = event.target.value.replace(/[^0-9]/g, '');
+    this.selectedNumberTable = value;
+    this.markAsChanged();
   }
+
+  checkDuplicateName(restaurantName: string): void {
+    if (!restaurantName || !restaurantName.trim()) {
+      this.isDuplicateName = false;
+      return;
+    }
+
+    // Don't check if it's the same as the original name (for edit mode)
+    if (this.mode === 'edit' && restaurantName.trim().toLowerCase() === this.originalRestaurantName.toLowerCase()) {
+      this.isDuplicateName = false;
+      return;
+    }
+
+    // Clear previous timeout
+    if (this.duplicateCheckTimeout) {
+      clearTimeout(this.duplicateCheckTimeout);
+    }
+
+    // Debounce the check to avoid too many queries
+    this.duplicateCheckTimeout = setTimeout(() => {
+      this.firestore
+        .collection<Restaurant>('restuarants', (ref) =>
+          ref
+            .where('ownerID', '==', this.currentUser?.uid)
+            .where('restaurantName', '==', restaurantName.trim())
+        )
+        .get()
+        .subscribe((querySnapshot) => {
+          this.isDuplicateName = !querySnapshot.empty;
+        });
+    }, 500);
+  }
+
+  onRestaurantNameChange(name: string): void {
+    this.restaurant.name = name;
+    this.checkDuplicateName(name);
+    this.markAsChanged();
+  }
+
 
   async onAddMenuClick(event: Event) {
     event.preventDefault();
 
-    const dialogRef = this.dialog.open(SaveProgressDialogComponent);
+    const dialogRef = this.dialog.open(SaveProgressDialogComponent, {
+      width: '400px',
+      disableClose: true
+    });
 
     const result = await dialogRef.afterClosed().toPromise();
 
     if (result) {
       try {
-        if (this.mode === 'add') {
-          await this.addRestaurant();
+        if (this.isFormValid()) {
+          if (this.mode === 'add') {
+            await this.addRestaurant();
+          } else {
+            await this.editRestaurant();
+          }
         } else {
-          await this.editRestaurant();
+          // Save as draft if form is not fully validated
+          this.saveDraft();
         }
         this.router.navigate(['/menus/add-menu', 1]);
       } catch (err) {
@@ -343,12 +283,11 @@ export class RestaurantFormComponent implements OnInit {
 
   private addRestaurantDraft() {
     const menuID = this.selectedMenu ? (typeof this.selectedMenu === 'string' ? this.selectedMenu : this.selectedMenu.menuID) : '';
-    let holdID = this.userChanged ? this.selectedUser.uid : '';
 
     this.newRestaurant = {
       ...this.newRestaurant,
       city: this.restaurant.city || '',
-      mainContactID: holdID,
+      mainContactID: this.currentUser?.uid || '', // Auto-assign current user
       menuID: menuID,
       numberTables: this.selectedNumberTable || '',
       ownerID: this.currentUser?.uid || '',
@@ -357,19 +296,13 @@ export class RestaurantFormComponent implements OnInit {
       status: false, // Draft is always inactive
       streetAdress: this.restaurant.street || '',
       zip: this.restaurant.zip || '',
-      assignedUsers: holdID ? [holdID] : [],
+      assignedUsers: [this.currentUser?.uid || ''], // Auto-assign current user
     };
 
     const restaurantCollection = this.firestore.collection('restuarants');
 
     const handleSuccess = () => {
-      this.dialog.open(SuccessAddRestaurantDialogComponent, {
-        width: '400px',
-        data: {
-          message: 'Your new restaurant has been successfully created as a draft.',
-          title: 'Restaurant Draft Saved',
-        },
-      });
+      this.toastr.success('Your new restaurant has been successfully created as a draft.');
       this.markAsSaved();
     };
 
@@ -403,17 +336,10 @@ export class RestaurantFormComponent implements OnInit {
   private editRestaurantDraft() {
     this.isSaving = false;
     const menuID = this.selectedMenu ? (typeof this.selectedMenu === 'string' ? this.selectedMenu : this.selectedMenu.menuID) : '';
-    var holdID = '';
-
-    if (this.userChanged) {
-      holdID = this.selectedUser.uid;
-    } else {
-      holdID = this.currentRestaurant.mainContactID;
-    }
 
     var tempRestaurant = {
       city: this.restaurant.city,
-      mainContactID: holdID,
+      mainContactID: this.currentRestaurant.mainContactID, // Keep existing main contact
       menuID: menuID,
       numberTables: this.selectedNumberTable,
       ownerID: this.currentUser.uid,
@@ -422,7 +348,7 @@ export class RestaurantFormComponent implements OnInit {
       status: false, // Draft is always inactive
       streetAdress: this.restaurant.street,
       zip: this.restaurant.zip,
-      assignedUsers: holdID ? [holdID] : [],
+      assignedUsers: this.currentRestaurant.assignedUsers || [], // Keep existing assigned users
     };
 
     this.firestore
@@ -430,13 +356,7 @@ export class RestaurantFormComponent implements OnInit {
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
-        this.dialog.open(SuccessAddRestaurantDialogComponent, {
-          width: '400px',
-          data: {
-            message: 'Your restaurant has been updated as a draft.',
-            title: 'Restaurant Draft Saved',
-          },
-        });
+        this.toastr.success('Your restaurant has been updated as a draft.');
         this.markAsSaved();
       })
       .catch((error) => {
@@ -465,22 +385,28 @@ export class RestaurantFormComponent implements OnInit {
         return;
       }
 
+      // Add duplicate name check
+      if (this.isDuplicateName) {
+        this.toastr.error('A restaurant with this name already exists. Please choose a different name.');
+        reject();
+        return;
+      }
+
       const menuID = this.selectedMenu ? (typeof this.selectedMenu === 'string' ? this.selectedMenu : this.selectedMenu.menuID) : '';
-      let holdID = this.userChanged ? this.selectedUser.uid : '';
 
       this.newRestaurant = {
         restaurantID: '1',
         city: this.restaurant.city || '',
-        mainContactID: holdID,
+        mainContactID: this.currentUser?.uid || '', // Auto-assign current user
         menuID: menuID,
         numberTables: this.selectedNumberTable || '',
-        ownerID: this.currentUser?.uid || '',
+        ownerID: this.currentUser?.uid || '', // Current user is owner
         province: this.restaurant.province || '',
         restaurantName: this.restaurant.name || '',
-        status: this.restaurantStatus ?? true,
+        status: true, // Always active for new restaurants
         streetAdress: this.restaurant.street || '',
         zip: this.restaurant.zip || '',
-        assignedUsers: holdID ? [holdID] : [],
+        assignedUsers: [this.currentUser?.uid || ''], // Auto-assign current user
       };
 
       this.firestore
@@ -494,17 +420,7 @@ export class RestaurantFormComponent implements OnInit {
             .update(this.newRestaurant);
         })
         .then(() => {
-          // Update user's assignedRestaurants array
-          if (holdID) {
-            this.updateUserRestaurantAssignment(holdID, this.newRestaurant.restaurantID, true);
-          }
-          this.dialog.open(SuccessAddRestaurantDialogComponent, {
-            width: '400px',
-            data: {
-              message: 'Your new restaurant has been successfully created.',
-              title: 'Restaurant Added',
-            },
-          });
+          this.toastr.success('Your new restaurant has been successfully created.');
           this.markAsSaved();
           resolve();
         })
@@ -518,18 +434,18 @@ export class RestaurantFormComponent implements OnInit {
 
   editRestaurant() {
     this.isSaving = false;
-    const menuID = this.selectedMenu ? (typeof this.selectedMenu === 'string' ? this.selectedMenu : this.selectedMenu.menuID) : '';
-    var holdID = '';
-
-    if (this.userChanged) {
-      holdID = this.selectedUser.uid;
-    } else {
-      holdID = this.currentRestaurant.mainContactID;
+    
+    // Add duplicate name check
+    if (this.isDuplicateName) {
+      this.toastr.error('A restaurant with this name already exists. Please choose a different name.');
+      return;
     }
+    
+    const menuID = this.selectedMenu ? (typeof this.selectedMenu === 'string' ? this.selectedMenu : this.selectedMenu.menuID) : '';
 
     var tempRestaurant = {
       city: this.restaurant.city,
-      mainContactID: holdID,
+      mainContactID: this.currentRestaurant.mainContactID, // Keep existing main contact
       menuID: menuID,
       numberTables: this.selectedNumberTable,
       ownerID: this.currentUser.uid,
@@ -538,7 +454,7 @@ export class RestaurantFormComponent implements OnInit {
       status: this.restaurantStatus,
       streetAdress: this.restaurant.street,
       zip: this.restaurant.zip,
-      assignedUsers: holdID ? [holdID] : [],
+      assignedUsers: this.currentRestaurant.assignedUsers || [], // Keep existing assigned users
     };
 
     this.firestore
@@ -546,25 +462,7 @@ export class RestaurantFormComponent implements OnInit {
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
-        // Update user restaurant assignments if user changed
-        if (this.userChanged) {
-          // Remove old user from restaurant assignment
-          if (this.currentRestaurant.mainContactID) {
-            this.updateUserRestaurantAssignment(this.currentRestaurant.mainContactID, this.currentRestaurantID, false);
-          }
-          // Add new user to restaurant assignment
-          if (holdID) {
-            this.updateUserRestaurantAssignment(holdID, this.currentRestaurantID, true);
-          }
-        }
-        
-        this.dialog.open(SuccessAddRestaurantDialogComponent, {
-          width: '400px',
-          data: {
-            message: 'Your restaurant has been updated.',
-            title: 'Restaurant Edited',
-          },
-        });
+        this.toastr.success('Your restaurant has been updated.');
         this.markAsSaved();
       })
       .catch((error) => {
@@ -579,34 +477,26 @@ export class RestaurantFormComponent implements OnInit {
       });
   }
 
-  selectUser(user: User) {
-    // If we're editing and changing from one user to another, update restaurant assignments
-    if (this.mode === 'edit' && this.currentRestaurant.mainContactID && this.currentRestaurant.mainContactID !== user.uid) {
-      // Remove old user from restaurant assignment
-      this.updateUserRestaurantAssignment(this.currentRestaurant.mainContactID, this.currentRestaurantID, false);
-    }
-    
-    this.selectedUser = user;
-    this.selectedUserName = user.firstName;
-    this.selectedUserSurname = user.Surname;
-    this.userChanged = true;
-    this.markAsChanged();
-  }
 
-  removeUser() {
-    // If we're editing and removing a user, update their restaurant assignment
-    if (this.mode === 'edit' && this.currentRestaurant.mainContactID) {
-      this.updateUserRestaurantAssignment(this.currentRestaurant.mainContactID, this.currentRestaurantID, false);
-    }
-    
-    this.selectedUser = null;
-    this.selectedUserName = '';
-    this.selectedUserSurname = '';
-    this.userChanged = true;
-    this.markAsChanged();
+  isFormValid(): boolean {
+    return !!(
+      this.restaurant.name &&
+      this.restaurant.street &&
+      this.restaurant.city &&
+      this.restaurant.province &&
+      this.restaurant.zip &&
+      this.selectedNumberTable &&
+      !this.isDuplicateName
+    );
   }
 
   onSubmit() {
+    if (!this.isFormValid()) {
+      // Save as draft if form is not fully validated
+      this.saveDraft();
+      return;
+    }
+    
     if (this.mode === 'add') {
       this.addRestaurant();
     } else {
@@ -614,36 +504,4 @@ export class RestaurantFormComponent implements OnInit {
     }
   }
 
-  private updateUserRestaurantAssignment(userId: string, restaurantId: string, add: boolean) {
-    // Get the user document
-    this.firestore
-      .collection('users')
-      .doc(userId)
-      .get()
-      .subscribe((userDoc) => {
-        if (userDoc.exists) {
-          const userData = userDoc.data() as User;
-          let assignedRestaurants = userData.assignedRestaurants || [];
-          
-          if (add) {
-            // Add restaurant to user's assigned restaurants
-            if (!assignedRestaurants.includes(restaurantId)) {
-              assignedRestaurants.push(restaurantId);
-            }
-          } else {
-            // Remove restaurant from user's assigned restaurants
-            assignedRestaurants = assignedRestaurants.filter(id => id !== restaurantId);
-          }
-          
-          // Update the user document
-          this.firestore
-            .collection('users')
-            .doc(userId)
-            .update({ assignedRestaurants })
-            .catch((error) => {
-              console.error('Error updating user restaurant assignment:', error);
-            });
-        }
-      });
-  }
 }

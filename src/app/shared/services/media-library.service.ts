@@ -35,7 +35,9 @@ import {
   generateThumbnailFileName,
   sanitizeFilename,
   getOptimalQuality,
-  formatFileSize
+  formatFileSize,
+  validateImageAspectRatio,
+  AspectRatioValidation
 } from '../utils/media-helpers';
 
 @Injectable({
@@ -65,12 +67,13 @@ export class MediaLibraryService {
   /**
    * Uploads a media file to Firebase Storage and saves metadata to Firestore
    * @param request Media upload request with file and metadata
+   * @param validateAspectRatio Whether to validate aspect ratio (default: false)
    * @returns Promise resolving to the created MediaItem
    */
-  async uploadMedia(request: MediaUploadRequest): Promise<MediaItem> {
+  async uploadMedia(request: MediaUploadRequest, validateAspectRatio: boolean = false): Promise<MediaItem> {
     try {
       // Validate the file
-      const validation = validateMediaFile(request.file);
+      const validation = await validateMediaFile(request.file, validateAspectRatio);
       if (!validation.isValid) {
         throw new Error(`File validation failed: ${validation.errors.join(', ')}`);
       }
@@ -658,6 +661,15 @@ export class MediaLibraryService {
    */
   resetUploadProgress(): void {
     this.uploadProgressSubject.next(null);
+  }
+
+  /**
+   * Validates image aspect ratio for specials media
+   * @param file The image file to validate
+   * @returns Promise resolving to aspect ratio validation result
+   */
+  async validateImageAspectRatio(file: File): Promise<AspectRatioValidation> {
+    return validateImageAspectRatio(file);
   }
 
   // Private helper methods

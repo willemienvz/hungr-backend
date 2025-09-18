@@ -40,15 +40,15 @@ export class AddMenuComponent implements OnInit {
   draggedOver = false;
   fileToUpload: File | null = null;
   newPreparation: string = '';
-  newPreparationPrice: string = 'R 0.00';
+  // Removed newPreparationPrice - preparations no longer have pricing
   newVariation: string = '';
-  newVariationPrice: string = 'R 0.00';
+  newVariationPrice: string = '';
   newPairing: string = '';
   newSideName: string = '';
-  newSidePrice: string = 'R 0.00';
+  newSidePrice: string = '';
   newAllergen: string = '';
   newSauce: string = '';
-  newSaucePrice: string = 'R 0.00';
+  newSaucePrice: string = '';
   categories: Category[] = [];
   restaurants: Restaurant[] = [];
   selectedRestaurant: string = '';
@@ -86,6 +86,8 @@ export class AddMenuComponent implements OnInit {
   selectedFileBulk: File | null = null;
   steps: string[] = ['Menu Details', 'Categories', 'Add Items', 'Done'];
   addRestaurantLater: boolean = false;
+  isDuplicateMenuName: boolean = false;
+  duplicateCheckTimeout: any;
 
   // Navigation safety properties
   hasUnsavedChanges: boolean = false;
@@ -274,11 +276,40 @@ export class AddMenuComponent implements OnInit {
 
   isValid(): boolean {
     return this.menuService.validateMenuName(this.menuName) && 
+           !this.isDuplicateMenuName &&
            (this.menuService.validateRestaurant(this.selectedRestaurant) || this.addRestaurantLater);
   }
 
   validateMenuName() {
     this.menuNameError = !this.menuService.validateMenuName(this.menuName);
+    this.checkDuplicateMenuName(this.menuName);
+  }
+
+  // Add method to check for duplicate names
+  checkDuplicateMenuName(menuName: string): void {
+    if (!menuName || !menuName.trim()) {
+      this.isDuplicateMenuName = false;
+      return;
+    }
+
+    // Clear previous timeout
+    if (this.duplicateCheckTimeout) {
+      clearTimeout(this.duplicateCheckTimeout);
+    }
+
+    // Debounce the check to avoid too many queries
+    this.duplicateCheckTimeout = setTimeout(() => {
+      this.menuService.checkDuplicateMenuName(menuName, this.OwnerID)
+        .subscribe((isDuplicate) => {
+          this.isDuplicateMenuName = isDuplicate;
+        });
+    }, 500);
+  }
+
+  // Add method to handle name changes
+  onMenuNameChange(name: string): void {
+    this.menuName = name;
+    this.checkDuplicateMenuName(name);
   }
 
   validateRestaurant() {
@@ -427,22 +458,11 @@ export class AddMenuComponent implements OnInit {
     this.markAsChanged();
   }
 
-  addPreparation(data: {itemIndex: number, prepData: {name: string, price?: string}}): void {
+  addPreparation(data: {itemIndex: number, prepData: {name: string}}): void {
     const { itemIndex, prepData } = data;
     
-    // Create preparation item - either string or PreparationItem object based on whether price is provided
-    let prepItem: string | PreparationItem;
-    if (prepData.price && prepData.price !== 'R 0.00') {
-      prepItem = {
-        name: prepData.name,
-        price: prepData.price
-      };
-    } else {
-      prepItem = prepData.name; // Backward compatibility - store as string
-    }
-    
-    // Add to preparations array
-    this.menuItems[itemIndex].preparations.push(prepItem);
+    // Simplified - just add the name as a string
+    this.menuItems[itemIndex].preparations.push(prepData.name);
     this.markAsChanged();
   }
 
@@ -455,7 +475,7 @@ export class AddMenuComponent implements OnInit {
     
     // Create variation item - either string or VariationItem object based on whether price is provided
     let variationItem: string | VariationItem;
-    if (variationData.price && variationData.price !== 'R 0.00') {
+    if (variationData.price && variationData.price !== 'R 0.00' && variationData.price.trim() !== '') {
       variationItem = {
         name: variationData.name,
         price: variationData.price
@@ -466,6 +486,10 @@ export class AddMenuComponent implements OnInit {
     
     // Add to variations array
     this.menuItems[itemIndex].variations.push(variationItem);
+    
+    // Clear the price input after adding
+    this.newVariationPrice = '';
+    
     this.markAsChanged();
   }
 
@@ -495,7 +519,7 @@ export class AddMenuComponent implements OnInit {
     
     // Create side item - either string or SideItem object based on whether price is provided
     let sideItem: string | SideItem;
-    if (sideData.price && sideData.price !== 'R 0.00') {
+    if (sideData.price && sideData.price !== 'R 0.00' && sideData.price.trim() !== '') {
       sideItem = {
         name: sideData.name,
         price: sideData.price
@@ -506,6 +530,10 @@ export class AddMenuComponent implements OnInit {
     
     // Add to sides array
     this.menuItems[itemIndex].sides.push(sideItem);
+    
+    // Clear the price input after adding
+    this.newSidePrice = '';
+    
     this.markAsChanged();
   }
 
@@ -527,7 +555,7 @@ export class AddMenuComponent implements OnInit {
     
     // Create sauce item - either string or SauceItem object based on whether price is provided
     let sauceItem: string | SauceItem;
-    if (sauceData.price && sauceData.price !== 'R 0.00') {
+    if (sauceData.price && sauceData.price !== 'R 0.00' && sauceData.price.trim() !== '') {
       sauceItem = {
         name: sauceData.name,
         price: sauceData.price
@@ -538,6 +566,10 @@ export class AddMenuComponent implements OnInit {
     
     // Add to sauces array
     this.menuItems[itemIndex].sauces.push(sauceItem);
+    
+    // Clear the price input after adding
+    this.newSaucePrice = '';
+    
     this.markAsChanged();
   }
 
@@ -567,6 +599,12 @@ export class AddMenuComponent implements OnInit {
   }
 
   saveMenu(): void {
+    // Add duplicate name check
+    if (this.isDuplicateMenuName) {
+      this.toastr.error('A menu with this name already exists. Please choose a different name.');
+      return;
+    }
+
     this.isSaving = true;
     const menuData = {
       menuName: this.menuName,
@@ -725,10 +763,7 @@ export class AddMenuComponent implements OnInit {
     this.saveMenu();
   }
 
-  // New price change methods for preparations, variations, and sauces
-  onNewPreparationPriceChange(value: string) {
-    this.newPreparationPrice = value;
-  }
+  // New price change methods for variations and sauces (preparations no longer have pricing)
 
   onNewVariationPriceChange(value: string) {
     this.newVariationPrice = value;

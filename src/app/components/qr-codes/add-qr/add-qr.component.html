@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col">
           <div class="colInner" *ngIf="selectedMenu">
-            <qrcode [qrdata]="selectedMenu.menuID" (qrCodeURL)="onChangeURL($event)" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+            <qrcode [qrdata]="getQRCodeData(selectedMenu.menuID)" (qrCodeURL)="onChangeURL($event)" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
               <div class="formGroup btnHolder">
                 <a class="btn btnTertiary" (click)="closePopup()">Cancel</a>
                 <a class="btn btnBlue" (click)="saveSettings()">Save</a>

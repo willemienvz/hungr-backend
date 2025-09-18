@@ -40,6 +40,22 @@ export class MenuItemPairingComponent implements OnInit, OnChanges {
   filteredMenuItems: Observable<MenuItemInterface[]> = new Observable();
   selectedPairings: PairingReference[] = [];
 
+  // Add computed property to check if any items are available for pairing
+  get hasAvailableItems(): boolean {
+    return this.availableMenuItems.some(item => 
+      item.itemId !== this.currentMenuItemId && 
+      !this.selectedPairingIds.includes(item.itemId)
+    );
+  }
+
+  // Add computed property to get available items count
+  get availableItemsCount(): number {
+    return this.availableMenuItems.filter(item => 
+      item.itemId !== this.currentMenuItemId && 
+      !this.selectedPairingIds.includes(item.itemId)
+    ).length;
+  }
+
   ngOnInit() {
     this.initializeSelectedPairings();
     this.setupAutocomplete();

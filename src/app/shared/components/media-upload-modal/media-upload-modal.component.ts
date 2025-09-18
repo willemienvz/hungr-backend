@@ -8,6 +8,7 @@ import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { MediaLibraryService } from '../../services/media-library.service';
 import { MediaItem, MediaUploadRequest, MediaFilters } from '../../types/media';
+import { validateImageAspectRatio, AspectRatioValidation } from '../../utils/media-helpers';
 
 // Enhanced validation interfaces
 export interface ImageValidationConfig {
@@ -39,6 +40,7 @@ export interface MediaUploadModalConfig {
   allowMultiple?: boolean;
   maxFiles?: number;
   required?: boolean;
+  validateAspectRatio?: boolean;
 }
 
 // Backward compatibility interfaces
@@ -56,6 +58,7 @@ export interface ImageUploadData {
   config?: ImageUploadConfig;
   currentImageUrl?: string;
   currentImageUrls?: string[];
+  validateAspectRatio?: boolean;
 }
 
 export interface ImageUploadResult {
@@ -304,6 +307,20 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     if (!dimensionValidation.valid) {
       this.error = dimensionValidation.error || 'Image dimension validation failed';
       return;
+    }
+
+    // Validate aspect ratio for specials media
+    if (this.componentType === 'special' && file.type.startsWith('image/')) {
+      try {
+        const aspectRatioValidation = await validateImageAspectRatio(file);
+        if (!aspectRatioValidation.isValid) {
+          this.error = aspectRatioValidation.message;
+          return;
+        }
+      } catch (error) {
+        this.error = 'Error validating image aspect ratio';
+        return;
+      }
     }
 
     // Show warnings if any
@@ -562,6 +579,14 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
       }
     }
     
+    // Check landscape orientation if aspect ratio validation is enabled
+    if (this.data.validateAspectRatio && mediaItem.metadata?.width && mediaItem.metadata?.height) {
+      const aspectRatio = mediaItem.metadata.width / mediaItem.metadata.height;
+      if (aspectRatio <= 1.0) { // Not landscape (width <= height)
+        return false;
+      }
+    }
+    
     return true;
   }
 
@@ -591,6 +616,18 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
       const { width, height } = this.validationConfig.maxDimensions;
       if (mediaItem.metadata.width > width || mediaItem.metadata.height > height) {
         messages.push(`Dimensions ${mediaItem.metadata.width}x${mediaItem.metadata.height}px exceed maximum ${width}x${height}px`);
+      }
+    }
+    
+    // Check landscape orientation if aspect ratio validation is enabled
+    if (this.data.validateAspectRatio && mediaItem.metadata?.width && mediaItem.metadata?.height) {
+      const aspectRatio = mediaItem.metadata.width / mediaItem.metadata.height;
+      if (aspectRatio <= 1.0) { // Not landscape (width <= height)
+        if (aspectRatio === 1.0) {
+          messages.push(`Image must be landscape (wider than tall). Current: ${mediaItem.metadata.width}x${mediaItem.metadata.height}px (square)`);
+        } else {
+          messages.push(`Image must be landscape (wider than tall). Current: ${mediaItem.metadata.width}x${mediaItem.metadata.height}px (portrait)`);
+        }
       }
     }
     

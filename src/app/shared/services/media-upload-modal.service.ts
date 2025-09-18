@@ -175,7 +175,8 @@ export class MediaUploadModalService {
       maxFileSize: 4 * 1024 * 1024, // 4MB
       maxDimensions: { width: 1000, height: 750 },
       allowMultiple: false,
-      maxFiles: 1
+      maxFiles: 1,
+      validateAspectRatio: true // Enable landscape validation for specials
     };
 
     return this.openUploadModal(config);

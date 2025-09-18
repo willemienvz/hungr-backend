@@ -19,7 +19,8 @@ export class RestaurantComponent {
   isPopupMenuOpen: boolean[] = [];
   isSaving: boolean = false;
   isLoading: boolean = false;
-  restuarants: Restaurant[] = [];
+  activeRestaurants: Restaurant[] = [];
+  draftRestaurants: Restaurant[] = [];
   hasUnsavedChanges: boolean = false;
 
   // Table configuration
@@ -48,6 +49,46 @@ export class RestaurantComponent {
       label: 'Edit',
       icon: 'edit',
       color: 'secondary'
+    },
+    {
+      key: 'delete',
+      label: 'Delete',
+      icon: 'delete',
+      color: 'danger'
+    }
+  ];
+
+  draftRestaurantColumns: TableColumn[] = [
+    {
+      key: 'restaurantName',
+      label: 'Restaurant Name',
+      sortable: true
+    },
+    {
+      key: 'city',
+      label: 'Location',
+      sortable: true
+    }
+  ];
+
+  draftRestaurantActions: TableAction[] = [
+    {
+      key: 'view',
+      label: 'View',
+      icon: 'visibility',
+      color: 'secondary'
+    },
+    {
+      key: 'edit',
+      label: 'Edit',
+      icon: 'edit',
+      color: 'secondary'
+    },
+    {
+      key: 'activate',
+      label: 'Activate',
+      icon: 'check_circle',
+      color: 'success'
     },
     {
       key: 'delete',
@@ -109,9 +150,12 @@ export class RestaurantComponent {
         ref.where('ownerID', '==', OwnerID)
       )
       .valueChanges()
-      .subscribe((restuarants) => {
-        this.restuarants = restuarants;
-        console.log(this.restuarants);
+      .subscribe((restaurants) => {
+        // Separate active and draft restaurants
+        this.activeRestaurants = restaurants.filter(restaurant => restaurant.status === true);
+        this.draftRestaurants = restaurants.filter(restaurant => restaurant.status === false);
+        console.log('Active restaurants:', this.activeRestaurants);
+        console.log('Draft restaurants:', this.draftRestaurants);
         this.isLoading = false;
       });
   }
@@ -133,6 +177,26 @@ export class RestaurantComponent {
     }
   }
 
+  onDraftRestaurantAction(event: any) {
+    const { action, row, index } = event;
+
+    switch (action.key) {
+      case 'view':
+        this.viewRestaurant(row.restaurantID, index);
+        break;
+      case 'edit':
+        // Navigate to edit restaurant page with unsaved changes check
+        this.navigateWithUnsavedChangesCheck(['/restaurants/edit-restaurant', row.restaurantID]);
+        break;
+      case 'activate':
+        this.activateRestaurant(row.restaurantID, index);
+        break;
+      case 'delete':
+        this.openDialog(row.restaurantID, index, row.restaurantName);
+        break;
+    }
+  }
+
   /**
    * Handle row click - trigger first available action
    */
@@ -147,6 +211,37 @@ export class RestaurantComponent {
     if (firstAvailableAction) {
       this.onRestaurantAction({ action: firstAvailableAction, row, index });
     }
+  }
+
+  onDraftRowClick(event: any) {
+    const { row, index } = event;
+
+    // Find the first available action for this row
+    const firstAvailableAction = this.draftRestaurantActions.find(action =>
+      action.visible ? action.visible(row) : true
+    );
+
+    if (firstAvailableAction) {
+      this.onDraftRestaurantAction({ action: firstAvailableAction, row, index });
+    }
+  }
+
+  activateRestaurant(restaurantId: string, index: number) {
+    this.firestore
+      .collection('restuarants')
+      .doc(restaurantId)
+      .update({ status: true })
+      .then(() => {
+        this.toastr.success('Restaurant activated successfully');
+        // Remove from draft list and add to active list
+        const restaurant = this.draftRestaurants[index];
+        this.draftRestaurants.splice(index, 1);
+        this.activeRestaurants.push(restaurant);
+      })
+      .catch((error) => {
+        console.error('Error activating restaurant:', error);
+        this.toastr.error('Failed to activate restaurant');
+      });
   }
 
   deleteRestaurant(id: string, index: number) {

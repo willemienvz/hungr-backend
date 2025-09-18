@@ -48,10 +48,15 @@ export class ViewComponent {
   }
 
   fetchMenus(id) {
+    if (!id) {
+      this.menuName = null;
+      return;
+    }
+    
     this.firestore.collection<Menu>('menus', ref => ref.where('menuID', '==', id))
     .valueChanges()
     .subscribe(result => {
-      this.menuName = result[0].menuName;
+      this.menuName = result.length > 0 ? result[0].menuName : null;
     });
   }
 

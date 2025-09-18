@@ -19,7 +19,24 @@
           Please select at least one day of the week.
         </div>
       </div>
-      <div class="formGroup centered mt-1">
+      
+      <!-- All Day Checkbox -->
+      <div class="formGroup centered mt-1 mb-1">
+        <div class="all-day-container">
+          <label class="all-day-checkbox">
+            <input
+              type="checkbox"
+              formControlName="isAllDay"
+              (change)="onAllDayToggle()"
+            />
+            <span class="checkmark"></span>
+            <span class="all-day-label">All Day</span>
+          </label>
+          <p class="all-day-description">Check this if the special runs all day</p>
+        </div>
+      </div>
+      
+      <div class="formGroup centered mt-1" *ngIf="!specialForm.get('isAllDay')?.value">
         <p class="mb-1 align-center">What times should this special be valid?</p>
         <div class="dateRow timeRow">
       
@@ -30,12 +47,11 @@
                 class="formControl"
                 formControlName="timeFrom"
                 placeholder="Start time"
-                value="00:00"
                 required
               />
               <div
                 class="error-message"
-                *ngIf="specialForm.get('timeFrom')?.touched && !specialForm.get('timeFrom')?.value"
+                *ngIf="specialForm.get('timeFrom')?.touched && !specialForm.get('timeFrom')?.value && !specialForm.get('isAllDay')?.value"
               >
                 Start time is required.
               </div>
@@ -50,12 +66,11 @@
                 class="formControl"
                 formControlName="timeTo"
                 placeholder="End time"
-                value="00:00"
                 required
               />
               <div
                 class="error-message"
-                *ngIf="specialForm.get('timeTo')?.touched && !specialForm.get('timeTo')?.value"
+                *ngIf="specialForm.get('timeTo')?.touched && !specialForm.get('timeTo')?.value && !specialForm.get('isAllDay')?.value"
               >
                 End time is required.
               </div>
@@ -63,7 +78,7 @@
       
         </div>
         <div
-          *ngIf="specialForm.errors?.['timeRangeInvalid']"
+          *ngIf="specialForm.errors?.['timeRangeInvalid'] && !specialForm.get('isAllDay')?.value"
           class="error-message"
         >
           Start time must be before end time.

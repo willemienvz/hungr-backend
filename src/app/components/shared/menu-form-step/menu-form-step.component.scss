@@ -4,6 +4,23 @@
 // Import shared menu styles
 @import '../../menus/shared/menu-shared.scss';
 
+// Error styling for validation
+.formControl.error {
+  border-color: var(--color-error) !important;
+  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+}
+
+.error-message {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: 4px;
+  display: block;
+}
+
+.required {
+  color: var(--color-error);
+}
+
 .restaurant-col {
   display: flex;
   flex-direction: column;

@@ -1,2 +1,41 @@
 /* KB: Import shared detail component styles */
-@use '../detail-components.scss'; 
+@use '../detail-components.scss';
+
+/* Empty state styling for pairing component */
+.empty-state-message {
+  margin: 0px 0;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  text-align: center;
+  grid-column: 2;
+
+  .empty-state-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    i {
+      color: #16d3d2;
+      font-size: 24px;
+    }
+
+    p {
+      margin: 0;
+      color: #6c757d;
+      font-size: 14px;
+      line-height: 1.4;
+      font-family: 'Poppins', sans-serif;
+    }
+  }
+}
+
+.no-results-option {
+  .no-results-text {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 14px;
+  }
+} 

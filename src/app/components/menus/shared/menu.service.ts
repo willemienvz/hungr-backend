@@ -2,7 +2,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { finalize } from 'rxjs';
+import { finalize, Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastrService } from 'ngx-toastr';
 import { Papa } from 'ngx-papaparse';
@@ -17,10 +18,10 @@ export interface SideItem {
   allergens?: string[]; // Optional allergen list for this specific side
 }
 
-/* KB: Interface for preparation items with optional pricing */
+/* KB: Interface for preparation items - simplified to text only */
 export interface PreparationItem {
   name: string;
-  price?: string; // Optional price in same format as main item price (R 0.00)
+  // Removed price property - preparations are now text-only
 }
 
 /* KB: Interface for variation items with optional pricing */
@@ -43,7 +44,7 @@ export interface MenuItemInterface {
   price: string;
   imageUrl: string | null; // Keep for backward compatibility
   imageUrls: string[]; // New array for multiple images
-  preparations: (string | PreparationItem)[]; // Backward compatible - supports both formats
+  preparations: string[]; // Simplified to string array only - no pricing
   variations: (string | VariationItem)[]; // Backward compatible - supports both formats
   pairings: string[]; // Keep for backward compatibility
   pairingIds: string[]; // New array for menu item references
@@ -90,6 +91,31 @@ export class MenuService {
 
   validateRestaurant(selectedRestaurant: string): boolean {
     return !!selectedRestaurant.trim();
+  }
+
+  // Add method to check for duplicate menu names
+  checkDuplicateMenuName(menuName: string, ownerId: string, excludeMenuId?: string): Observable<boolean> {
+    if (!menuName || !menuName.trim()) {
+      return of(false);
+    }
+
+    return this.firestore
+      .collection('menus', (ref) => {
+        let query = ref
+          .where('OwnerID', '==', ownerId)
+          .where('menuName', '==', menuName.trim());
+        
+        // Exclude current menu when editing
+        if (excludeMenuId) {
+          query = query.where('menuID', '!=', excludeMenuId);
+        }
+        
+        return query;
+      })
+      .get()
+      .pipe(
+        map(querySnapshot => !querySnapshot.empty)
+      );
   }
 
   // Price formatting - simplified to only add currency prefix if missing
@@ -203,6 +229,17 @@ export class MenuService {
     return updatedCategories;
   }
 
+  // Helper method to convert existing PreparationItem objects to strings
+  convertPreparationsToStrings(preparations: (string | PreparationItem)[]): string[] {
+    return preparations.map(prep => {
+      if (typeof prep === 'string') {
+        return prep;
+      } else {
+        return prep.name; // Convert PreparationItem object to string
+      }
+    });
+  }
+
   // Menu item management
   createMenuItem(): MenuItemInterface {
     return {
@@ -213,7 +250,7 @@ export class MenuService {
       price: 'R ',
       imageUrl: null,
       imageUrls: [],
-      preparations: [],
+      preparations: [], // Now string array only
       variations: [],
       pairings: [],
       pairingIds: [],
@@ -538,30 +575,51 @@ export class MenuService {
   }
 
   downloadTemplate(existingMenuItems?: MenuItemInterface[], categories?: Category[]) {
-    // Define headers with all 11 fields including allergens and sauces
-    const headers = ['name', 'description', 'price', 'category', 'preparations', 'variations', 'pairings', 'sides', 'labels', 'allergens', 'sauces'];
+    // Define headers with all fields including pricing and custom headings
+    const headers = [
+      'name', 
+      'description', 
+      'price', 
+      'category', 
+      'preparations', 
+      'variations', 
+      'variation_prices', // New: pricing for variations
+      'pairings', 
+      'sides', 
+      'side_prices', // New: pricing for sides
+      'labels', 
+      'allergens', 
+      'sauces',
+      'sauce_prices', // New: pricing for sauces
+      'custom_preparation_heading', // New: custom headings
+      'custom_variation_heading',
+      'custom_pairing_heading',
+      'custom_side_heading',
+      'custom_allergen_heading',
+      'custom_sauce_heading',
+      'image_urls' // New: multiple image support
+    ];
+    
     const data: any[] = [headers];
 
     // Add existing menu items if provided
     if (existingMenuItems && existingMenuItems.length > 0 && categories) {
       existingMenuItems.forEach(item => {
-        // Skip empty menu items (items with no name)
         if (!item.name.trim()) return;
 
-        // Find category name by ID
         const categoryName = item.categoryId 
           ? categories.find(cat => cat.id === item.categoryId)?.name || ''
           : '';
 
-        // Convert arrays to pipe-separated strings
-        const preparations = item.preparations.map(p => typeof p === 'string' ? p : p.name).join('|');
+        // Enhanced field extraction with pricing support
+        const preparations = item.preparations.join('|');
         const variations = item.variations.map(v => typeof v === 'string' ? v : v.name).join('|');
-        const pairings = item.pairings.join('|');
+        const variationPrices = item.variations.map(v => typeof v === 'string' ? '' : (v.price || '')).join('|');
         const sides = item.sides.map(s => typeof s === 'string' ? s : s.name).join('|');
-        const labels = item.labels.join('|');
-        const allergens = item.allergens.join('|');
+        const sidePrices = item.sides.map(s => typeof s === 'string' ? '' : (s.price || '')).join('|');
         const sauces = item.sauces.map(s => typeof s === 'string' ? s : s.name).join('|');
-
+        const saucePrices = item.sauces.map(s => typeof s === 'string' ? '' : (s.price || '')).join('|');
+        
         const row = [
           item.name,
           item.description,
@@ -569,18 +627,28 @@ export class MenuService {
           categoryName,
           preparations,
           variations,
-          pairings,
+          variationPrices,
+          item.pairings.join('|'),
           sides,
-          labels,
-          allergens,
-          sauces
+          sidePrices,
+          item.labels.join('|'),
+          item.allergens.join('|'),
+          sauces,
+          saucePrices,
+          item.customHeadings?.preparation || '',
+          item.customHeadings?.variation || '',
+          item.customHeadings?.pairing || '',
+          item.customHeadings?.side || '',
+          item.customHeadings?.allergen || '',
+          item.customHeadings?.sauce || '',
+          item.imageUrls.join('|')
         ];
 
         data.push(row);
       });
     }
 
-    // Add sample row if no existing items or as an example
+    // Enhanced sample data
     if (!existingMenuItems || existingMenuItems.length === 0) {
       data.push([
         'Sample Item',
@@ -589,19 +657,30 @@ export class MenuService {
         'Appetizers',
         'Grilled|Fried',
         'Small|Large',
+        'R 5.00|R 8.00',
         'Wine|Beer',
         'Fries|Salad',
-        'Spicy',
+        'R 15.00|R 12.00',
+        'Spicy|Popular',
         'Nuts|Dairy',
-        'Hot Sauce|BBQ'
+        'Hot Sauce|BBQ',
+        'R 3.00|R 4.00',
+        'Cooking Style',
+        'Size Options',
+        'Recommended Drinks',
+        'Side Dishes',
+        'Allergen Information',
+        'Sauce Options',
+        'https://example.com/image1.jpg|https://example.com/image2.jpg'
       ]);
     }
 
-    // Create workbook and worksheet
+
+    // Create workbook with enhanced formatting
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(data);
     
-    // Set column widths for better readability
+    // Enhanced column widths
     const colWidths = [
       { wch: 20 }, // name
       { wch: 30 }, // description
@@ -609,23 +688,33 @@ export class MenuService {
       { wch: 15 }, // category
       { wch: 20 }, // preparations
       { wch: 15 }, // variations
+      { wch: 15 }, // variation_prices
       { wch: 15 }, // pairings
       { wch: 15 }, // sides
+      { wch: 15 }, // side_prices
       { wch: 15 }, // labels
       { wch: 15 }, // allergens
-      { wch: 15 }  // sauces
+      { wch: 15 }, // sauces
+      { wch: 15 }, // sauce_prices
+      { wch: 20 }, // custom_preparation_heading
+      { wch: 20 }, // custom_variation_heading
+      { wch: 20 }, // custom_pairing_heading
+      { wch: 20 }, // custom_side_heading
+      { wch: 20 }, // custom_allergen_heading
+      { wch: 20 }, // custom_sauce_heading
+      { wch: 30 }  // image_urls
     ];
     ws['!cols'] = colWidths;
 
     XLSX.utils.book_append_sheet(wb, ws, 'Menu Template');
 
-    // Generate and download XLSX file
+    // Generate and download
     const xlsxBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'menu-template.xlsx';
+    a.download = 'menu-template-enhanced.xlsx';
     a.click();
     window.URL.revokeObjectURL(url);
   }
@@ -723,65 +812,112 @@ export class MenuService {
 
   private convertCsvDataToMenuItems(csvData: any[], categories: Category[]): MenuItemInterface[] {
     const menuItems: MenuItemInterface[] = [];
+    const errors: string[] = [];
 
-    csvData.forEach((row: any) => {
-      // Skip empty rows or rows without a name
+    csvData.forEach((row: any, index: number) => {
+      // Skip empty rows
       if (!row.name || !row.name.trim()) return;
 
-      // Find category ID by name
-      const categoryId = row.category 
-        ? this.getCategoryIdByName(categories, row.category.trim())
-        : null;
+      try {
+        // Validate required fields
+        if (!row.name?.trim()) {
+          errors.push(`Row ${index + 1}: Name is required`);
+          return;
+        }
 
-      // Parse pipe-separated arrays
-      const parseArray = (value: string): string[] => {
-        if (!value || !value.trim()) return [];
-        return value.split('|').map(item => item.trim()).filter(item => item.length > 0);
-      };
+        if (!row.price?.trim()) {
+          errors.push(`Row ${index + 1}: Price is required`);
+          return;
+        }
 
-      // Ensure price has 'R ' prefix
-      let price = row.price || 'R ';
-      if (!price.startsWith('R ')) {
-        price = 'R ' + price.replace(/^R\s*/, '');
+        // Find category ID by name
+        const categoryId = row.category 
+          ? this.getCategoryIdByName(categories, row.category.trim())
+          : null;
+
+        if (row.category && !categoryId) {
+          errors.push(`Row ${index + 1}: Category "${row.category}" not found`);
+        }
+
+        // Enhanced parsing with pricing support
+        const parseArrayWithPrices = (names: string, prices: string): (string | any)[] => {
+          if (!names || !names.trim()) return [];
+          
+          const nameArray = names.split('|').map(item => item.trim()).filter(item => item.length > 0);
+          const priceArray = prices ? prices.split('|').map(item => item.trim()) : [];
+          
+          return nameArray.map((name, i) => {
+            const price = priceArray[i] && priceArray[i] !== '' ? priceArray[i] : undefined;
+            return price ? { name, price } : name;
+          });
+        };
+
+        // Parse all fields with enhanced support
+        const preparations = parseArrayWithPrices(row.preparations, '');
+        const variations = parseArrayWithPrices(row.variations, row.variation_prices || '');
+        const sides = parseArrayWithPrices(row.sides, row.side_prices || '');
+        const sauces = parseArrayWithPrices(row.sauces, row.sauce_prices || '');
+        
+        const parseArray = (value: string): string[] => {
+          if (!value || !value.trim()) return [];
+          return value.split('|').map(item => item.trim()).filter(item => item.length > 0);
+        };
+
+        // Ensure price has 'R ' prefix
+        let price = row.price || 'R ';
+        if (!price.startsWith('R ')) {
+          price = 'R ' + price.replace(/^R\s*/, '');
+        }
+
+        // Parse image URLs
+        const imageUrls = parseArray(row.image_urls || '');
+
+        const menuItem: MenuItemInterface = {
+          itemId: uuidv4(),
+          categoryId: categoryId,
+          name: row.name.trim(),
+          description: row.description ? row.description.trim() : '',
+          price: price,
+          imageUrl: imageUrls.length > 0 ? imageUrls[0] : null,
+          imageUrls: imageUrls,
+          preparations: preparations,
+          variations: variations,
+          pairings: parseArray(row.pairings),
+          pairingIds: [],
+          sides: sides,
+          allergens: parseArray(row.allergens),
+          labels: parseArray(row.labels),
+          showLabelInput: false,
+          displayDetails: {
+            preparation: preparations.length > 0,
+            variation: variations.length > 0,
+            pairing: parseArray(row.pairings).length > 0,
+            side: sides.length > 0,
+            allergen: parseArray(row.allergens).length > 0,
+            sauce: sauces.length > 0,
+          },
+          sauces: sauces,
+          customHeadings: {
+            preparation: row.custom_preparation_heading?.trim() || undefined,
+            variation: row.custom_variation_heading?.trim() || undefined,
+            pairing: row.custom_pairing_heading?.trim() || undefined,
+            side: row.custom_side_heading?.trim() || undefined,
+            allergen: row.custom_allergen_heading?.trim() || undefined,
+            sauce: row.custom_sauce_heading?.trim() || undefined,
+          }
+        };
+
+        menuItems.push(menuItem);
+      } catch (error) {
+        errors.push(`Row ${index + 1}: ${error.message}`);
       }
-
-      const preparations = parseArray(row.preparations);
-      const variations = parseArray(row.variations);
-      const pairings = parseArray(row.pairings);
-      const sides = parseArray(row.sides);
-      const labels = parseArray(row.labels);
-      const allergens = parseArray(row.allergens);
-      const sauces = parseArray(row.sauces);
-
-      const menuItem: MenuItemInterface = {
-        itemId: uuidv4(),
-        categoryId: categoryId,
-        name: row.name.trim(),
-        description: row.description ? row.description.trim() : '',
-        price: price,
-        imageUrl: null,
-        imageUrls: [],
-        preparations: preparations,
-        variations: variations,
-        pairings: pairings,
-        pairingIds: [],
-        sides: sides,
-        allergens: allergens,
-        labels: labels,
-        showLabelInput: false,
-        displayDetails: {
-          preparation: preparations.length > 0,
-          variation: variations.length > 0,
-          pairing: pairings.length > 0,
-          side: sides.length > 0,
-          allergen: allergens.length > 0,
-          sauce: sauces.length > 0,
-        },
-        sauces: sauces,
-      };
-
-      menuItems.push(menuItem);
     });
+
+    // Show errors if any
+    if (errors.length > 0) {
+      this.toastr.error(`Found ${errors.length} errors in the uploaded file. Please check the console for details.`);
+      console.error('Bulk upload errors:', errors);
+    }
 
     return menuItems;
   }

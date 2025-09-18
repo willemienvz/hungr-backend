@@ -5,7 +5,6 @@ import { User } from '../../../shared/services/user';
 import { ConfigService } from '../../../config.service';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { MatDialog } from '@angular/material/dialog';
-import { SuccessAddRestaurantDialogComponent } from './success-add-restaurant-dialog/success-add-restaurant-dialog.component';
 import { SaveProgressDialogComponent } from '../../save-progress-dialog/save-progress-dialog.component';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -154,7 +153,10 @@ export class AddComponent implements OnInit {
   async onAddUserClick(event: Event) {
     event.preventDefault();
 
-    const dialogRef = this.dialog.open(SaveProgressDialogComponent);
+    const dialogRef = this.dialog.open(SaveProgressDialogComponent, {
+      width: '400px',
+      disableClose: true
+    });
 
     const result = await dialogRef.afterClosed().toPromise();
 
@@ -171,7 +173,10 @@ export class AddComponent implements OnInit {
   async onAddMenuClick(event: Event) {
     event.preventDefault();
 
-    const dialogRef = this.dialog.open(SaveProgressDialogComponent);
+    const dialogRef = this.dialog.open(SaveProgressDialogComponent, {
+      width: '400px',
+      disableClose: true
+    });
 
     const result = await dialogRef.afterClosed().toPromise();
 
@@ -206,13 +211,7 @@ export class AddComponent implements OnInit {
     const restaurantCollection = this.firestore.collection('restuarants');
 
     const handleSuccess = () => {
-      this.dialog.open(SuccessAddRestaurantDialogComponent, {
-        width: '400px',
-        data: {
-          message: 'Your new restaurant has been successfully created.',
-          title: 'Restaurant Added',
-        },
-      });
+      this.toastr.success('Your new restaurant has been successfully created.');
     };
 
     if (this.newRestaurant.restaurantID) {
@@ -284,13 +283,7 @@ export class AddComponent implements OnInit {
             .update(this.newRestaurant);
         })
         .then(() => {
-          this.dialog.open(SuccessAddRestaurantDialogComponent, {
-            width: '400px',
-            data: {
-              message: 'Your new restaurant has been successfully created.',
-              title: 'Restaurant Added',
-            },
-          });
+          this.toastr.success('Your new restaurant has been successfully created.');
           resolve();
         })
         .catch((error) => {

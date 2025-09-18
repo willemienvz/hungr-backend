@@ -8,6 +8,17 @@
 import { MediaValidationResult, MediaMetadata } from '../types/media';
 
 /**
+ * Aspect ratio validation result
+ */
+export interface AspectRatioValidation {
+  isValid: boolean;
+  actualRatio: number;
+  expectedRatio: number;
+  tolerance: number;
+  message: string;
+}
+
+/**
  * Supported image MIME types
  */
 export const SUPPORTED_IMAGE_TYPES = [
@@ -38,11 +49,22 @@ export const THUMBNAIL_DIMENSIONS = {
 };
 
 /**
+ * Minimum aspect ratio for landscape images (width > height)
+ */
+export const MIN_LANDSCAPE_RATIO = 1.0; // width must be greater than height
+
+/**
+ * Recommended aspect ratio for specials media (16:9)
+ */
+export const RECOMMENDED_ASPECT_RATIO = 16 / 9; // 1.777...
+
+/**
  * Validates a file for upload to the media library
  * @param file The file to validate
- * @returns Validation result with errors and warnings
+ * @param validateAspectRatio Whether to validate aspect ratio (default: false)
+ * @returns Promise resolving to validation result with errors and warnings
  */
-export function validateMediaFile(file: File): MediaValidationResult {
+export async function validateMediaFile(file: File, validateAspectRatio: boolean = false): Promise<MediaValidationResult> {
   const result: MediaValidationResult = {
     isValid: true,
     errors: [],
@@ -76,6 +98,20 @@ export function validateMediaFile(file: File): MediaValidationResult {
   if (invalidChars.test(file.name)) {
     result.warnings.push('Filename contains special characters that may cause issues');
     result.optimizations.push('Consider renaming the file to remove special characters');
+  }
+
+  // Validate aspect ratio if requested and file is an image
+  if (validateAspectRatio && file.type.startsWith('image/')) {
+    try {
+      const aspectRatioValidation = await validateImageAspectRatio(file);
+      if (!aspectRatioValidation.isValid) {
+        result.isValid = false;
+        result.errors.push(aspectRatioValidation.message);
+      }
+    } catch (error) {
+      result.isValid = false;
+      result.errors.push('Failed to validate image aspect ratio');
+    }
   }
 
   return result;
@@ -283,6 +319,65 @@ export function sanitizeFilename(filename: string): string {
     .replace(/\s+/g, '_')          // Replace spaces with underscores
     .replace(/_{2,}/g, '_')        // Replace multiple underscores with single
     .toLowerCase();                 // Convert to lowercase
+}
+
+/**
+ * Validates image aspect ratio for specials media (must be landscape)
+ * @param file The image file to validate
+ * @returns Promise resolving to aspect ratio validation result
+ */
+export function validateImageAspectRatio(file: File): Promise<AspectRatioValidation> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const actualRatio = img.width / img.height;
+      const minLandscapeRatio = MIN_LANDSCAPE_RATIO;
+      
+      // Check if image is landscape (width > height)
+      const isValid = actualRatio > minLandscapeRatio;
+      
+      let message = '';
+      if (!isValid) {
+        if (actualRatio === 1.0) {
+          message = `Image must be landscape (wider than tall). Current: ${img.width}x${img.height} (square). Please use a landscape image.`;
+        } else {
+          message = `Image must be landscape (wider than tall). Current: ${img.width}x${img.height} (portrait). Please use a landscape image.`;
+        }
+      }
+      
+      resolve({
+        isValid,
+        actualRatio,
+        expectedRatio: minLandscapeRatio,
+        tolerance: 0, // No tolerance needed for landscape check
+        message
+      });
+    };
+    
+    img.onerror = () => {
+      resolve({
+        isValid: false,
+        actualRatio: 0,
+        expectedRatio: MIN_LANDSCAPE_RATIO,
+        tolerance: 0,
+        message: 'Unable to read image dimensions. Please ensure the file is a valid image.'
+      });
+    };
+    
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+/**
+ * Gets recommended dimensions for a given height to achieve 16:9 aspect ratio
+ * @param currentHeight Current image height
+ * @returns Object with recommended width and height
+ */
+export function getRecommendedDimensions(currentHeight: number): { width: number; height: number } {
+  return {
+    width: Math.round(currentHeight * RECOMMENDED_ASPECT_RATIO),
+    height: currentHeight
+  };
 }
 
  

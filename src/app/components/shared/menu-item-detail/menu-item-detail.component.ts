@@ -29,7 +29,7 @@ export class MenuItemDetailComponent {
   @Input() newItemValue: string = '';
   
   /* KB: Current value of the new item price input */
-  @Input() newItemPrice: string = 'R 0.00';
+  @Input() newItemPrice: string = '';
   
   /* KB: Event emitted when user wants to close this detail section */
   @Output() closeDetail = new EventEmitter<void>();
@@ -61,16 +61,16 @@ export class MenuItemDetailComponent {
         name: this.newItemValue.trim()
       };
       
-      // Only include price if pricing is enabled and price is not default
-      if (this.config.showPricing && this.newItemPrice && this.newItemPrice !== 'R 0.00') {
+      // Only include price if pricing is enabled and price is not default/empty
+      if (this.config.showPricing && this.newItemPrice && this.newItemPrice !== 'R 0.00' && this.newItemPrice.trim() !== '') {
         itemData.price = this.newItemPrice;
       }
       
       this.addItem.emit(itemData);
       
-      // Reset inputs
+      // Reset inputs - clear price input instead of setting to 'R 0.00'
       this.newItemValue = '';
-      this.newItemPrice = 'R 0.00';
+      this.newItemPrice = '';
     }
   }
 
@@ -107,7 +107,15 @@ export class MenuItemDetailComponent {
     if (typeof item === 'string') {
       return null;
     }
-    return "+" +item.price || null;
+    if (!item.price) return null;
+    
+    // Ensure the price has "R " prefix
+    const price = item.price.toString();
+    if (price.startsWith('R ')) {
+      return price;
+    } else {
+      return `R ${price}`;
+    }
   }
 
   /* KB: Check if item has price (for conditional display) */

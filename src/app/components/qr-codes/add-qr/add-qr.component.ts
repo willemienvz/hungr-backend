@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { SafeUrl } from '@angular/platform-browser';
 import { Menu } from '../../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-add-qr',
@@ -19,6 +20,10 @@ export class AddQrComponent {
   saveSuccess: boolean = false;
 
   constructor(private firestore: AngularFirestore) { }
+
+  getQRCodeData(menuId: string): string {
+    return environment.menuUrl + menuId;
+  }
 
   onChangeURL(url: SafeUrl) {
     this.qrCodeDownloadLink = url;

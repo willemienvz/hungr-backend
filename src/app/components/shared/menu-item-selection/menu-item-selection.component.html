@@ -59,6 +59,80 @@
   </div>
 </div>
 
+<!-- KB - Preview Modal -->
+<div class="modal" [class.open]="showPreviewModal">
+  <div class="modal-content preview-modal">
+    <span class="close" (click)="cancelImport()">&times;</span>
+    <h6>Preview Import</h6>
+    <p>We found {{parsedMenuItems.length}} menu items in your file. Review the items below before importing.</p>
+    
+    <div class="preview-content">
+      <div class="preview-items" *ngIf="parsedMenuItems.length > 0">
+        <div class="preview-item" *ngFor="let item of parsedMenuItems; let i = index">
+          <div class="item-header">
+            <h6>{{item.name}}</h6>
+            <span class="item-price">{{item.price}}</span>
+          </div>
+          <p class="item-description" *ngIf="item.description">{{item.description}}</p>
+          <div class="item-details">
+            <span class="detail-tag" *ngIf="item.preparations.length > 0">
+              <i class="material-symbols-outlined">restaurant</i>
+              {{item.preparations.length}} preparation(s)
+            </span>
+            <span class="detail-tag" *ngIf="item.variations.length > 0">
+              <i class="material-symbols-outlined">tune</i>
+              {{item.variations.length}} variation(s)
+            </span>
+            <span class="detail-tag" *ngIf="item.sides.length > 0">
+              <i class="material-symbols-outlined">side_navigation</i>
+              {{item.sides.length}} side(s)
+            </span>
+            <span class="detail-tag" *ngIf="item.sauces.length > 0">
+              <i class="material-symbols-outlined">local_drink</i>
+              {{item.sauces.length}} sauce(s)
+            </span>
+            <span class="detail-tag" *ngIf="item.allergens.length > 0">
+              <i class="material-symbols-outlined">warning</i>
+              {{item.allergens.length}} allergen(s)
+            </span>
+            <span class="detail-tag" *ngIf="item.imageUrls.length > 0">
+              <i class="material-symbols-outlined">image</i>
+              {{item.imageUrls.length}} image(s)
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="preview-summary">
+        <h6>Import Summary</h6>
+        <div class="summary-stats">
+          <div class="stat">
+            <span class="stat-number">{{parsedMenuItems.length}}</span>
+            <span class="stat-label">Total Items</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{itemsWithPreparations}}</span>
+            <span class="stat-label">With Preparations</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{itemsWithVariations}}</span>
+            <span class="stat-label">With Variations</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{itemsWithImages}}</span>
+            <span class="stat-label">With Images</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="btnTertiary" (click)="cancelImport()">CANCEL</button>
+      <button class="btnPrimary" (click)="confirmImport()">CONFIRM IMPORT</button>
+    </div>
+  </div>
+</div>
+
 <!-- KB - Choice Modal (Replace or Append) -->
 <div class="modal" [class.open]="showChoiceModal">
   <div class="modal-content">

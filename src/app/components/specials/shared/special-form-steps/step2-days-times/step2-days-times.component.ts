@@ -25,6 +25,24 @@ export class Step2DaysTimesComponent {
     this.toggleSelection.emit(day);
   }
 
+  onAllDayToggle() {
+    const isAllDay = this.specialForm.get('isAllDay')?.value;
+    
+    if (isAllDay) {
+      // Set all day times
+      this.specialForm.patchValue({
+        timeFrom: '00:00',
+        timeTo: '23:59'
+      });
+    } else {
+      // Clear times when unchecking all day
+      this.specialForm.patchValue({
+        timeFrom: '',
+        timeTo: ''
+      });
+    }
+  }
+
   onPrevious() {
     this.previous.emit();
   }

@@ -26,7 +26,7 @@ export class SideDetailComponent {
   @Input() newSideName: string = '';
   
   /* KB: Current value of the new side price input */
-  @Input() newSidePrice: string = 'R 0.00';
+  @Input() newSidePrice: string = '';
   
   /* KB: Event emitted when user wants to close this detail section */
   @Output() closeDetail = new EventEmitter<void>();
@@ -58,16 +58,16 @@ export class SideDetailComponent {
         name: this.newSideName.trim()
       };
       
-      // Only include price if pricing is enabled and price is not default
-      if (this.config.showPricing && this.newSidePrice && this.newSidePrice !== 'R 0.00') {
+      // Only include price if pricing is enabled and price is not default/empty
+      if (this.config.showPricing && this.newSidePrice && this.newSidePrice !== 'R 0.00' && this.newSidePrice.trim() !== '') {
         sideData.price = this.newSidePrice;
       }
       
       this.addSide.emit(sideData);
       
-      // Reset inputs
+      // Reset inputs - clear price input instead of setting to 'R 0.00'
       this.newSideName = '';
-      this.newSidePrice = 'R 0.00';
+      this.newSidePrice = '';
     }
   }
 
@@ -104,7 +104,15 @@ export class SideDetailComponent {
     if (typeof side === 'string') {
       return null;
     }
-    return side.price || null;
+    if (!side.price) return null;
+    
+    // Ensure the price has "R " prefix
+    const price = side.price.toString();
+    if (price.startsWith('R ')) {
+      return price;
+    } else {
+      return `R ${price}`;
+    }
   }
 
   /* KB: Check if side has price (for conditional display) */

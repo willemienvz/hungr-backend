@@ -20,11 +20,13 @@ export class MenuItemSelectionComponent {
   showUploadModal: boolean = false;
   showSuccessModal: boolean = false;
   showChoiceModal: boolean = false;
+  showPreviewModal: boolean = false;
   
   /* KB - File upload state */
   selectedFile: File | null = null;
   parsedMenuItems: MenuItemInterface[] = [];
   isProcessingFile: boolean = false;
+  validationErrors: string[] = [];
 
   constructor(private menuService: MenuService) {}
 
@@ -57,6 +59,10 @@ export class MenuItemSelectionComponent {
     this.selectedFile = null;
   }
 
+  closePreviewModal() {
+    this.showPreviewModal = false;
+  }
+
   /* KB - Handle file selection */
   onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -69,6 +75,7 @@ export class MenuItemSelectionComponent {
   /* KB - Process the selected file */
   processFile(file: File) {
     this.isProcessingFile = true;
+    this.validationErrors = [];
     
     this.menuService.parseMenuFile(file, this.categories)
       .then((parsedItems: MenuItemInterface[]) => {
@@ -76,13 +83,8 @@ export class MenuItemSelectionComponent {
         this.isProcessingFile = false;
         this.showUploadModal = false;
 
-        // If there are existing items, show choice modal
-        if (this.existingMenuItems.length > 0) {
-          this.showChoiceModal = true;
-        } else {
-          // No existing items, just add the new ones
-          this.finishUpload(false); // false = don't replace (nothing to replace)
-        }
+        // Show preview modal
+        this.showPreviewModal = true;
       })
       .catch((error) => {
         console.error('Error processing file:', error);
@@ -128,5 +130,38 @@ export class MenuItemSelectionComponent {
     this.showUploadModal = false;
     // TODO: Implement save as draft logic
     console.log('Save as draft clicked');
+  }
+
+  /* KB - Handle preview confirmation */
+  confirmImport() {
+    this.showPreviewModal = false;
+    
+    // If there are existing items, show choice modal
+    if (this.existingMenuItems.length > 0) {
+      this.showChoiceModal = true;
+    } else {
+      // No existing items, just add the new ones
+      this.finishUpload(false);
+    }
+  }
+
+  /* KB - Cancel import from preview */
+  cancelImport() {
+    this.showPreviewModal = false;
+    this.parsedMenuItems = [];
+    this.selectedFile = null;
+  }
+
+  /* KB - Getter methods for preview statistics */
+  get itemsWithPreparations(): number {
+    return this.parsedMenuItems.filter(item => item.preparations.length > 0).length;
+  }
+
+  get itemsWithVariations(): number {
+    return this.parsedMenuItems.filter(item => item.variations.length > 0).length;
+  }
+
+  get itemsWithImages(): number {
+    return this.parsedMenuItems.filter(item => item.imageUrls.length > 0).length;
   }
 } 

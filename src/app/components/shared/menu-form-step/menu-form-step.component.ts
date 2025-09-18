@@ -15,6 +15,7 @@ export class MenuFormStepComponent {
   @Input() showAddRestaurantLink: boolean = true;
   @Input() currentStep: number = 1;
   @Input() addRestaurantLater: boolean = false;
+  @Input() isDuplicateMenuName: boolean = false;
 
   @Output() menuNameChange = new EventEmitter<string>();
   @Output() selectedRestaurantChange = new EventEmitter<string>();

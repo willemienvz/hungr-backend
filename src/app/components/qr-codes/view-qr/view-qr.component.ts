@@ -23,10 +23,12 @@ export class ViewQrComponent implements OnInit {
     
   }
   getCurrentCode(menuId: string){
-    return this.qrCodeDownloadLink = environment.menuUrl + menuId;
+    const fullUrl = environment.menuUrl + menuId;
+    this.qrCodeDownloadLink = fullUrl;
+    return fullUrl;
   }
   onChangeURL(url: SafeUrl) {
-    this.qrCodeDownloadLink = environment.menuUrl + url;
+    this.qrCodeDownloadLink = url;
   }
   openPopup(menuID:string) {
     this.selectedID = menuID;

@@ -10,17 +10,34 @@
   ]"
   [loading]="isLoading">
 
-  <!-- Restaurants Table -->
-  <app-content-block title="Restaurants">
+  <!-- Active Restaurants Section -->
+  <app-content-block title="Active Restaurants">
     <app-data-table
-      [data]="restuarants"
+      [data]="activeRestaurants"
       [columns]="restaurantColumns"
       [actions]="restaurantActions"
       [showIndex]="true"
       [loading]="isLoading"
-      emptyMessage="No restaurants found"
+      emptyMessage="No active restaurants found"
       (actionClick)="onRestaurantAction($event)"
       (rowClick)="onRowClick($event)">
+
+
+
+    </app-data-table>
+  </app-content-block>
+
+  <!-- Draft Restaurants Section -->
+  <app-content-block title="Restaurant Drafts">
+    <app-data-table
+      [data]="draftRestaurants"
+      [columns]="draftRestaurantColumns"
+      [actions]="draftRestaurantActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No draft restaurants found"
+      (actionClick)="onDraftRestaurantAction($event)"
+      (rowClick)="onDraftRowClick($event)">
 
 
 

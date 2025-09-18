@@ -27,8 +27,16 @@
       </div>
     </div>
     
-    <!-- Autocomplete input for selecting menu items -->
-    <div class="add-input-group">
+    <!-- Show helpful message when no items are available -->
+    <div *ngIf="!hasAvailableItems" class="empty-state-message">
+      <div class="empty-state-content">
+        <i class="material-icons">info</i>
+        <p>To add a pairing, more than one item needs to be added to your menu.</p>
+      </div>
+    </div>
+
+    <!-- Show autocomplete input only when items are available -->
+    <div *ngIf="hasAvailableItems" class="add-input-group">
       <div class="inputBox">
         <input
           type="text"
@@ -49,13 +57,13 @@
             <span>{{ menuItem.name }}</span>
           </mat-option>
           
-          <!-- Show no results message when no items match -->
+          <!-- Show no results message when no items match search -->
           <mat-option 
-            *ngIf="(filteredMenuItems | async)?.length === 0" 
+            *ngIf="(filteredMenuItems | async)?.length === 0 && hasAvailableItems" 
             class="no-results-option" 
             disabled
           >
-            <span class="no-results-text">No menu items found</span>
+            <span class="no-results-text">No menu items found matching your search</span>
           </mat-option>
         </mat-autocomplete>
       </div>

@@ -6,7 +6,6 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ConfigService } from '../../../config.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SuccessAddRestaurantDialogComponent } from '../add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 
@@ -217,13 +216,7 @@ export class EditRestaurantComponent {
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
-        this.dialog.open(SuccessAddRestaurantDialogComponent, {
-          width: '400px',
-          data: {
-            message: 'Your restaurant has been updated.',
-            title: 'Restaurant Edited',
-          },
-        });
+        this.toastr.success('Your restaurant has been updated.');
       })
       .catch((error) => {
         console.error('Error updating restaurant:', error);
@@ -267,13 +260,7 @@ export class EditRestaurantComponent {
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
-        this.dialog.open(SuccessAddRestaurantDialogComponent, {
-          width: '400px',
-          data: {
-            message: 'Your restaurant has been updated.',
-            title: 'Restaurant Edited',
-          },
-        });
+        this.toastr.success('Your restaurant has been updated.');
       })
       .catch((error) => {
         console.error('Error updating restaurant:', error);

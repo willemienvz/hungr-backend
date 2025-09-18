@@ -85,6 +85,7 @@ export class AddSpecialComponent implements OnInit {
         featureSpecialUnder: [''],
         timeFrom: ['00:00', Validators.required],
         timeTo: ['00:00', Validators.required],
+        isAllDay: [true],
         customPromotionalText: ['', [Validators.maxLength(500)]],
         selectedCategories: [[]],
         discountType: ['percentage'],
@@ -363,6 +364,35 @@ export class AddSpecialComponent implements OnInit {
     });
   }
 
+  // Add method to handle media deletion
+  onDeleteMedia() {
+    if (this.mediaId) {
+      // Delete from media library service
+      this.mediaLibraryService.deleteMedia(this.mediaId)
+        .then(() => {
+          // Reset state
+          this.selectedMediaItem = null;
+          this.mediaId = null;
+          this.uploadedImageUrl = null;
+          this.uploadDone = false;
+          this.markAsChanged();
+          this.toastr.success('Image deleted successfully!');
+        })
+        .catch((error) => {
+          console.error('Error deleting media:', error);
+          this.toastr.error('Failed to delete image. Please try again.');
+        });
+    } else {
+      // Just reset state if no media ID (local upload)
+      this.selectedMediaItem = null;
+      this.mediaId = null;
+      this.uploadedImageUrl = null;
+      this.uploadDone = false;
+      this.markAsChanged();
+      this.toastr.success('Image removed successfully!');
+    }
+  }
+
   // Removed uploadImageToFirebase method - now handled by MediaLibraryService
 
   onSubmit() {
@@ -541,17 +571,20 @@ export class AddSpecialComponent implements OnInit {
   }
 
   isStep2Invalid(): boolean {
+    const selectedDaysValid = this.selectedDays.length > 0;
+    const isAllDay = this.specialForm.get('isAllDay')?.value;
+    
+    if (isAllDay) {
+      return !selectedDaysValid;
+    }
+    
     const timeFrom = this.specialForm.get('timeFrom')?.value;
     const timeTo = this.specialForm.get('timeTo')?.value;
-
-    return (
-      this.selectedDays.length === 0 ||
-      !timeFrom ||
-      !timeTo ||
-      timeFrom.toString().trim() === '' ||
-      timeTo.toString().trim() === '' ||
-      this.specialForm.errors?.['timeRangeInvalid']
-    );
+    const timesValid = timeFrom && timeTo && 
+                      timeFrom.toString().trim() !== '' && 
+                      timeTo.toString().trim() !== '';
+    
+    return !selectedDaysValid || !timesValid || this.specialForm.errors?.['timeRangeInvalid'];
   }
 
   onSpecialTypeChange() {

@@ -99,3 +99,42 @@
     padding-top: 1.35em;
   }
 }
+
+/* All Day Checkbox Styling */
+.all-day-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.all-day-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary, #333);
+  
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #16d3d2;
+  }
+  
+  .all-day-label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+  }
+}
+
+.all-day-description {
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
+  margin: 0;
+  font-style: italic;
+  text-align: center;
+}

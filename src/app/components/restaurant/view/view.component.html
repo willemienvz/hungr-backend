@@ -8,18 +8,15 @@
          
         </div>
     </div>
-    <div class="row" style="align-items: flex-end;">
+    <div class="row">
         <div class="col">
             <p class="label">Address</p>
             <p class="answer">{{restuarant.streetAdress}}</p>
            
         </div>
         <div class="col">
-            <div class="row specialCase">
-                <p class="label">Number of tables</p>
-                <p class="answer">{{restuarant.numberTables}}</p>
-            </div>
-           
+            <p class="label">Number of tables</p>
+            <p class="answer">{{restuarant.numberTables}}</p>
         </div>
     </div>
     <div class="row">
@@ -29,15 +26,14 @@
             <p class="answer">{{owner}}</p>
         </div>
         <div class="col">
-           
             <p class="label">Assigned Menu</p>
-            <p class="answer">{{menuName}}</p>
+            <p class="answer menu-answer">{{menuName || 'No menu'}}</p>
         </div>
     </div>
 
     <footer class="confirmation-actions">
-        <button class="action-button cancel" (click)="onCancel()">Close</button>
-        <button class="action-button confirm" [routerLink]="['/restaurants/edit-restaurant', restuarant.restaurantID]"
+        <button class="btn btnSecondary" (click)="onCancel()">Close</button>
+        <button class="btn btnPrimary" [routerLink]="['/restaurants/edit-restaurant', restuarant.restaurantID]"
             (click)="onCancel()">Edit</button>
     </footer>
 </section>

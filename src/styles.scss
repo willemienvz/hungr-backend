@@ -991,17 +991,87 @@ mat-select {
 }
 
 .mat-mdc-select-value-text {
-  font-family: "Poppins";
+  font-family: "Poppins", sans-serif;
   font-size: 15px;
   font-weight: 400;
   line-height: 20.25px;
   letter-spacing: -0.001em;
 }
 
+/* Ensure mat-select placeholder uses Poppins font */
+::ng-deep .mat-mdc-select-placeholder {
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20.25px;
+  letter-spacing: -0.001em;
+}
+
+/* Ensure mat-select trigger uses Poppins font */
+::ng-deep .mat-mdc-select-trigger {
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20.25px;
+  letter-spacing: -0.001em;
+}
+
+/* Ensure all mat-form-field components use Poppins font */
+::ng-deep .mat-mdc-form-field {
+  font-family: "Poppins", sans-serif;
+}
+
+/* Ensure mat-form-field labels use Poppins font */
+::ng-deep .mat-mdc-form-field-label {
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20.25px;
+  letter-spacing: -0.001em;
+}
+
+/* Ensure mat-form-field hints use Poppins font */
+::ng-deep .mat-mdc-form-field-hint {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: -0.001em;
+}
+
+/* Hide subscript wrapper for mat-select form fields */
+::ng-deep .mat-mdc-form-field-type-mat-select .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+/* Hide hint wrapper for mat-select form fields */
+::ng-deep .mat-mdc-form-field-type-mat-select .mat-mdc-form-field-hint-wrapper {
+  display: none !important;
+}
+
+/* Hide subscript wrapper for all mat-form-fields containing mat-select */
+::ng-deep .mat-mdc-form-field:has(mat-select) .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+/* Hide hint wrapper for all mat-form-fields containing mat-select */
+::ng-deep .mat-mdc-form-field:has(mat-select) .mat-mdc-form-field-hint-wrapper {
+  display: none !important;
+}
+
 .mat-mdc-select-panel {
   margin-left: 0px;
   margin-top: 6px;
+  font-family: "Poppins", sans-serif !important;
+}
 
+/* Ensure mat-select panel and all its children use Poppins */
+::ng-deep .mat-mdc-select-panel {
+  font-family: "Poppins", sans-serif !important;
+}
+
+::ng-deep .mat-mdc-select-panel * {
+  font-family: "Poppins", sans-serif !important;
 }
 
 ::ng-deep .mat-select-panel {
@@ -1013,10 +1083,56 @@ mat-select {
   background-color: transparent !important;
 }
 
+/* Override Material Design CSS variables for mat-option and mat-select */
+:root {
+  --mat-option-label-text-font: "Poppins", sans-serif;
+  --mat-option-label-text-size: 15px;
+  --mat-option-label-text-weight: 400;
+  --mat-option-label-text-line-height: 20.25px;
+  --mat-option-label-text-letter-spacing: -0.001em;
+  
+  /* Override mat-select CSS variables */
+  --mat-select-label-text-font: "Poppins", sans-serif;
+  --mat-select-label-text-size: 15px;
+  --mat-select-label-text-weight: 400;
+  --mat-select-label-text-line-height: 20.25px;
+  --mat-select-label-text-letter-spacing: -0.001em;
+  
+  /* Override mat-form-field CSS variables */
+  --mat-form-field-label-text-font: "Poppins", sans-serif;
+  --mat-form-field-label-text-size: 15px;
+  --mat-form-field-label-text-weight: 400;
+  --mat-form-field-label-text-line-height: 20.25px;
+  --mat-form-field-label-text-letter-spacing: -0.001em;
+}
+
 /* Style the background color of the options in the dropdown */
 ::ng-deep .mat-option {
   background-color: white;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 20.25px !important;
+  letter-spacing: -0.001em !important;
   /* Set to white to match default background */
+}
+
+/* Additional mat-option styling for better coverage */
+::ng-deep .mat-mdc-option {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 20.25px !important;
+  letter-spacing: -0.001em !important;
+}
+
+/* Ensure mat-option text uses Poppins */
+::ng-deep .mat-option-text {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 20.25px !important;
+  letter-spacing: -0.001em !important;
 }
 
 /* Style the hover color of the options in the dropdown */
@@ -1054,6 +1170,10 @@ mat-select {
 
 mat-label {
   font-size: 14px !important;
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  display: none;
 }
 
 .colorPicker {

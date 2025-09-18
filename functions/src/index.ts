@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import { reviews } from './reviews';
 import { backfill } from './backfill';
 import { payfastItn } from './payfastItn';
+import { sendCustomEmailVerification, sendEmailWithTemplate } from './emailTemplates';
 
 // Initialize Firebase Admin SDK once
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -41,4 +42,7 @@ export const backfillAnalytics = functions
 
 // Export PayFast ITN handler
 export { payfastItn };
+
+// Export email template functions
+export { sendCustomEmailVerification, sendEmailWithTemplate };
 
