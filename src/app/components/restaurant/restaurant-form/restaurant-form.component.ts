@@ -10,6 +10,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { SelectOption } from '../../shared/form-select/form-select.component';
 
 @Component({
   selector: 'app-restaurant-form',
@@ -48,6 +49,9 @@ export class RestaurantFormComponent implements OnInit {
     'Northern Cape',
     'Western Cape',
   ];
+
+  provinceOptions: SelectOption[] = [];
+  menuOptions: SelectOption[] = [];
 
   constructor(
     private firestore: AngularFirestore,
@@ -93,6 +97,7 @@ export class RestaurantFormComponent implements OnInit {
     this.fetchMenus();
     this.fetchCurrentUser();
     this.setupFormTracking();
+    this.initializeOptions();
   }
 
   private setupFormTracking() {
@@ -169,7 +174,7 @@ export class RestaurantFormComponent implements OnInit {
 
   private fetchRestaurant(id: string) {
     this.firestore
-      .collection<Restaurant>('restuarants', (ref) =>
+      .collection<Restaurant>('restaurants', (ref) =>
         ref.where('restaurantID', '==', id)
       )
       .valueChanges()
@@ -225,7 +230,7 @@ export class RestaurantFormComponent implements OnInit {
     // Debounce the check to avoid too many queries
     this.duplicateCheckTimeout = setTimeout(() => {
       this.firestore
-        .collection<Restaurant>('restuarants', (ref) =>
+        .collection<Restaurant>('restaurants', (ref) =>
           ref
             .where('ownerID', '==', this.currentUser?.uid)
             .where('restaurantName', '==', restaurantName.trim())
@@ -299,7 +304,7 @@ export class RestaurantFormComponent implements OnInit {
       assignedUsers: [this.currentUser?.uid || ''], // Auto-assign current user
     };
 
-    const restaurantCollection = this.firestore.collection('restuarants');
+    const restaurantCollection = this.firestore.collection('restaurants');
 
     const handleSuccess = () => {
       this.toastr.success('Your new restaurant has been successfully created as a draft.');
@@ -352,7 +357,7 @@ export class RestaurantFormComponent implements OnInit {
     };
 
     this.firestore
-      .collection('restuarants')
+      .collection('restaurants')
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
@@ -410,12 +415,12 @@ export class RestaurantFormComponent implements OnInit {
       };
 
       this.firestore
-        .collection('restuarants')
+        .collection('restaurants')
         .add(this.newRestaurant)
         .then((docRef) => {
           this.newRestaurant.restaurantID = docRef.id;
           return this.firestore
-            .collection('restuarants')
+            .collection('restaurants')
             .doc(docRef.id)
             .update(this.newRestaurant);
         })
@@ -458,7 +463,7 @@ export class RestaurantFormComponent implements OnInit {
     };
 
     this.firestore
-      .collection('restuarants')
+      .collection('restaurants')
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
@@ -502,6 +507,49 @@ export class RestaurantFormComponent implements OnInit {
     } else {
       this.editRestaurant();
     }
+  }
+
+  getFieldError(fieldName: string): string {
+    if (fieldName === 'name' && this.isDuplicateName) {
+      return 'A restaurant with this name already exists. Please choose a different name.';
+    }
+    
+    const field = this.restaurant[fieldName];
+    if (!field && fieldName !== 'selectedNumberTable') {
+      return `${this.getFieldLabel(fieldName)} is required.`;
+    }
+    
+    if (fieldName === 'selectedNumberTable' && !this.selectedNumberTable) {
+      return 'Number of tables is required.';
+    }
+    
+    return '';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      'name': 'Restaurant Name',
+      'street': 'Street Address',
+      'city': 'City',
+      'province': 'Province',
+      'zip': 'Zip Code',
+      'selectedNumberTable': 'Number of Tables'
+    };
+    return labels[fieldName] || fieldName;
+  }
+
+  private initializeOptions() {
+    // Initialize province options
+    this.provinceOptions = this.saProvinces.map(province => ({
+      value: province,
+      label: province
+    }));
+
+    // Initialize menu options
+    this.menuOptions = this.menus.map(menu => ({
+      value: menu.menuID,
+      label: menu.menuName
+    }));
   }
 
 }

@@ -52,6 +52,22 @@ export class AboutComponent {
   selectedMenuId: string = '';
   isLoadingMenus: boolean = false;
 
+  // Select options for app-form-select
+  get restaurantSelectOptions() {
+    return this.restaurants.map(restaurant => ({
+      value: restaurant.restaurantID,
+      label: `${restaurant.restaurantName} - ${restaurant.city}, ${restaurant.province}${!restaurant.status ? ' (Inactive)' : ''}`,
+      disabled: !restaurant.status
+    }));
+  }
+
+  get menuSelectOptions() {
+    return this.menus.map(menu => ({
+      value: menu.menuID || menu.menuId || menu.id || menu._id,
+      label: menu.menuName || menu.name || 'Unnamed Menu'
+    }));
+  }
+
   // Preview URL management
   private readonly previewUrlBase = 'https://main.d1ovxejc04tu3k.amplifyapp.com/menu/';
   private cachedPreviewUrl: SafeResourceUrl | null = null;
@@ -126,7 +142,7 @@ export class AboutComponent {
             
             // For about page settings, always restrict to user's own restaurants
             // This ensures users can only edit about pages for restaurants they own
-            query = this.firestore.collection('restuarants', ref => 
+            query = this.firestore.collection('restaurants', ref => 
               ref.where('ownerID', '==', uid)
             );
             console.log('Fetching restaurants for ownerID:', uid);
@@ -160,8 +176,10 @@ export class AboutComponent {
   }
 
   onRestaurantChange(restaurantId: string) {
-    this.selectedRestaurantId = restaurantId;
-    this.selectedRestaurant = this.restaurants.find(r => r.restaurantID === restaurantId) || null;
+    // Handle both direct value and event object (for compatibility)
+    const id = typeof restaurantId === 'string' ? restaurantId : restaurantId;
+    this.selectedRestaurantId = id;
+    this.selectedRestaurant = this.restaurants.find(r => r.restaurantID === id) || null;
     
     if (this.selectedRestaurant) {
       this.loadAboutData();

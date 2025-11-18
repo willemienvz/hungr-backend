@@ -1,54 +1,31 @@
 <div class="block step1-container block-open-top">
   <div class="col2row">
     <div class="col">
-      <div class="formGroup" [ngClass]="{ error: menuNameError || isDuplicateMenuName }">
-        <label>Menu Name <span class="required">*</span></label>
-        <input
+      <div class="formGroup">
+        <app-form-input
+          label="Menu Name"
           type="text"
-          class="formControl"
-          [class.error]="isDuplicateMenuName"
           placeholder="Name your menu"
+          [required]="true"
+          [errorMessage]="getMenuNameError()"
           [ngModel]="menuName"
           (ngModelChange)="onMenuNameChange($event)"
-          required
-          (change)="onValidateMenuName()"
-        />
-        <div class="error-message" *ngIf="isDuplicateMenuName">
-          A menu with this name already exists. Please choose a different name.
-        </div>
-        <div class="error-message" *ngIf="menuNameError && !isDuplicateMenuName">
-          Menu name is required.
-        </div>
+          (change)="onValidateMenuName()">
+        </app-form-input>
       </div>
     </div>
     <div class="col restaurant-col" [ngClass]="{'col-resturant-set': addRestaurantLater}">
-      <div class="formGroup" [ngClass]="{ error: restaurantError }" *ngIf="!addRestaurantLater">
-        <label>Assign Restaurant</label>
-        <mat-form-field subscriptSizing="dynamic">
-          <mat-select
-            class="select-arrow-fix"
-            [ngModel]="selectedRestaurant"
-            (ngModelChange)="onSelectedRestaurantChange($event)"
-            (selectionChange)="onValidateRestaurant()"
-        
-          >
-            <mat-option value="" disabled selected hidden>
-              Assign your menu to a restaurant
-            </mat-option>
-            <mat-option
-              *ngFor="let restaurant of restaurants"
-              [value]="restaurant.restaurantID"
-            >
-              {{ restaurant.restaurantName }}
-            </mat-option>
-            <mat-option value="later">
-              Add restaurant later
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <div *ngIf="restaurantError" class="error-text">
-          Restaurant selection is required.
-        </div>
+      <div class="formGroup" *ngIf="!addRestaurantLater">
+        <app-form-select
+          label="Assign Restaurant"
+          placeholder="Assign your menu to a restaurant"
+          [required]="true"
+          [errorMessage]="getRestaurantError()"
+          [options]="restaurantOptions"
+          [ngModel]="selectedRestaurant"
+          (ngModelChange)="onSelectedRestaurantChange($event)"
+          (selectionChange)="onValidateRestaurant()">
+        </app-form-select>
       </div>
  
     </div>

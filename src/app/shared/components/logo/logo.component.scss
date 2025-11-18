@@ -1,0 +1,14 @@
+.logo-container {
+  cursor: pointer;
+  display: inline-block;
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+}

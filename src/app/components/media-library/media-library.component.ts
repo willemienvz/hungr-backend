@@ -27,6 +27,7 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
   filteredMedia: MediaItem[] = [];
   loading = false;
   error: string | null = null;
+  deletingMediaId: string | null = null;  // Track which media is being deleted
 
   // Filter and search properties
   searchControl = new FormControl('');
@@ -310,6 +311,10 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result) {
         try {
+          // Show loading state
+          this.deletingMediaId = media.id;
+          this.cdr.detectChanges();
+
           await this.mediaLibraryService.deleteMedia(media.id);
 
           // Remove from local arrays
@@ -335,6 +340,10 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
           }
 
           alert(errorMessage);
+        } finally {
+          // Clear loading state
+          this.deletingMediaId = null;
+          this.cdr.detectChanges();
         }
       }
     });
@@ -363,9 +372,33 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
       maxFiles: 10
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result && result.success) {
-        // Refresh the media library after successful upload
+    dialogRef.afterClosed().subscribe(async (result) => {
+      // The modal returns ImageUploadResult with action: 'save' | 'cancel' | 'remove'
+      if (result && result.action === 'save' && result.files && result.files.length > 0) {
+        // Files were selected - upload them
+        this.loading = true;
+        try {
+          for (const file of result.files) {
+            await this.mediaLibraryService.uploadMedia({
+              file,
+              componentType: 'media-library',
+              componentId: 'media-library-upload',
+              fieldName: 'media',
+              isPublic: false
+            });
+          }
+          
+          // Refresh the media library after successful upload
+          await this.loadMedia();
+        } catch (error) {
+          console.error('Error uploading media:', error);
+          alert('Upload failed. Please try again.');
+        } finally {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      } else if (result && result.action === 'save') {
+        // No new files, just refresh in case something changed
         this.loadMedia();
       }
     });

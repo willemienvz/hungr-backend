@@ -11,8 +11,8 @@ import { MediaItem } from '../../../shared/types/media';
       <p class="warning">This action cannot be undone.</p>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-raised-button color="warn" [mat-dialog-close]="true">Delete</button>
+      <button class="hungr-btn hungr-btn-secondary" mat-dialog-close>Cancel</button>
+      <button class="hungr-btn hungr-btn-danger" [mat-dialog-close]="true">Delete</button>
     </mat-dialog-actions>
   `,
   styles: [`

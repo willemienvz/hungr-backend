@@ -1,154 +1,167 @@
 .form-select-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
     width: 100%;
-}
+    margin-bottom: var(--spacing-3);
 
-.form-label {
-    font-family: var(--font-family-primary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
-    margin-bottom: 4px;
+    .form-label {
+        display: block;
+        color: var(--form-label-color);
+        font-size: var(--form-label-font-size);
+        font-weight: var(--form-label-font-weight);
+        margin-bottom: var(--form-label-margin-bottom);
 
-    &.required::after {
-        content: '*';
-        color: #d32f2f;
-        margin-left: 4px;
-    }
-}
-
-.select-field {
-    width: 100%;
-
-    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-        display: none;
-    }
-
-    ::ng-deep .mat-mdc-form-field-outline {
-        color: var(--form-field-border-color, #e0e0e0);
-
-        &.mat-mdc-form-field-outline-thick {
-            color: var(--form-field-focus-border-color, #16d3d2);
+        &.required::after {
+            content: ' *';
+            color: var(--color-error);
         }
     }
 
-    ::ng-deep .mdc-notched-outline__leading,
-    ::ng-deep .mdc-notched-outline__notch,
-    ::ng-deep .mdc-notched-outline__trailing {
-        border-color: var(--form-field-border-color, #e0e0e0);
-        border-width: 1px;
+    // Error state on wrapper - apply to select-field
+    &.error-state .select-field ::ng-deep .mat-mdc-text-field-wrapper {
+        border-color: var(--form-field-border-color-error);
+        box-shadow: var(--form-field-error-shadow);
     }
 
-    ::ng-deep .mdc-notched-outline--notched .mdc-notched-outline__notch {
-        border-top: none;
-    }
+    .select-field {
+        width: 100%;
+        position: relative;
 
-    // Error state
-    .form-select.error~ ::ng-deep .mdc-notched-outline__leading,
-    .form-select.error~ ::ng-deep .mdc-notched-outline__notch,
-    .form-select.error~ ::ng-deep .mdc-notched-outline__trailing {
-        border-color: #d32f2f;
-    }
-
-    .form-select.error~ ::ng-deep .mdc-notched-outline--notched .mdc-notched-outline__notch {
-        border-color: #d32f2f;
-    }
-}
-
-.form-select {
-    width: 100%;
-
-    ::ng-deep .mat-mdc-select-value {
-        color: var(--form-field-color, #333);
-        font-family: var(--font-family-primary);
-        font-size: var(--form-field-font-size, 14px);
-    }
-
-    ::ng-deep .mat-mdc-select-placeholder {
-        color: var(--form-field-placeholder-color, #999);
-        font-size: var(--font-size-base);
-    }
-
-    // Error state
-    &.error {
-
-        ::ng-deep .mdc-notched-outline__leading,
-        ::ng-deep .mdc-notched-outline__notch,
-        ::ng-deep .mdc-notched-outline__trailing {
-            border-color: #d32f2f !important;
+        // Hide Material's default subscript (hint/error area)
+        ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+            display: none;
         }
 
-        ::ng-deep .mdc-notched-outline--notched .mdc-notched-outline__notch {
-            border-color: #d32f2f !important;
+        // Remove Material's default padding and margins
+        ::ng-deep .mat-mdc-form-field-infix {
+            padding: 0;
+            min-height: auto;
+            border-top: none;
+        }
+
+        // Hide Material's default outline
+        ::ng-deep .mat-mdc-form-field-outline,
+        ::ng-deep .mdc-notched-outline {
+            display: none !important;
+        }
+
+        // Create custom border wrapper matching form-input
+        ::ng-deep .mat-mdc-text-field-wrapper {
+            background: transparent;
+            padding: 0;
+            border: var(--form-field-border-width) solid var(--form-field-border-color);
+            border-radius: var(--form-field-border-radius);
+            min-height: var(--form-field-height);
+            transition: var(--form-field-transition);
+        }
+
+        // Focus state border
+        &.mat-focused ::ng-deep .mat-mdc-text-field-wrapper {
+            border-color: var(--form-field-border-color-focus);
+            box-shadow: var(--form-field-focus-shadow);
+        }
+
+        // Error state border - when select-field has error class (from template)
+        &.error ::ng-deep .mat-mdc-text-field-wrapper {
+            border-color: var(--form-field-border-color-error);
+            box-shadow: var(--form-field-error-shadow);
+        }
+
+        // Ensure select trigger matches form-input height and padding
+        ::ng-deep .mat-mdc-select-trigger {
+            height: var(--form-field-height);
+            min-height: var(--form-field-height);
+            display: flex;
+            align-items: center;
+            padding: var(--form-field-padding);
+            font-family: var(--form-field-font-family);
+            font-size: var(--form-field-font-size);
+            font-weight: var(--form-field-font-weight);
+            line-height: var(--form-field-line-height);
+            box-sizing: border-box;
+        }
+
+        // Disabled state
+        &.mat-form-field-disabled ::ng-deep .mat-mdc-text-field-wrapper {
+            background: var(--form-field-bg-disabled);
+            border-color: var(--color-grey-300);
+            opacity: 0.6;
         }
     }
 
-    // Focus state
-    &.focused {
+    .form-select {
+        width: 100%;
 
-        ::ng-deep .mdc-notched-outline__leading,
-        ::ng-deep .mdc-notched-outline__notch,
-        ::ng-deep .mdc-notched-outline__trailing {
-            border-color: var(--form-field-focus-border-color, #16d3d2) !important;
-        }
-
-        ::ng-deep .mdc-notched-outline--notched .mdc-notched-outline__notch {
-            border-color: var(--form-field-focus-border-color, #16d3d2) !important;
-        }
-    }
-
-    // Disabled state
-    &.disabled {
+        // Match form-input text styling exactly
         ::ng-deep .mat-mdc-select-value {
-            color: var(--color-grey-500);
+            color: var(--form-field-color);
+            font-family: var(--form-field-font-family);
+            font-size: var(--form-field-font-size);
+            font-weight: var(--form-field-font-weight);
+            line-height: var(--form-field-line-height);
         }
 
-        ::ng-deep .mdc-notched-outline__leading,
-        ::ng-deep .mdc-notched-outline__notch,
-        ::ng-deep .mdc-notched-outline__trailing {
-            border-color: var(--color-grey-300) !important;
+        ::ng-deep .mat-mdc-select-placeholder {
+            color: var(--form-field-placeholder-color);
+            font-size: var(--form-field-font-size);
+            font-family: var(--form-field-font-family);
+        }
+
+        // Custom dropdown arrow - match form-input suffix icon style
+        ::ng-deep .mat-mdc-select-arrow-wrapper {
+            .mat-mdc-select-arrow {
+                color: var(--color-grey-500);
+                font-size: var(--spacing-5);
+                margin-left: var(--spacing-2);
+            }
+        }
+
+        // Disabled state - match form-input
+        &.disabled {
+            ::ng-deep .mat-mdc-select-value {
+                color: var(--form-field-color-disabled);
+            }
+
+            ::ng-deep .mat-mdc-select-arrow {
+                color: var(--color-grey-300);
+            }
+        }
+    }
+
+    // Panel styling
+    ::ng-deep .mat-mdc-select-panel {
+        font-family: var(--form-field-font-family);
+
+        .mat-mdc-option {
+            font-size: var(--form-field-font-size);
+            color: var(--form-field-color);
+
+            &.mat-mdc-option-active {
+                background-color: rgba(22, 211, 210, 0.1);
+            }
+
+            &.mdc-list-item--selected {
+                background-color: var(--color-secondary);
+                color: white;
+            }
+        }
+
+        .mat-mdc-optgroup-label {
+            font-weight: var(--font-weight-bold);
+            color: var(--form-field-color);
             background-color: var(--color-grey-100);
-        }
-    }
-}
-
-// Panel styling
-::ng-deep .mat-mdc-select-panel {
-    font-family: var(--font-family-primary);
-
-    .mat-mdc-option {
-        font-size: var(--font-size-base);
-        color: var(--color-text-primary);
-
-        &.mat-mdc-option-active {
-            background-color: rgba(22, 211, 210, 0.1);
-        }
-
-        &.mdc-list-item--selected {
-            background-color: var(--color-secondary);
-            color: white;
+            font-size: var(--form-label-font-size);
         }
     }
 
-    .mat-mdc-optgroup-label {
-        font-weight: var(--font-weight-bold);
-        color: var(--color-text-primary);
-        background-color: var(--color-grey-100);
-        font-size: var(--font-size-sm);
-    }
-}
+    .error-message {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-1);
+        color: var(--form-error-color);
+        font-size: var(--form-error-font-size);
+        margin-top: var(--form-error-margin-top);
 
-.error-message {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: #d32f2f;
-    margin-top: 4px;
-
-    .material-icons {
-        font-size: 14px;
+        .material-icons {
+            font-size: var(--form-error-icon-size);
+        }
     }
 }

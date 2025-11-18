@@ -30,7 +30,11 @@
             (click)="onRoleChange(role)">
             <div class="role-card-header">
               <span class="role-name">{{ getRoleDisplayName(role) }}</span>
-              <input type="radio" [value]="role" [checked]="selectedRole === role" readonly>
+              <app-form-radio
+              [value]="role"
+              name="role"
+              [(ngModel)]="selectedRole">
+                </app-form-radio>
             </div>
             <p class="role-description">{{ getRoleDescription(role) }}</p>
             <div class="role-permissions-preview" *ngIf="role !== 'custom'">
@@ -60,11 +64,12 @@
             <h5>Analytics & Reporting</h5>
             <div class="permission-items">
               <label class="permission-checkbox" *ngFor="let permission of ['viewAnalytics']">
-                <input
-                  type="checkbox"
-                  [checked]="hasPermission(permission)"
-                  (change)="onPermissionChange($event, permission)">
-                <span class="checkmark"></span>
+                <app-form-checkbox
+              [label]="getPermissionLabels()[permission]"
+              [(ngModel)]="permissions[permission]"
+              (valueChange)="onPermissionChange(permission, $event)">
+            </app-form-checkbox>
+                
                 <div class="permission-info">
                   <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
                   <span class="permission-desc">Access to view analytics and reports</span>
@@ -77,11 +82,12 @@
             <h5>Menu Management</h5>
             <div class="permission-items">
               <label class="permission-checkbox" *ngFor="let permission of ['createMenus', 'editMenus']">
-                <input
-                  type="checkbox"
-                  [checked]="hasPermission(permission)"
-                  (change)="onPermissionChange($event, permission)">
-                <span class="checkmark"></span>
+                <app-form-checkbox
+              [label]="getPermissionLabels()[permission]"
+              [(ngModel)]="permissions[permission]"
+              (valueChange)="onPermissionChange(permission, $event)">
+            </app-form-checkbox>
+                
                 <div class="permission-info">
                   <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
                   <span class="permission-desc">
@@ -96,11 +102,12 @@
             <h5>Restaurant Settings</h5>
             <div class="permission-items">
               <label class="permission-checkbox" *ngFor="let permission of ['editRestaurants', 'editBranding']">
-                <input
-                  type="checkbox"
-                  [checked]="hasPermission(permission)"
-                  (change)="onPermissionChange($event, permission)">
-                <span class="checkmark"></span>
+                <app-form-checkbox
+              [label]="getPermissionLabels()[permission]"
+              [(ngModel)]="permissions[permission]"
+              (valueChange)="onPermissionChange(permission, $event)">
+            </app-form-checkbox>
+                
                 <div class="permission-info">
                   <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
                   <span class="permission-desc">
@@ -115,11 +122,12 @@
             <h5>Specials & Promotions</h5>
             <div class="permission-items">
               <label class="permission-checkbox" *ngFor="let permission of ['addSpecials']">
-                <input
-                  type="checkbox"
-                  [checked]="hasPermission(permission)"
-                  (change)="onPermissionChange($event, permission)">
-                <span class="checkmark"></span>
+                <app-form-checkbox
+              [label]="getPermissionLabels()[permission]"
+              [(ngModel)]="permissions[permission]"
+              (valueChange)="onPermissionChange(permission, $event)">
+            </app-form-checkbox>
+                
                 <div class="permission-info">
                   <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
                   <span class="permission-desc">Create and manage daily specials and promotions</span>
@@ -132,11 +140,12 @@
             <h5>Administration</h5>
             <div class="permission-items">
               <label class="permission-checkbox" *ngFor="let permission of ['manageUsers']">
-                <input
-                  type="checkbox"
-                  [checked]="hasPermission(permission)"
-                  (change)="onPermissionChange($event, permission)">
-                <span class="checkmark"></span>
+                <app-form-checkbox
+              [label]="getPermissionLabels()[permission]"
+              [(ngModel)]="permissions[permission]"
+              (valueChange)="onPermissionChange(permission, $event)">
+            </app-form-checkbox>
+                
                 <div class="permission-info">
                   <span class="permission-name">{{ getPermissionLabels()[permission] }}</span>
                   <span class="permission-desc">Invite, manage, and remove team members</span>
@@ -165,10 +174,10 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btnTertiary" (click)="cancel()" [disabled]="isSaving">
+      <button class="hungr-btn hungr-btn-tertiary" (click)="cancel()" [disabled]="isSaving">
         Cancel
       </button>
-      <button class="btn btnPrimary" (click)="savePermissions()" [disabled]="isSaving">
+      <button class="hungr-btn hungr-btn-primary" (click)="savePermissions()" [disabled]="isSaving">
         Save Permissions
       </button>
     </div>

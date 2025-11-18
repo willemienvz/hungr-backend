@@ -4,10 +4,10 @@
 /* Empty state styling for pairing component */
 .empty-state-message {
   margin: 0px 0;
-  padding: 16px;
+  padding: var(--spacing-4);
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
   text-align: center;
   grid-column: 2;
 
@@ -18,7 +18,7 @@
     gap: 8px;
 
     i {
-      color: #16d3d2;
+      color: var(--color-secondary);
       font-size: 24px;
     }
 

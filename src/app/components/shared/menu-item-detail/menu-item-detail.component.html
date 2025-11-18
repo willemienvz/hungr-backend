@@ -15,32 +15,28 @@
   <div class="detail-content grid">
     <!-- KB: Custom heading input field -->
     <div class="custom-heading-input">
-      <div class="inputBox">
-        <input
-          placeholder="Custom heading (optional)"
-          type="text"
-          [ngModel]="config.customHeading"
-          (ngModelChange)="onCustomHeadingChange($event)"
-          [ngModelOptions]="{ standalone: true }"
-        />
-        <label>Custom heading for this section</label>
-      </div>
+      <app-form-input
+        type="text"
+        placeholder="Custom heading (optional)"
+        label="Custom heading for this section"
+        [ngModel]="config.customHeading"
+        (ngModelChange)="onCustomHeadingChange($event)"
+        [ngModelOptions]="{ standalone: true }">
+      </app-form-input>
     </div>
     
     <!-- KB: Optional description text, only shown if provided in config -->
     
     <div class="add-input-group">
-      <div class="inputBox">
-        <input
-          [placeholder]="config.placeholder"
-          type="text"
-          [ngModel]="newItemValue"
-          (ngModelChange)="onNewItemValueChange($event)"
-          [ngModelOptions]="{ standalone: true }"
-          (keyup.enter)="onAddItem()"
-        />
-        <label>press enter to add</label>
-      </div>
+      <app-form-input
+        type="text"
+        [placeholder]="config.placeholder"
+        label="press enter to add"
+        [ngModel]="newItemValue"
+        (ngModelChange)="onNewItemValueChange($event)"
+        [ngModelOptions]="{ standalone: true }"
+        (keyup.enter)="onAddItem()">
+      </app-form-input>
       
       <!-- KB: Optional price input for items -->
       <div *ngIf="config.showPricing" class="price-input-container">

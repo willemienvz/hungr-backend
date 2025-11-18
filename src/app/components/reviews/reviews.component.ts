@@ -235,7 +235,7 @@ export class ReviewsComponent implements OnInit {
 
   private loadRestaurantsForOwner(ownerId: string): void {
     this.firestore
-      .collection<Restaurant>('restuarants', ref => ref.where('ownerID', '==', ownerId))
+      .collection<Restaurant>('restaurants', ref => ref.where('ownerID', '==', ownerId))
       .valueChanges()
       .subscribe(restaurants => {
         restaurants.forEach(r => {
@@ -315,8 +315,7 @@ export class ReviewsComponent implements OnInit {
     }
   }
 
-  onSearchInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.searchControl.setValue(target.value);
+  onSearchInput(value: string): void {
+    this.searchControl.setValue(value);
   }
 } 

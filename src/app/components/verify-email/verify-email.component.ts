@@ -12,6 +12,8 @@ import { PayFastService } from '../../shared/services/payfast.service';
 })
 export class VerifyEmailComponent implements OnInit {
   isSaving: boolean = false;
+  isResending: boolean = false;
+  userEmail: string = '';
 
   constructor(
     public authService: AuthService,
@@ -23,15 +25,25 @@ export class VerifyEmailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Check for dev mode query parameter
+    const isDevMode = this.route.snapshot.queryParamMap.get('dev') === 'true';
+
     // Get stored form data
     const formDataString = localStorage.getItem('formData');
     if (!formDataString) {
-      this.toastr.error('No registration data found');
-      this.router.navigate(['/register-user/step1']);
-      return;
+      if (!isDevMode) {
+        this.toastr.error('No registration data found');
+        this.router.navigate(['/register-user/step1']);
+        return;
+      } else {
+        // In dev mode, show a message but don't redirect
+        this.toastr.info('Dev mode: No registration data found, but continuing anyway');
+        return;
+      }
     }
 
     const formData = JSON.parse(formDataString);
+    this.userEmail = formData.userEmail; // Store email for template
 
     // Create user account
     this.createUserAccount(formData);
@@ -90,8 +102,8 @@ export class VerifyEmailComponent implements OnInit {
     }
   }
 
-  async verifyAndCreate() {
-    this.isSaving = true;
+  async resendVerificationEmail() {
+    this.isResending = true;
     try {
       const user = await this.auth.currentUser;
       if (user) {
@@ -104,7 +116,7 @@ export class VerifyEmailComponent implements OnInit {
       this.toastr.error(error.message || 'Error sending verification email. Please try again.');
       console.error('Error:', error);
     } finally {
-      this.isSaving = false;
+      this.isResending = false;
     }
   }
 }

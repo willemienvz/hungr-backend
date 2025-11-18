@@ -1,5 +1,5 @@
 .delete-confirmation {
-  border-radius: 10px;
+  border-radius: var(--border-radius-lg);
   background-color: #fff;
   display: flex;
   max-width: 399px;
@@ -19,7 +19,7 @@
 }
 
 .confirmation-title {
-  font-size: 18px;
+  font-size: 1var(--spacing-2);
   font-weight: 700;
   color: #2e3646;
   line-height: 1;
@@ -37,21 +37,21 @@
   color: #2e3646;
   font-size: 15px;
   font-weight: 400;
-  line-height: 20px;
-  margin: 20px auto 0;
+  line-height: var(--spacing-5);
+  margin: var(--spacing-5) auto 0;
   max-width: 283px;
 }
 
 .confirmation-actions {
   display: flex;
-  margin-top: 28px;
+  margin-top: 2var(--spacing-2);
   gap: 15px;
 }
 
 .action-button {
   flex: 1;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: var(--spacing-4);
   font-weight: 700;
   text-transform: uppercase;
   padding: 10px 30px;
@@ -65,6 +65,6 @@
 }
 
 .confirm {
-  background-color: #16d3d2;
+  background-color: var(--color-secondary);
   color: #181818;
 }

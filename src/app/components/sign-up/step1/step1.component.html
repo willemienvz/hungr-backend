@@ -1,113 +1,80 @@
-<div class="form-container">
-    <img class="logo" src="../../../../assets/images/shared/logo.png" alt="" />
-    <div class="form-container-inner">
-        <a class="backLink" routerLink="/sign-in"><span class="material-symbols-outlined">
-                arrow_back
-            </span>Back</a>
-        <h1>Sign Up</h1>
+<div class="auth-layout">
+    <app-logo containerClass="auth-logo"></app-logo>
+    <div class="auth-layout-inner">
+        <div class="auth-header-line">
+            <a class="backLink no-absolute" routerLink="/sign-in"><span class="material-symbols-outlined">
+                    arrow_back
+                </span>Back</a>
+            <h1>Sign Up</h1>
+        </div>
         <form [formGroup]="step1Form">
-            <div class="row">
-                <div class="col">
+            <div class="auth-form-grid">
+                <div class="auth-form-col">
                     <h6>Your details</h6>
-                    <div class="authBlock">
-                        <div class="formGroup" [ngClass]="{
-                            'has-error': step1Form.get('firstName')?.invalid && (step1Form.get('firstName')?.touched || step1Form.get('firstName')?.dirty)
-                          }">
-                            <div class="label-container">
-                                <label>First name</label>
-                                <div *ngIf="step1Form.get('firstName')?.hasError('required') && (step1Form.get('firstName')?.touched || step1Form.get('firstName')?.dirty)"
-                                    class="error-message">
-                                    First name is required.
-                                </div>
-                            </div>
-                            <input type="text" class="formControl" placeholder="John" formControlName="firstName" />
-                        </div>
+                  
+                        <app-form-input
+                            label="First name"
+                            type="text"
+                            placeholder="John"
+                            [required]="true"
+                            [errorMessage]="getFieldError('firstName')"
+                            formControlName="firstName">
+                        </app-form-input>
 
-                        <div class="formGroup" [ngClass]="{
-                            'has-error': step1Form.get('lastName')?.invalid && (step1Form.get('lastName')?.touched || step1Form.get('lastName')?.dirty)
-                          }">
-                            <div class="label-container">
-                                <label>Surname</label>
-                                <div *ngIf="step1Form.get('lastName')?.hasError('required') && (step1Form.get('lastName')?.touched || step1Form.get('lastName')?.dirty)"
-                                    class="error-message">
-                                    Surname is required.
-                                </div>
-                            </div>
-                            <input type="text" class="formControl" placeholder="Smith" formControlName="lastName" />
-                        </div>
+                        <app-form-input
+                            label="Surname"
+                            type="text"
+                            placeholder="Smith"
+                            [required]="true"
+                            [errorMessage]="getFieldError('lastName')"
+                            formControlName="lastName">
+                        </app-form-input>
 
-                        <h6>Contact Details</h6>
-                        <div class="formGroup" [ngClass]="{
-                            'has-error': step1Form.get('userEmail')?.invalid && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)
-                          }">
-                            <div class="label-container">
-                                <label>Email</label>
-                                <div *ngIf="step1Form.get('userEmail')?.hasError('required') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)"
-                                    class="error-message">
-                                    Email is required.
-                                </div>
-                                <div *ngIf="step1Form.get('userEmail')?.hasError('email') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)"
-                                    class="error-message">
-                                    Enter a valid email address.
-                                </div>
-                                <div *ngIf="emailInUse" class="error-message">
-                                    This email is already in use.
-                                </div>
-                            </div>
-                            <input type="email" class="formControl" placeholder="email@address.co.za"
-                                formControlName="userEmail" />
-                        </div>
-                        <div class="formGroup" [ngClass]="{
-                            'has-error': step1Form.get('cellphone')?.invalid && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)
-                          }">
-                            <div class="label-container">
-                                <label>Cellphone number</label>
-                                <div *ngIf="step1Form.get('cellphone')?.hasError('required') && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)"
-                                    class="error-message">
-                                    Cellphone number is required.
-                                </div>
-                                <div *ngIf="step1Form.get('cellphone')?.hasError('invalidCellphone') && !step1Form.get('cellphone')?.hasError('required') && (step1Form.get('cellphone')?.touched || step1Form.get('cellphone')?.dirty)"
-                                    class="error-message">
-                                    Enter a valid cellphone number (e.g., +27 12 234 5678).
-                                </div>
-                            </div>
-                            <input type="tel" class="formControl" placeholder="+27 12 234 5678"
-                                formControlName="cellphone" />
-                        </div>
-                    </div>
+                        <h6 class='mt-md'>Contact Details</h6>
+                        <app-form-input
+                            label="Email"
+                            type="email"
+                            placeholder="email@address.co.za"
+                            [required]="true"
+                            [errorMessage]="getFieldError('userEmail')"
+                            formControlName="userEmail">
+                        </app-form-input>
+                        <app-form-input
+                            label="Cellphone number"
+                            type="tel"
+                            placeholder="+27 12 234 5678"
+                            [required]="true"
+                            [errorMessage]="getFieldError('cellphone')"
+                            formControlName="cellphone">
+                        </app-form-input>
+              
                 </div>
-                <div class="col">
+                <div class="auth-form-col">
                     <h6>Login details</h6>
-                    <div class="formGroup" [ngClass]="{'green-text': isPasswordValid()}">
-                        <div class="label-container">
-                            <label>Password</label>
-                        </div>
-                        <div class="password-toggle">
-                            <input class="formControl" placeholder="Password" formControlName="password" required
-                                type="{{ showPassword ? 'text' : 'password' }}" />
-                            <i class="material-icons" (click)="togglePasswordVisibility()">{{ showPassword ?
-                                'visibility' : 'visibility_off' }}</i>
-                        </div>
-                    </div>
+                    <app-form-input
+                        label="Password"
+                        [type]="showPassword ? 'text' : 'password'"
+                        placeholder="Password"
+                        [required]="true"
+                        [errorMessage]="getFieldError('password')"
+                        [suffixIcon]="showPassword ? 'visibility_off' : 'visibility'"
+                        (suffixIconClick)="togglePasswordVisibility()"
+                        formControlName="password">
+                    </app-form-input>
 
-                    <div class="formGroup">
-                        <div class="label-container">
-                            <label>Confirm Password</label>
-                            <div *ngIf="isPasswordMismatch()" class="error-message">
-                                Passwords do not match.
-                            </div>
-                        </div>
-                        <div class="password-toggle">
-                            <input class="formControl" placeholder="Confirm Password" formControlName="userPwdConfrim"
-                                required type="{{ showPasswordConf ? 'text' : 'password' }}" />
-                            <i class="material-icons" (click)="togglePasswordConfirmVisibility()">{{
-                                showPasswordConf ?
-                                'visibility' : 'visibility_off' }}</i>
-                        </div>
-                    </div>
-                    <div class="infobox">
-                        <p class="font-small-medium">Make sure your password has:</p>
-                        <div class="inner-row">
+                    <app-form-input
+                        label="Confirm Password"
+                        [type]="showPasswordConf ? 'text' : 'password'"
+                        placeholder="Confirm Password"
+                        [required]="true"
+                        [errorMessage]="getFieldError('userPwdConfrim')"
+                        [suffixIcon]="showPasswordConf ? 'visibility_off' : 'visibility'"
+                        (suffixIconClick)="togglePasswordConfirmVisibility()"
+                        formControlName="userPwdConfrim">
+                    </app-form-input>
+                    <div class="auth-info-box mt-md">
+                        <p class="auth-info-text">Make sure your password has:</p>
+                        <div class="auth-info-row">
                             <p [ngClass]="{'valid': isLengthValid()}">10 characters</p>
                             <p [ngClass]="{'valid': isUppercaseValid()}">an uppercase letter</p>
                             <p [ngClass]="{'valid': isSpecialCharValid()}">a special character</p>
@@ -118,10 +85,13 @@
 
                 </div>
             </div>
-            <button (click)="onNext()" class="btnPrimary" [disabled]="step1Form.invalid">Next</button>
-            <div class="redirectToLogin">
-                <span class="redirect mainLink" routerLink="/sign-in">
-                    Already have an account? Log In</span>
+            <div class="auth-btn-container">
+                <button (click)="onNext()" class="hungr-btn hungr-btn-primary" [disabled]="step1Form.invalid">Next</button>
+            </div>
+            <div class="auth-redirect">
+                <a class="auth-redirect-link" routerLink="/sign-in">
+                    Already have an account? Log In
+                </a>
             </div>
         </form>
     </div>

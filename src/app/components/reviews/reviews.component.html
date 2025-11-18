@@ -3,15 +3,13 @@
 
     <div class="reviews-controls">
       <div class="search-container">
-        <div class="search-input">
-          <i class="material-icons">search</i>
-          <input 
-            type="text" 
-            [value]="searchControl.value"
-            (input)="onSearchInput($event)"
-            placeholder="Search by customer name or message..."
-            class="search-field">
-        </div>
+        <app-form-input
+          type="text"
+          placeholder="Search by customer name or message..."
+          [ngModel]="searchControl.value"
+          (ngModelChange)="onSearchInput($event)"
+          [ngModelOptions]="{ standalone: true }">
+        </app-form-input>
       </div>
       <div class="filter-dropdown">
         <mat-select 
@@ -95,23 +93,23 @@
 
           <div class="review-actions">
             <ng-container *ngIf="review.status === 'pending'; else approvedActions">
-            <button class="btnPrimary" (click)="approveReview(review)">
+            <button class="hungr-btn hungr-btn-primary" (click)="approveReview(review)">
               <i class="material-icons">check</i>
               Approve
             </button>
-            <button class="btnOutline" (click)="rejectReview(review)">
+            <button class="hungr-btn hungr-btn-secondary" (click)="rejectReview(review)">
               <i class="material-icons">close</i>
               Reject
             </button>
             </ng-container>
             <ng-template #approvedActions>
-            <button class="btnOutline" (click)="unapproveReview(review)">
+            <button class="hungr-btn hungr-btn-secondary" (click)="unapproveReview(review)">
               <i class="material-icons">undo</i>
               Unapprove
             </button>
             </ng-template>
 
-            <button class="btnSecondary" (click)="deleteReview(review)">
+            <button class="hungr-btn hungr-btn-secondary" (click)="deleteReview(review)">
               <i class="material-icons">delete</i>
               Delete
             </button>
@@ -121,17 +119,17 @@
       <ng-container *ngIf="(totalPages$ | async) as totalPages">
         <div class="review-pagination" *ngIf="totalPages > 1">
         <ng-container *ngIf="(pageIndex$ | async) as pageIndex">
-          <button class="pagination-btn" (click)="goToPage(1, totalPages)">
+          <button class="hungr-btn hungr-btn-tertiary" (click)="goToPage(1, totalPages)">
             <i class="material-icons">first_page</i>
           </button>
-          <button class="pagination-btn" (click)="goToPage(pageIndex - 1, totalPages)">
+          <button class="hungr-btn hungr-btn-tertiary" (click)="goToPage(pageIndex - 1, totalPages)">
             <i class="material-icons">chevron_left</i>
           </button>
           <span class="page-indicator">Page {{ pageIndex }} of {{ totalPages }}</span>
-          <button class="pagination-btn" (click)="goToPage(pageIndex + 1, totalPages)">
+          <button class="hungr-btn hungr-btn-tertiary" (click)="goToPage(pageIndex + 1, totalPages)">
             <i class="material-icons">chevron_right</i>
           </button>
-          <button class="pagination-btn" (click)="goToPage(totalPages, totalPages)">
+          <button class="hungr-btn hungr-btn-tertiary" (click)="goToPage(totalPages, totalPages)">
             <i class="material-icons">last_page</i>
           </button>
         </ng-container>

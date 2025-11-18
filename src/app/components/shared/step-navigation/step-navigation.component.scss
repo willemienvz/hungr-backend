@@ -41,8 +41,8 @@
       &::after {
         content: '';
         position: absolute;
-        width: 16px;
-        height: 16px;
+        width: var(--spacing-4);
+        height: var(--spacing-4);
         margin: auto;
         border: 2px solid transparent;
         border-top-color: currentColor;

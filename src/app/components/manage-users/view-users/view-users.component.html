@@ -87,10 +87,10 @@
     </div>
 
     <div class="modal-actions">
-      <button class="btn btnTertiary" (click)="closePopup()" [disabled]="isSaving">
+      <button class="hungr-btn hungr-btn-tertiary" (click)="closePopup()" [disabled]="isSaving">
         Close
       </button>
-      <button class="btn btnSecondary" (click)="switchToEditMode()" [disabled]="isSaving">
+      <button class="hungr-btn hungr-btn-secondary" (click)="switchToEditMode()" [disabled]="isSaving">
         <i class="material-icons">edit</i>
         Edit User
       </button>
@@ -110,47 +110,51 @@
           <h4>Basic Information</h4>
           <div class="row">
           <div class="formGroup">
-            <label>Name</label>
-            <input
+            <app-form-input
+              label="Name"
               type="text"
-              class="formControl"
+              placeholder="Enter name"
+              [required]="true"
+              [errorMessage]="getFieldError('firstName')"
               name="name"
-              [(ngModel)]="user.firstName"
-              required
-            />
+              [(ngModel)]="user.firstName">
+            </app-form-input>
           </div>
           <div class="formGroup">
-            <label>Email address</label>
-            <input
+            <app-form-input
+              label="Email address"
               type="email"
-              class="formControl"
+              placeholder="email@address.co.za"
+              [required]="true"
+              [disabled]="true"
+              [errorMessage]="getFieldError('email')"
               name="email"
-              [(ngModel)]="user.email"
-              required
-              disabled
-            />
+              [(ngModel)]="user.email">
+            </app-form-input>
           </div>
           </div>
           <div class="row">
           <div class="formGroup">
-            <label>Surname</label>
-            <input
+            <app-form-input
+              label="Surname"
               type="text"
-              class="formControl"
+              placeholder="Enter surname"
+              [required]="true"
+              [errorMessage]="getFieldError('Surname')"
               name="lastname"
-              [(ngModel)]="user.Surname"
-              required
-            />
+              [(ngModel)]="user.Surname">
+            </app-form-input>
           </div>
           <div class="formGroup">
-            <label>Phone number</label>
-            <input
-              type="text"
-              class="formControl"
+            <app-form-input
+              label="Phone number"
+              type="tel"
+              placeholder="012 345 6789"
+              [required]="true"
+              [errorMessage]="getFieldError('cellphoneNumber')"
               name="phone"
-              [(ngModel)]="user.cellphoneNumber"
-              required
-            />
+              [(ngModel)]="user.cellphoneNumber">
+            </app-form-input>
           </div>
           </div>
         </div>
@@ -197,19 +201,21 @@
           </div>
         </div>
         <div class="formGroup btnHolder">
-          <input
-            class="btn btnTertiary"
+          <button
+            class="hungr-btn hungr-btn-tertiary"
             type="button"
-            value="Cancel"
             (click)="switchToViewMode()"
             [disabled]="isSaving"
-          />
-          <input
+          >
+            Cancel
+          </button>
+          <button
             type="submit"
-            class="btn btnPrimary"
+            class="hungr-btn hungr-btn-primary"
             [disabled]="!editForm.valid || isSaving"
-            value="Save Changes"
-          />
+          >
+            Save Changes
+          </button>
         </div>
       </form>
     </div>

@@ -19,7 +19,7 @@
 .restaurantholder{
     display: flex;
     width: 100%;
-    padding: 12px 14px;
+    padding: var(--spacing-3) 14px;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
@@ -53,7 +53,7 @@
     flex-direction: column;
     gap:13px;
     padding: 13px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     width: 90px;
     a{
         font-family: 'Poppins', sans-serif;
@@ -97,7 +97,7 @@ table{
         font-size: 14px;
         font-weight: 500;
         border-bottom: 1px solid #444444;
-        padding: 15px 15px 20px 15px;
+        padding: 15px 15px var(--spacing-5) 15px;
     }
     td{
         text-align: left;

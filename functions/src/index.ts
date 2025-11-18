@@ -46,3 +46,9 @@ export { payfastItn };
 // Export email template functions
 export { sendCustomEmailVerification, sendEmailWithTemplate };
 
+// Export subscription management functions
+export { pauseSubscription } from './pauseSubscription';
+export { cancelSubscription } from './cancelSubscription';
+export { unpauseSubscription } from './unpauseSubscription';
+export { updateSubscription } from './updateSubscription';
+

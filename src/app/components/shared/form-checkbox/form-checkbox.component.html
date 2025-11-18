@@ -1,0 +1,23 @@
+<div class="checkbox-container" [class]="checkboxClass" (click)="onContainerClick($event)">
+  <label [for]="checkboxId" class="checkbox-label">
+    <input
+      [id]="checkboxId"
+      type="checkbox"
+      [checked]="value"
+      [disabled]="disabled"
+      (change)="onInputChange($event)"
+      (focus)="onFocus($event)"
+      (blur)="onBlur($event)"
+      class="checkbox-input"
+    />
+    <span class="checkbox-custom"></span>
+    <span class="checkbox-text" *ngIf="label">
+      {{ label }}
+      <span class="required-indicator" *ngIf="required">*</span>
+    </span>
+  </label>
+
+  <div class="error-message" *ngIf="showError && errorMessage">
+    {{ errorMessage }}
+  </div>
+</div>

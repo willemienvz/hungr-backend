@@ -2,23 +2,17 @@
  
     <ng-content select="[header]"></ng-content>
 
-  <div class="block rowSpecial block-open-top">
+  <app-content-block title="" customClass="rowSpecial block-open-top">
     <form [formGroup]="specialForm">
       <div class="formGroup">
-        <p class="label">Special Title</p>
-        <input
+        <app-form-input
           type="text"
-          class="formControl"
-          formControlName="specialTitle"
+          label="Special Title"
           placeholder="Enter special title"
-          required
-        />
-        <div
-          class="error-message"
-          *ngIf="specialForm.get('specialTitle')?.touched && specialForm.get('specialTitle')?.invalid"
-        >
-          Special Title is required.
-        </div>
+          [required]="true"
+          [errorMessage]="specialForm.get('specialTitle')?.touched && specialForm.get('specialTitle')?.invalid ? 'Special Title is required.' : ''"
+          formControlName="specialTitle">
+        </app-form-input>
       </div>
       <div class="formGroup">
         <p class="label">Select Menu</p>
@@ -61,37 +55,24 @@
       <div class="formGroup dateRow">
        
           <div class="col">
-            <p class="label">Start Date</p>
-            <input
+            <app-form-input
               type="date"
-              class="formControl"
-              formControlName="dateFrom"
+              label="Start Date"
               placeholder="Start date"
-              required
-            />
-            <div
-              class="error-message"
-              *ngIf="specialForm.get('dateFrom')?.touched && (specialForm.get('dateFrom')?.invalid || !specialForm.get('dateFrom')?.value)"
-            >
-              Start date is required.
-            </div>
+              [required]="true"
+              [errorMessage]="specialForm.get('dateFrom')?.touched && (specialForm.get('dateFrom')?.invalid || !specialForm.get('dateFrom')?.value) ? 'Start date is required.' : ''"
+              formControlName="dateFrom">
+            </app-form-input>
           </div>
           <div class="col">
-            <p class="label">End Date</p>
-            <input
+            <app-form-input
               type="date"
-              class="formControl"
-              formControlName="dateTo"
+              label="End Date"
               placeholder="End date"
-              required
-            />
-            <div
-              class="error-message"
-              *ngIf="specialForm.get('dateTo')?.touched && (specialForm.get('dateTo')?.invalid || !specialForm.get('dateTo')?.value)"
-            >
-              End date is required.
-            </div>
- 
+              [required]="true"
+              [errorMessage]="specialForm.get('dateTo')?.touched && (specialForm.get('dateTo')?.invalid || !specialForm.get('dateTo')?.value) ? 'End date is required.' : ''"
+              formControlName="dateTo">
+            </app-form-input>
         </div>
         <div
           *ngIf="specialForm.errors?.['dateRangeInvalid']"
@@ -101,5 +82,5 @@
         </div>
       </div>
     </form>
-  </div>
+  </app-content-block>
 </div> 

@@ -13,7 +13,7 @@ import { User } from '../../../shared/services/user';
   styleUrl: './view.component.scss'
 })
 export class ViewComponent {
-  restuarant: Restaurant;  
+  restaurant: Restaurant;  
   menuName: string;
   owner: string;
     constructor(
@@ -35,13 +35,13 @@ export class ViewComponent {
   }
 
   fetchRestaurants() {
-  this.firestore.collection<Restaurant>('restuarants', ref => ref.where('restaurantID', '==', this.data.id))
+  this.firestore.collection<Restaurant>('restaurants', ref => ref.where('restaurantID', '==', this.data.id))
     .valueChanges()
-    .subscribe(restuarants => {
-      console.log(restuarants)
-      this.restuarant = restuarants[0];
-      this.fetchMenus(this.restuarant.menuID);
-      this.fetchOwener(this.restuarant.ownerID);
+    .subscribe(restaurants => {
+      console.log(restaurants)
+      this.restaurant = restaurants[0];
+      this.fetchMenus(this.restaurant.menuID);
+      this.fetchOwener(this.restaurant.ownerID);
     });
     
    

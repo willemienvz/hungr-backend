@@ -2,20 +2,20 @@
 <mat-dialog-content>
   You have unsaved changes. If you continue, your progress will be lost.
 </mat-dialog-content>
-<mat-dialog-actions align="end" style="gap: 12px; padding: 16px 24px 24px 24px;">
+<mat-dialog-actions align="end" style="gap: var(--spacing-3); padding: var(--spacing-4) 24px 24px 24px;">
   <button
-    class="btnTertiary"
+    class="hungr-btn hungr-btn-tertiary"
     type="button"
     (click)="onNoClick()"
-    style="min-width: 120px;"
+    style="min-width: 1var(--spacing-5);"
   >
     Cancel
   </button>
   <button
-    class="btnPrimary"
+    class="hungr-btn hungr-btn-primary"
     type="button"
     (click)="onYesClick()"
-    style="min-width: 120px;"
+    style="min-width: 1var(--spacing-5);"
   >
     Yes, discard
   </button>

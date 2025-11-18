@@ -1,6 +1,6 @@
 .step2-container {
   .headerBlock {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-5);
   }
 
   .block {
@@ -23,8 +23,8 @@
       flex-direction: column;
 
       .formGroup {
-        margin-bottom: 20px;
-        gap: 8px;
+        margin-bottom: var(--spacing-5);
+        gap: var(--spacing-2);
       }
     }
   }
@@ -32,7 +32,7 @@
 
 
 .label {
-  color: #9a9a9a;
+  color: var(--color-text-muted);
   font-weight: 400;
   font-size: 15px;
   line-height: 20.25px;
@@ -58,11 +58,11 @@
   user-select: none;
   transition: background-color 0.3s, border-color 0.3s;
   font-weight: 400;
-  font-size: 16px;
+  font-size: var(--spacing-4);
   line-height: 100%;
   letter-spacing: -0.1%;
   vertical-align: middle;
-  font-family: "Poppins", sans-serif;
+  font-family: var(--font-family-primary);
 }
 
 .weekday.selected {
@@ -80,10 +80,10 @@
   input {
     width: 100%;
     border: 1px solid var(--hungr-dark-grey);
-    height: 38px;
-    padding: 3px 12px;
-    border-radius: 5px;
-    line-height: 38px;
+    height: 3var(--spacing-2);
+    padding: 3px var(--spacing-3);
+    border-radius: var(--border-radius-md);
+    line-height: 3var(--spacing-2);
     text-align: center;
   }
 
@@ -105,24 +105,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin: 16px 0;
+  gap: var(--spacing-2);
+  margin: var(--spacing-4) 0;
 }
 
 .all-day-checkbox {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-3);
   cursor: pointer;
-  font-size: 16px;
+  font-size: var(--spacing-4);
   font-weight: 500;
   color: var(--color-text-primary, #333);
   
   input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: var(--spacing-5);
+    height: var(--spacing-5);
     cursor: pointer;
-    accent-color: #16d3d2;
+    accent-color: var(--color-secondary);
   }
   
   .all-day-label {

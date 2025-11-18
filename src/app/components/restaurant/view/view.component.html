@@ -1,7 +1,7 @@
 <section class="delete-confirmation">
     <div class="row">
         <div class="col">
-            <h5>{{restuarant.restaurantName}}</h5>
+            <h5>{{restaurant.restaurantName}}</h5>
             
         </div>
         <div class="col">
@@ -11,12 +11,12 @@
     <div class="row">
         <div class="col">
             <p class="label">Address</p>
-            <p class="answer">{{restuarant.streetAdress}}</p>
+            <p class="answer">{{restaurant.streetAdress}}</p>
            
         </div>
         <div class="col">
             <p class="label">Number of tables</p>
-            <p class="answer">{{restuarant.numberTables}}</p>
+            <p class="answer">{{restaurant.numberTables}}</p>
         </div>
     </div>
     <div class="row">
@@ -32,8 +32,8 @@
     </div>
 
     <footer class="confirmation-actions">
-        <button class="btn btnSecondary" (click)="onCancel()">Close</button>
-        <button class="btn btnPrimary" [routerLink]="['/restaurants/edit-restaurant', restuarant.restaurantID]"
+        <button class="hungr-btn hungr-btn-secondary" (click)="onCancel()">Close</button>
+        <button class="hungr-btn hungr-btn-primary" [routerLink]="['/restaurants/edit-restaurant', restaurant.restaurantID]"
             (click)="onCancel()">Edit</button>
     </footer>
 </section>

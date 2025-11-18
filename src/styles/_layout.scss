@@ -1,0 +1,274 @@
+/**
+ * Shared Layout Styles
+ * 
+ * Common layout patterns extracted from component SCSS files.
+ * Use these instead of defining in individual components.
+ * 
+ * Created: October 21, 2025
+ * Part of: Backend Component Unification (Phase 6)
+ */
+
+// ============================================================================
+// FORM LAYOUTS
+// ============================================================================
+
+.formGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: var(--spacing-3, 12px);
+  margin-bottom: var(--spacing-4, 16px);
+}
+
+// ============================================================================
+// GRID LAYOUTS
+// ============================================================================
+
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-4, 16px);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 12px);
+}
+
+// Specific column layouts
+.col2row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  flex-direction: row;
+  gap: var(--spacing-4, 16px);
+
+  .col {
+    flex: 1;
+    display: flex;
+  }
+}
+
+.row3col {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1%;
+
+  .col3row {
+    width: 32%;
+    display: flex;
+  }
+}
+
+// ============================================================================
+// CONTAINER BLOCKS
+// ============================================================================
+
+.block {
+  background: #ffffff;
+  border-radius: var(--spacing-3, 12px);
+  padding: var(--spacing-6, 24px);
+  box-shadow: 0 2px var(--spacing-2, 8px) rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-grey-100, #e5e7eb);
+  transition: var(--transition-normal, 0.2s ease);
+
+  &:hover {
+    box-shadow: 0 4px var(--spacing-3, 12px) rgba(0, 0, 0, 0.12);
+  }
+}
+
+.outerBlock {
+  padding: var(--spacing-3, 12px) 13px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--spacing-4, 16px);
+  background-color: var(--color-grey-100, #f3f4f5);
+  border-radius: var(--border-radius-md, 8px);
+
+  input {
+    flex: 1;
+    height: 100%;
+  }
+}
+
+// ============================================================================
+// INPUT WRAPPERS
+// ============================================================================
+
+.inputBox {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: var(--spacing-2, 8px);
+
+  input, textarea {
+    width: 100%;
+  }
+
+  label {
+    font-size: var(--font-size-sm, 12px);
+    font-weight: var(--font-weight-light, 300);
+    color: var(--color-text-muted, #6b7280);
+  }
+}
+
+// ============================================================================
+// SECTIONS
+// ============================================================================
+
+.section {
+  margin-bottom: var(--spacing-6, 24px);
+  width: 100%;
+}
+
+.section-header {
+  margin-bottom: var(--spacing-5, 20px);
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2, 8px);
+    font-size: var(--font-size-lg, 18px);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--color-text-primary, #1f2937);
+    margin: 0 0 var(--spacing-2, 8px) 0;
+    font-family: var(--font-family-primary, 'Poppins', sans-serif);
+
+    i {
+      color: var(--color-secondary, #16d3d2);
+      font-size: var(--spacing-5, 20px);
+    }
+  }
+
+  .section-description {
+    color: var(--color-text-muted, #6b7280);
+    font-size: var(--font-size-sm, 14px);
+    line-height: var(--line-height-normal, 1.5);
+    margin: 0;
+    font-family: var(--font-family-primary, 'Poppins', sans-serif);
+  }
+
+  .section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-2, 8px);
+  }
+}
+
+// ============================================================================
+// UTILITY LAYOUTS
+// ============================================================================
+
+.container {
+  display: flex;
+  padding: var(--spacing-5, 20px);
+  flex-direction: column;
+  gap: var(--spacing-5, 20px);
+}
+
+.btnHolder {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-3, 12px);
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.btnRow {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-3, 12px);
+  justify-content: flex-end;
+  padding-top: var(--spacing-4, 16px);
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-6);
+}
+
+.mb-sm {
+  margin-bottom: var(--spacing-2);
+}
+
+.mt-md {
+  margin-top: var(--spacing-6);
+}
+
+// ============================================================================
+// RESPONSIVE UTILITIES
+// ============================================================================
+
+// Breakpoints
+$mobile: 768px;
+$tablet: 1024px;
+$desktop: 1200px;
+
+@media (max-width: $mobile) {
+  .row {
+    flex-direction: column;
+  }
+
+  .col {
+    width: 100%;
+  }
+
+  .row3col {
+    flex-direction: column;
+
+    .col3row {
+      width: 100%;
+    }
+  }
+}
+
+// ============================================================================
+// NOTES
+// ============================================================================
+
+/**
+ * USAGE:
+ * 
+ * Instead of defining .formGroup, .row, .col, .block in each component,
+ * just use these shared classes.
+ * 
+ * BEFORE (in component.scss):
+ * .formGroup {
+ *   width: 100%;
+ *   display: flex;
+ *   ...
+ * }
+ * 
+ * AFTER (component.scss is empty or has only unique styles):
+ * // .formGroup is now defined globally in _layout.scss
+ * 
+ * BENEFITS:
+ * - Reduced CSS duplication
+ * - Consistent layouts across all components
+ * - Single source of truth for layout patterns
+ * - Easier maintenance
+ */
+
+
+
+
+
+
+
+
+
+
+
+

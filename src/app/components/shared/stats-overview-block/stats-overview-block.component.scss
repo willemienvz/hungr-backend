@@ -21,11 +21,11 @@
     cursor: pointer;
     width: 30px;
     margin-bottom: 10px;
-    color: #9a9a9a;
+    color: var(--color-text-muted);
   }
 
   .time {
-    color: #9a9a9a;
+    color: var(--color-text-muted);
     margin-bottom: 33px;
   }
 
@@ -35,7 +35,7 @@
 
   .stat {
     color: #444444;
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-family-primary);
     font-size: 64px;
     font-weight: 600;
     line-height: 1;
@@ -43,8 +43,8 @@
   }
 
   .movement {
-    color: #16d3d2;
-    font-family: "Poppins", sans-serif;
+    color: var(--color-secondary);
+    font-family: var(--font-family-primary);
     font-size: 24px;
     font-weight: 600;
     line-height: 1;

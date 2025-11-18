@@ -52,9 +52,9 @@
     <input #fileInput type="file" (change)="onFileSelected($event)" accept=".csv,.xlsx,.xls" style="display: none;">
     
     <div class="modal-buttons" *ngIf="!isProcessingFile">
-      <button class="btnTertiary" (click)="closeUploadModal()">CANCEL</button>
-      <button class="btnTertiary" (click)="onSaveAsDraft()">SAVE AS DRAFT</button>
-      <button class="btnSecondary" (click)="fileInput.click()">SELECT</button>
+      <button class="hungr-btn hungr-btn-tertiary" (click)="closeUploadModal()">CANCEL</button>
+      <button class="hungr-btn hungr-btn-tertiary" (click)="onSaveAsDraft()">SAVE AS DRAFT</button>
+      <button class="hungr-btn hungr-btn-secondary" (click)="fileInput.click()">SELECT</button>
     </div>
   </div>
 </div>
@@ -127,8 +127,8 @@
     </div>
     
     <div class="modal-buttons">
-      <button class="btnTertiary" (click)="cancelImport()">CANCEL</button>
-      <button class="btnPrimary" (click)="confirmImport()">CONFIRM IMPORT</button>
+      <button class="hungr-btn hungr-btn-tertiary" (click)="cancelImport()">CANCEL</button>
+      <button class="hungr-btn hungr-btn-primary" (click)="confirmImport()">CONFIRM IMPORT</button>
     </div>
   </div>
 </div>
@@ -159,7 +159,7 @@
     </div>
     
     <div class="modal-buttons">
-      <button class="btnTertiary" (click)="closeChoiceModal()">CANCEL</button>
+      <button class="hungr-btn hungr-btn-tertiary" (click)="closeChoiceModal()">CANCEL</button>
     </div>
   </div>
 </div>
@@ -172,8 +172,8 @@
     <p>Your menu items have been successfully uploaded.</p>
     
     <div class="modal-buttons">
-      <button class="btnTertiary" (click)="closeSuccessModal()">SAVE MENU</button>
-      <button class="btnSecondary" (click)="closeSuccessModal()">VIEW MENU</button>
+      <button class="hungr-btn hungr-btn-tertiary" (click)="closeSuccessModal()">SAVE MENU</button>
+      <button class="hungr-btn hungr-btn-secondary" (click)="closeSuccessModal()">VIEW MENU</button>
     </div>
   </div>
 </div> 

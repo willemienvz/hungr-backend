@@ -7,8 +7,8 @@
   margin-bottom: 25px;
 
   label {
-    color: #9a9a9a;
-    margin-bottom: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-3);
   }
 }
 
@@ -25,14 +25,14 @@
     /* Override centralized flex display for grid layout */
     width: 32%;
     /* Ensure each block takes full width of its column */
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-2);
     /* Uses centralized block styling with display override */
   }
 }
 
 h5 {
-  font-family: "Poppins";
-  font-size: 18px;
+  font-family: var(--font-family-primary);
+  font-size: 1var(--spacing-2);
   font-weight: 700;
   line-height: 22.5px;
   letter-spacing: -0.001em;
@@ -42,7 +42,7 @@ h5 {
 }
 
 h6 {
-  font-family: "Poppins";
+  font-family: var(--font-family-primary);
   font-size: 14px;
   font-weight: 600;
   line-height: 22.5px;
@@ -53,7 +53,7 @@ h6 {
 
 
 .subheading {
-  font-family: "Poppins";
+  font-family: var(--font-family-primary);
   font-size: 15px;
   font-weight: 600;
   line-height: 20.25px;
@@ -78,14 +78,14 @@ h6 {
   .editBtn {
     position: absolute;
     right: 14px;
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-family-primary);
     font-size: 10px;
     font-weight: 500;
     line-height: 1;
     letter-spacing: -0.1%;
     cursor: pointer;
     text-decoration: underline;
-    color: #9a9a9a;
+    color: var(--color-text-muted);
   }
 }
 
@@ -95,7 +95,7 @@ h6 {
 
 .toggleHolder p {
   font-size: 10px;
-  padding-left: 12px;
+  padding-left: var(--spacing-3);
 }
 
 .row {
@@ -125,9 +125,9 @@ h6 {
   width: 100%;
   flex-direction: row;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 18px;
-  margin-top: 18px;
+  gap: var(--spacing-5);
+  margin-bottom: 1var(--spacing-2);
+  margin-top: 1var(--spacing-2);
 
   label {
     color: #1fcc96;
@@ -158,7 +158,7 @@ h6 {
   cursor: pointer;
   width: 30px;
   margin-bottom: 10px;
-  color: #9a9a9a;
+  color: var(--color-text-muted);
 }
 
 .btnBlock {
@@ -167,7 +167,7 @@ h6 {
   p {
     font-size: 10px;
     text-align: center;
-    color: #9a9a9a;
+    color: var(--color-text-muted);
     margin-bottom: 19px;
   }
 
@@ -191,11 +191,11 @@ h6 {
   flex-direction: column;
   gap: 13px;
   padding: 13px;
-  border-radius: 10px;
+  border-radius: var(--border-radius-lg);
   width: 90px;
 
   a {
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-family-primary);
     font-size: 11px;
     font-weight: 400;
     line-height: 10px;
@@ -225,7 +225,7 @@ h6 {
 }
 
 .longBlock {
-  width: calc((100% / 3) * 2 - 20px) !important;
+  width: calc((100% / 3) * 2 - var(--spacing-5)) !important;
   column-span: 2;
 }
 
@@ -234,7 +234,7 @@ h6 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-3);
 
   a {
     width: 100%;
@@ -255,13 +255,13 @@ h6 {
   padding: 10px;
   justify-content: flex-start;
   align-items: center;
-  border-radius: 5px;
+  border-radius: var(--border-radius-md);
   gap: 10px;
 
   .hex-code {
-    font-size: 12px;
-    color: #9a9a9a;
-    font-family: "Poppins";
+    font-size: var(--spacing-3);
+    color: var(--color-text-muted);
+    font-family: var(--font-family-primary);
   }
 }
 
@@ -275,7 +275,7 @@ h6 {
 }
 
 .selectField {
-  border: 1px solid #9a9a9a;
+  border: 1px solid var(--color-text-muted);
   padding: 0 10px;
   background-color: white;
   border-radius: 2px;
@@ -286,7 +286,7 @@ h6 {
 }
 
 .headingTable {
-  color: #9a9a9a;
+  color: var(--color-text-muted);
   font-size: 13px;
   text-align: center;
   width: 100%;
@@ -303,7 +303,7 @@ h6 {
 }
 
 .heading {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-5);
 }
 
 .inner-page {
@@ -311,14 +311,14 @@ h6 {
   width: 100%;
   height: 100%;
   gap: 30px;
-  padding: 20px;
+  padding: var(--spacing-5);
 }
 
 .all-other {
   flex: 2; // Takes up 2/3 of the space
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--spacing-5);
   min-width: 0; // Prevent flex item from overflowing
 }
 
@@ -330,12 +330,12 @@ h6 {
   border-left: 1px solid #dedede;
   padding: 0px;
   min-width: 0; // Prevent flex item from overflowing
-  gap: 20px;
+  gap: var(--spacing-5);
   max-height: calc(100vh - 150px);
 
   .btnBlock {
     margin-top: auto; // Push to bottom
-    padding-top: 20px;
+    padding-top: var(--spacing-5);
   }
 }
 
@@ -343,14 +343,14 @@ h6 {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: var(--spacing-5);
   background: white;
-  border-radius: 10px;
+  border-radius: var(--border-radius-lg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   .row {
     &:first-child {
-      margin-bottom: 20px;
+      margin-bottom: var(--spacing-5);
     }
   }
 }
@@ -368,7 +368,7 @@ h6 {
     width: 100%;
     height: 100%;
     position: relative;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background: white;
@@ -400,14 +400,14 @@ h6 {
 
     label {
       margin-top: var(--margin-md);
-      margin-bottom: 8px;
-      font-family: "Poppins";
+      margin-bottom: var(--spacing-2);
+      font-family: var(--font-family-primary);
       font-size: 15px;
       font-weight: 400;
       line-height: 20.25px;
       letter-spacing: -0.001em;
       text-align: left;
-      color: #9a9a9a;
+      color: var(--color-text-muted);
     }
 
     .blockInnerColours {
@@ -416,8 +416,8 @@ h6 {
       flex-direction: row;
 
       align-items: center;
-      border-radius: 5px;
-      padding: 25px 20px;
+      border-radius: var(--border-radius-md);
+      padding: 25px var(--spacing-5);
       justify-content: center;
 
       label {
@@ -485,7 +485,7 @@ h6 {
     width: 100%;
     height: 100%;
     position: relative;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background: white;
@@ -506,7 +506,7 @@ h6 {
     .mat-mdc-form-field {
       width: 100%;
       background: white;
-      border-radius: 5px;
+      border-radius: var(--border-radius-md);
     }
 
     .mat-mdc-text-field-wrapper {
@@ -528,22 +528,22 @@ h6 {
     }
 
     .mat-mdc-form-field-hint {
-      color: #9a9a9a;
+      color: var(--color-text-muted);
     }
   }
 }
 
 .buttonExample {
-  padding: 25px 20px;
+  padding: 25px var(--spacing-5);
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 5px;
 
   a {
-    padding: 12px 12px;
+    padding: var(--spacing-3) var(--spacing-3);
     border-radius: 6px;
-    min-width: 120px;
+    min-width: 1var(--spacing-5);
     text-align: center;
   }
 }
@@ -553,7 +553,7 @@ h6 {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 12px;
+  gap: var(--spacing-3);
 
   label {
     width: 90px;
@@ -571,19 +571,19 @@ h6 {
 .conTextHold {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: var(--spacing-5);
 }
 
 .previewTexrt {
   background-color: #f5f5f7;
-  border-radius: 5px;
+  border-radius: var(--border-radius-md);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--spacing-5);
   align-items: flex-start;
   justify-content: center;
   width: 265px;
-  border-radius: 5px;
+  border-radius: var(--border-radius-md);
   padding: 30px;
 
   h1 {
@@ -634,11 +634,11 @@ h6 {
   position: relative;
   align-items: center;
   justify-content: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-5);
 
   .hex-code {
-    font-size: 12px;
-    color: #9a9a9a;
+    font-size: var(--spacing-3);
+    color: var(--color-text-muted);
     font-family: monospace;
   }
 }
@@ -647,7 +647,7 @@ h6 {
   width: 23px;
   height: 23px;
   border-radius: 50%;
-  border: 1px solid #9a9a9a;
+  border: 1px solid var(--color-text-muted);
   margin-bottom: 0;
   cursor: pointer;
 }
@@ -655,20 +655,20 @@ h6 {
 .modal-content {
   background-color: #fefefe;
   margin: 15% auto;
-  padding: 20px;
+  padding: var(--spacing-5);
   border: 1px solid #888;
   width: 30%;
   display: flex;
   flex-direction: column;
   position: relative;
-  gap: 20px;
+  gap: var(--spacing-5);
   align-items: flex-start;
 
   .row {
     width: 100%;
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: var(--spacing-5);
   }
 
   h6 {
@@ -715,7 +715,7 @@ h6 {
 .close {
   color: #aaa;
   position: absolute;
-  font-size: 28px;
+  font-size: 2var(--spacing-2);
   font-weight: bold;
   right: 15px;
   top: 15px;
@@ -738,7 +738,7 @@ h6 {
   position: relative;
   margin-top: 10px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: var(--border-radius-base);
   overflow: hidden;
   max-width: 200px;
 
@@ -761,7 +761,7 @@ h6 {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 16px;
+    font-size: var(--spacing-4);
     transition: background-color 0.2s;
 
     &:hover {
@@ -776,7 +776,7 @@ h6 {
     right: 0;
     background: rgba(0, 0, 0, 0.8);
     color: white;
-    padding: 8px;
+    padding: var(--spacing-2);
     font-size: 11px;
 
     .media-source {
@@ -793,7 +793,7 @@ h6 {
       .tag {
         background: rgba(255, 255, 255, 0.2);
         padding: 2px 6px;
-        border-radius: 10px;
+        border-radius: var(--border-radius-lg);
         font-size: 10px;
       }
     }
@@ -802,20 +802,20 @@ h6 {
 
 .logo-requirements {
   margin-top: 15px;
-  padding: 12px;
+  padding: var(--spacing-3);
   background: #f8f9fa;
-  border-radius: 4px;
+  border-radius: var(--border-radius-base);
   border-left: 3px solid #007bff;
 
   p {
-    margin: 0 0 8px 0;
+    margin: 0 0 var(--spacing-2) 0;
     font-weight: 600;
     color: #333;
   }
 
   ul {
     margin: 0;
-    padding-left: 20px;
+    padding-left: var(--spacing-5);
     color: #666;
 
     li {

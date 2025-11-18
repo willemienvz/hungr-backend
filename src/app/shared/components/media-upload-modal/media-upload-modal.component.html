@@ -31,7 +31,7 @@
               <mat-icon>cloud_upload</mat-icon>
               <h3>Drag and drop your image here</h3>
               <p>or</p>
-              <button class="btnSecondary" (click)="fileInput.click()">
+              <button class="hungr-btn hungr-btn-secondary" (click)="fileInput.click()">
                 <mat-icon>add</mat-icon>
                 Choose File
               </button>
@@ -101,8 +101,8 @@
 
 
             <div class="form-actions">
-              <button class="btnTertiary" (click)="closeModal()">Cancel</button>
-              <button class="btnPrimary" 
+              <button class="hungr-btn hungr-btn-tertiary" (click)="closeModal()">Cancel</button>
+              <button class="hungr-btn hungr-btn-primary" 
                       (click)="uploadMedia()"
                       [disabled]="uploading || !isValidationValid">
                 <mat-spinner diameter="20" *ngIf="uploading"></mat-spinner>
@@ -169,7 +169,7 @@
             <mat-icon>image</mat-icon>
             <h3>No media found</h3>
             <p>Upload your first image to get started</p>
-            <button class="btnSecondary" (click)="activeTab = 0">
+            <button class="hungr-btn hungr-btn-secondary" (click)="activeTab = 0">
               Upload Media
             </button>
           </div>
@@ -234,7 +234,7 @@
               <p class="upload-text">Drag and drop your images here</p>
               <p class="upload-subtext">or click upload media below</p>
               <button type="button" 
-                      class="btnSecondary"
+                      class="hungr-btn hungr-btn-secondary"
                       (click)="onUploadMedia()"
                       [disabled]="uploading">
                 <mat-icon>{{ uploading ? 'hourglass_empty' : 'add' }}</mat-icon>
@@ -279,11 +279,11 @@
 
   <!-- Legacy Action Buttons -->
   <div class="modal-buttons" *ngIf="isLegacyMode">
-    <button type="button" class="btnTertiary" (click)="closeModal()">
+    <button type="button" class="hungr-btn hungr-btn-tertiary" (click)="closeModal()">
       CANCEL
     </button>
     <button type="button" 
-            class="btnSecondary" 
+            class="hungr-btn hungr-btn-secondary" 
             (click)="uploadMedia()"
             [disabled]="uploading || !isValidationValid">
       SAVE

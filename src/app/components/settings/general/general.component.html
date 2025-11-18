@@ -1,59 +1,45 @@
 <div class="settingspage inner-page">
-  <div class="block">
+  <app-content-block title="Profile">
     <form
       [formGroup]="accountForm"
       (ngSubmit)="saveAccountDetails()"
       class="formBlock"
     >
       <div class="leftCol">
-        <div class="row">
-          <h6>Profile</h6>
-        </div>
 
         <div class="row">
           <div class="formGroup">
-            <div class="label-container">
-              <label>First name</label>
-              <div class="error-message">First name is required.</div>
-            </div>
-            <div class="input-holder">
-              <input
-                type="text"
-                class="formControl"
-                placeholder="John"
-                formControlName="name"
-              />
-            </div>
+            <app-form-input
+              label="First name"
+              type="text"
+              placeholder="John"
+              [required]="true"
+              [errorMessage]="getFieldError('name')"
+              formControlName="name">
+            </app-form-input>
           </div>
           <div class="formGroup">
-            <div class="label-container">
-              <label>Surname</label>
-              <div class="error-message">Surname is required.</div>
-            </div>
-            <div class="input-holder">
-              <input
-                type="text"
-                class="formControl"
-                placeholder="Smith"
-                formControlName="surname"
-              />
-            </div>
+            <app-form-input
+              label="Surname"
+              type="text"
+              placeholder="Smith"
+              [required]="true"
+              [errorMessage]="getFieldError('surname')"
+              formControlName="surname">
+            </app-form-input>
           </div>
         </div>
 
         <div class="row">
           <div class="formGroup">
-            <div class="label-container">
-              <label>Password</label>
-              <div class="error-message">Password is required.</div>
-            </div>
-            <div class="input-holder">
-              <input
-                type="password"
-                class="formControl"
-                formControlName="password"
-              />
-            </div>
+            <app-form-input
+              label="Password"
+              type="password"
+              placeholder="Enter new password"
+              [required]="true"
+              [errorMessage]="getFieldError('password')"
+              formControlName="password">
+            </app-form-input>
           </div>
         </div>
       </div>
@@ -63,98 +49,131 @@
         </div>
         <div class="row">
           <div class="formGroup">
-            <div class="label-container">
-              <label>Phone number</label>
-              <div class="error-message">Phone number is required.</div>
-            </div>
-            <div class="input-holder">
-              <input
-                type="tel"
-                class="formControl"
-                placeholder="+278212345678"
-                formControlName="phone"
-              />
-            </div>
+            <app-form-input
+              label="Phone number"
+              type="tel"
+              placeholder="+278212345678"
+              [required]="true"
+              [errorMessage]="getFieldError('phone')"
+              formControlName="phone">
+            </app-form-input>
           </div>
         </div>
       </div>
     </form>
     <div class="row btnRow">
-      <a class="btnTertiary" (click)="authService.SignOut()">log out</a>
-      <a class="btnSecondary" (click)="saveAll()">Save Changes</a>
+      <button class="hungr-btn hungr-btn-tertiary" (click)="authService.SignOut()">log out</button>
+      <button class="hungr-btn hungr-btn-secondary" (click)="saveAll()">Save Changes</button>
     </div>
-  </div>
+  </app-content-block>
 
-  <div class="block">
+  <app-content-block title="HUNGR Plan">
     <div class="row">
-      <h6 style="margin-bottom: 0; min-width: 120px">HUNGR Plan</h6>
       <div class="rowInner">
-        <p>
-          Digital Menu Subscription - R999/month
+        <div class="subscription-status" *ngIf="subscriptionData">
+          <span class="status-badge" [ngClass]="{
+            'active': subscriptionData.status === 'active',
+            'paused': subscriptionData.status === 'paused',
+            'cancelled': subscriptionData.status === 'cancelled'
+          }">
+            {{ subscriptionData.status | titlecase }}
+          </span>
+          <p>Digital Menu Subscription - R{{ (subscriptionData.amount || subscriptionData.recurringAmount || 99900) / 100 }}/month</p>
+          <p *ngIf="subscriptionData.nextBillingDate">
+            Next billing: {{ subscriptionData.nextBillingDate | date }}
+          </p>
+          <p *ngIf="subscriptionData.pausedAt">
+            Paused since: {{ subscriptionData.pausedAt | date }}
+          </p>
+          <p *ngIf="subscriptionData.cancelledAt">
+            Cancelled on: {{ subscriptionData.cancelledAt | date }}
+          </p>
+        </div>
+        <p *ngIf="!subscriptionData">
+          No active subscription
         </p>
         <div class="row btnRow">
           <button
-            class="btnTertiary"
-            (click)="cancelSubscription()"
+            class="hungr-btn hungr-btn-tertiary"
+            (click)="pauseSubscription()"
             *ngIf="subscriptionData && subscriptionData.status === 'active'"
-            [disabled]="isCancellingSubscription"
+            [disabled]="isPausing || isCancellingSubscription || isResuming || isChangingSubscription"
+          >
+            {{ isPausing ? 'Pausing...' : 'Pause Subscription' }}
+          </button>
+          <button
+            class="hungr-btn hungr-btn-secondary"
+            (click)="resumeSubscription()"
+            *ngIf="subscriptionData && subscriptionData.status === 'paused'"
+            [disabled]="isResuming || isCancellingSubscription || isPausing || isChangingSubscription"
+          >
+            {{ isResuming ? 'Resuming...' : 'Resume Subscription' }}
+          </button>
+          <button
+            class="hungr-btn hungr-btn-tertiary"
+            (click)="cancelSubscription()"
+            *ngIf="subscriptionData && (subscriptionData.status === 'active' || subscriptionData.status === 'paused')"
+            [disabled]="isCancellingSubscription || isPausing || isResuming || isChangingSubscription"
           >
             {{ isCancellingSubscription ? 'Cancelling...' : 'Cancel Subscription' }}
           </button>
-          <a class="btnSecondary" href="mailto:support@hungr.co">Change</a>
+          <button
+            class="hungr-btn hungr-btn-secondary"
+            (click)="changeSubscription()"
+            *ngIf="subscriptionData && subscriptionData.status === 'active'"
+            [disabled]="isChangingSubscription || isPausing || isCancellingSubscription || isResuming"
+          >
+            {{ isChangingSubscription ? 'Changing...' : 'Change Subscription' }}
+          </button>
         </div>
       </div>
     </div>
-  </div>
-  <div class="block">
-    <h6>Billing</h6>
+  </app-content-block>
+  <app-content-block title="Billing">
     <div class="row">
       <div class="formGroup" style="flex: 3">
-        <div class="label-container">
-          <label>Card Holder Name</label>
-          <div class="error-message">Card Holder Name is required.</div>
-        </div>
-        <div class="input-holder">
-          <input type="text" class="formControl" placeholder="JS Smith" />
-        </div>
+        <app-form-input
+          label="Card Holder Name"
+          type="text"
+          placeholder="JS Smith"
+          [required]="true"
+          [errorMessage]="getFieldError('cardHolderName')">
+        </app-form-input>
       </div>
       <div class="formGroup" style="flex: 3">
-        <div class="label-container">
-          <label>Card number</label>
-          <div class="error-message">Card number is required.</div>
-        </div>
-        <div class="input-holder">
-          <input type="text" class="formControl" placeholder="xxxx xxxx 1234" />
-        </div>
+        <app-form-input
+          label="Card number"
+          type="text"
+          placeholder="xxxx xxxx 1234"
+          [required]="true"
+          [errorMessage]="getFieldError('cardNumber')">
+        </app-form-input>
       </div>
       <div class="formGroup" style="flex: 1">
-        <div class="label-container">
-          <label>CVV</label>
-          <div class="error-message">CVV is required.</div>
-        </div>
-        <div class="input-holder">
-          <input type="text" class="formControl" placeholder="xxx" />
-        </div>
+        <app-form-input
+          label="CVV"
+          type="text"
+          placeholder="xxx"
+          [required]="true"
+          [errorMessage]="getFieldError('cvv')">
+        </app-form-input>
       </div>
       <div class="formGroup" style="flex: 1">
-        <div class="label-container">
-          <label>Expiry Date</label>
-          <div class="error-message">Expiry Date is required.</div>
-        </div>
-        <div class="input-holder">
-          <input type="text" class="formControl" placeholder="mm/yy" />
-        </div>
+        <app-form-input
+          label="Expiry Date"
+          type="text"
+          placeholder="mm/yy"
+          [required]="true"
+          [errorMessage]="getFieldError('expiryDate')">
+        </app-form-input>
       </div>
     </div>
 
     <div class="row btnHolder">
-      <a class="btnSecondary">Save changes</a>
+      <button class="hungr-btn hungr-btn-secondary">Save changes</button>
     </div>
-  </div>
-  <div class="block" *ngIf="currentUserData">
-    <div class="row">
-      <h6 class="heading">Notifications</h6>
-    </div>
+  </app-content-block>
+  <app-content-block title="Notifications" *ngIf="currentUserData">
     <div class="toggleHolder">
       <div class="toggle-container">
         <label>Email Notifications</label>
@@ -180,9 +199,9 @@
         ></mat-slide-toggle>
       </div>
     </div>
-  </div>
+  </app-content-block>
 
-  <!--  <div class="block posBlock">
+  <!--  <app-content-block title="POS Integration" customClass="posBlock">
     <h6>POS Integration</h6>
     <div class="row">
       <p>

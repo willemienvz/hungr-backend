@@ -21,7 +21,7 @@
     background-color: #fefefe;
     padding: 25px;
     border: 1px solid #dedede;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     max-width: 600px;
     width: 90%;
     position: relative;
@@ -43,7 +43,7 @@
       width: 100%;
       flex-direction: row;
       justify-content: center;
-      gap: 20px;
+      gap: var(--spacing-5);
       align-items: center;
     }
   }
@@ -53,13 +53,13 @@
 .step3 {
   width: 100%;
   display: flex;
-  gap: 20px;
+  gap: var(--spacing-5);
   flex-direction: row;
 
   .col {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--spacing-5);
   }
 
   .col:first-of-type {
@@ -71,7 +71,7 @@
   }
 
   .heading {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-5);
   }
 }
 
@@ -88,7 +88,7 @@
 
 .cdk-drag-preview {
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: var(--spacing-2);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   background: white;
   transform: rotate(2deg);
@@ -97,9 +97,9 @@
 .cdk-drag-placeholder {
   opacity: 0.4;
   background: var(--hungr-light-grey-2);
-  border: 2px dashed #16d3d2;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  border: 2px dashed var(--color-secondary);
+  border-radius: var(--spacing-2);
+  margin-bottom: var(--spacing-5);
   min-height: 80px;
   
   &:last-child {

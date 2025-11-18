@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-5);
 
   .formGroup {
     display: flex;
@@ -21,13 +21,13 @@
   width: 100% !important;
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: var(--spacing-5);
   align-items: center;
   justify-content: flex-end;
 }
 
 h3 {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-5);
 }
 
 // Enhanced Modal Styles
@@ -46,13 +46,13 @@ h3 {
 
 .popup-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--spacing-3);
   max-width: 1000px;
   min-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 var(--spacing-5) 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .user-detail-modal {
@@ -68,14 +68,14 @@ h3 {
 
     h3 {
       color: #2e3646;
-      font-family: "Poppins", sans-serif;
+      font-family: var(--font-family-primary);
       font-size: 24px;
       font-weight: 600;
       margin: 0;
     }
 
     .popup-close {
-      color: #9a9a9a;
+      color: var(--color-text-muted);
       cursor: pointer;
       font-size: 24px;
       transition: color 0.2s ease;
@@ -94,12 +94,17 @@ h3 {
     padding: 0 0 24px;
     margin-bottom: 24px;
   }
+
+  // Remove double padding from authBlock when inside modal
+  .authBlock {
+    padding: 0;
+  }
 }
 
 .user-profile-section {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--spacing-5);
   padding: 0 24px 24px;
   border-bottom: 1px solid #f0f0f0;
   margin-bottom: 24px;
@@ -107,28 +112,28 @@ h3 {
   .user-avatar {
     i {
       font-size: 64px;
-      color: #9a9a9a;
+      color: var(--color-text-muted);
     }
   }
 
   .user-basic-info {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacing-2);
 
     h4 {
       color: #2e3646;
-      font-family: "Poppins", sans-serif;
-      font-size: 20px;
+      font-family: var(--font-family-primary);
+      font-size: var(--spacing-5);
       font-weight: 600;
       margin: 0;
     }
 
     .user-role-badge {
       display: inline-block;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 12px;
+      padding: 4px var(--spacing-3);
+      border-radius: var(--spacing-3);
+      font-size: var(--spacing-3);
       font-weight: 500;
       text-transform: uppercase;
       width: fit-content;
@@ -166,7 +171,7 @@ h3 {
 
         i {
           color: #2e7d32;
-          font-size: 16px;
+          font-size: var(--spacing-4);
         }
       }
 
@@ -175,7 +180,7 @@ h3 {
 
         i {
           color: #ef6c00;
-          font-size: 16px;
+          font-size: var(--spacing-4);
         }
       }
 
@@ -184,7 +189,7 @@ h3 {
 
         i {
           color: #c62828;
-          font-size: 16px;
+          font-size: var(--spacing-4);
         }
       }
     }
@@ -194,7 +199,7 @@ h3 {
 .user-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: var(--spacing-5);
   padding: 0 24px;
   margin-bottom: 32px;
 
@@ -204,9 +209,9 @@ h3 {
     gap: 6px;
 
     label {
-      color: #9a9a9a;
-      font-family: "Poppins", sans-serif;
-      font-size: 12px;
+      color: var(--color-text-muted);
+      font-family: var(--font-family-primary);
+      font-size: var(--spacing-3);
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -214,10 +219,10 @@ h3 {
 
     span {
       color: #2e3646;
-      font-family: "Poppins", sans-serif;
+      font-family: var(--font-family-primary);
       font-size: 14px;
       font-weight: 400;
-      padding: 8px 0;
+      padding: var(--spacing-2) 0;
     }
   }
 }
@@ -225,19 +230,19 @@ h3 {
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: var(--spacing-3);
   padding: 24px;
   border-top: 1px solid #f0f0f0;
   background-color: #f8f9fb;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 var(--spacing-3) var(--spacing-3);
 
   .btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
+    gap: var(--spacing-2);
+    padding: 10px var(--spacing-5);
     border-radius: 6px;
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-family-primary);
     font-size: 14px;
     font-weight: 500;
     border: none;
@@ -250,28 +255,10 @@ h3 {
     }
 
     i {
-      font-size: 16px;
+      font-size: var(--spacing-4);
     }
 
-    &.btnTertiary {
-      background-color: transparent;
-      color: #9a9a9a;
-      border: 1px solid #e6e9ec;
-
-      &:hover:not(:disabled) {
-        background-color: #f8f9fb;
-        color: #444;
-      }
-    }
-
-    &.btnSecondary {
-      background-color: #16d3d2;
-      color: white;
-
-      &:hover:not(:disabled) {
-        background-color: #14c0bf;
-      }
-    }
+    // Custom button styling removed to allow global styles to apply
   }
 }
 
@@ -280,23 +267,23 @@ h3 {
   grid-column: 1 / -1; // Span full width
 
   label {
-    color: #9a9a9a !important;
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
+    color: var(--color-text-muted) !important;
+    font-family: var(--font-family-primary);
+    font-size: var(--spacing-3);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-2);
   }
 
   .permissions-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--spacing-2);
 
     .permission-tag {
       display: inline-block;
-      padding: 4px 8px;
+      padding: 4px var(--spacing-2);
       border-radius: 6px;
       font-size: 11px;
       font-weight: 500;
@@ -320,14 +307,14 @@ h3 {
 
   h4 {
     color: #2e3646;
-    margin-bottom: 16px;
-    font-size: 16px;
+    margin-bottom: var(--spacing-4);
+    font-size: var(--spacing-4);
     font-weight: 600;
   }
 
   h5 {
     color: #444444;
-    margin-bottom: 12px;
+    margin-bottom: var(--spacing-3);
     font-size: 14px;
     font-weight: 500;
   }
@@ -337,29 +324,29 @@ h3 {
   .role-options {
     display: flex;
     flex-direction: row;
-    gap: 12px;
+    gap: var(--spacing-3);
 
     .role-option {
       border: 2px solid #e9ecef;
-      border-radius: 8px;
-      padding: 16px;
+      border-radius: var(--spacing-2);
+      padding: var(--spacing-4);
       cursor: pointer;
       transition: all 0.2s ease;
       background-color: #ffffff;
       flex: .5;
 
       &:hover {
-        border-color: #16d3d2;
+        border-color: var(--color-secondary);
         background-color: #f8fffe;
       }
 
       &.selected {
-        border-color: #16d3d2;
+        border-color: var(--color-secondary);
         background-color: #f0fffe;
 
         .role-header {
           .role-name {
-            color: #16d3d2;
+            color: var(--color-secondary);
           }
         }
       }
@@ -368,19 +355,19 @@ h3 {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 8px;
+        margin-bottom: var(--spacing-2);
 
         .role-name {
-          font-size: 16px;
+          font-size: var(--spacing-4);
           font-weight: 600;
           color: #2e3646;
           transition: color 0.2s ease;
         }
 
         input[type="radio"] {
-          width: 18px;
-          height: 18px;
-          accent-color: #16d3d2;
+          width: 1var(--spacing-2);
+          height: 1var(--spacing-2);
+          accent-color: var(--color-secondary);
         }
       }
 
@@ -395,25 +382,25 @@ h3 {
 }
 
 .custom-permissions {
-  margin-top: 20px;
-  padding-top: 20px;
+  margin-top: var(--spacing-5);
+  padding-top: var(--spacing-5);
   border-top: 1px solid #e9ecef;
 
   .permissions-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 12px;
+    gap: var(--spacing-3);
 
     .permission-item {
       .permission-checkbox {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: var(--spacing-3);
         cursor: pointer;
         font-size: 14px;
         color: #444444;
-        padding: 8px;
-        border-radius: 4px;
+        padding: var(--spacing-2);
+        border-radius: var(--border-radius-base);
         transition: background-color 0.2s ease;
 
         &:hover {
@@ -421,15 +408,15 @@ h3 {
         }
 
         input[type="checkbox"] {
-          width: 18px;
-          height: 18px;
-          accent-color: #16d3d2;
+          width: 1var(--spacing-2);
+          height: 1var(--spacing-2);
+          accent-color: var(--color-secondary);
           cursor: pointer;
         }
 
         .checkmark {
-          width: 18px;
-          height: 18px;
+          width: 1var(--spacing-2);
+          height: 1var(--spacing-2);
           border: 2px solid #dee2e6;
           border-radius: 3px;
           display: flex;
@@ -440,7 +427,7 @@ h3 {
 
           &::after {
             content: '✓';
-            color: #16d3d2;
+            color: var(--color-secondary);
             font-size: 14px;
             font-weight: bold;
             display: none;
@@ -448,8 +435,8 @@ h3 {
         }
 
         input[type="checkbox"]:checked+.checkmark {
-          background-color: #16d3d2;
-          border-color: #16d3d2;
+          background-color: var(--color-secondary);
+          border-color: var(--color-secondary);
 
           &::after {
             display: block;
@@ -465,17 +452,17 @@ h3 {
   .permissions-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-top: 8px;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-2);
 
     .permission-item {
       .permission-checkbox {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--spacing-2);
         cursor: pointer;
-        padding: 8px;
-        border-radius: 4px;
+        padding: var(--spacing-2);
+        border-radius: var(--border-radius-base);
         transition: background-color 0.2s ease;
 
         &:hover {
@@ -483,15 +470,15 @@ h3 {
         }
 
         input[type="checkbox"] {
-          width: 16px;
-          height: 16px;
-          accent-color: #16d3d2;
+          width: var(--spacing-4);
+          height: var(--spacing-4);
+          accent-color: var(--color-secondary);
           cursor: pointer;
         }
 
         .checkmark {
-          width: 16px;
-          height: 16px;
+          width: var(--spacing-4);
+          height: var(--spacing-4);
           border: 2px solid #dee2e6;
           border-radius: 3px;
           display: flex;
@@ -502,16 +489,16 @@ h3 {
 
           &::after {
             content: '✓';
-            color: #16d3d2;
-            font-size: 12px;
+            color: var(--color-secondary);
+            font-size: var(--spacing-3);
             font-weight: bold;
             display: none;
           }
         }
 
         input[type="checkbox"]:checked+.checkmark {
-          background-color: #16d3d2;
-          border-color: #16d3d2;
+          background-color: var(--color-secondary);
+          border-color: var(--color-secondary);
 
           &::after {
             display: block;
@@ -528,15 +515,15 @@ h3 {
   }
 
   .permission-actions {
-    margin-top: 12px;
+    margin-top: var(--spacing-3);
     text-align: left;
 
     .btn-link {
       background: none;
       border: none;
-      color: #16d3d2;
+      color: var(--color-secondary);
       cursor: pointer;
-      font-size: 12px;
+      font-size: var(--spacing-3);
       text-decoration: underline;
       padding: 4px 0;
       transition: color 0.2s ease;

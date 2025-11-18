@@ -1,4 +1,10 @@
-.outer {
+/* Import responsive mixins */
+@import "../../../styles/_responsive";
+
+/* Sign-in component specific styles */
+/* Login page has a unique two-column layout with side image */
+
+.login-layout {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -6,146 +12,87 @@
   align-items: stretch;
   height: 100vh;
 
-  .outer-container {
+  @include respond-to-max('sm') {
+    flex-direction: column;
+    height:auto;
+  }
+
+  .login-container {
     width: 100%;
     max-width: 1400px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 0.7fr;
     padding: 50px 0;
     flex-direction: row;
     justify-content: space-between;
     align-items: stretch;
     height: 100vh;
+
+    // Mobile responsive: single column layout
+    @include respond-to-max('sm') {
+      display:flex;
+      flex-direction: column-reverse;
+      gap: 2rem;
+      padding: 20px 0;
+      height: auto;
+    }
   }
-  .col {
+
+  .login-image-col {
     width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    img {
+      max-height:80vh;
+      object-fit:contain;
+      width: 100%;
+      border-radius: var(--border-radius-lg);
+    }
   }
 
-  .formCol {
+  .login-form-col {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    .logo {
+
+    .login-logo {
       width: 195px;
       margin-bottom: 70px;
     }
 
     h1 {
-      color: #444444;
+      color: var(--color-dark);
       text-align: center;
       margin-bottom: 24px;
     }
 
-    .displayTableCell {
+    .login-form-container {
       width: 60%;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
 
-      label {
-        color: #9a9a9a;
-        text-align: left;
-        margin-bottom: 12px;
-      }
-
-      .authBlock {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: flex-start;
-
-        .formGroup {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-          align-items: flex-start;
-          margin-bottom: 25px;
-
-          label {
-            margin-bottom:0;
-          }
-
-          .password-toggle {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            .material-icons {
-              position: absolute;
-              top: 11px;
-              right: 13px;
-              font-size: 19px;
-              cursor: pointer;
-              color: #ebedee;
-            }
-          }
-
-          .forgotPassword {
-            width: 100%;
-            display: flex;
-            margin-top: 12px;
-          }
-        }
-
-        .btnHolder {
-          align-items: center;
-          margin-bottom: 23px;
-        }
-      }
-    }
-    .redirectToLogin {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      .redirect {
-        text-align: center;
-        width: 100%;
-        text-decoration: underline;
+      @include respond-to-max('sm') {
+        width:90%;
       }
     }
   }
+}
 
-  .downloadappcol {
-    display: flex;
-    flex-direction: column;
- 
-
-    img {
-     aspect-ratio:16/17;
-     
-      width: 100%;
-      border-radius: 10px;
-    
-    }
-  }
-
-  .downloadappbox {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-end;
-    width: 100%;
-
-    .downloadappboxinner {
-      width: 50%;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      justify-content: center;
-      align-items: center;
-    }
-    h3 {
-      text-align: center;
-      color: #181818;
-    }
+/* Component-specific overrides */
+.mainLink {
+  color: #9A9A9A;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+  text-align: right;
+  background: none;
+  border: none;
+  
+  &:hover {
+    color: #9A9A9A;
   }
 }

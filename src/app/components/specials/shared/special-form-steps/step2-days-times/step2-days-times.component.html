@@ -1,7 +1,7 @@
 <div class="step2-container block-open-top">
     <ng-content select="[header]"></ng-content>
   
-  <div class="block rowSpecial block-open-top">
+  <app-content-block title="" customClass="rowSpecial block-open-top">
     <form [formGroup]="specialForm">
       <div class="formGroup centered mb-1 mt-1">
         <p class="mb-1 align-center">What day(s) of the week should this special be valid?</p>
@@ -41,39 +41,27 @@
         <div class="dateRow timeRow">
       
             <div class="col">
-              <p class="label">Start time</p>
-              <input
+              <app-form-input
                 type="time"
-                class="formControl"
-                formControlName="timeFrom"
+                label="Start time"
                 placeholder="Start time"
-                required
-              />
-              <div
-                class="error-message"
-                *ngIf="specialForm.get('timeFrom')?.touched && !specialForm.get('timeFrom')?.value && !specialForm.get('isAllDay')?.value"
-              >
-                Start time is required.
-              </div>
+                [required]="true"
+                [errorMessage]="specialForm.get('timeFrom')?.touched && !specialForm.get('timeFrom')?.value && !specialForm.get('isAllDay')?.value ? 'Start time is required.' : ''"
+                formControlName="timeFrom">
+              </app-form-input>
             </div>
             <div class="col toCol">
               <p>To</p>
             </div>
             <div class="col">
-              <p class="label">End time</p>
-              <input
+              <app-form-input
                 type="time"
-                class="formControl"
-                formControlName="timeTo"
+                label="End time"
                 placeholder="End time"
-                required
-              />
-              <div
-                class="error-message"
-                *ngIf="specialForm.get('timeTo')?.touched && !specialForm.get('timeTo')?.value && !specialForm.get('isAllDay')?.value"
-              >
-                End time is required.
-              </div>
+                [required]="true"
+                [errorMessage]="specialForm.get('timeTo')?.touched && !specialForm.get('timeTo')?.value && !specialForm.get('isAllDay')?.value ? 'End time is required.' : ''"
+                formControlName="timeTo">
+              </app-form-input>
             </div>
       
         </div>
@@ -85,5 +73,5 @@
         </div>
       </div>
     </form>
-  </div>
+  </app-content-block>
 </div> 

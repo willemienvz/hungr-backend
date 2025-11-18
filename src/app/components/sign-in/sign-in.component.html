@@ -1,59 +1,52 @@
-<div class="outer">
-  <div class="outer-container">
-    <div class="col downloadappcol">
-      <img src="../../../assets/images/login/loginimg.png" alt="" />
+<div class="login-layout">
+  <div class="login-container">
+    <div class="login-image-col">
+      <img src="../../../assets/images/login/loginimg.png" alt="Login Image" />
     </div>
-    <div class="col formCol">
-      <img class="logo" src="../../../assets/images/shared/logo.png" alt="" />
+    <div class="login-form-col">
+      <img class="login-logo" src="../../../assets/images/shared/logo.png" alt="Hungr Logo" />
       <h1>Log In</h1>
-      <div class="displayTableCell">
-        <div class="authBlock">
-          <div class="formGroup">
-            <label>Email</label>
-            <input
-              type="text"
-              class="formControl"
-              placeholder="Email"
-              #userName
-              required
-            />
+      <div class="login-form-container">
+        <div class="auth-block">
+          <app-form-input
+            label="Email"
+            type="email"
+            placeholder="Email"
+            [required]="true"
+            [errorMessage]="emailError"
+            (valueChange)="onEmailChange($event)"
+            #userName>
+          </app-form-input>
+          <app-form-input
+            label="Password"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Password"
+            [required]="true"
+            [errorMessage]="passwordError"
+            [suffixIcon]="showPassword ? 'visibility_off' : 'visibility'"
+            (suffixIconClick)="togglePasswordVisibility()"
+            (valueChange)="onPasswordChange($event)"
+            (keyup.enter)="authService.SignIn(userName.value, userPassword.value)"
+            #userPassword>
+          </app-form-input>
+          <div class="auth-form-group right-aligned mb-md">
+            <span class="mainLink" (click)="forgotPassword.openPopup()">
+              Forgot Password?
+            </span>
           </div>
-          <div class="formGroup">
-            <label>Password</label>
-            <div class="password-toggle">
-              <input
-                class="formControl"
-                placeholder="Password"
-                #userPassword
-                required
-                type="{{ showPassword ? 'text' : 'password' }}"
-                (keyup.enter)="
-                  authService.SignIn(userName.value, userPassword.value)
-                "
-              />
-              <i class="material-icons" (click)="togglePasswordVisibility()">{{
-                showPassword ? "visibility" : "visibility_off"
-              }}</i>
-            </div>
-            <div class="forgotPassword">
-              <span class="mainLink" (click)="forgotPassword.openPopup()"
-                >Forgot Password?</span
-              >
-            </div>
-          </div>
-          <div class="formGroup btnHolder">
-            <input
-              type="button"
-              class="btn btnPrimary"
-              value="Log in"
+          <div class="auth-btn-container">
+            <button
+              class="hungr-btn hungr-btn-primary mb-md"
               (click)="authService.SignIn(userName.value, userPassword.value)"
-            />
+            >
+              Log in
+            </button>
           </div>
         </div>
-        <div class="redirectToLogin">
-          <span class="redirect mainLink" routerLink="/register-user">
-            Don't have an account? Sign Up</span
-          >
+        <div class="auth-redirect">
+          <a class="auth-redirect-link" routerLink="/register-user">
+            Don't have an account? Sign Up
+          </a>
         </div>
       </div>
     </div>

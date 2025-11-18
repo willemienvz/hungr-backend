@@ -1,0 +1,43 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Default: deny all
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+    
+    // ===== HELPER FUNCTIONS FOR ROLE-BASED ACCESS =====
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Media files: allow authenticated users to manage their own files
+    match /media/{userId}/{fileName} {
+      // Allow read for authenticated users who own the file
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Allow write (upload/update/delete) by the owner
+      allow write: if isAuthenticated() &&
+        request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024 // 10MB max
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Allow read access to public media files
+    match /media/public/{fileName} {
+      allow read: if true;
+      allow write: if isAuthenticated(); // Simplified permission check
+    }
+    
+    // Team-specific media folder (for shared team assets)
+    match /media/team/{teamId}/{fileName} {
+      // Simplified permission checks
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+        request.resource.size < 10 * 1024 * 1024 // 10MB max
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

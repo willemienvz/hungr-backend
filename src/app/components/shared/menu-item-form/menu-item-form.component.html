@@ -108,14 +108,13 @@
         <div class="col second">
      
             <div class="fieldHolder">
-              <label>Item Name</label>
-            <input
+            <app-form-input
               type="text"
-              [(ngModel)]="menuItem.name"
+              label="Item Name"
               placeholder="Item Name"
-              [ngModelOptions]="{ standalone: true }"
-            />
-        
+              [(ngModel)]="menuItem.name"
+              [ngModelOptions]="{ standalone: true }">
+            </app-form-input>
       </div>
           
         </div>
@@ -146,24 +145,19 @@
         <div class="col add_tag_col">
 
           <div class="fieldHolder">
-            <label>Add Label</label>
           <!-- KB: Optional description text, only shown if provided in config -->
           
           <div class="add-input-group">
-      
-              <div class="inputBox">
-                  <input
-                  [placeholder]="'New Label'"
-                  type="text"
-                  [ngModel]="newLabel"
-                  (ngModelChange)="onNewLabelChange($event)"
-                  [ngModelOptions]="{ standalone: true }"
-                  (keyup.enter)="onAddLabel()"
-                  />
-                  <label>press enter to add</label>
-                </div>
-           
-      
+              <app-form-input
+                type="text"
+                label="Add Label"
+                placeholder="New Label"
+                [ngModel]="newLabel"
+                (ngModelChange)="onNewLabelChange($event)"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup.enter)="onAddLabel()">
+              </app-form-input>
+              <label class="helper-text">press enter to add</label>
           </div>
           <div class="detail-label-add">
             <div
@@ -181,13 +175,13 @@
 
         <div class="col fifth">
           <div class="fieldHolder">
-            <label>Description</label>
-            <textarea
-              [(ngModel)]="menuItem.description"
+            <app-form-textarea
+              label="Description"
               placeholder="Description..."
+              [(ngModel)]="menuItem.description"
               [ngModelOptions]="{ standalone: true }"
-              rows="3"
-            ></textarea>
+              [rows]="3">
+            </app-form-textarea>
           </div>
         </div>
         <div class="col sixth">

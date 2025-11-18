@@ -29,14 +29,14 @@
     margin-bottom: 24px;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px;
+    padding: var(--spacing-5) 24px;
     /* Override block padding for header layout */
     background: white;
     /* Override block background for white */
 
     .header-left {
         flex: 0 0 auto;
-        min-width: 120px;
+        min-width: 1var(--spacing-5);
 
         .back-button {
             display: flex;
@@ -88,14 +88,14 @@
 
     .header-right {
         flex: 0 0 auto;
-        min-width: 120px;
+        min-width: 1var(--spacing-5);
         display: flex;
         justify-content: flex-end;
 
         .page-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--spacing-3);
 
             app-button {
                 white-space: nowrap;
@@ -107,13 +107,13 @@
 // Responsive design
 @media (max-width: 768px) {
     .page-layout {
-        padding: 16px;
+        padding: var(--spacing-4);
     }
 
     .page-header {
-        padding: 16px 20px;
+        padding: var(--spacing-4) var(--spacing-5);
         flex-direction: column;
-        gap: 16px;
+        gap: var(--spacing-4);
         text-align: left;
 
         .header-left {
@@ -126,7 +126,7 @@
             text-align: left;
 
             .page-title {
-                font-size: 20px;
+                font-size: var(--spacing-5);
             }
 
             .page-subtitle {
@@ -145,7 +145,7 @@
 
                 app-button {
                     flex: 1;
-                    min-width: 120px;
+                    min-width: 1var(--spacing-5);
                 }
             }
         }
@@ -169,20 +169,20 @@
     padding: 24px;
 
     @media (max-width: 768px) {
-        padding: 16px;
+        padding: var(--spacing-4);
     }
 }
 
 // Compact variant (for simpler pages)
 .page-layout.compact .page-header {
-    padding: 16px 20px;
-    margin-bottom: 16px;
+    padding: var(--spacing-4) var(--spacing-5);
+    margin-bottom: var(--spacing-4);
 }
 
 .page-layout.compact .page-header .page-title {
-    font-size: 20px;
+    font-size: var(--spacing-5);
 }
 
 .page-layout.compact .page-content {
-    gap: 16px;
+    gap: var(--spacing-4);
 }

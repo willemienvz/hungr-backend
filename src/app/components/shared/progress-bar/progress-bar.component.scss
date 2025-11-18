@@ -11,7 +11,7 @@
 
   i {
     color: var(--hungr-dark-grey);
-    font-size: 20px;
+    font-size: var(--spacing-5);
     cursor: help;
     transition: color 0.3s ease;
 
@@ -38,11 +38,11 @@
 }
 
 .progress-bar-container {
-  border-radius: 28px;
+  border-radius: 2var(--spacing-2);
   background-color: #f2f3f4;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--spacing-5);
   position: relative;
   width: 100%;
   justify-content: center;
@@ -50,8 +50,8 @@
 }
 
 .progress-bar {
-  border-radius: 28px;
-  background-color: #16d3d2;
+  border-radius: 2var(--spacing-2);
+  background-color: var(--color-secondary);
   height: 15px;
   flex-grow: 1;
   position: absolute;
@@ -85,7 +85,7 @@
   justify-content: center;
   background-color: #e0e0e0;
   color: white;
-  font-size: 18px;
+  font-size: 1var(--spacing-2);
   font-weight: bold;
   position: relative;
   z-index: 2;
@@ -130,7 +130,7 @@
     &:hover {
       transform: scale(1.1);
       border-color: var(--hungr-tertiary-color);
-      box-shadow: 0 2px 8px rgba(22, 211, 210, 0.3);
+      box-shadow: 0 2px var(--spacing-2) rgba(22, 211, 210, 0.3);
     }
 
     &:active {
@@ -178,7 +178,7 @@
   .line {
     width: 100%;
     height: 1px;
-    background-color: #9a9a9a;
+    background-color: var(--color-text-muted);
     position: absolute;
     z-index: 1;
   }

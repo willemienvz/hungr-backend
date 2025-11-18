@@ -155,6 +155,29 @@ Unified button component with consistent styling.
 **Button Types:**
 - `primary`, `secondary`, `tertiary`, `danger`, `gray`, `blue`
 
+### 6.1. Unified Button Classes (CSS Classes)
+
+For simple button styling without component overhead, use the unified CSS classes:
+
+```html
+<!-- Primary Button -->
+<button class="hungr-btn hungr-btn-primary" (click)="onSave()">Save</button>
+
+<!-- Secondary Button -->
+<button class="hungr-btn hungr-btn-secondary" (click)="onCancel()">Cancel</button>
+
+<!-- Tertiary Button -->
+<button class="hungr-btn hungr-btn-tertiary" (click)="onReset()">Reset</button>
+
+<!-- Danger Button -->
+<button class="hungr-btn hungr-btn-danger" (click)="onDelete()">Delete</button>
+```
+
+**Button Migration Status:**
+- ✅ **100% Complete** - All legacy button classes (`.btnPrimary`, `.btnSecondary`, `.btnTertiary`) have been migrated to the unified system (`.hungr-btn .hungr-btn-primary`, etc.)
+- ✅ **Verification**: 0 instances of legacy button classes remain in the codebase
+- ✅ **Date Completed**: 2025
+
 ### 7. Form Components
 
 #### Text Input (`app-form-input`)

@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { SelectOption } from '../../shared/form-select/form-select.component';
 
 @Component({
   selector: 'app-edit-restaurant',
@@ -49,6 +50,10 @@ export class EditRestaurantComponent {
     'Western Cape',
   ];
 
+  provinceOptions: SelectOption[] = [];
+  menuOptions: SelectOption[] = [];
+  userOptions: SelectOption[] = [];
+
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user')!);
     this.OwnerID = this.user.uid;
@@ -61,6 +66,7 @@ export class EditRestaurantComponent {
     this.fetchMenus();
     this.fetchUsers();
     this.setupFormTracking();
+    this.initializeOptions();
   }
 
   private setupFormTracking() {
@@ -168,7 +174,7 @@ export class EditRestaurantComponent {
 
   private fetchRestaurant(id: string) {
     this.firestore
-      .collection<Restaurant>('restuarants', (ref) =>
+      .collection<Restaurant>('restaurants', (ref) =>
         ref.where('restaurantID', '==', id)
       )
       .valueChanges()
@@ -212,7 +218,7 @@ export class EditRestaurantComponent {
 
     console.log(tempRestaurant);
     this.firestore
-      .collection('restuarants')
+      .collection('restaurants')
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
@@ -256,7 +262,7 @@ export class EditRestaurantComponent {
 
     console.log(tempRestaurant);
     this.firestore
-      .collection('restuarants')
+      .collection('restaurants')
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
@@ -292,5 +298,50 @@ export class EditRestaurantComponent {
     this.selectedUserName = '';
     this.selectedUserSurname = '';
     this.userChanged = true;
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.restaurant[fieldName];
+    if (!field && fieldName !== 'selectedNumberTable') {
+      return `${this.getFieldLabel(fieldName)} is required.`;
+    }
+    
+    if (fieldName === 'selectedNumberTable' && !this.selectedNumberTable) {
+      return 'Number of tables is required.';
+    }
+    
+    return '';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      'name': 'Restaurant Name',
+      'street': 'Street Address',
+      'city': 'City',
+      'province': 'Province',
+      'zip': 'Zip Code',
+      'selectedNumberTable': 'Number of Tables'
+    };
+    return labels[fieldName] || fieldName;
+  }
+
+  private initializeOptions() {
+    // Initialize province options
+    this.provinceOptions = this.saProvinces.map(province => ({
+      value: province,
+      label: province
+    }));
+
+    // Initialize menu options
+    this.menuOptions = this.menus.map(menu => ({
+      value: menu.menuID,
+      label: menu.menuName
+    }));
+
+    // Initialize user options
+    this.userOptions = this.users.map(user => ({
+      value: user.uid,
+      label: `${user.firstName} ${user.Surname}`
+    }));
   }
 }

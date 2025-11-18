@@ -4,18 +4,16 @@
   
   <div class="all-other">
     <div class="row">
-      <div class="block logoBlock">
-        <h5>Logo</h5>
+      <app-content-block title="Logo" customClass="logo-block">
         <p>Please upload your logo.</p>
 
-        <div class="row" style="margin-top: 20px">
-          <a
-            class="btnTertiary"
+        <div class="row" style="margin-top: var(--spacing-5)">
+          <button
+            class="hungr-btn hungr-btn-tertiary"
             (click)="openImageUploadModal()"
-            style="font-weight: 500; text-transform: capitalize"
           >
             Upload Logo
-          </a>
+          </button>
           
           <!-- Logo Display with Media Library Integration -->
           <div *ngIf="imageUrl" class="imagePreview">
@@ -36,13 +34,10 @@
             </div>-->
           </div>
         </div>
+      </app-content-block>
 
-    
-      </div>
-
-      <div class="block">
+      <app-content-block title="Brand Colours">
         <div class="row">
-          <h5 class="heading">Brand Colours</h5>
           <i
             class="material-icons"
             (mouseenter)="tooltipOpen['brandColors'] = true"
@@ -119,16 +114,13 @@
           <span class="hex-code">{{accentColor}}</span>
          
         </div>
-      </div>
+      </app-content-block>
     </div>
 
     <div class="outerRow">
       <div class="outerCol">
         <div class="row">
-          <div class="block">
-            <div class="row">
-              <h5 class="heading">Text Styles</h5>
-            </div>
+          <app-content-block title="Text Styles">
             <div class="conTextHold">
               <div class="colText" style="flex: 1">
                 <div class="row">
@@ -321,7 +313,7 @@
                 </p>
               </div>
             </div>
-          </div>
+          </app-content-block>
         </div>
       </div>
     </div>
@@ -329,10 +321,7 @@
 
   <div class="sidebar">
     <div class="outerLive">
-      <div class="blockPreview">
-        <div class="row">
-          <h5 class="heading">Real-time Preview</h5>
-        </div>
+      <app-content-block title="Real-time Preview" customClass="blockPreview">
         <div class="row">
           <div class="select-container">
             <mat-form-field appearance="outline">
@@ -359,27 +348,26 @@
             ></iframe>
           </div>
         </div>
-      </div>
+      </app-content-block>
     </div>
     <div class="btnBlock">
       <p *ngIf="isPreviewMode && hasUnsavedChanges">You have unsaved changes in preview mode</p>
       <div class="row">
-        <a 
-          class="btnTertiary" 
+        <button 
+          class="hungr-btn hungr-btn-tertiary" 
           (click)="discardChanges()" 
-          style="width: 130px"
           [title]="isPreviewMode ? 'Revert to original settings' : 'Discard current changes'"
         >
           {{ isPreviewMode ? 'Revert' : 'Discard' }}
-        </a>
-        <a 
-          class="btnSecondary" 
+        </button>
+        <button 
+          class="hungr-btn hungr-btn-secondary" 
           (click)="updateBrandingDetails()"
-          [class.disabled]="isSaving"
+          [disabled]="isSaving"
           [title]="isPreviewMode ? 'Save preview as default' : 'Save changes'"
         >
           {{ isSaving ? 'Saving...' : (isPreviewMode ? 'Save Preview' : 'Save Changes') }}
-        </a>
+        </button>
       </div>
     </div>
   </div>

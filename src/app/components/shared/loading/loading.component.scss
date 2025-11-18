@@ -1,11 +1,11 @@
 .loading {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: var(--spacing-5);
+  right: var(--spacing-5);
   background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: var(--spacing-3);
+  padding: var(--spacing-4);
+  box-shadow: 0 4px var(--spacing-5) rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,7 +29,7 @@
 
 .lds-roller div {
   animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  transform-origin: 20px 20px;
+  transform-origin: var(--spacing-5) var(--spacing-5);
 }
 
 .lds-roller div:after {
@@ -76,7 +76,7 @@
 
 .lds-roller div:nth-child(4):after {
   top: 36px;
-  left: 20px;
+  left: var(--spacing-5);
 }
 
 .lds-roller div:nth-child(5) {
@@ -85,7 +85,7 @@
 
 .lds-roller div:nth-child(5):after {
   top: 35px;
-  left: 16px;
+  left: var(--spacing-4);
 }
 
 .lds-roller div:nth-child(6) {
@@ -94,7 +94,7 @@
 
 .lds-roller div:nth-child(6):after {
   top: 34px;
-  left: 12px;
+  left: var(--spacing-3);
 }
 
 .lds-roller div:nth-child(7) {
@@ -142,7 +142,7 @@
   .loading {
     bottom: 15px;
     right: 15px;
-    padding: 12px;
+    padding: var(--spacing-3);
   }
 
   .lds-roller {
@@ -151,7 +151,7 @@
   }
 
   .lds-roller div {
-    transform-origin: 16px 16px;
+    transform-origin: var(--spacing-4) var(--spacing-4);
   }
 
   .lds-roller div:nth-child(1):after {
@@ -171,7 +171,7 @@
 
   .lds-roller div:nth-child(4):after {
     top: 29px;
-    left: 16px;
+    left: var(--spacing-4);
   }
 
   .lds-roller div:nth-child(5):after {

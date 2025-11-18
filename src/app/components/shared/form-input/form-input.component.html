@@ -29,7 +29,7 @@
     />
 
     <!-- Suffix icon -->
-    <i *ngIf="suffixIcon" class="material-icons suffix-icon">
+    <i *ngIf="suffixIcon" class="material-icons suffix-icon clickable" (click)="onSuffixIconClick()">
       {{ suffixIcon }}
     </i>
   </div>

@@ -1,17 +1,17 @@
 /* Ensure proper button styling and layout */
 :host ::ng-deep .mat-mdc-dialog-actions {
     display: flex !important;
-    gap: 12px !important;
+    gap: var(--spacing-3) !important;
     justify-content: flex-end !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
-    padding: 16px 24px 24px 24px !important;
+    padding: var(--spacing-4) 24px 24px 24px !important;
     position: relative !important;
 }
 
 :host ::ng-deep .mat-mdc-dialog-actions button {
     flex-shrink: 0 !important;
-    min-width: 120px !important;
+    min-width: 1var(--spacing-5) !important;
     position: relative !important;
     /* Override any absolute positioning from Material Dialog */
     top: auto !important;

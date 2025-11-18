@@ -24,7 +24,6 @@
     ></app-stats-card>
   </div>
 </div>
-
 } @else {
 <div class="inner-page">
   <div class="row" *ngIf="!isLoading">
@@ -63,19 +62,16 @@
     ></app-stats-overview-block>
   </div>
   <div class="row">
-    <div class="block biggerBlock">
-      <h6 class="heading">Daily Menu Visits</h6>
+    <app-content-block title="Daily Menu Visits" customClass="biggerBlock">
       <div echarts [options]="chartOptions" class="echart"></div>
-    </div>
-    <div class="block">
-      <h6 class="heading">Sales Overview</h6>
+    </app-content-block>
+    <app-content-block title="Sales Overview">
       <div echarts [options]="chartOptionsSales" class="echart"></div>
-    </div>
+    </app-content-block>
   </div>
   <div class="row">
-    <div class="block stat1">
+    <app-content-block title="Category insights" customClass="stat1">
       <div class="row">
-        <h6 class="heading">Category insights</h6>
         <label class="time">Last 30 days</label>
       </div>
       <div class="row list">
@@ -90,7 +86,7 @@
           <b>{{ leastOrderedCategory }}</b>
         </p>
       </div>
-    </div>
+    </app-content-block>
 
     <app-most-ordered
       heading="Most ordered items"
@@ -98,9 +94,8 @@
       [data]="topOrderedItems"
     ></app-most-ordered>
 
-    <div class="block stat">
+    <app-content-block title="Additional insights" customClass="stat">
       <div class="row">
-        <h6 class="heading">Additional insights</h6>
         <label class="time">Last 30 days</label>
       </div>
 
@@ -125,7 +120,7 @@
           <b>{{ tipValueMovementPercentage.toFixed(0) }}%</b>
         </p>
       </div>
-    </div>
+    </app-content-block>
   </div>
 </div>
 }

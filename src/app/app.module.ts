@@ -8,6 +8,7 @@ import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
 import { SignInComponent } from './components/sign-in/sign-in.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -28,6 +29,7 @@ import { CategoryInsightsComponent } from './components/shared/stats/overview/ca
 import { MostOrderedComponent } from './components/shared/stats/overview/most-ordered/most-ordered.component';
 import { AdditionalInsightsComponent } from './components/shared/stats/overview/additional-insights/additional-insights.component';
 import { GeneralComponent } from './components/settings/general/general.component';
+import { ChangeSubscriptionDialogComponent } from './components/settings/general/change-subscription-dialog/change-subscription-dialog.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
@@ -119,6 +121,7 @@ import { MediaUploadModalComponent } from './shared/components/media-upload-moda
 import { MediaPreviewDialogComponent } from './shared/components/media-preview-dialog/media-preview-dialog.component';
 import { MenuCompletionSuccessComponent } from './components/shared/menu-completion-success/menu-completion-success.component';
 import { PriceInputComponent } from './shared/components/price-input/price-input.component';
+import { LogoComponent } from './shared/components/logo/logo.component';
 import { SpecialsTableComponent } from './components/specials/shared/specials-table/specials-table.component';
 import { ViewSpecialDialogComponent } from './components/specials/shared/view-special-dialog/view-special-dialog.component';
 import { Step1SpecialBasicsComponent } from './components/specials/shared/special-form-steps/step1-special-basics/step1-special-basics.component';
@@ -133,6 +136,8 @@ import { ButtonComponent } from './components/shared/button/button.component';
 import { FormInputComponent } from './components/shared/form-input/form-input.component';
 import { FormSelectComponent } from './components/shared/form-select/form-select.component';
 import { FormTextareaComponent } from './components/shared/form-textarea/form-textarea.component';
+import { FormCheckboxComponent } from './components/shared/form-checkbox/form-checkbox.component';
+import { FormRadioComponent } from './components/shared/form-radio/form-radio.component';
 import { DataTableComponent } from './components/shared/data-table/data-table.component';
 import { ActionButtonComponent } from './components/shared/action-button/action-button.component';
 import { StatusBadgeComponent } from './components/shared/status-badge/status-badge.component';
@@ -166,6 +171,7 @@ import { PayFastTestComponent } from './components/test/payfast-test/payfast-tes
     MostOrderedComponent,
     AdditionalInsightsComponent,
     GeneralComponent,
+    ChangeSubscriptionDialogComponent,
     ManageUsersComponent,
     LoadingComponent,
     AddUserDialogComponent,
@@ -222,6 +228,7 @@ import { PayFastTestComponent } from './components/test/payfast-test/payfast-tes
     ImageUploadModalComponent,
     MenuCompletionSuccessComponent,
     PriceInputComponent,
+    LogoComponent,
     TestAuthComponent,
     SpecialsTableComponent,
     ViewSpecialDialogComponent,
@@ -237,6 +244,8 @@ import { PayFastTestComponent } from './components/test/payfast-test/payfast-tes
     FormInputComponent,
     FormSelectComponent,
     FormTextareaComponent,
+    FormCheckboxComponent,
+    FormRadioComponent,
     DataTableComponent,
     ActionButtonComponent,
     StatusBadgeComponent,
@@ -259,6 +268,7 @@ import { PayFastTestComponent } from './components/test/payfast-test/payfast-tes
     AngularFirestoreModule,
     AngularFireAuthModule,
     AngularFireStorageModule,
+    AngularFireFunctionsModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,

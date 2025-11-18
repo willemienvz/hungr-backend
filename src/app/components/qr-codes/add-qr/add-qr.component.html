@@ -9,8 +9,8 @@
           <div class="colInner" *ngIf="selectedMenu">
             <qrcode [qrdata]="getQRCodeData(selectedMenu.menuID)" (qrCodeURL)="onChangeURL($event)" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
               <div class="formGroup btnHolder">
-                <a class="btn btnTertiary" (click)="closePopup()">Cancel</a>
-                <a class="btn btnBlue" (click)="saveSettings()">Save</a>
+                <button class="hungr-btn hungr-btn-tertiary" (click)="closePopup()">Cancel</button>
+                <button class="hungr-btn hungr-btn-primary" (click)="saveSettings()">Save</button>
               </div>
           </div>
         </div>
@@ -29,7 +29,7 @@
             <p class="success-message" *ngIf="saveSuccess">QR code assigned to {{selectedMenu?.menuName}}</p>
           </div>
           <div class="formGroup btnHolder">
-            <a class="btn btnSecondary" [href]="qrCodeDownloadLink" download="qrcode">SAVE & Download</a>
+            <a class="hungr-btn hungr-btn-secondary" [href]="qrCodeDownloadLink" download="qrcode">SAVE & Download</a>
           </div>
         </div>
       </div>

@@ -1,75 +1,45 @@
 <div class="container">
   <!-- Restaurant Selection Section - Full Width -->
   <div class="restaurant-selector-container">
-    <div class="block restaurantBlock">
-      <div class="section-header">
-        <h6 class="section-title">
-          <i class="material-symbols-outlined">store</i>
-          Select Restaurant
-        </h6>
-        <p class="section-description">Choose which restaurant's about page you want to edit.</p>
-      </div>
+    <app-content-block title="Select Restaurant" customClass="restaurantBlock">
+      <p class="section-description">Choose which restaurant's about page you want to edit.</p>
       <div class="formGroup">
-        <label class="field-label">
-          <i class="material-symbols-outlined">restaurant</i>
-          Restaurant
-        </label>
-        <select
-          class="formControl enhanced-select"
+        <app-form-select
+          label="Restaurant"
+          placeholder="Select a restaurant..."
+          [options]="restaurantSelectOptions"
           [(ngModel)]="selectedRestaurantId"
-          (change)="onRestaurantChange(selectedRestaurantId)"
-          [disabled]="isLoadingRestaurants"
-        >
-          <option value="" disabled>Select a restaurant...</option>
-          <option 
-            *ngFor="let restaurant of restaurants" 
-            [value]="restaurant.restaurantID"
-            [disabled]="!restaurant.status"
-          >
-            {{ restaurant.restaurantName }} - {{ restaurant.city }}, {{ restaurant.province }}
-            {{ !restaurant.status ? ' (Inactive)' : '' }}
-          </option>
-        </select>
+          (selectionChange)="onRestaurantChange($event.value)"
+          [disabled]="isLoadingRestaurants">
+        </app-form-select>
         <div *ngIf="isLoadingRestaurants" class="loading-indicator">
           <i class="material-symbols-outlined rotating">refresh</i>
           Loading restaurants...
         </div>
       </div>
-    </div>
+    </app-content-block>
   </div>
 
   <!-- About Page Settings (only show when restaurant is selected) -->
   <div class="settings-container" *ngIf="selectedRestaurantId">
     <div class="outerCol">
     <!-- About Text Section -->
-    <div class="block aboutBlock">
-      <div class="section-header">
-        <h6 class="section-title">
-          <i class="material-symbols-outlined">restaurant</i>
-          About Us
-        </h6>
-        <p class="section-description">Tell your customers about your restaurant, story, and what makes you special.</p>
-      </div>
+    <app-content-block title="About Us" customClass="aboutBlock">
+      <p class="section-description">Tell your customers about your restaurant, story, and what makes you special.</p>
       <div class="formGroup">
-        <textarea
-          matInput
-          [(ngModel)]="aboutText"
+        <app-form-textarea
+          label="About Us Text"
           placeholder="Share your restaurant's story, mission, and what makes your dining experience unique..."
-          (input)="markAsChanged()"
-          class="enhanced-textarea"
-        ></textarea>
+          [(ngModel)]="aboutText"
+          (ngModelChange)="markAsChanged()"
+          [rows]="8">
+        </app-form-textarea>
       </div>
-    </div>
+    </app-content-block>
 
     <!-- Images Section -->
-    <div class="block imgBlock">
-      <div class="section-header">
-        <h6 class="section-title">
-          <i class="material-symbols-outlined">photo_library</i>
-          Restaurant Images
-        </h6>
-        <p class="section-description">Upload high-quality images to showcase your restaurant and atmosphere.</p>
-      </div>
+    <app-content-block title="Restaurant Images" customClass="imgBlock">
+      <p class="section-description">Upload high-quality images to showcase your restaurant and atmosphere.</p>
       
       <!-- Main Image -->
       <section class="image-section">
@@ -157,16 +127,12 @@
           </p>
         </div>
       </section>
-    </div>
+    </app-content-block>
 
     <!-- Business Hours Section -->
-    <div class="block hoursBlock">
+    <app-content-block title="Business Hours" customClass="hoursBlock">
       <div class="section-header">
         <div class="section-title-row">
-          <h6 class="section-title">
-            <i class="material-symbols-outlined">schedule</i>
-            Business Hours
-          </h6>
           <div class="visibility-toggle">
             <mat-slide-toggle
               [(ngModel)]="isBusinessHoursVisible"
@@ -181,24 +147,20 @@
         <p class="section-description">Set your restaurant's operating hours and let customers know when you're open.</p>
       </div>
       <div class="formGroup">
-        <textarea 
-          matInput 
-          [(ngModel)]="businessHours" 
-          (input)="markAsChanged()"
+        <app-form-textarea
+          label="Business Hours"
           placeholder="Example: Monday - Friday: 11:00 AM - 10:00 PM&#10;Saturday - Sunday: 12:00 PM - 11:00 PM"
-          class="enhanced-textarea hours-textarea">
-        </textarea>
+          [(ngModel)]="businessHours"
+          (ngModelChange)="markAsChanged()"
+          [rows]="6">
+        </app-form-textarea>
       </div>
-    </div>
+    </app-content-block>
 
     <!-- Contact Details Section -->
-    <div class="block contactBlock">
+    <app-content-block title="Contact Details" customClass="contactBlock">
       <div class="section-header">
         <div class="section-title-row">
-          <h6 class="section-title">
-            <i class="material-symbols-outlined">contact_phone</i>
-            Contact Details
-          </h6>
           <div class="visibility-toggle">
             <mat-slide-toggle
               [(ngModel)]="isContactDetailsVisible"
@@ -214,47 +176,33 @@
       </div>
       <div class="contact-fields">
         <div class="formGroup">
-          <label class="field-label">
-            <i class="material-symbols-outlined">email</i>
-            Email Address
-          </label>
-          <input
+          <app-form-input
             type="email"
-            class="formControl enhanced-input"
+            label="Email Address"
             placeholder="restaurant@example.com"
             [(ngModel)]="email"
-            (input)="markAsChanged()"
-          />
+            (ngModelChange)="markAsChanged()">
+          </app-form-input>
         </div>
         <div class="formGroup">
-          <label class="field-label">
-            <i class="material-symbols-outlined">phone</i>
-            Phone Number
-          </label>
-          <input
+          <app-form-input
             type="tel"
-            class="formControl enhanced-input"
+            label="Phone Number"
             placeholder="+27 (0)12 345 6789"
             [(ngModel)]="cellphone"
-            (input)="markAsChanged()"
-          />
+            (ngModelChange)="markAsChanged()">
+          </app-form-input>
         </div>
       </div>
-    </div>
+    </app-content-block>
   </div>
   </div>
 
   <!-- Right Column - Preview and Actions -->
   <div class="outerColSmall" *ngIf="selectedRestaurantId">
     <!-- Save Actions -->
-    <div class="block btnBlock">
-      <div class="save-header">
-        <h6 class="save-title">
-          <i class="material-symbols-outlined">save</i>
-          Save Changes
-        </h6>
-        <p class="save-description">Review your changes and save them to update your about page.</p>
-      </div>
+    <app-content-block title="Save Changes" customClass="btnBlock">
+      <p class="save-description">Review your changes and save them to update your about page.</p>
       <div class="save-actions">
         <button class="btn-discard" (click)="discardChanges()" [disabled]="!hasUnsavedChanges">
           <i class="material-symbols-outlined">undo</i>
@@ -265,35 +213,22 @@
           {{ isSaving ? 'Saving...' : 'Save Changes' }}
         </button>
       </div>
-    </div>
+    </app-content-block>
 
     <!-- Preview Section -->
-    <div class="block previewBlock">
-      <div class="preview-header">
-        <h6 class="preview-title">
-          <i class="material-symbols-outlined">visibility</i>
-          Live Preview
-        </h6>
-        <p class="preview-description">See how your about page will appear to customers in real-time.</p>
-      </div>
+    <app-content-block title="Live Preview" customClass="previewBlock">
+      <p class="preview-description">See how your about page will appear to customers in real-time.</p>
       
       <!-- Menu Selection for Preview -->
       <div class="formGroup" *ngIf="menus.length > 0">
-        <label class="field-label">
-          <i class="material-symbols-outlined">restaurant_menu</i>
-          Select Menu to Preview
-        </label>
-        <select
-          class="formControl enhanced-select"
+        <app-form-select
+          label="Select Menu to Preview"
+          placeholder="Select a menu..."
+          [options]="menuSelectOptions"
           [(ngModel)]="selectedMenuId"
-          (change)="onMenuSelectionChange($event)"
-          [disabled]="isLoadingMenus"
-        >
-          <option value="" disabled>Select a menu...</option>
-          <option *ngFor="let menu of menus" [value]="menu.menuID || menu.menuId || menu.id || menu._id">
-            {{ menu.menuName || menu.name || 'Unnamed Menu' }}
-          </option>
-        </select>
+          (selectionChange)="onMenuSelectionChange($event)"
+          [disabled]="isLoadingMenus">
+        </app-form-select>
         <div *ngIf="isLoadingMenus" class="loading-indicator">
           <i class="material-symbols-outlined rotating">refresh</i>
           Loading menus...
@@ -339,7 +274,7 @@
           <p>Please select a restaurant to see the preview.</p>
         </div>
       </div>
-    </div>
+    </app-content-block>
   </div>
 
 

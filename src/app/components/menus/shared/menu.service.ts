@@ -394,7 +394,7 @@ export class MenuService {
   // Restaurant operations
   fetchRestaurants(ownerId: string) {
     return this.firestore
-      .collection<Restaurant>('restuarants', (ref) =>
+      .collection<Restaurant>('restaurants', (ref) =>
         ref.where('ownerID', '==', ownerId)
       )
       .valueChanges();

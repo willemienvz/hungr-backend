@@ -1,0 +1,25 @@
+<div class="radio-container" [class]="radioClass">
+  <label [for]="radioId" class="radio-label">
+    <input
+      [id]="radioId"
+      [name]="radioName"
+      type="radio"
+      [value]="value"
+      [checked]="isChecked"
+      [disabled]="disabled"
+      (change)="onInputChange($event)"
+      (focus)="onFocus($event)"
+      (blur)="onBlur($event)"
+      class="radio-input"
+    />
+    <span class="radio-custom"></span>
+    <span class="radio-text" *ngIf="label">
+      {{ label }}
+      <span class="required-indicator" *ngIf="required">*</span>
+    </span>
+  </label>
+  
+  <div class="error-message" *ngIf="showError && errorMessage">
+    {{ errorMessage }}
+  </div>
+</div>

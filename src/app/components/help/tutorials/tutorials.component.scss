@@ -78,13 +78,13 @@
 
 .modal-content {
     background-color: #fefefe;
-    padding: 20px;
+    padding: var(--spacing-5);
     border: 1px solid #888;
     width: 46%;
     display: flex;
     flex-direction: column;
     position: relative;
-    gap: 20px;
+    gap: var(--spacing-5);
     align-items: flex-start;
 
     iframe {
@@ -95,7 +95,7 @@
         width: 100%;
         display: flex;
         flex-direction: row;
-        gap: 20px;
+        gap: var(--spacing-5);
     }
 
 }

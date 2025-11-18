@@ -1,0 +1,96 @@
+<h2 mat-dialog-title>Change Subscription</h2>
+<mat-dialog-content>
+  <p style="margin-bottom: 20px; color: var(--color-text-muted);">
+    Update your subscription details. Leave fields blank if you don't want to change them.
+  </p>
+
+  <form [formGroup]="changeForm" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="amount">Amount (R)</label>
+        <app-form-input
+          id="amount"
+          type="number"
+          formControlName="amount"
+          placeholder="Enter amount in Rands"
+          [errorMessage]="getFieldError('amount')"
+          [required]="false">
+        </app-form-input>
+        <p class="hint-text" *ngIf="data?.currentAmount">
+          Current: R{{ data.currentAmount / 100 }}/month
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="frequency">Billing Frequency</label>
+        <app-form-select
+          id="frequency"
+          formControlName="frequency"
+          [options]="frequencyOptions"
+          placeholder="Select frequency"
+          [errorMessage]="getFieldError('frequency')"
+          [showError]="changeForm.get('frequency')?.invalid && changeForm.get('frequency')?.touched"
+          [required]="false">
+        </app-form-select>
+        <p class="hint-text" *ngIf="data?.currentFrequency">
+          Current: {{ getFrequencyLabel(data.currentFrequency) }}
+        </p>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="cycles">Remaining Cycles</label>
+        <app-form-input
+          id="cycles"
+          type="number"
+          formControlName="cycles"
+          placeholder="Enter number of cycles (0 = unlimited)"
+          [errorMessage]="getFieldError('cycles')"
+          [required]="false">
+        </app-form-input>
+        <p class="hint-text" *ngIf="data?.currentCycles !== undefined">
+          Current: {{ data.currentCycles === 0 ? 'Unlimited' : data.currentCycles }}
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="run_date">Next Billing Date</label>
+        <input
+          id="run_date"
+          type="date"
+          formControlName="run_date"
+          class="form-control"
+          [class.error]="changeForm.get('run_date')?.invalid && changeForm.get('run_date')?.touched"
+        />
+        <p class="error-message" *ngIf="getFieldError('run_date')">
+          {{ getFieldError('run_date') }}
+        </p>
+        <p class="hint-text" *ngIf="data?.currentBillingDate">
+          Current: {{ data.currentBillingDate | date }}
+        </p>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end" style="gap: var(--spacing-3); padding: var(--spacing-4) 24px 24px 24px;">
+  <button
+    class="hungr-btn hungr-btn-tertiary"
+    type="button"
+    (click)="onCancel()"
+    [disabled]="isSubmitting"
+    style="min-width: 100px;"
+  >
+    Cancel
+  </button>
+  <button
+    class="hungr-btn hungr-btn-primary"
+    type="button"
+    (click)="onSubmit()"
+    [disabled]="isSubmitting"
+    style="min-width: 100px;"
+  >
+    {{ isSubmitting ? 'Updating...' : 'Update Subscription' }}
+  </button>
+</mat-dialog-actions>
+

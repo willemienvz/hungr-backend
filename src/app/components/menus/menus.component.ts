@@ -172,7 +172,7 @@ export class MenusComponent implements OnInit {
   }
 
   private fetchRestaurants(ownerId: string) {
-    this.firestore.collection<Restaurant>('restuarants', ref => ref.where('ownerID', '==', ownerId))
+    this.firestore.collection<Restaurant>('restaurants', ref => ref.where('ownerID', '==', ownerId))
       .valueChanges()
       .subscribe(restaurants => {
         this.restaurants = restaurants;

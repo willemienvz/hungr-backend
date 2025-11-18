@@ -7,22 +7,22 @@
   color: #2e3646;
   text-align: center;
   letter-spacing: -0.02px;
-  padding: 18px;
+  padding: 1var(--spacing-2);
   border: 1px solid #dedede;
   justify-content: center;
-  gap: 20px;
+  gap: var(--spacing-5);
 }
 .confirmation-header {
   align-self: flex-end;
   display: flex;
   width: 267px;
   max-width: 100%;
-  gap: 20px;
+  gap: var(--spacing-5);
   justify-content: space-between;
 }
 .confirmation-title {
-  font-family: "Poppins";
-  font-size: 18px;
+  font-family: var(--font-family-primary);
+  font-size: 1var(--spacing-2);
   font-weight: 700;
   line-height: 22.5px;
   letter-spacing: -0.001em;
@@ -37,17 +37,17 @@
 .confirmation-message {
   font-size: 15px;
   font-weight: 400;
-  line-height: 20px;
+  line-height: var(--spacing-5);
   width: 274px;
 }
 .confirmation-button {
   align-self: stretch;
   border-radius: 6px;
-  background-color: #16d3d2;
+  background-color: var(--color-secondary);
   margin-top: 27px;
   width: 171px;
   max-width: 100%;
-  font-size: 16px;
+  font-size: var(--spacing-4);
   color: #181818;
   text-transform: uppercase;
   line-height: 1;

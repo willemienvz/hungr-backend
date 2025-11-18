@@ -122,6 +122,8 @@
                   <app-action-button
                     type="delete"
                     title="Delete media"
+                    [loading]="deletingMediaId === media.id"
+                    [disabled]="deletingMediaId !== null"
                     (actionClick)="onMediaDelete(media)"
                     customColor="rgba(255, 255, 255, 0.9)">
                   </app-action-button>
@@ -162,6 +164,8 @@
                 <app-action-button
                   type="delete"
                   title="Delete media"
+                  [loading]="deletingMediaId === media.id"
+                  [disabled]="deletingMediaId !== null"
                   (actionClick)="onMediaDelete(media)">
                 </app-action-button>
               </div>
@@ -201,11 +205,11 @@
     <h3>No media found</h3>
     <p *ngIf="hasActiveFilters">
       No media items match your current filters. 
-      <button mat-button color="primary" (click)="clearFilters()">Clear filters</button>
+      <button class="hungr-btn hungr-btn-tertiary" (click)="clearFilters()">Clear filters</button>
     </p>
     <p *ngIf="!hasActiveFilters">Upload your first image to get started</p>
-    <button mat-raised-button color="primary" (click)="openUploadModal()" class="upload-btn">
-      <mat-icon>add</mat-icon>
+    <button class="hungr-btn hungr-btn-primary" (click)="openUploadModal()">
+      <i class="material-icons">add</i>
       Upload Media
     </button>
   </div>

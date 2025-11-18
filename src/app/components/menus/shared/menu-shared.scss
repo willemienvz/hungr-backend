@@ -2,9 +2,9 @@
 // Shared styles for menu components to eliminate duplication
 .container {
   display: flex;
-  padding: 20px;
+  padding: var(--spacing-5);
   flex-direction: column;
-  gap: 20px;
+  gap: var(--spacing-5);
 
   .row {
     width: 100%;
@@ -58,7 +58,7 @@
 }
 
 label {
-  font-size: 12px;
+  font-size: var(--spacing-3);
   font-weight: 300;
 }
 
@@ -84,7 +84,7 @@ mat-form-field {
   justify-content: space-between;
   gap: 15px;
   background-color: #f3f4f5;
-  border-radius: 5px;
+  border-radius: var(--border-radius-md);
 
   input {
     flex: 1;
@@ -101,7 +101,7 @@ mat-form-field {
   }
 
   .category {
-    width: calc(50% - 8px);
+    width: calc(50% - var(--spacing-2));
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -139,12 +139,12 @@ mat-form-field {
   flex-direction: column;
   gap: 13px;
   padding: 13px;
-  border-radius: 10px;
+  border-radius: var(--border-radius-lg);
   width: 90px;
   z-index: 50;
 
   a {
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-family-primary);
     font-size: 11px;
     font-weight: 400;
     line-height: 10px;
@@ -172,9 +172,9 @@ mat-form-field {
   padding: 10px;
   position: relative;
   border: 1px solid var(--hungr-quinary-color);
-  border-radius: 5px;
+  border-radius: var(--border-radius-md);
 
-  font-size: 12px;
+  font-size: var(--spacing-3);
 
 
   .deleteIcon {
@@ -198,13 +198,13 @@ mat-form-field {
     line-height: 1;
 
     .tooltip-icon {
-      font-size: 16px;
+      font-size: var(--spacing-4);
       color: #999;
       cursor: help;
       transition: color 0.3s ease;
 
       &:hover {
-        color: #16d3d2;
+        color: var(--color-secondary);
       }
     }
 
@@ -215,14 +215,14 @@ mat-form-field {
       background-color: #333;
       color: white;
       text-align: center;
-      border-radius: 4px;
-      padding: 8px;
+      border-radius: var(--border-radius-base);
+      padding: var(--spacing-2);
       position: absolute;
       z-index: 100;
       bottom: 125%;
       left: 50%;
       margin-left: -125px;
-      font-size: 12px;
+      font-size: var(--spacing-3);
       line-height: 1.4;
       transition: opacity 0.3s ease, visibility 0.3s ease;
       font-family: var(--hungr-font-family);
@@ -261,10 +261,10 @@ mat-form-field {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 15px;
-  margin-top: 20px;
+  margin-top: var(--spacing-5);
 
   .block {
-    width: calc(50% - 8px);
+    width: calc(50% - var(--spacing-2));
     min-height: 100px;
     position: relative;
     /* Uses centralized block styling */
@@ -312,7 +312,7 @@ mat-form-field {
 
       p {
         margin: 0;
-        font-size: 12px;
+        font-size: var(--spacing-3);
       }
 
       i {
@@ -334,7 +334,7 @@ mat-form-field {
   flex-direction: column;
   justify-content: center;
   gap: 15px;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-5);
 
   .row {
     display: flex;
@@ -364,7 +364,7 @@ mat-form-field {
 
 .headerBlock {
   padding: 25px 15px;
-  border-radius: 10px;
+  border-radius: var(--border-radius-lg);
   border: 1px solid var(--hungr-light-grey);
   background-color: #fff;
 
@@ -372,9 +372,9 @@ mat-form-field {
 
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--spacing-5);
 
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-5);
 
   &:not(.closedBottom) {
     margin-bottom: 0;
@@ -393,7 +393,7 @@ mat-form-field {
     position: fixed;
     z-index: 10000;
     bottom: 10px;
-    right: 20px;
+    right: var(--spacing-5);
   }
 }
 
@@ -406,7 +406,7 @@ mat-form-field {
     top: 0;
     padding: 0 10px;
     pointer-events: none;
-    height: 38px;
+    height: 3var(--spacing-2);
     justify-content: center;
     align-content: center;
     color: var(--hungr-dark-grey);

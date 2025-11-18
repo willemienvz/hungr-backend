@@ -185,6 +185,43 @@ togglePasswordVisibility(): void {
 togglePasswordConfirmVisibility(): void {
   this.showPasswordConf = !this.showPasswordConf;
 }
+
+getFieldError(fieldName: string): string {
+  const field = this.step1Form.get(fieldName);
+  if (field && field.invalid && (field.touched || field.dirty)) {
+    if (field.hasError('required')) {
+      return `${this.getFieldLabel(fieldName)} is required.`;
+    }
+    if (field.hasError('email')) {
+      return 'Enter a valid email address.';
+    }
+    if (field.hasError('invalidCellphone')) {
+      return 'Enter a valid cellphone number (e.g., +27 12 234 5678).';
+    }
+    if (field.hasError('emailInUse')) {
+      return 'This email is already in use.';
+    }
+    if (field.hasError('minlength')) {
+      return 'Password must be at least 10 characters long.';
+    }
+    if (field.hasError('mismatch') && fieldName === 'userPwdConfrim') {
+      return 'Passwords do not match.';
+    }
+  }
+  return '';
+}
+
+private getFieldLabel(fieldName: string): string {
+  const labels: { [key: string]: string } = {
+    'firstName': 'First name',
+    'lastName': 'Surname',
+    'userEmail': 'Email',
+    'cellphone': 'Cellphone number',
+    'password': 'Password',
+    'userPwdConfrim': 'Confirm Password'
+  };
+  return labels[fieldName] || fieldName;
+}
   onNext() {
     if (this.isPasswordMismatch()) {
       this.toastr.error('Passwords do not match');

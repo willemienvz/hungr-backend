@@ -1,0 +1,32 @@
+# RELAXED FIRESTORE RULES (For Testing)
+# Use this if upload/delete are failing with the strict rules
+
+# Replace lines 36-39 in firestore.rules with:
+
+      // RELAXED: Allow authenticated users to read media (less secure but functional)
+      // TODO: Tighten this after app code is verified
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() &&
+        (request.resource.data.ownerId == request.auth.uid ||
+         request.resource.data.userId == request.auth.uid ||
+         request.resource.data.uploadedBy == request.auth.uid);
+         
+      allow update, delete: if isAuthenticated() &&
+        (getMediaOwnerId() == request.auth.uid);
+
+# This restores read access to all authenticated users (original state)
+# But keeps create/update/delete restricted to owners
+# Less secure but should make upload/delete work again
+
+
+
+
+
+
+
+
+
+
+
+

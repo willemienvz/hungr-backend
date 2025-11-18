@@ -117,19 +117,18 @@
       [showDescription]="false">
       </app-step-header>
       <div class="addItemBtn">
-        <button class="btnSecondary" (click)="addMenuItem()">
+        <button class="hungr-btn hungr-btn-secondary" (click)="addMenuItem()">
           + Add Menu Item
         </button>
       </div>
       <div class="addItemBtn fixed">
-        <button class="btnSecondary" (click)="addMenuItem()">
+        <button class="hungr-btn hungr-btn-secondary" (click)="addMenuItem()">
           + Add Menu Item
         </button>
       </div>
     </div>
 
-    <div class="block filter-section">
-      <h6>Filter by</h6>
+    <app-content-block title="Filter by" customClass="filter-section">
       <div class="col2row">
         <div class="col">
           <div class="formGroup">
@@ -153,18 +152,17 @@
         </div>
         <div class="col">
           <div class="formGroup">
-            <label>Search</label>
             <div class="search-input-container">
-              <input
+              <app-form-input
                 type="text"
-                class="formControl search-input"
+                label="Search"
                 placeholder="Search menu items..."
                 [ngModel]="searchTerm"
-                (ngModelChange)="onSearchTermChange($event)"
-              />
+                (ngModelChange)="onSearchTermChange($event)">
+              </app-form-input>
               <app-svg-icon
                 iconName="search"
-                size="16px"
+                size="var(--spacing-4)"
                 color="#999"
                 class="search-icon"
               ></app-svg-icon>
@@ -172,10 +170,10 @@
           </div>
         </div>
       </div>
-    </div>
+    </app-content-block>
 
     <!-- KB: No results message when filters return empty results -->
-    <div *ngIf="menuItems.length > 0 && filteredMenuItems.length === 0" class="block no-results-block">
+    <app-content-block *ngIf="menuItems.length > 0 && filteredMenuItems.length === 0" title="" customClass="no-results-block">
       <div class="no-results-content">
         <app-svg-icon
           iconName="no-results"
@@ -188,21 +186,21 @@
         <div class="filter-actions">
           <button 
             *ngIf="selectedCategoryFilter !== null" 
-            class="btnSecondary small" 
+            class="hungr-btn hungr-btn-secondary hungr-btn-sm" 
             (click)="onCategoryFilterChange('all')"
           >
             Clear Category Filter
           </button>
           <button 
             *ngIf="searchTerm" 
-            class="btnSecondary small" 
+            class="hungr-btn hungr-btn-secondary hungr-btn-sm" 
             (click)="onSearchTermChange('')"
           >
             Clear Search
           </button>
         </div>
       </div>
-    </div>
+    </app-content-block>
 
     <!-- KB: Add CDK drag and drop container for menu item reordering -->
     <div 

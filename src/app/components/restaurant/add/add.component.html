@@ -1,36 +1,33 @@
 <div class="inner-page">
   <form #userForm="ngForm" (ngSubmit)="addRestaurant()">
     <div class="row" style="align-items: unset; justify-content: unset">
-      <div class="block" style="height: 100%">
+      <app-content-block title="Add Restaurant Details" customClass="" [ngStyle]="{'height': '100%'}">
         <a class="backLink" (click)="navigateWithUnsavedChangesCheck('/restaurants')"
           ><i class="material-icons">chevron_left</i> Back</a
         >
-        <h6>Add Restaurant Details</h6>
         <div class="block-row">
           <div class="col">
             <div class="formGroup">
-              <label>Restaurant Name</label>
-              <input
+              <app-form-input
                 type="text"
-                class="formControl"
+                label="Restaurant Name"
                 placeholder="Name your restaurant..."
                 name="name"
                 [(ngModel)]="restaurant.name"
-                required
-              />
+                [required]="true">
+              </app-form-input>
             </div>
           </div>
           <div class="col">
             <div class="formGroup">
-              <label>Street Address</label>
-              <input
+              <app-form-input
                 type="text"
-                class="formControl"
+                label="Street Address"
                 placeholder="1882 Bodenstein St"
                 name="street"
                 [(ngModel)]="restaurant.street"
-                required
-              />
+                [required]="true">
+              </app-form-input>
             </div>
             <div class="formGroup">
               <label>Province</label>
@@ -52,34 +49,31 @@
           </div>
           <div class="col">
             <div class="formGroup">
-              <label>City</label>
-              <input
+              <app-form-input
                 type="text"
-                class="formControl"
+                label="City"
                 placeholder="Boksburg"
                 name="city"
                 [(ngModel)]="restaurant.city"
-                required
-              />
+                [required]="true">
+              </app-form-input>
             </div>
             <div class="formGroup">
-              <label>Zip Code</label>
-              <input
+              <app-form-input
                 type="text"
-                class="formControl"
+                label="Zip Code"
                 placeholder="1213"
                 name="zip"
                 [(ngModel)]="restaurant.zip"
-                required
-              />
+                [required]="true">
+              </app-form-input>
             </div>
           </div>
         </div>
-      </div>
+      </app-content-block>
 
-      <div class="block" style="gap: 0">
-        <h6 style="margin-bottom: 10px">Assign menu</h6>
-        <p style="color: #9a9a9a; margin-bottom: 8px">
+      <app-content-block title="Assign menu" [ngStyle]="{'gap': '0'}">
+        <p style="color: var(--color-text-muted); margin-bottom: 8px">
           Please assign a menu to this restaurant.
         </p>
         <div
@@ -107,11 +101,10 @@
             >
           </p>
         </div>
-      </div>
+      </app-content-block>
 
-      <div class="block contactBlock" style="gap: 0">
-        <h6 style="margin-bottom: 10px">Users</h6>
-        <p style="color: #9a9a9a; margin-bottom: 8px">
+      <app-content-block title="Users" customClass="contactBlock" [ngStyle]="{'gap': '0'}">
+        <p style="color: var(--color-text-muted); margin-bottom: 8px">
           Please assign a user to this restaurant
         </p>
         <div class="rowMenu">
@@ -143,11 +136,10 @@
             close
           </span>
         </p>
-      </div>
+      </app-content-block>
 
       <div class="rowBottom">
-        <div class="block" style="width: 50%">
-          <h6>Restaurant Status</h6>
+        <app-content-block title="Restaurant Status" [ngStyle]="{'width': '50%'}">
           <div class="toggle-container">
             <label [style.color]="restaurantStatus ? '#16D3D2' : '#444444'">{{
               restaurantStatus ? "Active" : "Inactive"
@@ -158,30 +150,30 @@
               name="restaurantStatus"
             ></mat-slide-toggle>
           </div>
-        </div>
+        </app-content-block>
 
-        <div class="block contactBlock">
-          <h6>Number of tables in the restaurant</h6>
+        <app-content-block title="Number of tables in the restaurant" customClass="contactBlock">
           <div class="row" style="align-items: center">
             <p style="width: 60%">Please enter a numerical value</p>
-            <input
-              style="width: 40%"
-              type="text"
-              class="formControl"
-              name="selectedNumberTable"
-              [(ngModel)]="selectedNumberTable"
-              required
-            />
+            <div style="width: 40%">
+              <app-form-input
+                type="number"
+                placeholder="10"
+                name="selectedNumberTable"
+                [(ngModel)]="selectedNumberTable"
+                [required]="true">
+              </app-form-input>
+            </div>
           </div>
-        </div>
+        </app-content-block>
       </div>
     </div>
     <div class="formGroup btnHolder">
-      <a (click)="navigateWithUnsavedChangesCheck('/restaurants')" class="btn btnTertiary">Cancel</a>
-      <button type="button" (click)="saveDraft()" class="btn btnSecondary">
+      <button (click)="navigateWithUnsavedChangesCheck('/restaurants')" class="hungr-btn hungr-btn-tertiary">Cancel</button>
+      <button type="button" (click)="saveDraft()" class="hungr-btn hungr-btn-secondary">
         Save as draft
       </button>
-      <button type="submit" class="btn btnSecondary">Save</button>
+      <button type="submit" class="hungr-btn hungr-btn-secondary">Save</button>
     </div>
   </form>
 </div>

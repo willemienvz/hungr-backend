@@ -467,17 +467,36 @@ async function handleSubscriptionCancellation(itnData: PayFastItnData): Promise<
     // Update subscription status
     await subscriptionDoc.ref.update({
       status: 'cancelled',
-      cancellationDate: admin.firestore.FieldValue.serverTimestamp(),
-      cancellationReason: itnData.item_description || 'User requested cancellation',
+      cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+      cancellationReason: itnData.item_description || 'Cancelled via PayFast',
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     });
 
     // Update user document
     await db.collection('users').doc(userId).update({
       subscriptionStatus: 'cancelled',
-      subscriptionPlan: 'none',
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     });
+
+    // Log audit action
+    try {
+      await db.collection('audit_logs').add({
+        type: 'subscription_management',
+        action: 'cancel',
+        userId,
+        subscriptionId: subscriptionDoc.id,
+        result: 'success',
+        source: 'payfast_itn',
+        metadata: {
+          payment_id: itnData.pf_payment_id,
+          reason: 'Cancelled via PayFast ITN'
+        },
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Failed to log subscription cancellation audit:', error);
+    }
 
     console.log('Subscription cancelled successfully:', subscriptionDoc.id);
 
@@ -510,19 +529,40 @@ async function handleSubscriptionFailure(itnData: PayFastItnData): Promise<void>
     const subscriptionData = subscriptionDoc.data();
     const userId = subscriptionData.userId;
 
-    // Update subscription status
+    // Update subscription status - treat payment failure as paused (can be resumed)
+    // This allows users to fix payment issues and resume
     await subscriptionDoc.ref.update({
-      status: 'suspended',
-      suspensionDate: admin.firestore.FieldValue.serverTimestamp(),
-      suspensionReason: itnData.item_description || 'Payment failed',
+      status: 'paused',
+      pausedAt: admin.firestore.FieldValue.serverTimestamp(),
+      pauseReason: itnData.item_description || 'Payment failed',
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     });
 
     // Update user document
     await db.collection('users').doc(userId).update({
-      subscriptionStatus: 'suspended',
+      subscriptionStatus: 'paused',
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     });
+
+    // Log audit action
+    try {
+      await db.collection('audit_logs').add({
+        type: 'subscription_management',
+        action: 'pause',
+        userId,
+        subscriptionId: subscriptionDoc.id,
+        result: 'success',
+        source: 'payfast_itn',
+        metadata: {
+          payment_id: itnData.pf_payment_id,
+          reason: 'Payment failed - paused via PayFast ITN'
+        },
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Failed to log subscription pause audit:', error);
+    }
 
     console.log('Subscription suspended due to payment failure:', subscriptionDoc.id);
 

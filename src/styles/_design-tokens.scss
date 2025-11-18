@@ -14,6 +14,9 @@
     /* Green - Accent color */
     --color-quaternary: #9747FF;
     /* Purple - Special accent */
+    --color-dark: #1b1b3a;
+
+    --color-darkblue: #1E1A35;
 
     /* Neutral Colors */
     --color-white: #FFFFFF;
@@ -41,7 +44,7 @@
     /* Text Colors */
     --color-text-primary: #181818;
     /* Primary text */
-    --color-text-secondary: #444444;
+    --color-text-secondary: #1b1b3a;
     /* Secondary text */
     --color-text-muted: #9A9A9A;
     /* Muted text */
@@ -234,19 +237,53 @@
    Specialized tokens for different component types
    =============================================== */
 
-/* Form Field Tokens */
+/* Form Design Tokens */
 :root {
-    --form-field-height: 38px;
-    --form-field-border-color: var(--color-border-medium);
-    --form-field-border-radius: var(--border-radius-base);
-    --form-field-padding: var(--padding-sm);
-    --form-field-font-size: var(--font-size-md);
-    --form-field-line-height: var(--line-height-normal);
+    /* Form Field Dimensions */
+    --form-field-height: 40px;
+    --form-field-height-sm: 32px;
+    --form-field-height-lg: 48px;
+    --form-field-padding: 0 var(--spacing-3);
+    --form-field-padding-sm: 0 var(--spacing-2);
+    --form-field-padding-lg: 0 var(--spacing-4);
+    --form-field-border-radius: 4px;
+    --form-field-border-width: 1px;
+
+    /* Form Field Colors */
+    --form-field-bg: var(--color-white);
+    --form-field-bg-disabled: var(--color-grey-100);
+    --form-field-border-color: var(--color-dark);
+    --form-field-border-color-focus: var(--color-secondary);
+    --form-field-border-color-error: var(--color-error);
     --form-field-color: var(--color-text-primary);
-    --form-field-bg: var(--color-bg-primary);
-    --form-field-focus-border-color: var(--color-secondary);
-    --form-field-error-color: var(--color-error);
-    --form-field-placeholder-color: var(--color-text-muted);
+    --form-field-color-disabled: var(--color-grey-500);
+    --form-field-placeholder-color: var(--color-grey-500);
+
+    /* Form Field Typography */
+    --form-field-font-family: var(--font-family-primary);
+    --form-field-font-size: var(--font-size-base);
+    --form-field-font-size-sm: var(--font-size-sm);
+    --form-field-font-size-lg: var(--font-size-lg);
+    --form-field-font-weight: var(--font-weight-normal);
+    --form-field-line-height: 1.4;
+
+    /* Form Field States */
+    --form-field-transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    --form-field-focus-shadow: 0 0 0 2px rgba(22, 211, 210, 0.1);
+    --form-field-error-shadow: 0 0 0 2px rgba(211, 47, 47, 0.1);
+
+    /* Form Label */
+    --form-label-color: #9A9A9A;
+    --form-label-font-size: 16px;
+    --form-label-font-weight: 400;
+    --form-label-margin-bottom: 7px;
+    --form-label-letter-spacing: -0.016px;
+
+    /* Form Error Message */
+    --form-error-color: var(--color-error);
+    --form-error-font-size: var(--font-size-sm);
+    --form-error-margin-top: var(--spacing-1);
+    --form-error-icon-size: 14px;
 }
 
 /* Button Tokens */
@@ -265,7 +302,7 @@
     --button-sm-min-width: 80px;
 
     --button-md-font-size: var(--font-size-base);
-    --button-md-padding: var(--padding-sm) var(--padding-md);
+    --button-md-padding: 8px var(--padding-md);
     --button-md-min-width: 120px;
 
     --button-lg-font-size: var(--font-size-lg);
@@ -275,7 +312,7 @@
     /* Button Variants */
     /* Primary Buttons */
     --button-primary-bg: var(--color-secondary);
-    --button-primary-color: var(--color-text-inverse);
+    --button-primary-color: var(--color-dark);
     --button-primary-hover-bg: #14C0BF;
     --button-primary-active-bg: #129B9A;
     --button-primary-focus-ring: rgba(var(--color-secondary), 0.3);
@@ -305,6 +342,14 @@
     --button-ghost-hover-color: var(--color-text-primary);
     --button-ghost-active-bg: var(--color-grey-200);
     --button-ghost-focus-ring: rgba(var(--color-grey-600), 0.3);
+
+    /* Tertiary Buttons */
+    --button-tertiary-bg: var(--color-grey-300);
+    --button-tertiary-color: var(--color-text-primary);
+    --button-tertiary-border: none;
+    --button-tertiary-hover-bg: var(--color-grey-400);
+    --button-tertiary-active-bg: var(--color-grey-500);
+    --button-tertiary-focus-ring: rgba(var(--color-grey-600), 0.3);
 
     /* Button States */
     --button-disabled-bg: var(--color-grey-300);
@@ -363,7 +408,7 @@
 
     /* Hover effects */
     &:hover {
-        //   box-shadow: var(--block-shadow-hover);
+        box-shadow: var(--block-shadow-hover);
     }
 
 
@@ -490,13 +535,21 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--color-text-secondary);
+    color: var(--color-dark);
     text-decoration: none;
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: color 0.3s ease;
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-5);
+    text-transform:uppercase;
+
+    &.no-absolute {
+        position:relative;
+        top:0;
+        left:0;
+        margin-bottom:0;
+    }
 
     /* Icon styling */
     i {

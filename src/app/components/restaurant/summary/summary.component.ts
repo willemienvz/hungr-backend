@@ -14,7 +14,7 @@ export class SummaryComponent  implements OnInit{
   isTooltipOpen:boolean = false;
   isPopupMenuOpen: boolean[] = [];
   isSaving: boolean = false;
-  restuarants: Restaurant[] = [];
+  restaurants: Restaurant[] = [];
   constructor(private firestore: AngularFirestore,  private elementRef: ElementRef, private dialog: MatDialog, private toastr: ToastrService) {
   }
   ngOnInit() {
@@ -35,10 +35,10 @@ export class SummaryComponent  implements OnInit{
   private fetchRestaurant() {
     const user = JSON.parse(localStorage.getItem('user')!);
     const OwnerID = user.uid;
-    this.firestore.collection<Restaurant>('restuarants', ref => ref.where('ownerID', '==', OwnerID))
+    this.firestore.collection<Restaurant>('restaurants', ref => ref.where('ownerID', '==', OwnerID))
       .valueChanges()
-      .subscribe(restuarants => {
-        this.restuarants = restuarants;
+      .subscribe(restaurants => {
+        this.restaurants = restaurants;
         this.isSaving = false;
       });
   }
@@ -68,7 +68,7 @@ export class SummaryComponent  implements OnInit{
 
   private deleteRestaurant(id: string, index: number) {
     this.togglePopupMenu(index);
-    this.firestore.collection('restuarants').doc(id).delete()
+    this.firestore.collection('restaurants').doc(id).delete()
         .then(() => {
             this.toastr.success('Restaurant successfully deleted!');
         })

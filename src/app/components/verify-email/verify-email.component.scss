@@ -17,8 +17,8 @@ background-size: cover;
         max-width: 500px;
         flex-direction: column;
         background-color: white;
-        padding: 50px;
-        border-radius: 10px;
+        padding: 50px 50px 25px;
+        border-radius: var(--border-radius-lg);
 
         .authBlock{
             width: 100%;
@@ -27,17 +27,27 @@ background-size: cover;
             align-items: center;
             flex-direction: column;
             gap:25px;
-            margin-bottom: 25px;
+            margin-bottom: 0px;
+            padding:0;
+            box-shadow:none;
 
             .formGroup {
                 align-items: center;
+                margin-bottom:0;
+                padding-bottom:0;
+                button {
+                    margin-bottom:20px;
+                }
+                .text-center {
+                    margin-top: 0px;
+                }
             }
 
             p{
                 text-align: center;
                 color: #2E3646;
                 font-family: 'Poppins';
-                font-size: 16px;
+                font-size: var(--spacing-4);
                 font-weight: 400;
                 line-height: 24px;
                 letter-spacing: -0.02em;

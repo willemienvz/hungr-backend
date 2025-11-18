@@ -62,7 +62,7 @@
           <p class="upload-text">Drag and drop your images here</p>
           <p class="upload-subtext">or click upload media below</p>
             <button *ngIf="!hasImages" type="button" 
-                class="upload-media-btn btnPrimary"
+                class="upload-media-btn hungr-btn hungr-btn-primary"
                 (click)="onUploadMedia()"
                 [disabled]="isUploading || (config.maxFiles && allImages.length >= config.maxFiles)">
             <i class="material-symbols-outlined">{{ isUploading ? 'hourglass_empty' : 'add' }}</i>
@@ -111,11 +111,11 @@
 
   <!-- Action Buttons -->
   <div class="modal-buttons">
-    <button type="button" class="btnTertiary" (click)="onCancel()">
+    <button type="button" class="hungr-btn hungr-btn-tertiary" (click)="onCancel()">
       CANCEL
     </button>
     <button type="button" 
-            class="btnSecondary" 
+            class="hungr-btn hungr-btn-secondary" 
             (click)="onSave()"
             [disabled]="isUploading">
       SAVE

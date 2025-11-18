@@ -36,7 +36,7 @@ export class AboutMigrationService {
           try {
             // Find restaurants owned by this user
             const restaurantsSnapshot = await this.firestore
-              .collection('restuarants', ref => ref.where('ownerID', '==', userData.uid))
+              .collection('restaurants', ref => ref.where('ownerID', '==', userData.uid))
               .get()
               .toPromise();
 

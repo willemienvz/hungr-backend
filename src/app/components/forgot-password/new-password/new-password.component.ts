@@ -14,6 +14,7 @@ export class NewPasswordComponent implements OnInit {
   showPopup: boolean = true;
   oobCode: string | null = null;
   newPassword: string = '';
+  passwordError: string = '';
 
   constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly toastr: ToastrService) {}
 
@@ -50,5 +51,12 @@ export class NewPasswordComponent implements OnInit {
 
   closePopup() {
     this.router.navigate(['/sign-in']);
+  }
+
+  onPasswordChange(value: string): void {
+    // Clear error when user starts typing
+    if (this.passwordError) {
+      this.passwordError = '';
+    }
   }
 }

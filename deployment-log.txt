@@ -1,0 +1,18 @@
+
+=== DEPLOYMENT LOG ===
+Date: Tue 21 Oct 2025 12:08:53 SAST
+Deployment: Firestore Security Rules - Media Library Isolation Fix
+Project: hungr-firebase
+Status: SUCCESS ✅
+Deployed by: User
+Fix: Media library now enforces user isolation (users can only read their own media)
+==================
+
+=== FIX DEPLOYMENT ===
+Date: Tue 21 Oct 2025 12:28:23 SAST
+Fix 1: Storage rules - Added separate delete permission
+Fix 2: Firestore media_usage - Fixed delete permissions
+Status: SUCCESS ✅
+Issue: Upload and delete were failing after initial security fix
+Resolution: Storage delete needed separate rule, media_usage needed proper owner check
+==================

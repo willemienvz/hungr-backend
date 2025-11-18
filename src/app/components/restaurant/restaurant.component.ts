@@ -146,7 +146,7 @@ export class RestaurantComponent {
     const user = JSON.parse(localStorage.getItem('user')!);
     const OwnerID = user.uid;
     this.firestore
-      .collection<Restaurant>('restuarants', (ref) =>
+      .collection<Restaurant>('restaurants', (ref) =>
         ref.where('ownerID', '==', OwnerID)
       )
       .valueChanges()
@@ -228,7 +228,7 @@ export class RestaurantComponent {
 
   activateRestaurant(restaurantId: string, index: number) {
     this.firestore
-      .collection('restuarants')
+      .collection('restaurants')
       .doc(restaurantId)
       .update({ status: true })
       .then(() => {
@@ -246,7 +246,7 @@ export class RestaurantComponent {
 
   deleteRestaurant(id: string, index: number) {
     this.firestore
-      .collection('restuarants')
+      .collection('restaurants')
       .doc(id)
       .delete()
       .then(() => {

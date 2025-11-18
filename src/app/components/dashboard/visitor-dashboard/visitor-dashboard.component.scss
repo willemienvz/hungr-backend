@@ -45,7 +45,7 @@
 }
 
 ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
-  font-family: "Poppins" !important;
+  font-family: var(--font-family-primary) !important;
   font-size: 10px !important;
   font-weight: 500 !important;
   line-height: 10px !important;

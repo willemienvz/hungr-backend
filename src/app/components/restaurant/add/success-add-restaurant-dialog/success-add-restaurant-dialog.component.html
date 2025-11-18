@@ -4,7 +4,7 @@
     <i
       class="material-icons"
       (click)="closeDialog()"
-      style="cursor: pointer; position: absolute; top: 20px; right: 20px"
+      style="cursor: pointer; position: absolute; top: var(--spacing-5); right: var(--spacing-5)"
       >close</i
     >
   </header>
@@ -12,7 +12,7 @@
     {{ data.message }}
   </p>
   <button
-    class="btnSecondary"
+    class="hungr-btn hungr-btn-secondary"
     routerLink="/restaurants"
     (click)="closeDialog()"
   >

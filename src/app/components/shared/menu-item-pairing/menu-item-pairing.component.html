@@ -15,16 +15,14 @@
     <div class="detail-content grid">
     <!-- KB: Custom heading input field -->
     <div class="custom-heading-input">
-      <div class="inputBox">
-        <input
-          placeholder="Custom heading (optional)"
-          type="text"
-          [ngModel]="config.customHeading"
-          (ngModelChange)="onCustomHeadingChange($event)"
-          [ngModelOptions]="{ standalone: true }"
-        />
-        <label>Custom heading for this section</label>
-      </div>
+      <app-form-input
+        type="text"
+        label="Custom heading for this section"
+        placeholder="Custom heading (optional)"
+        [ngModel]="config.customHeading"
+        (ngModelChange)="onCustomHeadingChange($event)"
+        [ngModelOptions]="{ standalone: true }">
+      </app-form-input>
     </div>
     
     <!-- Show helpful message when no items are available -->

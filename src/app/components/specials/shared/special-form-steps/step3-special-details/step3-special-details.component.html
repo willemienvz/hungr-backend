@@ -1,7 +1,7 @@
 <div class="step3-container block-open-top">
   <ng-content select="[header]"></ng-content>
 
-  <div class="block rowSpecial block-open-top">
+  <app-content-block title="" customClass="rowSpecial block-open-top">
     <form [formGroup]="specialForm">
       <!-- Percentage Discount -->
       <div *ngIf="selectedSpecialType === SpecialType.PERCENTAGE_DISCOUNT"  class="inputHolder">
@@ -274,5 +274,5 @@
         </div>
       </div>
     </form>
-  </div>
+  </app-content-block>
 </div> 

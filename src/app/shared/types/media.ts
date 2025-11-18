@@ -14,6 +14,9 @@ export interface MediaItem {
   /** Unique identifier for the media item */
   id: string;
   
+  /** User ID who owns this media item - CRITICAL for security */
+  userId: string;
+  
   /** Generated filename for storage */
   fileName: string;
   
@@ -234,6 +237,7 @@ export interface StorageUsage {
  */
 export interface MediaDocument {
   id: string;
+  userId: string; // CRITICAL: User ID for security filtering
   fileName: string;
   originalName: string;
   fileSize: number;

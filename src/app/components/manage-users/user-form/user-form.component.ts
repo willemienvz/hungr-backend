@@ -50,9 +50,8 @@ export class UserFormComponent {
     }
   }
 
-  onPermissionChange(event: Event, permission: keyof UserPermissions) {
-    const target = event.target as HTMLInputElement;
-    this.permissions[permission] = target.checked;
+  onPermissionChange(value: boolean, permission: keyof UserPermissions) {
+    this.permissions[permission] = value;
   }
 
   getRoleDisplayName(role: UserRole): string {
@@ -83,6 +82,34 @@ export class UserFormComponent {
       permissions: this.role === 'custom' ? this.permissions : this.permissionService.getPermissionsForRole(this.role)
     };
     this.submit.emit(payload);
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.user[fieldName as keyof User];
+    if (!field) {
+      return `${this.getFieldLabel(fieldName)} is required.`;
+    }
+    
+    if (fieldName === 'email' && field && !this.isValidEmail(field as string)) {
+      return 'Enter a valid email address.';
+    }
+    
+    return '';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      'firstName': 'First Name',
+      'Surname': 'Last Name',
+      'email': 'Email address',
+      'cellphoneNumber': 'Phone number'
+    };
+    return labels[fieldName] || fieldName;
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
 }
 

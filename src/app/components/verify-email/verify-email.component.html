@@ -1,13 +1,23 @@
-<div class='logo-top'>
-    <img src="../../../assets/images/shared/logo.png" alt="" />
-</div>
+<app-logo containerClass="logo-top"></app-logo>
 <div class="displayTable">
     <div class="displayTableCell">
         <div class="authBlock">
             <h2>Verifying your account</h2>
             <div class="formGroup">
                 <p class="text-center" *ngIf="isSaving">Please wait while we set up your account...</p>
-                <p class="text-center" *ngIf="!isSaving">Your account has been created! Please check your email for verification.</p>
+                <p class="text-center" *ngIf="!isSaving && userEmail">We have sent a confirmation email to {{ userEmail }}. Please check your email and click on the link to verify your email address.</p>
+                <p class="text-center" *ngIf="!isSaving && !userEmail">We have sent a confirmation email to your email address. Please check your email and click on the link to verify your email address.</p>
+
+                <div class="text-center" *ngIf="!isSaving">
+                    <button class="hungr-btn hungr-btn-primary" [disabled]="isResending" (click)="resendVerificationEmail()">
+                        <mat-spinner *ngIf="isResending" diameter="20" color="accent"></mat-spinner>
+                        {{ isResending ? 'Sending...' : 'Resend Email' }}
+                    </button>
+                </div>
+
+                <span class="bottom-small-text">
+                    Didn't receive the email? Check your details to verify your email address.
+                </span>
             </div>
         </div>
     </div>

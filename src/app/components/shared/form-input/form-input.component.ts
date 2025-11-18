@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-export type InputType = 'text' | 'password' | 'email' | 'tel' | 'number' | 'url';
+export type InputType = 'text' | 'password' | 'email' | 'tel' | 'number' | 'url' | 'time' | 'date' | 'datetime-local';
 
 @Component({
     selector: 'app-form-input',
@@ -34,6 +34,7 @@ export class FormInputComponent implements ControlValueAccessor {
     @Output() valueChange = new EventEmitter<string>();
     @Output() focus = new EventEmitter<Event>();
     @Output() blur = new EventEmitter<Event>();
+    @Output() suffixIconClick = new EventEmitter<void>();
 
     value: string = '';
     isFocused: boolean = false;
@@ -73,6 +74,12 @@ export class FormInputComponent implements ControlValueAccessor {
         this.isFocused = false;
         this.onTouched();
         this.blur.emit(event);
+    }
+
+    onSuffixIconClick(): void {
+        if (this.suffixIcon) {
+            this.suffixIconClick.emit();
+        }
     }
 
     get inputClass(): string {

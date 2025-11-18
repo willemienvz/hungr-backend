@@ -1,129 +1,98 @@
 <div class="inner-page">
   <form #userForm="ngForm" (ngSubmit)="onSubmit()">
     <div class="col">
-      <div class="block">
+      <app-content-block [title]="mode === 'add' ? 'Add Restaurant Details' : 'Edit Restaurant Details'">
         <a class="backLink" (click)="navigateWithUnsavedChangesCheck('/restaurants')"
           ><i class="material-icons">chevron_left</i> Back</a
         >
-        <h6>{{ mode === 'add' ? 'Add Restaurant Details' : 'Edit Restaurant Details' }}</h6>
         <div class="row">
           <div class="col">
             <div class="formGroup">
-              <label>Restaurant Name <span class="required">*</span></label>
-              <input
+              <app-form-input
+                label="Restaurant Name"
                 type="text"
-                class="formControl"
-                [class.error]="(userForm.controls['name']?.invalid && userForm.controls['name']?.touched) || isDuplicateName"
                 placeholder="Name your restaurant..."
+                [required]="true"
+                [errorMessage]="getFieldError('name')"
                 name="name"
                 [(ngModel)]="restaurant.name"
                 (ngModelChange)="onRestaurantNameChange($event)"
-                required
-                #nameField="ngModel"
-              />
-              <div class="error-message" *ngIf="isDuplicateName">
-                A restaurant with this name already exists. Please choose a different name.
-              </div>
-              <div class="error-message" *ngIf="nameField.invalid && nameField.touched && !isDuplicateName">
-                Restaurant name is required
-              </div>
+                #nameField="ngModel">
+              </app-form-input>
             </div>
           </div>
           <div class="col">
             <div class="formGroup">
-              <label>Street Address <span class="required">*</span></label>
-              <input
+              <app-form-input
+                label="Street Address"
                 type="text"
-                class="formControl"
-                [class.error]="userForm.controls['street']?.invalid && userForm.controls['street']?.touched"
                 placeholder="1882 Bodenstein St"
+                [required]="true"
+                [errorMessage]="getFieldError('street')"
                 name="street"
                 [(ngModel)]="restaurant.street"
-                required
-                #streetField="ngModel"
-              />
-              <div class="error-message" *ngIf="streetField.invalid && streetField.touched">
-                Street address is required
-              </div>
+                #streetField="ngModel">
+              </app-form-input>
             </div>
             <div class="formGroup">
-              <label>Province <span class="required">*</span></label>
-              <mat-form-field appearance="fill" style="width: 100%">
-                <mat-select
-                  [(ngModel)]="restaurant.province"
-                  name="province"
-                  required
-                  #provinceField="ngModel"
-                >
-                  <mat-option
-                    *ngFor="let province of saProvinces"
-                    [value]="province"
-                  >
-                    {{ province }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-              <div class="error-message" *ngIf="provinceField.invalid && provinceField.touched">
-                Province is required
-              </div>
+              <app-form-select
+                label="Province"
+                placeholder="Select Province"
+                [required]="true"
+                [errorMessage]="getFieldError('province')"
+                [options]="provinceOptions"
+                [(ngModel)]="restaurant.province"
+                name="province"
+                #provinceField="ngModel">
+              </app-form-select>
             </div>
           </div>
           <div class="col">
             <div class="formGroup">
-              <label>City <span class="required">*</span></label>
-              <input
+              <app-form-input
+                label="City"
                 type="text"
-                class="formControl"
-                [class.error]="userForm.controls['city']?.invalid && userForm.controls['city']?.touched"
                 placeholder="Boksburg"
+                [required]="true"
+                [errorMessage]="getFieldError('city')"
                 name="city"
                 [(ngModel)]="restaurant.city"
-                required
-                #cityField="ngModel"
-              />
-              <div class="error-message" *ngIf="cityField.invalid && cityField.touched">
-                City is required
-              </div>
+                #cityField="ngModel">
+              </app-form-input>
             </div>
             <div class="formGroup">
-              <label>Zip Code <span class="required">*</span></label>
-              <input
+              <app-form-input
+                label="Zip Code"
                 type="text"
-                class="formControl"
-                [class.error]="userForm.controls['zip']?.invalid && userForm.controls['zip']?.touched"
                 placeholder="1213"
+                [required]="true"
+                [errorMessage]="getFieldError('zip')"
                 name="zip"
                 [(ngModel)]="restaurant.zip"
-                required
-                #zipField="ngModel"
-              />
-              <div class="error-message" *ngIf="zipField.invalid && zipField.touched">
-                Zip code is required
-              </div>
+                #zipField="ngModel">
+              </app-form-input>
             </div>
           </div>
         </div>
-      </div>
+      </app-content-block>
     </div>
     
     <div class="col">
-      <div class="block" style="gap: 0">
-        <h6 style="margin-bottom: 10px">Assign menu</h6>
-        <label style="color: #9a9a9a; margin-bottom: 8px"
+      <app-content-block title="Assign menu" [ngStyle]="{'gap': '0'}">
+        <label style="color: var(--color-text-muted); margin-bottom: 8px"
           >Please assign a menu to this restaurant.</label
         >
         <div class="rowMenu">
-          <mat-form-field appearance="fill" style="width: 32%">
-            <mat-select
+          <div style="width: 32%">
+            <app-form-select
+              label="Select Menu"
+              placeholder="Choose a menu"
+              [options]="menuOptions"
               [(ngModel)]="selectedMenu"
               (selectionChange)="selectMenu($event.value)"
-              name="selectedMenu"
-            >
-              <mat-option *ngFor="let menu of menus" [value]="menu">
-                {{ menu.menuName }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+              name="selectedMenu">
+            </app-form-select>
+          </div>
           <p>
             Need to create a new menu for this restaurant?
             <a
@@ -134,12 +103,11 @@
             >
           </p>
         </div>
-      </div>
+      </app-content-block>
 
 
       <div class="blockItemsRow" *ngIf="mode === 'edit'">
-        <div class="block" style="height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
-          <h6>Restaurant Status</h6>
+        <app-content-block title="Restaurant Status" [ngStyle]="{'height': '140px', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'space-between'}">
           <div class="toggle-container">
             <label [style.color]="restaurantStatus ? '#16D3D2' : '#444444'">{{
               restaurantStatus ? "Active" : "Inactive"
@@ -150,57 +118,57 @@
               name="restaurantStatus"
             ></mat-slide-toggle>
           </div>
-        </div>
-        <div class="block contactBlock" style="height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
-          <h6>Number of tables in the restaurant</h6>
+        </app-content-block>
+        <app-content-block title="Number of tables in the restaurant" customClass="contactBlock" [ngStyle]="{'height': '140px', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'space-between'}">
           <div class="row" style="align-items: center">
             <p style="width: 60%">Please enter a numerical value</p>
-            <input
-              style="width: 40%"
-              type="number"
-              class="formControl"
-              name="selectedNumberTable"
-              [(ngModel)]="selectedNumberTable"
-              (input)="onNumberTableInput($event)"
-              min="1"
-              max="100"
-              step="1"
-              pattern="[0-9]*"
-              inputmode="numeric"
-              required
-            />
+            <div style="width: 40%">
+              <app-form-input
+                label=""
+                type="number"
+                placeholder="Number of tables"
+                [required]="true"
+                [errorMessage]="getFieldError('selectedNumberTable')"
+                [min]="1"
+                [max]="100"
+                [step]="1"
+                name="selectedNumberTable"
+                [(ngModel)]="selectedNumberTable"
+                (input)="onNumberTableInput($event)">
+              </app-form-input>
+            </div>
           </div>
-        </div>
+        </app-content-block>
       </div>
 
-      <div class="block contactBlock" *ngIf="mode === 'add'" style="height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
-        <h6>Number of tables in the restaurant</h6>
+      <app-content-block title="Number of tables in the restaurant" customClass="contactBlock" *ngIf="mode === 'add'" [ngStyle]="{'height': '140px', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'space-between'}">
         <div class="row" style="align-items: center">
           <p style="width: 60%">Please enter a numerical value</p>
-          <input
-            style="width: 40%"
-            type="number"
-            class="formControl"
-            name="selectedNumberTable"
-            [(ngModel)]="selectedNumberTable"
-            (input)="onNumberTableInput($event)"
-            min="1"
-            max="100"
-            step="1"
-            pattern="[0-9]*"
-            inputmode="numeric"
-            required
-          />
+          <div style="width: 40%">
+            <app-form-input
+              label=""
+              type="number"
+              placeholder="Number of tables"
+              [required]="true"
+              [errorMessage]="getFieldError('selectedNumberTable')"
+              [min]="1"
+              [max]="100"
+              [step]="1"
+              name="selectedNumberTable"
+              [(ngModel)]="selectedNumberTable"
+              (input)="onNumberTableInput($event)">
+            </app-form-input>
+          </div>
         </div>
-      </div>
+      </app-content-block>
 
       <div class="formGroup btnHolder" style="margin-top: 30px;">
-        <a (click)="navigateWithUnsavedChangesCheck('/restaurants')" 
-           [class]="mode === 'add' ? 'btn btnSecondary' : 'btn btnSecondary'">Cancel</a>
-        <button type="button" (click)="saveDraft()" class="btn btnSecondary" *ngIf="mode === 'edit'">
+        <button (click)="navigateWithUnsavedChangesCheck('/restaurants')" 
+           class="hungr-btn hungr-btn-secondary">Cancel</button>
+        <button type="button" (click)="saveDraft()" class="hungr-btn hungr-btn-secondary" *ngIf="mode === 'edit'">
           Save as draft
         </button>
-        <button type="submit" [class]="mode === 'add' ? 'btn btnPrimary' : 'btn btnPrimary'" [disabled]="!isFormValid()">
+        <button type="submit" class="hungr-btn hungr-btn-primary" [disabled]="!isFormValid()">
           {{ mode === 'add' ? 'Save Restaurant' : 'Update Restaurant' }}
         </button>
       </div>

@@ -15,7 +15,7 @@
 
     label {
         color: #9A9A9A;
-        margin-bottom: 12px;
+        margin-bottom: var(--spacing-3);
 
     }
 }
@@ -25,7 +25,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-2);
 
     a {
         width: 32px;
@@ -42,15 +42,15 @@
         }
 
         i {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-            color: #9a9a9a;
+            font-size: 1var(--spacing-2);
+            width: 1var(--spacing-2);
+            height: 1var(--spacing-2);
+            color: var(--color-text-muted);
             transition: color 0.2s ease;
         }
 
         &:hover i {
-            color: #16d3d2;
+            color: var(--color-secondary);
         }
 
         &.delete-link:hover i {
@@ -66,7 +66,7 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    max-width: 320px;
+    max-width: 3var(--spacing-5);
 
     .editBtn {
         position: absolute;
@@ -82,9 +82,7 @@
     }
 }
 
-.btnSecondary {
-    min-width: 180px
-}
+// Custom button styling removed to allow global styles to apply
 
 
 .material-icons {
@@ -102,7 +100,7 @@
     flex-direction: column;
     gap: 13px;
     padding: 13px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     width: 90px;
 
     a {
@@ -137,7 +135,7 @@
         width: 100%;
         border-collapse: collapse;
         background: white;
-        border-radius: 8px;
+        border-radius: var(--spacing-2);
         overflow: hidden;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         margin-top: 1rem;
@@ -146,10 +144,10 @@
             background: #f8f9fb;
 
             th {
-                padding: 16px 20px;
+                padding: var(--spacing-4) var(--spacing-5);
                 text-align: left;
-                color: #9a9a9a;
-                font-family: "Poppins", sans-serif;
+                color: var(--color-text-muted);
+                font-family: var(--font-family-primary);
                 font-size: 13px;
                 font-weight: 400;
                 line-height: 140%;
@@ -176,10 +174,10 @@
                 }
 
                 td {
-                    padding: 16px 20px;
+                    padding: var(--spacing-4) var(--spacing-5);
                     vertical-align: middle;
                     color: #444444;
-                    font-family: "Poppins", sans-serif;
+                    font-family: var(--font-family-primary);
                     font-size: 13px;
                     font-weight: 500;
                     line-height: 140%;
@@ -198,7 +196,7 @@
     text-align: center;
     padding: 2rem;
     background-color: #f5f5f5;
-    border-radius: 4px;
+    border-radius: var(--border-radius-base);
     margin-top: 1rem;
     color: #666;
 
@@ -215,7 +213,7 @@
 
 .toggleHolder p {
     font-size: 10px;
-    padding-left: 12px;
+    padding-left: var(--spacing-3);
 
 }
 
@@ -224,11 +222,11 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-2);
 
     label {
         color: #444444;
-        font-family: "Poppins", sans-serif;
+        font-family: var(--font-family-primary);
         font-size: 13px;
         font-weight: 400;
     }
@@ -241,11 +239,11 @@
         }
 
         ::ng-deep .mat-slide-toggle-thumb {
-            background-color: #16d3d2;
+            background-color: var(--color-secondary);
         }
 
         ::ng-deep .mat-checked .mat-slide-toggle-bar {
-            background-color: #16d3d2;
+            background-color: var(--color-secondary);
         }
     }
 }
@@ -253,7 +251,7 @@
 .status-toggle-container {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--spacing-3);
 
     .status-toggle {
         transform: scale(0.8);
@@ -263,11 +261,11 @@
         }
 
         ::ng-deep .mat-slide-toggle-thumb {
-            background-color: #16d3d2;
+            background-color: var(--color-secondary);
         }
 
         ::ng-deep .mat-checked .mat-slide-toggle-bar {
-            background-color: #16d3d2;
+            background-color: var(--color-secondary);
         }
     }
 }

@@ -1,6 +1,6 @@
 .step3-container {
   .headerBlock {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-5);
   }
 
   .block {
@@ -16,15 +16,15 @@
     flex-direction: column;
 
     form {
-      width: min(720px, 92%);
+      width: min(7var(--spacing-5), 92%);
       justify-content: center;
       align-items: center;
       display: flex;
       flex-direction: column;
 
       .formGroup {
-        margin-bottom: 20px;
-        gap: 8px;
+        margin-bottom: var(--spacing-5);
+        gap: var(--spacing-2);
       }
     }
   }
@@ -32,7 +32,7 @@
 
 .row {
   display: flex;
-  gap: 16px;
+  gap: var(--spacing-4);
   width: 100%;
   justify-content: center;
   align-items: flex-start;
@@ -55,7 +55,7 @@
 
 // Section title
 .section-title {
-  margin: 0 0 8px 2px;
+  margin: 0 0 var(--spacing-2) 2px;
   font-weight: 600;
   color: var(--hungr-text, #222);
 }
@@ -65,8 +65,8 @@
   text-align: right;
   width: 100%;
   color: #6b7280;
-  font-size: 12px;
-  margin-top: 8px;
+  font-size: var(--spacing-3);
+  margin-top: var(--spacing-2);
 }
 
 .fieldHolder {
@@ -76,7 +76,7 @@
   width: 100%;
 
   label {
-    color: #9a9a9a;
+    color: var(--color-text-muted);
     font-weight: 400;
     font-size: 14px;
     margin: 0 0 2px 2px;
@@ -85,7 +85,7 @@
 
 .item-list {
   width: 100%;
-  margin-top: 20px;
+  margin-top: var(--spacing-5);
 
   .list {
     display: flex;
@@ -93,13 +93,13 @@
     align-items: center;
     padding: 10px;
     border: 1px solid var(--hungr-dark-grey);
-    border-radius: 5px;
+    border-radius: var(--border-radius-md);
     margin-bottom: 10px;
 
     .left {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--spacing-2);
     }
 
     .btnRemove {
@@ -112,7 +112,7 @@
       height: 24px;
       line-height: 24px;
       border-radius: 6px;
-      font-size: 16px;
+      font-size: var(--spacing-4);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -133,14 +133,14 @@
 }
 
 .no-results-option {
-  color: #9a9a9a;
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
 // Tighten mat-form-field density for compact layout
 :host ::ng-deep .compact-field .mat-mdc-form-field-infix {
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: var(--spacing-2);
+  padding-bottom: var(--spacing-2);
 }
 
 :host ::ng-deep .compact-field .mat-mdc-text-field-wrapper {

@@ -6,28 +6,26 @@
     <div class="date-range-compact">
         <div class="date-range-controls">
             <div class="date-field">
-                <label class="date-label">From:</label>
-                <input
+                <app-form-input
                     type="date"
-                    class="formControl"
-                    [(ngModel)]="dateFrom"
-                    (change)="onDateRangeChange()"
+                    label="From:"
                     placeholder="From date"
-                />
+                    [(ngModel)]="dateFrom"
+                    (ngModelChange)="onDateRangeChange()">
+                </app-form-input>
             </div>
 
             <div class="date-field">
-                <label class="date-label">To:</label>
-                <input
+                <app-form-input
                     type="date"
-                    class="formControl"
-                    [(ngModel)]="dateTo"
-                    (change)="onDateRangeChange()"
+                    label="To:"
                     placeholder="To date"
-                />
+                    [(ngModel)]="dateTo"
+                    (ngModelChange)="onDateRangeChange()">
+                </app-form-input>
             </div>
 
-            <button mat-raised-button color="primary" (click)="applyDateRange()" class="apply-button">
+            <button class="hungr-btn hungr-btn-primary" (click)="applyDateRange()">
                 Apply
             </button>
         </div>
@@ -64,10 +62,9 @@
         ></app-stats-insight-card>
     </div>
     <div class="row">
-        <div class="block">
-            <h6 class="heading">Daily Menu Visits</h6>
+        <app-content-block title="Daily Menu Visits">
             <div echarts [options]="chartOptions" class="echart"></div>
-        </div>
+        </app-content-block>
     </div>
 </div>
 }@else {
@@ -79,28 +76,26 @@
     <div class="date-range-compact">
         <div class="date-range-controls">
             <div class="date-field">
-                <label class="date-label">From:</label>
-                <input
+                <app-form-input
                     type="date"
-                    class="formControl"
-                    [(ngModel)]="dateFrom"
-                    (change)="onDateRangeChange()"
+                    label="From:"
                     placeholder="From date"
-                />
+                    [(ngModel)]="dateFrom"
+                    (ngModelChange)="onDateRangeChange()">
+                </app-form-input>
             </div>
 
             <div class="date-field">
-                <label class="date-label">To:</label>
-                <input
+                <app-form-input
                     type="date"
-                    class="formControl"
-                    [(ngModel)]="dateTo"
-                    (change)="onDateRangeChange()"
+                    label="To:"
                     placeholder="To date"
-                />
+                    [(ngModel)]="dateTo"
+                    (ngModelChange)="onDateRangeChange()">
+                </app-form-input>
             </div>
 
-            <button mat-raised-button color="primary" (click)="applyDateRange()" class="apply-button">
+            <button class="hungr-btn hungr-btn-primary" (click)="applyDateRange()">
                 Apply
             </button>
         </div>
@@ -146,29 +141,25 @@
         ></app-stats-insight-card>
     </div>
     <div class="row" *ngIf="!isLoading">
-        <div class="block biggerBlock">
-            <h6 class="heading">Daily Menu Visits</h6>
+        <app-content-block title="Daily Menu Visits" customClass="biggerBlock">
             <div echarts [options]="chartOptions" class="echart"></div>
-        </div>
-        <div class="block">
-            <h6 class="heading">Sales Overview</h6>
+        </app-content-block>
+        <app-content-block title="Sales Overview">
             <div echarts [options]="chartOptionsCategoryPercentages" class="echart"></div>
-        </div>
+        </app-content-block>
     </div>
     <div class="row">
-        <div class="block">
-            <h6 class="heading">Most Ordered Items</h6>
+        <app-content-block title="Most Ordered Items">
             <div echarts [options]="chartOptionsMostOrderedItems" class="echart"></div>
-        </div>
-        <div class="block">
-            <h6 class="heading">Frequent Item Pairs</h6>
+        </app-content-block>
+        <app-content-block title="Frequent Item Pairs">
             <div class="pariholder">
                 <div *ngFor="let pair of frequentItemPairs" class="pair-item">
                     <span class="pair-text">{{ pair.itemA }} + {{ pair.itemB }}</span>
                     <span class="pair-count">{{ pair.count }} orders</span>
                 </div>
             </div>
-        </div>
+        </app-content-block>
     </div>
 </div>
 }

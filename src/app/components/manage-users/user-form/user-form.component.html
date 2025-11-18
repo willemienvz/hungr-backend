@@ -9,22 +9,51 @@
       <h4>Basic Information</h4>
       <div class="row">
         <div class="formGroup">
-          <label>First Name</label>
-          <input type="text" class="formControl" placeholder="John" name="name" [(ngModel)]="user.firstName" required>
+          <app-form-input
+            label="First Name"
+            type="text"
+            placeholder="John"
+            [required]="true"
+            [errorMessage]="getFieldError('firstName')"
+            name="name"
+            [(ngModel)]="user.firstName">
+          </app-form-input>
         </div>
         <div class="formGroup">
-          <label>Last Name</label>
-          <input type="text" class="formControl" placeholder="Smith" name="lastname" [(ngModel)]="user.Surname" required>
+          <app-form-input
+            label="Last Name"
+            type="text"
+            placeholder="Smith"
+            [required]="true"
+            [errorMessage]="getFieldError('Surname')"
+            name="lastname"
+            [(ngModel)]="user.Surname">
+          </app-form-input>
         </div>
       </div>
       <div class="row">
         <div class="formGroup">
-          <label>Email address</label>
-          <input type="email" class="formControl" placeholder="email@address.co.za" name="email" [(ngModel)]="user.email" [disabled]="mode==='edit'" required email>
+          <app-form-input
+            label="Email address"
+            type="email"
+            placeholder="email@address.co.za"
+            [required]="true"
+            [disabled]="mode==='edit'"
+            [errorMessage]="getFieldError('email')"
+            name="email"
+            [(ngModel)]="user.email">
+          </app-form-input>
         </div>
         <div class="formGroup">
-          <label>Phone number</label>
-          <input type="text" class="formControl" placeholder="012 345 6789" name="phone" [(ngModel)]="user.cellphoneNumber" required>
+          <app-form-input
+            label="Phone number"
+            type="tel"
+            placeholder="012 345 6789"
+            [required]="true"
+            [errorMessage]="getFieldError('cellphoneNumber')"
+            name="phone"
+            [(ngModel)]="user.cellphoneNumber">
+          </app-form-input>
         </div>
       </div>
     </div>
@@ -35,15 +64,19 @@
       <div class="role-selection">
         <div class="roleGroup">
           <div class="role-options">
-            <div *ngFor="let role of availableRoles"
+            <div *ngFor="let roleOption of availableRoles"
                  class="role-option"
-                 [class.selected]="role === role"
-                 (click)="onRoleChange(role)">
+                 [class.selected]="role === roleOption"
+                 (click)="onRoleChange(roleOption)">
               <div class="role-header">
-                <span class="role-name">{{ getRoleDisplayName(role) }}</span>
-                <input type="radio" [value]="role" [checked]="role === role" name="role" readonly>
+                <span class="role-name">{{ getRoleDisplayName(roleOption) }}</span>
+                <app-form-radio
+                  [value]="roleOption"
+                  name="role"
+                  [(ngModel)]="role">
+                </app-form-radio>
               </div>
-              <p class="role-description">{{ getRoleDescription(role) }}</p>
+              <p class="role-description">{{ getRoleDescription(roleOption) }}</p>
             </div>
           </div>
         </div>
@@ -54,11 +87,11 @@
         <h5>Custom Permissions</h5>
         <div class="permissions-grid">
           <div *ngFor="let permission of getAllPermissions()" class="permission-item">
-            <label class="permission-checkbox">
-              <input type="checkbox" [checked]="permissions[permission]" (change)="onPermissionChange($event, permission)">
-              <span class="checkmark"></span>
-              {{ getPermissionLabels()[permission] }}
-            </label>
+            <app-form-checkbox
+              [label]="getPermissionLabels()[permission]"
+              [(ngModel)]="permissions[permission]"
+              (valueChange)="onPermissionChange($event, permission)">
+            </app-form-checkbox>
           </div>
         </div>
       </div>
@@ -66,8 +99,12 @@
 
     <!-- Action Buttons -->
     <div class="formGroup btnHolder">
-      <input class="btn btnTertiary" type="button" value="Cancel" (click)="onCancel()" [disabled]="isSaving">
-      <input type="submit" class="btn btnPrimary" [disabled]="isSaving" [value]="mode==='add' ? 'Send Invitation' : 'Save Changes'">
+      <button class="hungr-btn hungr-btn-tertiary" type="button" (click)="onCancel()" [disabled]="isSaving">
+        Cancel
+      </button>
+      <button type="submit" class="hungr-btn hungr-btn-primary" [disabled]="isSaving">
+        {{ mode==='add' ? 'Send Invitation' : 'Save Changes' }}
+      </button>
     </div>
   </form>
 </div>

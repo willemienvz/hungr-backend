@@ -4,7 +4,7 @@
   .field-holder {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacing-2);
     width: 100%;
   }
 
@@ -41,10 +41,10 @@
 
   .price-input {
     width: 100%;
-    height: 38px;
-    padding: 8px 12px;
+    height: 3var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-3);
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: var(--border-radius-base);
     font-size: 14px;
     font-family: var(--hungr-font-family, 'Poppins', sans-serif);
     background-color: #fff;
@@ -53,7 +53,7 @@
 
     &:focus {
       outline: none;
-      border-color: #16d3d2;
+      border-color: var(--color-secondary);
       background-color: #f0fffe;
     }
 
@@ -75,7 +75,7 @@
 
   .error-message {
     color: #ff6b6b;
-    font-size: 12px;
+    font-size: var(--spacing-3);
     font-weight: 400;
     margin-top: 4px;
     display: flex;
@@ -92,7 +92,7 @@
 // Specific styling for smaller inputs (like in menu item forms)
 .price-input-container.compact {
   .price-input {
-    max-width: 120px;
+    max-width: 1var(--spacing-5);
     height: 36px;
     font-size: 13px;
   }
@@ -103,14 +103,13 @@
 }
 
 // Integration with existing form styles
-.formGroup .price-input-container,
-.formControl.price-input-container {
+.formGroup .price-input-container {
   .price-input {
     // Inherit existing form control styles while maintaining price-specific behavior
     background-color: inherit;
     
     &:focus {
-      border-color: #16d3d2;
+      border-color: var(--color-secondary);
       background-color: #f0fffe;
     }
   }

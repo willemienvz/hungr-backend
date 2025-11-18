@@ -7,9 +7,12 @@ import { AuthService } from "../../shared/services/auth.service";
 })
 export class ForgotPasswordComponent implements OnInit {
   showPopup: boolean = false;
+  emailError: string = '';
+
   constructor(
     public authService: AuthService
   ) { }
+
   ngOnInit() {
   }
 
@@ -19,5 +22,12 @@ export class ForgotPasswordComponent implements OnInit {
 
   closePopup() {
     this.showPopup = false;
+  }
+
+  onEmailChange(value: string): void {
+    // Clear error when user starts typing
+    if (this.emailError) {
+      this.emailError = '';
+    }
   }
 }

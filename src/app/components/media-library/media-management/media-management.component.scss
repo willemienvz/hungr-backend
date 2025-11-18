@@ -125,7 +125,7 @@
   gap: var(--spacing-md);
 
   @include responsive-mobile {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(1var(--spacing-5), 1fr));
   }
 }
 
@@ -319,7 +319,7 @@
 
   .media-image {
     width: 100%;
-    height: 120px;
+    height: 1var(--spacing-5);
     object-fit: cover;
   }
 
@@ -386,7 +386,7 @@
 
 .storage-analytics {
   .storage-bar {
-    height: 12px;
+    height: var(--spacing-3);
     background-color: var(--color-background-tertiary);
     border-radius: var(--border-radius-sm);
     overflow: hidden;

@@ -27,8 +27,11 @@
     <div class="inner">
 
         <div class="search-bar">
-            <input type="text" placeholder="Type your question or term here..." id="searchInput"
+            <app-form-input
+                type="text"
+                placeholder="Type your question or term here..."
                 *ngIf="isSearchBarExpanded">
+            </app-form-input>
             <div class="icon yellowIcon" (click)="toggleSearchBar()"><i class="material-icons">search</i></div>
         </div>
 

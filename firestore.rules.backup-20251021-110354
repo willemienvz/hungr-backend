@@ -1,0 +1,140 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===== HELPER FUNCTIONS =====
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // ===== COLLECTIONS =====
+
+    // Reviews - guests can create and view, authenticated users can manage all
+    match /reviews/{reviewId} {
+      allow read: if true; // Anyone can read reviews
+      allow create: if true; // Guests can create reviews
+      allow update, delete: if isAuthenticated(); // Authenticated users can modify
+    }
+    
+    // Review stats - public read, authenticated users can manage
+    match /reviewStats/{menuItemId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Media library - users can only access their own media
+    match /media/{mediaId} {
+      // Helper function to get the owner ID (supports both userId and uploadedBy for backward compatibility)
+      function getMediaOwnerId() {
+        return resource.data.ownerId != null ? resource.data.ownerId :
+               (resource.data.userId != null ? resource.data.userId : resource.data.uploadedBy);
+      }
+      
+      // Allow read for authenticated users (needed for queries with orderBy)
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+        (request.resource.data.ownerId == request.auth.uid ||
+         request.resource.data.userId == request.auth.uid ||
+         request.resource.data.uploadedBy == request.auth.uid);
+      allow update, delete: if isAuthenticated() &&
+        (getMediaOwnerId() == request.auth.uid);
+    }
+    
+    // Media usage tracking - users can only access their own media usage
+    match /media_usage/{usageId} {
+      // Helper function to get the owner ID (supports both userId and uploadedBy for backward compatibility)
+      function getUsageOwnerId() {
+        return resource.data.userId != null ? resource.data.userId : resource.data.uploadedBy;
+      }
+      
+      // Temporary permissive rules for testing - allow all authenticated users to read
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+        (getUsageOwnerId() == request.auth.uid);
+    }
+
+    // Restaurants - public read, authenticated users can manage all
+    match /restaurants/{restaurantId} {
+      allow read: if true; // Public read
+      allow create: if isAuthenticated(); // Authenticated users can create
+      allow update, delete: if isAuthenticated(); // Authenticated users can manage all
+    }
+
+    // About pages - public read, authenticated users can manage all
+    match /aboutPages/{restaurantId} {
+      allow read: if true; // Public read
+      allow create: if isAuthenticated(); // Authenticated users can create
+      allow update, delete: if isAuthenticated(); // Authenticated users can manage all
+    }
+
+    // Specials - public read, authenticated users can manage all
+    match /specials/{specialId} {
+      allow read: if true; // Public read
+      allow create: if isAuthenticated(); // Authenticated users can create
+      allow update, delete: if isAuthenticated(); // Authenticated users can manage all
+    }
+
+    // Branding - public read, authenticated users can manage all
+    match /branding/{brandingId} {
+      allow read: if true; // Public read
+      allow create: if isAuthenticated(); // Authenticated users can create
+      allow update, delete: if isAuthenticated(); // Authenticated users can manage all
+    }
+
+    // Branding preview - public read, authenticated users can manage all
+    match /branding-preview/{previewId} {
+      allow read: if true; // Public read
+      allow create: if isAuthenticated(); // Authenticated users can create
+      allow update, delete: if isAuthenticated(); // Authenticated users can manage all
+    }
+
+    // Menus - public read, authenticated users can manage all
+    match /menus/{menuId} {
+      allow read: if true; // Public read
+      allow create: if isAuthenticated(); // Authenticated users can create
+      allow update, delete: if isAuthenticated(); // Authenticated users can manage all
+    }
+
+    // Orders - public read, authenticated users can manage
+    match /orders/{orderId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Users - users can read their own, authenticated users can manage all
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == uid; // Users can create their own profile
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated(); // Authenticated users can delete users
+    }
+
+    // Invitations - authenticated users can manage all
+    match /invitations/{invitationToken} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Notifications - authenticated users can manage all
+    match /notification/{notifId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
+    }
+
+    // Analytics - public create for events, authenticated users can manage aggregated data
+    match /analytics-events/{eventId} {
+      allow create: if true; // Public create for analytics
+      allow read, update, delete: if isAuthenticated();
+    }
+
+    match /analytics-aggregated/{dateKey} {
+      allow read: if true;
+      match /{subcollection}/{docId} {
+        allow read: if true;
+        allow write: if isAuthenticated();
+      }
+    }
+  }
+}

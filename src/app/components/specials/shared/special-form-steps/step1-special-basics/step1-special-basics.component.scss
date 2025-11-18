@@ -1,6 +1,6 @@
 .step1-container {
   .headerBlock {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-5);
   }
 
   .block {
@@ -23,7 +23,7 @@
       flex-direction: column;
 
       .formGroup {
-        margin-bottom: 20px;
+        margin-bottom: var(--spacing-5);
         gap: 8px;
       }
     }
@@ -40,7 +40,7 @@
 }
 
 .label {
-  color: #9a9a9a;
+  color: var(--color-text-muted);
   font-weight: 400;
   font-size: 15px;
   line-height: 20.25px;
@@ -73,9 +73,9 @@
     width: 100%;
     border: 1px solid var(--hungr-dark-grey);
     height: 38px;
-    border-radius: 5px;
-    padding: 5px 12px;
+    border-radius: var(--border-radius-md);
+    padding: 5px var(--spacing-3);
     line-height: 38px;
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-family-primary);
   }
 }

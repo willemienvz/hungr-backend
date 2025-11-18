@@ -13,6 +13,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Observable, from, of, throwError, BehaviorSubject } from 'rxjs';
 import { map, switchMap, catchError, tap, finalize } from 'rxjs/operators';
 import { Timestamp } from 'firebase/firestore';
+import { AuthService } from './auth.service';
 
 import {
   MediaItem,
@@ -58,6 +59,7 @@ export class MediaLibraryService {
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private auth: AngularFireAuth,
+    private authService: AuthService,
     private ngZone: NgZone
   ) {
     this.mediaCollection = this.firestore.collection<MediaDocument>(this.MEDIA_COLLECTION);
@@ -141,6 +143,7 @@ export class MediaLibraryService {
       // Create media item
       const mediaItem: MediaItem = {
         id: this.firestore.createId(),
+        userId: user.uid, // CRITICAL: Set user ID for security filtering
         fileName,
         originalName: request.file.name,
         fileSize: request.file.size,
@@ -159,6 +162,7 @@ export class MediaLibraryService {
       // Save to Firestore
       const mediaDoc: any = {
         id: mediaItem.id,
+        userId: mediaItem.userId, // CRITICAL: Include user ID for security filtering
         fileName: mediaItem.fileName,
         originalName: mediaItem.originalName,
         fileSize: mediaItem.fileSize,
@@ -247,39 +251,99 @@ export class MediaLibraryService {
    */
   async getAllMedia(filters?: MediaFilters): Promise<MediaItem[]> {
     try {
-      let query = this.mediaCollection.ref;
+      // Get current user first - CRITICAL SECURITY FIX
+      let user;
+      try {
+        user = await this.getCurrentUser();
+      } catch (error) {
+        console.error('Authentication error:', error);
+        throw new Error('You must be logged in to access the media library. Please sign in and try again.');
+      }
+      
+      if (!user) {
+        throw new Error('You must be logged in to access the media library. Please sign in and try again.');
+      }
 
-      // Apply filters
+      // CRITICAL: Filter by current user ID to prevent cross-user data access
+      // Handle both userId (new format) and uploadedBy (legacy format) for backward compatibility
+      
+      console.log('Querying media for user:', user.uid);
+      
+      // Query 1: Get media with userId field (new format)
+      let query1 = this.mediaCollection.ref.where('userId', '==', user.uid) as any;
+      
+      // Query 2: Get media with uploadedBy field (legacy format) where userId doesn't exist
+      let query2 = this.mediaCollection.ref.where('uploadedBy', '==', user.uid) as any;
+
+      // Apply filters to both queries
       if (filters?.category) {
-        query = query.where('category', '==', filters.category) as any;
+        query1 = query1.where('category', '==', filters.category) as any;
+        query2 = query2.where('category', '==', filters.category) as any;
       }
 
       if (filters?.isPublic !== undefined) {
-        query = query.where('isPublic', '==', filters.isPublic) as any;
+        query1 = query1.where('isPublic', '==', filters.isPublic) as any;
+        query2 = query2.where('isPublic', '==', filters.isPublic) as any;
       }
 
       if (filters?.mimeType) {
-        query = query.where('mimeType', '==', filters.mimeType) as any;
+        query1 = query1.where('mimeType', '==', filters.mimeType) as any;
+        query2 = query2.where('mimeType', '==', filters.mimeType) as any;
       }
 
       if (filters?.dateRange) {
-        query = query.where('uploadedAt', '>=', Timestamp.fromDate(filters.dateRange.start))
-                     .where('uploadedAt', '<=', Timestamp.fromDate(filters.dateRange.end)) as any;
+        // Convert dates to Firestore Timestamps for querying
+        const startTimestamp = Timestamp.fromDate(filters.dateRange.start);
+        const endTimestamp = Timestamp.fromDate(filters.dateRange.end);
+        query1 = query1.where('uploadedAt', '>=', startTimestamp)
+                       .where('uploadedAt', '<=', endTimestamp) as any;
+        query2 = query2.where('uploadedAt', '>=', startTimestamp)
+                       .where('uploadedAt', '<=', endTimestamp) as any;
       }
 
       // Apply pagination
       if (filters?.pagination) {
         const { page, limit } = filters.pagination;
-        query = query.limit(limit) as any;
-        // Note: offset is not available in older Firebase versions, using startAfter instead
+        query1 = query1.limit(limit) as any;
+        query2 = query2.limit(limit) as any;
       }
 
-      const snapshot = await query.get();
+      // Execute both queries with error handling
+      let snapshot1, snapshot2;
+      try {
+        console.log('Executing media queries...');
+        [snapshot1, snapshot2] = await Promise.all([
+          query1.get(),
+          query2.get()
+        ]);
+        console.log('Query 1 results:', snapshot1.size, 'Query 2 results:', snapshot2.size);
+      } catch (queryError) {
+        console.error('Query execution error:', queryError);
+        throw new Error('Failed to query media items: ' + queryError.message);
+      }
+      
       const mediaItems: MediaItem[] = [];
+      const processedIds = new Set<string>(); // Prevent duplicates
 
-      snapshot.forEach(doc => {
+      // Process results from both queries
+      snapshot1.forEach(doc => {
         const data = doc.data() as MediaDocument;
-        mediaItems.push(this.convertDocumentToMediaItem(data));
+        if (!processedIds.has(doc.id)) {
+          mediaItems.push(this.convertDocumentToMediaItem(data));
+          processedIds.add(doc.id);
+        }
+      });
+
+      snapshot2.forEach(doc => {
+        const data = doc.data() as MediaDocument;
+        if (!processedIds.has(doc.id)) {
+          // Ensure legacy items have userId field for consistency
+          if (!data.userId) {
+            data.userId = data.uploadedBy;
+          }
+          mediaItems.push(this.convertDocumentToMediaItem(data));
+          processedIds.add(doc.id);
+        }
       });
 
       // Apply additional filters that can't be done in Firestore
@@ -675,7 +739,19 @@ export class MediaLibraryService {
   // Private helper methods
 
   private async getCurrentUser(): Promise<any> {
-    return this.auth.currentUser;
+    // Use the AuthService's getCurrentUserId method for consistent authentication handling
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      throw new Error('No authenticated user found');
+    }
+    
+    // Get the full user object from Firebase Auth
+    const currentUser = await this.auth.currentUser;
+    if (!currentUser) {
+      throw new Error('No authenticated user found');
+    }
+    
+    return currentUser;
   }
 
   private updateUploadProgress(progress: UploadProgress): void {

@@ -1,29 +1,29 @@
 <div class="step-navigation">
   <div class="step-buttons">
     <div class="left-buttons">
-      <button *ngIf="showCancel" class="btnGray" [routerLink]="cancelRoute" [class.disabled]="isDisabled">
+      <button *ngIf="showCancel" class="hungr-btn hungr-btn-secondary" [routerLink]="cancelRoute" [class.disabled]="isDisabled">
         Cancel
       </button>
-      <button *ngIf="showDraft" class="btnGray" (click)="onDraft()" [disabled]="isDisabled">
+      <button *ngIf="showDraft" class="hungr-btn hungr-btn-secondary" (click)="onDraft()" [disabled]="isDisabled">
         SAVE AS DRAFT
       </button>
-      <button *ngIf="showPublish" class="btnPrimary" (click)="onPublish()" [disabled]="isDisabled">
+      <button *ngIf="showPublish" class="hungr-btn hungr-btn-primary" (click)="onPublish()" [disabled]="isDisabled">
         PUBLISH MENU
       </button>
-      <button *ngIf="showSubmit" class="btnPrimary" (click)="onSubmit()" [disabled]="isDisabled">
+      <button *ngIf="showSubmit" class="hungr-btn hungr-btn-primary" (click)="onSubmit()" [disabled]="isDisabled">
         {{ submitText }}
       </button>
-      <button *ngIf="showPrevious" class="btnPrimary" (click)="onPrevious()" [disabled]="isDisabled">
+      <button *ngIf="showPrevious" class="hungr-btn hungr-btn-primary" (click)="onPrevious()" [disabled]="isDisabled">
         Previous
       </button>
-      <button *ngIf="showNext" class="btnPrimary" (click)="onNext()" [disabled]="nextDisabled || isDisabled">
+      <button *ngIf="showNext" class="hungr-btn hungr-btn-primary" (click)="onNext()" [disabled]="nextDisabled || isDisabled">
         {{ nextText }}
       </button>
       <!-- Debug info -->
       <div style="display: none;">showNext: {{ showNext }}</div>
-      <a *ngIf="showDone" class="btnPrimary" [routerLink]="cancelRoute" [class.disabled]="isDisabled">
+      <button *ngIf="showDone" class="hungr-btn hungr-btn-primary" [routerLink]="cancelRoute" [class.disabled]="isDisabled">
         Done
-      </a>
+      </button>
     </div>
     <div class="right-buttons">
      

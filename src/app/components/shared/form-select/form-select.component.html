@@ -1,11 +1,11 @@
-<div class="form-select-wrapper" [class]="customClass">
+<div class="form-select-wrapper" [class]="customClass" [class.error-state]="showError && errorMessage">
   <!-- Label -->
   <label *ngIf="label" class="form-label" [class.required]="required">
     {{ label }}
   </label>
 
   <!-- Select container -->
-  <mat-form-field [appearance]="appearance" class="select-field">
+  <mat-form-field [appearance]="appearance" class="select-field" [class.error]="showError && errorMessage">
     <mat-select
       [class]="selectClass"
       [placeholder]="placeholder"

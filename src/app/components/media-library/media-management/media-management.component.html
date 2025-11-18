@@ -14,7 +14,7 @@
   <div *ngIf="error" class="error-container">
     <mat-icon>error</mat-icon>
     <p>{{ error }}</p>
-    <button mat-raised-button color="primary" (click)="loadAnalytics()">
+    <button class="hungr-btn hungr-btn-primary" (click)="loadAnalytics()">
       Retry
     </button>
   </div>
@@ -139,10 +139,10 @@
               </div>
               
               <div class="selection-actions">
-                <button mat-button (click)="onSelectAll()">
+                <button class="hungr-btn hungr-btn-secondary" (click)="onSelectAll()">
                   Select All
                 </button>
-                <button mat-button (click)="onClearSelection()">
+                <button class="hungr-btn hungr-btn-secondary" (click)="onClearSelection()">
                   Clear Selection
                 </button>
               </div>
@@ -150,14 +150,14 @@
 
             <!-- Bulk Operation Buttons -->
             <div class="bulk-actions">
-              <button mat-raised-button color="warn" 
+              <button class="hungr-btn hungr-btn-danger" 
                       [disabled]="selectedMedia.length === 0 || bulkOperationInProgress"
                       (click)="onBulkDelete()">
                 <mat-icon>delete</mat-icon>
                 Delete Selected
               </button>
 
-              <button mat-raised-button color="primary" 
+              <button class="hungr-btn hungr-btn-primary" 
                       [disabled]="selectedMedia.length === 0 || bulkOperationInProgress"
                       (click)="onBulkCategorize()">
                 <mat-icon>category</mat-icon>
@@ -199,7 +199,7 @@
             <div class="tool-section">
               <h3>Storage Optimization</h3>
               <p>Optimize your storage by compressing large files and generating better thumbnails.</p>
-              <button mat-raised-button color="primary" 
+              <button class="hungr-btn hungr-btn-primary" 
                       [disabled]="loading"
                       (click)="onOptimizeStorage()">
                 <mat-icon>storage</mat-icon>
@@ -210,7 +210,7 @@
             <div class="tool-section">
               <h3>Orphaned Files Cleanup</h3>
               <p>Remove files that exist in storage but are not referenced in the database.</p>
-              <button mat-raised-button color="warn" 
+              <button class="hungr-btn hungr-btn-danger" 
                       [disabled]="loading"
                       (click)="onCleanupOrphanedFiles()">
                 <mat-icon>cleaning_services</mat-icon>

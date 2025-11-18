@@ -169,4 +169,32 @@ export class ViewUsersComponent {
     const target = event.target as HTMLInputElement;
     this.updateCustomPermission(permission, target.checked);
   }
+
+  getFieldError(fieldName: string): string {
+    const field = this.user[fieldName as keyof User];
+    if (!field) {
+      return `${this.getFieldLabel(fieldName)} is required.`;
+    }
+    
+    if (fieldName === 'email' && field && !this.isValidEmail(field as string)) {
+      return 'Enter a valid email address.';
+    }
+    
+    return '';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      'firstName': 'Name',
+      'Surname': 'Surname',
+      'email': 'Email address',
+      'cellphoneNumber': 'Phone number'
+    };
+    return labels[fieldName] || fieldName;
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
 }

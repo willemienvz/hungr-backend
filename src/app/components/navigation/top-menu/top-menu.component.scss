@@ -100,7 +100,7 @@
 .search-bar input{
     border: 1px solid #DEDEDE;
     border-radius: 60px;
-    padding: 12px 25px;
+    padding: var(--spacing-3) 25px;
     width: 350px;
     position: absolute;
     right: 0;
@@ -190,10 +190,10 @@ border-radius: 50%;
 // Mobile Responsive Styles
 @media (max-width: 768px) {
     .navbar {
-        padding: 12px 20px; // Reduce padding on mobile
+        padding: var(--spacing-3) var(--spacing-5); // Reduce padding on mobile
         
         .inner:first-of-type {
-            gap: 20px; // Reduce gap on mobile
+            gap: var(--spacing-5); // Reduce gap on mobile
         }
         
         .breadcrumb-container {

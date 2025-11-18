@@ -2,14 +2,13 @@
     <app-loading [isLoading]="isLoading"></app-loading>
     <div class="row">
         <div class="col-large">
-            <div class="block">
-                <h6 class="heading">Menu Views by Hour</h6>
+            <app-content-block title="Menu Views by Hour">
                 <mat-tab-group (selectedIndexChange)="onTabChange($event)" class="marginTop">
                     <mat-tab *ngFor="let day of daysOfWeek; index as i" [label]="day"></mat-tab>
                 </mat-tab-group>
 
                 <div echarts [options]="options" class="chart marginTop" *ngIf="!isLoading"></div>
-            </div>
+            </app-content-block>
         </div>
         <div class="col-small">
             <app-stats-insight-card

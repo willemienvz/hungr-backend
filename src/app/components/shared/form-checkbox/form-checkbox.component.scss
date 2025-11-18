@@ -1,0 +1,126 @@
+.checkbox-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  cursor: pointer;
+  
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    font-family: var(--font-family-primary);
+    font-size: 14px;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+    position: relative;
+    gap:.5rem;
+    
+    .checkbox-input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 18px;
+      width: 18px;
+      margin: 0;
+      top: 2px;
+      left: 0;
+      z-index: 1;
+      
+      &:checked ~ .checkbox-custom {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+        
+        &:after {
+          display: block;
+        }
+      }
+      
+      &:focus ~ .checkbox-custom {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+      
+      &:disabled {
+        cursor: not-allowed;
+        
+        ~ .checkbox-custom {
+          background-color: var(--color-disabled);
+          border-color: var(--color-disabled);
+          opacity: 0.6;
+        }
+        
+        ~ .checkbox-text {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+    
+    .checkbox-custom {
+      position: relative;
+      height: 18px;
+      width: 18px;
+      min-height: 18px;
+      min-width: 18px;
+      background-color: transparent;
+      border: 2px solid var(--color-border, #ccc);
+      border-radius: 3px;
+      margin-right: 8px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.2s ease;
+      display: block;
+      
+      &:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 4px;
+        top: 0;
+        width: 4px;
+        height: 9px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+    }
+    
+    .checkbox-text {
+      flex: 1;
+      
+      .required-indicator {
+        color: var(--color-error);
+        margin-left: 4px;
+      }
+    }
+  }
+  
+  .error-message {
+    color: var(--color-error);
+    font-size: 12px;
+    margin-top: 4px;
+    margin-left: 26px;
+  }
+  
+  &.error {
+    .checkbox-label .checkbox-custom {
+      border-color: var(--color-error);
+    }
+  }
+  
+  &.focused {
+    .checkbox-label .checkbox-custom {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+  }
+  
+  &.disabled {
+    cursor: not-allowed;
+
+    .checkbox-label {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}

@@ -23,21 +23,43 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
 
-    // Media library - authenticated users can manage all
+    // Media library - users can only access their own media
     match /media/{mediaId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if isAuthenticated();
+      // Helper function to get the owner ID (supports both userId and uploadedBy for backward compatibility)
+      function getMediaOwnerId() {
+        return resource.data.ownerId != null ? resource.data.ownerId :
+               (resource.data.userId != null ? resource.data.userId : resource.data.uploadedBy);
+      }
+      
+      // SECURITY FIX (Oct 21, 2025): Restrict read access to document owner only
+      // Users can only read media documents they own (checks userId, ownerId, or uploadedBy)
+      allow read: if isAuthenticated() && 
+        (resource.data.userId == request.auth.uid ||
+         resource.data.ownerId == request.auth.uid ||
+         resource.data.uploadedBy == request.auth.uid);
+         
+      // Allow create if userId/ownerId/uploadedBy matches current user
+      allow create: if isAuthenticated() &&
+        (request.resource.data.ownerId == request.auth.uid ||
+         request.resource.data.userId == request.auth.uid ||
+         request.resource.data.uploadedBy == request.auth.uid);
+         
+      // Allow update/delete if user owns the document (check existing owner fields)
+      allow update, delete: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid ||
+         resource.data.ownerId == request.auth.uid ||
+         resource.data.uploadedBy == request.auth.uid);
     }
     
-    // Media usage tracking - authenticated users can manage all
+    // Media usage tracking - users can access their own media usage
     match /media_usage/{usageId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      // Permissive rules for usage tracking (not sensitive data)
+      // Allow all authenticated users to manage usage records
+      allow read, write: if isAuthenticated();
     }
 
-    // Restuarants (actual collection name) - public read, authenticated users can manage all
-    match /restuarants/{restaurantId} {
+    // Restaurants - public read, authenticated users can manage all
+    match /restaurants/{restaurantId} {
       allow read: if true; // Public read
       allow create: if isAuthenticated(); // Authenticated users can create
       allow update, delete: if isAuthenticated(); // Authenticated users can manage all

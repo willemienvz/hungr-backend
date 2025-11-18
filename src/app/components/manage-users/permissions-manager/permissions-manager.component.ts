@@ -74,6 +74,10 @@ export class PermissionsManagerComponent {
         }
     }
 
+    onPermissionChange(permission: string, value: boolean) {
+        this.updatePermission(permission as keyof UserPermissions, value);
+    }
+
     savePermissions() {
         this.isSaving = true;
 
@@ -128,10 +132,6 @@ export class PermissionsManagerComponent {
     /**
      * Handle checkbox change event for permissions
      */
-    onPermissionChange(event: Event, permission: keyof UserPermissions | string) {
-        const target = event.target as HTMLInputElement;
-        this.updatePermission(permission as keyof UserPermissions, target.checked);
-    }
 
     /**
      * Get permission value for role preview (for template use)

@@ -208,7 +208,7 @@ export class AddComponent implements OnInit {
       zip: this.restaurant.zip || '',
     };
 
-    const restaurantCollection = this.firestore.collection('restuarants');
+    const restaurantCollection = this.firestore.collection('restaurants');
 
     const handleSuccess = () => {
       this.toastr.success('Your new restaurant has been successfully created.');
@@ -273,12 +273,12 @@ export class AddComponent implements OnInit {
       };
 
       this.firestore
-        .collection('restuarants')
+        .collection('restaurants')
         .add(this.newRestaurant)
         .then((data) => {
           this.newRestaurant.restaurantID = data.id;
           return this.firestore
-            .collection('restuarants')
+            .collection('restaurants')
             .doc(data.id)
             .update(this.newRestaurant);
         })

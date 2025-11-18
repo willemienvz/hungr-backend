@@ -1,11 +1,16 @@
-<div class="form-container">
-  <img class="logo" src="../../../../assets/images/shared/logo.png" alt="" />
-  <div class="form-container-inner">
-    <h1>Sign Up</h1>
-    <h6>Choose Your Plan</h6>
-    <a class="backLink" (click)="onPrevious()"
+<div class="auth-layout">
+  <app-logo containerClass="auth-logo"></app-logo>
+  <div class="auth-layout-inner">
+    <div class="auth-header-line">
+      <a class="backLink" (click)="onPrevious()"
       ><span class="material-symbols-outlined"> arrow_back </span>Back</a
     >
+      <div class='centered-header'>
+        <h1>Sign Up</h1>
+        <h6 class="hideForMobile--no-space">Select your Option</h6>
+      </div>
+   
+  </div>
     <form [formGroup]="step2Form">
       <div class="pricing-cards">
         <!-- Digital Menu Card -->
@@ -26,7 +31,7 @@
               Charged as a set monthly cost.
             </div>
             
-            <div class="signup-btn">SIGN UP</div>
+            <div class="sign-up-strip">SIGN UP</div>
             
             <div class="features-list">
               <div class="feature-item">
@@ -51,7 +56,7 @@
 
         <!-- Order & Pay Card -->
         <div
-          class="pricing-card order-pay coming-soon unselectable"
+          class="pricing-card order-pay coming-soon unselectable hideForMobile--no-space"
         >
           <div class="card-header">
             <h2 class="plan-title red">ORDER & PAY</h2>
@@ -67,7 +72,7 @@
               Charged per transaction processed through the Hungr platform.
             </div>
             
-            <div class="coming-soon-badge">COMING SOON</div>
+            <div class="coming-soon-text">COMING SOON</div>
             
             <div class="features-list">
               <div class="feature-item">
@@ -93,35 +98,38 @@
 
       <div class="all-checkboxes">
         <div class="checkbox-container">
-          <label>
-            <input type="checkbox" formControlName="agreeToTerms" required />
-            By signing up you agree to our Terms & Conditions & Privacy Policy
-          </label>
+          <app-form-checkbox
+            formControlName="agreeToTerms"
+            label="By signing up you agree to our Terms & Conditions & Privacy Policy"
+            name="agreeToTerms"
+            [required]="true">
+          </app-form-checkbox>
         </div>
 
         <div class="checkbox-container">
-          <label>
-            <input type="checkbox" formControlName="receiveMarketingInfo" />
-            I'd like to receive awesome specials and marketing information
-          </label>
+          <app-form-checkbox
+            formControlName="receiveMarketingInfo"
+            label="I'd like to receive awesome specials and marketing information"
+            name="receiveMarketingInfo">
+          </app-form-checkbox>
         </div>
       </div>
 
       <div class="btn-holder">
         <button
           (click)="onComplete()"
-          class="btnPrimary"
+          class="hungr-btn hungr-btn-primary"
           [disabled]="step2Form.invalid"
         >
           Next
         </button>
       </div>
 
-      <div class="redirectToLogin">
-        <span class="redirect mainLink" routerLink="/sign-in">
-          Already have an account? Log In</span
-        >
-      </div>
+      <div class="auth-redirect">
+        <a class="auth-redirect-link" routerLink="/sign-in">
+            Already have an account? Log In
+        </a>
+    </div>
     </form>
   </div>
 </div>

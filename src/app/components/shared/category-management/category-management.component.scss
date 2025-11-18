@@ -18,9 +18,7 @@
     max-width: 50%;
     min-width: 500px;
 
-    .btnSecondary {
-      min-width: 180px;
-    }
+    // Custom button styling removed to allow global styles to apply
 
    
   }
@@ -41,14 +39,14 @@
     grid-template-columns: repeat(2, 1fr);
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 20px;
+    gap: var(--spacing-5);
+    margin-top: var(--spacing-5);
   }
 
   .category {
     background-color: #fff;
     padding: 25px 25px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     position: relative;
     flex: .5;
 
@@ -56,7 +54,7 @@
     app-svg-icon.dltIcon {
       position: absolute;
       right:22px;
-      top:18px;
+      top:1var(--spacing-2);
       width: 14px;
       
     }
@@ -70,7 +68,7 @@
       
       .addBox, .menuSub {
         cursor: pointer;
-        color: #16d3d2;
+        color: var(--color-secondary);
       }
     }
     
@@ -85,7 +83,7 @@
     top: 100%;
     background-color: #f8f9fb;
     border: 1px solid #dedede;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     padding: 13px;
     z-index: 50;
     
@@ -98,7 +96,7 @@
       cursor: pointer;
       
       &:hover {
-        color: #16d3d2;
+        color: var(--color-secondary);
       }
     }
   }

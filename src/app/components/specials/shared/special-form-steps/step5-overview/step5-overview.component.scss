@@ -7,31 +7,31 @@
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px;
+  padding: var(--spacing-5);
 }
 
 .summary-title {
   font-size: 24px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-5);
   text-align: center;
 }
 
 .summary-card {
   background: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-5);
+  margin-bottom: var(--spacing-5);
 }
 
 .summary-info {
   margin: 10px 0;
-  font-size: 16px;
+  font-size: var(--spacing-4);
   color: #333;
 }
 
 .promo-section {
-  margin-top: 20px;
+  margin-top: var(--spacing-5);
 }
 
 .promo-section p {

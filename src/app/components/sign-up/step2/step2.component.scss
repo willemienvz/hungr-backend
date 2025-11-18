@@ -1,237 +1,10 @@
-.form-container {
-  width: 100%;
-  display: flex;
-  position: relative;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  min-height: 100vh;
+/* Import responsive mixins */
+@import "../../../../styles/_responsive";
 
-  .form-container-inner {
-    position: relative;
-  }
+/* Sign-up step2 component specific styles only */
+/* All layout styles are now handled by the centralized auth-layout system */
 
-  .logo {
-    position: absolute;
-    top: 17px;
-    left: 46px;
-    width: 150px;
-  }
-
-  &-inner {
-    width: 100%;
-    max-width: 840px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-  }
-
-  h1 {
-    color: #2e3646;
-  }
-
-  form {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-
-
-    .row {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 56px;
-
-      .col {
-        width: calc(50% - 28px);
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-
-        h6 {
-          color: #2e3646;
-          text-align: left;
-          margin-bottom: 18px;
-        }
-
-        .formGroup {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-          align-items: flex-start;
-          margin-bottom: 25px;
-
-          label {
-            color: #9a9a9a;
-            margin-bottom: 12px;
-          }
-        }
-
-        .authBlock {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-
-          .infobox {
-            width: 100%;
-            border-radius: 5px;
-            background: #f8f9fb;
-            padding: 13px 36px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-
-            .font-small-medium {
-              text-align: left;
-              color: #5f6d7e;
-            }
-
-            .inner-row {
-              width: 100%;
-              display: flex;
-              flex-wrap: wrap;
-              flex-direction: row;
-
-              p {
-                width: 50%;
-                font-family: "Poppins", sans-serif;
-                font-size: 9px;
-                font-weight: 500;
-                line-height: 14px;
-                letter-spacing: -0.001em;
-                text-align: left;
-              }
-
-              .vaild {
-                color: #16d3d2;
-              }
-            }
-          }
-        }
-
-        .inner-row-form-group {
-          width: 100%;
-          display: flex;
-          flex-direction: row;
-          gap: 23px;
-
-          .formGroup {
-            width: calc(50% - 12px);
-          }
-        }
-      }
-    }
-  }
-}
-
-.password-toggle {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-
-  .material-icons {
-    position: absolute;
-    top: 11px;
-    right: 13px;
-    font-size: 19px;
-    cursor: pointer;
-    color: #ebedee;
-  }
-}
-
-.icon-first {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-
-  .material-icons {
-    position: absolute;
-    top: 11px;
-    left: 13px;
-    font-size: 19px;
-    color: #000000;
-  }
-
-  input {
-    padding-left: 40px;
-  }
-}
-
-.tab-container {
-  display: flex;
-  background-color: #f3f4f5;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 8px;
-  border-radius: 5px;
-  gap: 15px;
-}
-
-.tab {
-  cursor: pointer;
-  padding: 8px 16px;
-  border-radius: 3px;
-  font-family: "Poppins";
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 20px;
-  letter-spacing: -0.001em;
-  text-align: center;
-  color: #2e3646;
-}
-
-.tab.active {
-  background-color: #2e3646;
-  color: #fff;
-}
-
-.all-checkboxes {
-  display: flex;
-  justify-content: flex-start;
-  align-self: center;
-  flex-direction: column;
-  width: 100%;
-  gap: 12px;
-}
-
-.checkbox-container {
-  display: flex;
-  justify-content: flex-start;
-  align-self: center;
-  flex-direction: row;
-  width: 100%;
-
-  label {
-    display: flex;
-    justify-content: flex-start;
-    align-self: center;
-    flex-direction: row;
-    gap: 9px;
-
-    font-size: 11px;
-    font-weight: 400;
-    line-height: 16.5px;
-    letter-spacing: -0.02em;
-  }
-}
-
+/* Pricing Cards - Component specific */
 .pricing-cards {
   width: 100%;
   display: flex;
@@ -239,11 +12,20 @@
   justify-content: center;
   align-items: stretch;
   gap: 30px;
-  margin: 30px 0;
+  margin-top: 30px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+
+  // Mobile responsive: switch to flex layout
+  @include respond-to-max('sm') {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  } 
 
   .pricing-card {
     flex: 1;
-    max-width: 600px;
+   
     border-radius: 15px;
     padding: 30px 25px;
     cursor: pointer;
@@ -259,7 +41,7 @@
 
     &.always-selected {
       cursor: default;
-      border-color: #2e3646;
+      border-color: var(--color-secondary);
       box-shadow: 0 4px 15px rgba(46, 54, 70, 0.1);
     }
 
@@ -272,8 +54,8 @@
       margin-bottom: 25px;
 
       .plan-title {
-        font-family: "Poppins", sans-serif;
-        font-size: 20px;
+        font-family: var(--font-family-primary);
+        font-size: var(--spacing-5);
         font-weight: 700;
         letter-spacing: 1px;
         margin: 0;
@@ -302,59 +84,54 @@
         gap:var(--spacing-2);
 
         .price {
-          font-family: "Poppins", sans-serif;
-          font-size: 48px;
+          font-family: var(--font-family-primary);
+          font-size: 3rem;
           font-weight: 800;
           line-height: 1;
-         
           color: #2e3646;
         }
 
         .billing-period {
-          font-family: "Poppins", sans-serif;
+          font-family: var(--font-family-primary);
           font-size: 14px;
           font-weight: 400;
-          color: #666;
+          color:var(--color-dark);
           margin-bottom:4px;
         }
       }
 
       .price-description {
-        font-family: "Poppins", sans-serif;
+        font-family: var(--font-family-primary);
         font-size: 14px;
         font-weight: 400;
-        color: #666;
-        margin-bottom: 25px;
+        color: var(--color-dark);
+        height:4rem;
         line-height: 1.4;
-        min-height:3rem;
       }
 
       .signup-btn {
         background-color: #00d4d4;
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: var(--spacing-2);
         padding: 5px 30px;
-        font-family: "Poppins", sans-serif;
-        font-size: 16px;
+        font-family: var(--font-family-primary);
+        font-size: var(--spacing-4);
         font-weight: 600;
         letter-spacing: 0.5px;
- 
         margin-bottom: 30px;
         transition: all 0.3s ease;
         align-self: flex-start;
         width:100%;
         text-align:center;
-      
       }
 
       .coming-soon-badge {
         color: #ff1744;
-     
-        border-radius: 8px;
+        border-radius: var(--spacing-2);
         padding: 5px 0;
-        font-family: "Poppins", sans-serif;
-        font-size: 16px;
+        font-family: var(--font-family-primary);
+        font-size: var(--spacing-4);
         font-weight: 700;
         letter-spacing: 0.5px;
         margin-bottom: 30px;
@@ -367,13 +144,13 @@
 
         .feature-item {
           display: flex;
-          align-items: flex-start;
-          margin-bottom: 15px;
-          gap: 12px;
+          align-items:center;
+          margin-bottom: var(--spacing-6);
+          gap: var(--spacing-5);
 
           .check-icon {
-            width: 34px;
-            height: 34px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -382,13 +159,13 @@
             margin-top: 2px;
             
             svg {
-              width: 18px;
+              width: 1var(--spacing-2);
               height: 14px;
             }
           }
 
           .feature-text {
-            font-family: "Poppins", sans-serif;
+            font-family: var(--font-family-primary);
             font-size: 14px;
             font-weight: 400;
             line-height: 1.4;
@@ -408,6 +185,18 @@
         background-color: #00d4d4;
         color: white;
       }
+
+      .sign-up-strip {
+        width:100%;
+        background:var(--color-secondary);
+        color:#fff;
+        text-align:center;
+        font-weight:500;
+        padding: 6px;
+        border-radius: 5px;
+        font-weight:bold;
+        margin-bottom: 2em;
+      }
     }
 
     &.order-pay {
@@ -425,6 +214,17 @@
       .price {
         color: #2e3646;
       }
+
+      .coming-soon-text {
+        width:100%;
+        color:var(--color-primary);
+        font-size: 24px;
+        font-weight:400;
+      
+        font-weight:bold;
+        margin-bottom: 2rem;
+       
+      }
     }
 
     &.coming-soon {
@@ -433,19 +233,35 @@
   }
 }
 
+.all-checkboxes {
+  width: 100%;
+  display:grid;
+  grid-template-columns:1fr 1fr; 
+  gap: 30px;
+
+
+  .checkbox-container {
+    .checkbox-label { 
+      gap:1rem;
+    }
+    .checkbox-text {
+      font-weight:400;
+    }
+  }
+
+  // Mobile responsive: switch to flex layout
+  @include respond-to-max('sm') {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+}
+
 .btn-holder {
   width: 100%;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: var(--spacing-5);
   display: flex;
-}
-
-@import "../../../../styles/_design-tokens";
-
-/* Back Link styling - Now centralized in _design-tokens.scss */
-.backLink {
-  /* Using absolute and uppercase variants for this component */
-  @include backLink-absolute;
-  @include backLink-uppercase;
 }

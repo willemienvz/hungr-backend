@@ -6,21 +6,7 @@
     margin: 0;
   }
   
-  .btnSecondary {
-    background: #16d3d2;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    
-    &:hover {
-      background: #14b8b7;
-    }
-  }
+  // Custom button styling removed to allow global styles to apply
 }
 
 .formGroup {
@@ -33,7 +19,7 @@
 
     label {
         color: #9A9A9A;
-        margin-bottom: 12px;
+        margin-bottom: var(--spacing-3);
 
     }
 }
@@ -44,7 +30,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-5);
 }
 .alignright{
     justify-content: flex-end;
@@ -56,7 +42,7 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    max-width: 320px;
+    max-width: 3var(--spacing-5);
 
     .editBtn{
         position: absolute;
@@ -72,9 +58,7 @@
     }
 }
 
-.btnSecondary{
-    min-width: 180px
-}
+// Custom button styling removed to allow global styles to apply
 
 
 .material-icons{
@@ -92,7 +76,7 @@
     flex-direction: column;
     gap:13px;
     padding: 13px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     width: 90px;
     a{
         font-family: 'Poppins', sans-serif;
@@ -125,7 +109,7 @@
         width: 100%;
         border-collapse: collapse;
         background: white;
-        border-radius: 8px;
+        border-radius: var(--spacing-2);
         overflow: hidden;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         margin-top: 1rem;
@@ -133,10 +117,10 @@
         thead tr {
             background: #f8f9fb;
             th {
-                padding: 16px 20px;
+                padding: var(--spacing-4) var(--spacing-5);
                 text-align: left;
-                color: #9a9a9a;
-                font-family: "Poppins", sans-serif;
+                color: var(--color-text-muted);
+                font-family: var(--font-family-primary);
                 font-size: 13px;
                 font-weight: 400;
                 line-height: 140%;
@@ -159,10 +143,10 @@
                 }
                 
                 td {
-                    padding: 16px 20px;
+                    padding: var(--spacing-4) var(--spacing-5);
                     vertical-align: middle;
                     color: #444444;
-                    font-family: "Poppins", sans-serif;
+                    font-family: var(--font-family-primary);
                     font-size: 13px;
                     font-weight: 500;
                     line-height: 140%;
@@ -180,7 +164,7 @@
 
 .toggleHolder p{
         font-size: 10px;
-        padding-left: 12px;
+        padding-left: var(--spacing-3);
         
 }
 

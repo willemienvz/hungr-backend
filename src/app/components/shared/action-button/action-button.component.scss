@@ -6,7 +6,7 @@
     width: 32px;
     height: 32px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--border-radius-base);
     background: transparent;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -30,7 +30,7 @@
         height: 28px;
 
         .action-button-icon {
-            font-size: 16px;
+            font-size: var(--spacing-4);
         }
 
         .action-button-spinner .material-icons {
@@ -161,7 +161,7 @@
         height: 100%;
 
         .material-icons {
-            font-size: 16px;
+            font-size: var(--spacing-4);
             animation: spin 1s linear infinite;
         }
     }

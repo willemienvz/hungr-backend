@@ -8,11 +8,30 @@ import { AuthService } from "../../shared/services/auth.service";
 export class SignInComponent implements OnInit {
   password: string = '';
   showPassword: boolean = false;
+  emailError: string = '';
+  passwordError: string = '';
+
   constructor(
     public authService: AuthService
   ) { }
+
   ngOnInit() { }
+
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  onEmailChange(value: string): void {
+    // Clear error when user starts typing
+    if (this.emailError) {
+      this.emailError = '';
+    }
+  }
+
+  onPasswordChange(value: string): void {
+    // Clear error when user starts typing
+    if (this.passwordError) {
+      this.passwordError = '';
+    }
   }
 }

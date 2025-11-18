@@ -1,100 +1,91 @@
 <div class="inner-page">
   <form #userForm="ngForm" (ngSubmit)="editRestaurant()">
     <div class="col">
-      <div class="block">
+      <app-content-block title="Edit Restaurant Details">
         <a class="backLink" (click)="navigateWithUnsavedChangesCheck('/restaurants')"
           ><i class="material-icons">chevron_left</i> Back</a
         >
-        <h6>Edit Restaurant Details</h6>
         <div class="row">
           <div class="col">
             <div class="formGroup">
-              <label>Restaurant Name</label>
-              <input
+              <app-form-input
+                label="Restaurant Name"
                 type="text"
-                class="formControl"
                 placeholder="Name your restaurant..."
+                [required]="true"
+                [errorMessage]="getFieldError('name')"
                 name="name"
-                [(ngModel)]="restaurant.name"
-                required
-              />
+                [(ngModel)]="restaurant.name">
+              </app-form-input>
             </div>
           </div>
           <div class="col">
             <div class="formGroup">
-              <label>Street Address</label>
-              <input
+              <app-form-input
+                label="Street Address"
                 type="text"
-                class="formControl"
                 placeholder="1882 Bodenstein St"
+                [required]="true"
+                [errorMessage]="getFieldError('street')"
                 name="street"
-                [(ngModel)]="restaurant.street"
-                required
-              />
+                [(ngModel)]="restaurant.street">
+              </app-form-input>
             </div>
             <div class="formGroup">
-              <label>Province</label>
-              <mat-form-field appearance="fill" style="width: 100%">
-                <mat-select
-                  [(ngModel)]="restaurant.province"
-                  name="province"
-                  required
-                >
-                  <mat-option
-                    *ngFor="let province of saProvinces"
-                    [value]="province"
-                  >
-                    {{ province }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+              <app-form-select
+                label="Province"
+                placeholder="Select Province"
+                [required]="true"
+                [errorMessage]="getFieldError('province')"
+                [options]="provinceOptions"
+                [(ngModel)]="restaurant.province"
+                name="province">
+              </app-form-select>
             </div>
           </div>
           <div class="col">
             <div class="formGroup">
-              <label>City</label>
-              <input
+              <app-form-input
+                label="City"
                 type="text"
-                class="formControl"
                 placeholder="Boksburg"
+                [required]="true"
+                [errorMessage]="getFieldError('city')"
                 name="city"
-                [(ngModel)]="restaurant.city"
-                required
-              />
+                [(ngModel)]="restaurant.city">
+              </app-form-input>
             </div>
             <div class="formGroup">
-              <label>Zip Code</label>
-              <input
+              <app-form-input
+                label="Zip Code"
                 type="text"
-                class="formControl"
                 placeholder="1213"
+                [required]="true"
+                [errorMessage]="getFieldError('zip')"
                 name="zip"
-                [(ngModel)]="restaurant.zip"
-                required
-              />
+                [(ngModel)]="restaurant.zip">
+              </app-form-input>
             </div>
           </div>
         </div>
-      </div>
+      </app-content-block>
     </div>
     <div class="col">
-      <div class="block" style="gap: 0">
-        <h6 style="margin-bottom: 10px">Assign menu</h6>
-        <label style="color: #9a9a9a; margin-bottom: 8px"
+      <app-content-block title="Assign menu" [ngStyle]="{'gap': '0'}">
+        <label style="color: var(--color-text-muted); margin-bottom: 8px"
           >Please assign a menu to this restaurant.</label
         >
         <div class="rowMenu">
-          <mat-form-field appearance="fill" style="width: 32%">
-            <mat-select
+          <div style="width: 32%">
+            <app-form-select
+              label="Select Menu"
+              placeholder="Choose a menu"
+              [options]="menuOptions"
               [(ngModel)]="selectedMenu"
               (selectionChange)="selectMenu($event.value)"
-              name="selectedMenu"
-            >
-              <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
-                {{ menu.menuName }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+              name="selectedMenu">
+            </app-form-select>
+          </div>
           <p>
             Need to create a new menu for this restaurant?
             <a
@@ -105,23 +96,19 @@
             >
           </p>
         </div>
-      </div>
+      </app-content-block>
 
-      <div class="block contactBlock" style="margin-bottom: 0">
-        <h6 style="margin-bottom: 10px">Users</h6>
-        <p style="color: #9a9a9a">Please assign a user to this restaurant</p>
+      <app-content-block title="Users" customClass="contactBlock" [ngStyle]="{'margin-bottom': '0'}">
+        <p style="color: var(--color-text-muted)">Please assign a user to this restaurant</p>
         <div class="rowMenu">
-          <mat-form-field appearance="fill">
-            <mat-select
-              [(ngModel)]="selectedUser"
-              (selectionChange)="selectUser($event.value)"
-              name="selectedUser"
-            >
-              <mat-option *ngFor="let user of users" [value]="user"
-                >{{ user.firstName }} {{ user.Surname }}</mat-option
-              >
-            </mat-select>
-          </mat-form-field>
+          <app-form-select
+            label="Select User"
+            placeholder="Choose a user"
+            [options]="userOptions"
+            [(ngModel)]="selectedUser"
+            (selectionChange)="selectUser($event.value)"
+            name="selectedUser">
+          </app-form-select>
           <p>
             Need to add a new user?
             <a
@@ -139,11 +126,10 @@
             close
           </span>
         </p>
-      </div>
+      </app-content-block>
 
       <div class="blockItemsRow">
-        <div class="block">
-          <h6>Restaurant Status</h6>
+        <app-content-block title="Restaurant Status">
           <div class="toggle-container">
             <label [style.color]="restaurantStatus ? '#444444' : '#444444'">{{
               restaurantStatus ? "Active" : "Inactive"
@@ -154,29 +140,31 @@
               name="restaurantStatus"
             ></mat-slide-toggle>
           </div>
-        </div>
-        <div class="block contactBlock">
-          <h6>Number of tables in the restaurant</h6>
+        </app-content-block>
+        <app-content-block title="Number of tables in the restaurant" customClass="contactBlock">
           <div class="row" style="align-items: center">
             <p style="width: 60%">Please enter a numerical value</p>
-            <input
-              style="width: 40%"
-              type="text"
-              class="formControl"
-              name="selectedNumberTable"
-              [(ngModel)]="selectedNumberTable"
-              required
-            />
+            <div style="width: 40%">
+              <app-form-input
+                label=""
+                type="number"
+                placeholder="Number of tables"
+                [required]="true"
+                [errorMessage]="getFieldError('selectedNumberTable')"
+                name="selectedNumberTable"
+                [(ngModel)]="selectedNumberTable">
+              </app-form-input>
+            </div>
           </div>
-        </div>
+        </app-content-block>
       </div>
 
       <div class="formGroup btnHolder">
-        <a (click)="navigateWithUnsavedChangesCheck('/restaurants')" class="btn btnTertiary">Cancel</a>
-        <button type="button" (click)="saveDraft()" class="btn btnSecondary">
+        <button (click)="navigateWithUnsavedChangesCheck('/restaurants')" class="hungr-btn hungr-btn-tertiary">Cancel</button>
+        <button type="button" (click)="saveDraft()" class="hungr-btn hungr-btn-secondary">
           Save as draft
         </button>
-        <button type="submit" class="btn btnSecondary">Save</button>
+        <button type="submit" class="hungr-btn hungr-btn-secondary">Save</button>
       </div>
     </div>
   </form>

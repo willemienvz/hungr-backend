@@ -1,6 +1,6 @@
 .step4-container {
   .headerBlock {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-5);
   }
 
   .block {
@@ -22,28 +22,28 @@
 .aspect-ratio-info {
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
+  border-radius: var(--spacing-2);
+  padding: var(--spacing-4);
+  margin-bottom: var(--spacing-5);
   width: 100%;
   max-width: 500px;
 
   .info-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-3);
 
     mat-icon {
-      color: #16d3d2;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+      color: var(--color-secondary);
+      font-size: var(--spacing-5);
+      width: var(--spacing-5);
+      height: var(--spacing-5);
     }
 
     h6 {
       margin: 0;
-      font-size: 16px;
+      font-size: var(--spacing-4);
       font-weight: 600;
       color: var(--color-text-primary, #333);
       font-family: 'Poppins', sans-serif;
@@ -68,7 +68,7 @@
 
 /* Media Preview Styling */
 .media-preview-container {
-  margin-top: 20px;
+  margin-top: var(--spacing-5);
   width: 100%;
   display: flex;
   justify-content: center;
@@ -83,25 +83,25 @@
 .preview-image {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: var(--spacing-2);
+  box-shadow: 0 2px var(--spacing-2) rgba(0, 0, 0, 0.1);
 }
 
 .media-actions {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
   display: flex;
-  gap: 8px;
+  gap: var(--spacing-2);
 }
 
 .btn-danger {
   background-color: #dc3545;
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-size: 12px;
+  border-radius: var(--border-radius-base);
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--spacing-3);
   font-weight: 500;
   cursor: pointer;
   display: flex;
@@ -120,9 +120,9 @@
   }
 
   mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+    font-size: var(--spacing-4);
+    width: var(--spacing-4);
+    height: var(--spacing-4);
   }
 }
 
@@ -151,23 +151,23 @@
 
 .modal-content {
   background-color: white;
-  border-radius: 8px;
+  border-radius: var(--spacing-2);
   padding: 0;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px var(--spacing-5) rgba(0, 0, 0, 0.15);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px 16px 24px;
+  padding: var(--spacing-5) 24px var(--spacing-4) 24px;
   border-bottom: 1px solid #e9ecef;
 
   h6 {
     margin: 0;
-    font-size: 18px;
+    font-size: 1var(--spacing-2);
     font-weight: 600;
     color: var(--color-text-primary, #333);
     font-family: 'Poppins', sans-serif;
@@ -178,7 +178,7 @@
     border: none;
     cursor: pointer;
     padding: 4px;
-    border-radius: 4px;
+    border-radius: var(--border-radius-base);
     color: var(--color-text-secondary, #666);
 
     &:hover {
@@ -186,15 +186,15 @@
     }
 
     mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+      font-size: var(--spacing-5);
+      width: var(--spacing-5);
+      height: var(--spacing-5);
     }
   }
 }
 
 .modal-body {
-  padding: 20px 24px;
+  padding: var(--spacing-5) 24px;
 
   p {
     margin: 0;
@@ -207,13 +207,13 @@
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 24px 24px 24px;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) 24px 24px 24px;
   border-top: 1px solid #e9ecef;
 
   .btn {
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 10px var(--spacing-5);
+    border-radius: var(--border-radius-md);
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: 500;
@@ -224,33 +224,12 @@
     gap: 6px;
     transition: background-color 0.2s ease;
 
-    &.btnSecondary {
-      background-color: var(--hungr-secondary-color, #6c757d);
-      color: white;
-
-      &:hover {
-        background-color: var(--hungr-secondary-dark, #5a6268);
-      }
-    }
-
-    &.btnPrimary {
-      background-color: #dc3545;
-      color: white;
-
-      &:hover:not(:disabled) {
-        background-color: #c82333;
-      }
-
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-    }
+    // Custom button styling removed to allow global styles to apply
 
     mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
+      font-size: var(--spacing-4);
+      width: var(--spacing-4);
+      height: var(--spacing-4);
     }
   }
 }

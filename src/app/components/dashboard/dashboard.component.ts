@@ -253,7 +253,7 @@ export class DashboardComponent implements OnInit {
   }
   fetchRestaurants() {
     this.restaurant$ = this.firestore
-      .collection('restuarants', (ref) => ref.where('ownerID', '==', this.userDataID))
+      .collection('restaurants', (ref) => ref.where('ownerID', '==', this.userDataID))
       .snapshotChanges();
 
     this.restaurant$.subscribe({

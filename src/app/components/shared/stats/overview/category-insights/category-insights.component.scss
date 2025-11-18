@@ -16,8 +16,8 @@
     .list{
       margin-bottom: 10px;  
       background-color: #F3F4F5;
-      padding: 20px 25px;
-      border-radius: 10px;
+      padding: var(--spacing-5) 25px;
+      border-radius: var(--border-radius-lg);
       min-height: 65px;
 
     }
