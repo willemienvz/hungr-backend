@@ -60,6 +60,7 @@ import { AddMenuComponent } from './components/menus/add-menu/add-menu.component
 import { ProgressBarComponent } from './components/shared/progress-bar/progress-bar.component';
 import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.component';
 import { AboutComponent } from './components/settings/about/about.component';
+import { BillingComponent } from './components/settings/billing/billing.component';
 import { AddSpecialComponent } from './components/specials/add-special/add-special.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { SpecialsLandingComponent } from './components/specials/specials-landing/specials-landing.component';
@@ -191,6 +192,7 @@ import { PayFastTestComponent } from './components/test/payfast-test/payfast-tes
     ProgressBarComponent,
     EditMenuComponent,
     AboutComponent,
+    BillingComponent,
     AddSpecialComponent,
     SpecialsLandingComponent,
     EditSpecialComponent,

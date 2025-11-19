@@ -140,5 +140,25 @@ service cloud.firestore {
         allow write: if isAuthenticated();
       }
     }
+
+    // Subscriptions - users can only read their own subscription data
+    match /subscriptions/{subscriptionId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if false; // Only Cloud Functions can write to subscriptions
+    }
+
+    // Transactions - users can only read their own transaction history
+    match /transactions/{transactionId} {
+      // Allow reading if email matches (works for both get and list queries)
+      // Firestore will validate each document in list queries against this rule
+      allow read: if isAuthenticated() && resource.data.email_address == request.auth.token.email;
+      allow write: if false; // Only Cloud Functions can write to transactions
+    }
+
+    // Audit logs - authenticated users can read their own audit logs
+    match /audit_logs/{logId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if false; // Only Cloud Functions can write to audit logs
+    }
   }
 }

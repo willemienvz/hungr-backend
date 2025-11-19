@@ -1,8 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-// Email verification template
-const EMAIL_VERIFICATION_TEMPLATE = `
+// Email verification template (for future use)
+export const EMAIL_VERIFICATION_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -117,10 +117,10 @@ export const sendCustomEmailVerification = functions.https.onCall(async (data, c
     
     const verificationLink = await admin.auth().generateEmailVerificationLink(email, actionCodeSettings);
 
-    // Replace template variables
-    const htmlContent = EMAIL_VERIFICATION_TEMPLATE
-      .replace(/\{\{firstName\}\}/g, firstName)
-      .replace(/\{\{verificationLink\}\}/g, verificationLink);
+    // TODO: Replace template variables and send email using your preferred email service
+    // const htmlContent = EMAIL_VERIFICATION_TEMPLATE
+    //   .replace(/\{\{firstName\}\}/g, firstName)
+    //   .replace(/\{\{verificationLink\}\}/g, verificationLink);
 
     // Send email using your preferred email service
     // This is a placeholder - you'll need to implement the actual email sending

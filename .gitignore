@@ -50,3 +50,8 @@ Thumbs.db
 .env.production
 
 email-lamda/serviceAccountKey.json
+
+.cursor
+.specify
+.vscode
+/docs

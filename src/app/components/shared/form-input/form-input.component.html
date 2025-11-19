@@ -24,6 +24,8 @@
       [pattern]="pattern"
       [class]="inputClass"
       (input)="onInputChange($event)"
+      (keydown)="onKeyDown($event)"
+      (paste)="onPaste($event)"
       (focus)="onFocus($event)"
       (blur)="onBlur($event)"
     />

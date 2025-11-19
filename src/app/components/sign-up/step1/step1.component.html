@@ -45,6 +45,8 @@
                             placeholder="+27 12 234 5678"
                             [required]="true"
                             [errorMessage]="getFieldError('cellphone')"
+                            (keydown)="onCellphoneKeyDown($event)"
+                            (paste)="onCellphonePaste($event)"
                             formControlName="cellphone">
                         </app-form-input>
               

@@ -76,6 +76,14 @@ export const payfastItn = functions.https.onRequest(async (req, res) => {
     }
 
     console.log('PayFast ITN received:', JSON.stringify(req.body, null, 2));
+    console.log('ITN Subscription fields:', {
+      subscription_type: req.body.subscription_type,
+      recurring_amount: req.body.recurring_amount,
+      frequency: req.body.frequency,
+      cycles: req.body.cycles,
+      billing_date: req.body.billing_date,
+      token: req.body.token || req.body.tokenisation ? 'PRESENT' : 'MISSING'
+    });
 
     const itnData: PayFastItnData = req.body;
 
@@ -309,21 +317,73 @@ async function processPayment(itnData: PayFastItnData): Promise<{success: boolea
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     };
 
-    // Save transaction
+    // Save transaction (all statuses are logged)
     await db.collection('transactions').add(transactionData);
 
+    // Define terminal statuses that can change subscription state
+    const terminalStatuses = ['COMPLETE', 'FAILED', 'CANCELLED'];
+    const paymentStatus = itnData.payment_status;
+
+    // Create audit log entry for all payment statuses
+    try {
+      const auditLogData: any = {
+        type: 'payment_processing',
+        action: 'status_received',
+        payment_id: itnData.pf_payment_id,
+        payment_status: paymentStatus,
+        email_address: itnData.email_address,
+        amount_gross: parseFloat(itnData.amount_gross),
+        result: 'success',
+        source: 'payfast_itn',
+        metadata: {
+          m_payment_id: itnData.m_payment_id,
+          item_name: itnData.item_name,
+          item_description: itnData.item_description
+        },
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: new Date().toISOString()
+      };
+
+      // Add warning flag for unknown statuses
+      if (!['PENDING', 'PROCESSING', 'COMPLETE', 'FAILED', 'CANCELLED'].includes(paymentStatus)) {
+        auditLogData.metadata.warning = 'Unknown payment status received';
+        auditLogData.metadata.is_unknown_status = true;
+        console.warn('Unknown payment status received:', paymentStatus, 'for payment:', itnData.pf_payment_id);
+      }
+
+      await db.collection('audit_logs').add(auditLogData);
+    } catch (error) {
+      console.error('Failed to log payment status audit:', error);
+      // Don't fail payment processing if audit logging fails
+    }
+
+    // Handle non-terminal statuses (PENDING, PROCESSING, unknown) - log only, no subscription changes
+    if (paymentStatus === 'PENDING' || paymentStatus === 'PROCESSING') {
+      console.log(`Payment status ${paymentStatus} received - logged, no subscription changes`);
+      return { success: true };
+    }
+
+    // Handle unknown statuses - log with warning, no subscription changes
+    if (!terminalStatuses.includes(paymentStatus)) {
+      console.warn(`Unknown payment status "${paymentStatus}" received - logged with warning, no subscription changes`);
+      return { success: true };
+    }
+
+    // Handle terminal statuses only (COMPLETE, FAILED, CANCELLED)
+    // These can change subscription state
+    
     // Update user subscription if payment is complete
-    if (itnData.payment_status === 'COMPLETE') {
+    if (paymentStatus === 'COMPLETE') {
       await updateUserSubscription(itnData);
     }
     
     // Handle subscription cancellations
-    if (itnData.payment_status === 'CANCELLED' && itnData.token) {
+    if (paymentStatus === 'CANCELLED' && itnData.token) {
       await handleSubscriptionCancellation(itnData);
     }
     
     // Handle subscription status updates (suspended, etc.)
-    if (itnData.payment_status === 'FAILED' && itnData.token) {
+    if (paymentStatus === 'FAILED' && itnData.token) {
       await handleSubscriptionFailure(itnData);
     }
 
@@ -356,13 +416,48 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
       
       // Create Firestore user document only
       // Firebase Auth user will be created by the verify-email-address component
+      // Determine if recurring (check subscription_type, token, or recurring_amount)
+      // If we have a token, it's definitely a recurring subscription (PayFast only issues tokens for subscriptions)
+      const hasToken = !!(itnData.token || itnData.tokenisation);
+      const hasSubscriptionType = itnData.subscription_type === '1';
+      const hasRecurringAmount = !!itnData.recurring_amount;
+      const isRecurringForUser = hasSubscriptionType || hasRecurringAmount || hasToken;
+      
+      // Determine plan name
+      let userPlanName = 'monthly';
+      if (isRecurringForUser) {
+        if (itnData.frequency) {
+          switch (itnData.frequency) {
+            case '3':
+              userPlanName = 'monthly';
+              break;
+            case '4':
+              userPlanName = 'quarterly';
+              break;
+            case '5':
+              userPlanName = 'bi-annual';
+              break;
+            case '6':
+              userPlanName = 'annual';
+              break;
+            default:
+              userPlanName = 'monthly';
+          }
+        } else {
+          // No frequency specified, but we have a token - default to monthly (our standard plan)
+          userPlanName = 'monthly';
+        }
+      } else {
+        userPlanName = 'once-off';
+      }
+      
       const newUserData = {
         email: itnData.email_address,
         firstName: itnData.name_first,
         lastName: itnData.name_last,
         phoneNumber: itnData.cell_number || '',
         subscriptionStatus: 'active',
-        subscriptionPlan: itnData.subscription_type === '1' ? 'monthly' : 'once-off',
+        subscriptionPlan: userPlanName,
         lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
         created_at: admin.firestore.FieldValue.serverTimestamp(),
         updated_at: admin.firestore.FieldValue.serverTimestamp()
@@ -379,17 +474,75 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
     }
 
     // Check if this is a recurring payment notification
-    const isRecurring = itnData.subscription_type === '1';
+    // A subscription is recurring if:
+    // 1. subscription_type is '1', OR
+    // 2. recurring_amount field is present (indicates recurring billing), OR
+    // 3. A token is present (token indicates recurring billing capability - PayFast only issues tokens for subscriptions)
+    const hasToken = !!(itnData.token || itnData.tokenisation);
+    const hasSubscriptionType = itnData.subscription_type === '1';
+    const hasRecurringAmount = !!itnData.recurring_amount;
+    const hasFrequency = !!itnData.frequency;
+    
+    // If we have a token, it's definitely a recurring subscription (PayFast only issues tokens for subscriptions)
+    // This handles cases where PayFast doesn't echo subscription_type in ITN
+    let isRecurring = hasSubscriptionType || hasRecurringAmount || hasToken;
+    
+    // Log subscription detection for debugging
+    console.log('Subscription detection:', {
+      subscription_type: itnData.subscription_type,
+      hasToken,
+      hasSubscriptionType,
+      hasRecurringAmount,
+      hasFrequency,
+      isRecurring,
+      frequency: itnData.frequency,
+      recurring_amount: itnData.recurring_amount,
+      amount_gross: itnData.amount_gross
+    });
+    
+    // Determine plan based on frequency if available
+    // For sign-ups, we always expect monthly recurring subscription (R999/month)
+    // Default to monthly if we have a token (indicates recurring capability)
+    let planName = 'monthly'; // Default to monthly for recurring subscriptions
+    if (isRecurring) {
+      if (itnData.frequency) {
+        switch (itnData.frequency) {
+          case '3':
+            planName = 'monthly';
+            break;
+          case '4':
+            planName = 'quarterly';
+            break;
+          case '5':
+            planName = 'bi-annual';
+            break;
+          case '6':
+            planName = 'annual';
+            break;
+          default:
+            planName = 'monthly';
+        }
+      } else {
+        // No frequency specified, but we have a token - default to monthly (our standard plan)
+        planName = 'monthly';
+      }
+    } else {
+      planName = 'once-off';
+    }
+    
+    console.log('Determined plan name:', planName, 'isRecurring:', isRecurring);
     
     // Create or update subscription
     const subscriptionData: any = {
       userId: userId,
       email: itnData.email_address,
       status: 'active',
-      plan: isRecurring ? 'monthly' : 'once-off',
+      plan: planName,
       amount: parseFloat(itnData.amount_gross),
       paymentId: itnData.pf_payment_id,
       token: itnData.token || itnData.tokenisation, // Handle both token field names
+      consecutiveFailures: 0, // Initialize failure counter
+      needsManualReview: false, // Initialize manual review flag
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     };
 
@@ -422,13 +575,46 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
       subscriptionData.created_at = existingData.created_at;
       subscriptionData.startDate = existingData.startDate || existingData.created_at;
       
+      // Reset failure counter on successful payment
+      subscriptionData.consecutiveFailures = 0;
+      subscriptionData.needsManualReview = false;
+      // Clear manual review fields if they exist
+      if (existingData.manualReviewReason !== undefined) {
+        subscriptionData.manualReviewReason = admin.firestore.FieldValue.delete();
+      }
+      if (existingData.manualReviewFlaggedAt !== undefined) {
+        subscriptionData.manualReviewFlaggedAt = admin.firestore.FieldValue.delete();
+      }
+      
       await subscriptionDoc.ref.update(subscriptionData);
+      
+      // Log failure counter reset
+      try {
+        await db.collection('audit_logs').add({
+          type: 'subscription_management',
+          action: 'failure_counter_reset',
+          userId: userId,
+          subscriptionId: subscriptionDoc.id,
+          result: 'success',
+          source: 'payfast_itn',
+          metadata: {
+            payment_id: itnData.pf_payment_id,
+            reason: 'Payment succeeded - counter reset'
+          },
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('Failed to log failure counter reset:', error);
+      }
     }
 
     // Update user document
+    const tokenToSave = itnData.token || itnData.tokenisation;
     await db.collection('users').doc(userId).update({
       subscriptionStatus: 'active',
-      subscriptionPlan: isRecurring ? 'monthly' : 'once-off',
+      subscriptionPlan: planName, // Use the same planName determined above
+      payfastToken: tokenToSave, // Save PayFast token to user document for subscription management
       lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -508,6 +694,7 @@ async function handleSubscriptionCancellation(itnData: PayFastItnData): Promise<
 
 /**
  * Handles subscription failure (e.g., payment failed)
+ * Enhanced with consecutive failure tracking, grace period, and automatic cancellation
  */
 async function handleSubscriptionFailure(itnData: PayFastItnData): Promise<void> {
   try {
@@ -521,53 +708,155 @@ async function handleSubscriptionFailure(itnData: PayFastItnData): Promise<void>
       .get();
     
     if (subscriptionQuery.empty) {
-      console.error('Subscription not found for token:', itnData.token);
-      return;
+      console.error('Subscription not found for token:', subscriptionToken);
+      return; // May be one-off payment, no subscription
     }
 
     const subscriptionDoc = subscriptionQuery.docs[0];
     const subscriptionData = subscriptionDoc.data();
     const userId = subscriptionData.userId;
-
-    // Update subscription status - treat payment failure as paused (can be resumed)
-    // This allows users to fix payment issues and resume
-    await subscriptionDoc.ref.update({
-      status: 'paused',
-      pausedAt: admin.firestore.FieldValue.serverTimestamp(),
-      pauseReason: itnData.item_description || 'Payment failed',
+    
+    // Get current consecutive failure count (default to 0 for backward compatibility)
+    const currentFailures = subscriptionData.consecutiveFailures || 0;
+    const newFailures = currentFailures + 1;
+    
+    // Prepare update object
+    const updateData: any = {
+      consecutiveFailures: newFailures,
       updated_at: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    // Update user document
-    await db.collection('users').doc(userId).update({
-      subscriptionStatus: 'paused',
-      updated_at: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    // Log audit action
-    try {
-      await db.collection('audit_logs').add({
-        type: 'subscription_management',
-        action: 'pause',
-        userId,
-        subscriptionId: subscriptionDoc.id,
-        result: 'success',
-        source: 'payfast_itn',
-        metadata: {
-          payment_id: itnData.pf_payment_id,
-          reason: 'Payment failed - paused via PayFast ITN'
-        },
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        createdAt: new Date().toISOString()
+    };
+    
+    // Apply grace period and cancellation logic
+    if (newFailures === 1) {
+      // First failure: Log failure, keep subscription active (grace period)
+      await logFailureTracking(db, userId, subscriptionDoc.id, newFailures, 'first_failure', itnData);
+      
+    } else if (newFailures === 2) {
+      // Second failure: Flag for manual review, keep subscription active (grace period)
+      updateData.needsManualReview = true;
+      const lastFailurePaymentId = subscriptionData.lastFailurePaymentId || 'unknown';
+      updateData.manualReviewReason = `Payment failed - 2 consecutive failures (payment IDs: ${lastFailurePaymentId}, ${itnData.pf_payment_id})`;
+      updateData.manualReviewFlaggedAt = admin.firestore.FieldValue.serverTimestamp();
+      
+      await logFailureTracking(db, userId, subscriptionDoc.id, newFailures, 'grace_period_warning', itnData);
+      await logManualReviewFlag(db, userId, subscriptionDoc.id, updateData.manualReviewReason);
+      
+    } else if (newFailures >= 3) {
+      // Third failure: Cancel subscription
+      updateData.status = 'cancelled';
+      updateData.cancelledAt = admin.firestore.FieldValue.serverTimestamp();
+      updateData.cancellationReason = `Cancelled due to ${newFailures} consecutive payment failures`;
+      
+      // Update user document
+      await db.collection('users').doc(userId).update({
+        subscriptionStatus: 'cancelled',
+        updated_at: admin.firestore.FieldValue.serverTimestamp()
       });
-    } catch (error) {
-      console.error('Failed to log subscription pause audit:', error);
+      
+      await logFailureTracking(db, userId, subscriptionDoc.id, newFailures, 'cancellation', itnData);
+      await logCancellation(db, userId, subscriptionDoc.id, updateData.cancellationReason);
     }
-
-    console.log('Subscription suspended due to payment failure:', subscriptionDoc.id);
+    
+    // Store last failure payment ID for tracking
+    updateData.lastFailurePaymentId = itnData.pf_payment_id;
+    
+    // Update subscription document
+    await subscriptionDoc.ref.update(updateData);
+    
+    console.log(`Subscription failure handled: ${newFailures} consecutive failures for subscription:`, subscriptionDoc.id);
 
   } catch (error) {
     console.error('Error handling subscription failure:', error);
     throw error;
+  }
+}
+
+/**
+ * Log failure tracking event
+ */
+async function logFailureTracking(
+  db: admin.firestore.Firestore,
+  userId: string,
+  subscriptionId: string,
+  consecutiveFailures: number,
+  failureType: 'first_failure' | 'grace_period_warning' | 'cancellation',
+  itnData: PayFastItnData
+): Promise<void> {
+  try {
+    await db.collection('audit_logs').add({
+      type: 'subscription_management',
+      action: 'failure_tracked',
+      userId,
+      subscriptionId,
+      result: 'success',
+      source: 'payfast_itn',
+      metadata: {
+        payment_id: itnData.pf_payment_id,
+        consecutive_failures: consecutiveFailures,
+        failure_type: failureType,
+        reason: itnData.item_description || 'Payment failed',
+        amount: parseFloat(itnData.amount_gross)
+      },
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Failed to log failure tracking:', error);
+  }
+}
+
+/**
+ * Log manual review flag event
+ */
+async function logManualReviewFlag(
+  db: admin.firestore.Firestore,
+  userId: string,
+  subscriptionId: string,
+  reason: string
+): Promise<void> {
+  try {
+    await db.collection('audit_logs').add({
+      type: 'subscription_management',
+      action: 'flag_manual_review',
+      userId,
+      subscriptionId,
+      result: 'success',
+      source: 'payfast_itn',
+      metadata: {
+        reason: reason
+      },
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Failed to log manual review flag:', error);
+  }
+}
+
+/**
+ * Log cancellation event
+ */
+async function logCancellation(
+  db: admin.firestore.Firestore,
+  userId: string,
+  subscriptionId: string,
+  reason: string
+): Promise<void> {
+  try {
+    await db.collection('audit_logs').add({
+      type: 'subscription_management',
+      action: 'cancel_due_to_failures',
+      userId,
+      subscriptionId,
+      result: 'success',
+      source: 'payfast_itn',
+      metadata: {
+        reason: reason
+      },
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Failed to log cancellation:', error);
   }
 }

@@ -93,38 +93,9 @@
           No active subscription
         </p>
         <div class="row btnRow">
-          <button
-            class="hungr-btn hungr-btn-tertiary"
-            (click)="pauseSubscription()"
-            *ngIf="subscriptionData && subscriptionData.status === 'active'"
-            [disabled]="isPausing || isCancellingSubscription || isResuming || isChangingSubscription"
-          >
-            {{ isPausing ? 'Pausing...' : 'Pause Subscription' }}
-          </button>
-          <button
-            class="hungr-btn hungr-btn-secondary"
-            (click)="resumeSubscription()"
-            *ngIf="subscriptionData && subscriptionData.status === 'paused'"
-            [disabled]="isResuming || isCancellingSubscription || isPausing || isChangingSubscription"
-          >
-            {{ isResuming ? 'Resuming...' : 'Resume Subscription' }}
-          </button>
-          <button
-            class="hungr-btn hungr-btn-tertiary"
-            (click)="cancelSubscription()"
-            *ngIf="subscriptionData && (subscriptionData.status === 'active' || subscriptionData.status === 'paused')"
-            [disabled]="isCancellingSubscription || isPausing || isResuming || isChangingSubscription"
-          >
-            {{ isCancellingSubscription ? 'Cancelling...' : 'Cancel Subscription' }}
-          </button>
-          <button
-            class="hungr-btn hungr-btn-secondary"
-            (click)="changeSubscription()"
-            *ngIf="subscriptionData && subscriptionData.status === 'active'"
-            [disabled]="isChangingSubscription || isPausing || isCancellingSubscription || isResuming"
-          >
-            {{ isChangingSubscription ? 'Changing...' : 'Change Subscription' }}
-          </button>
+          <a routerLink="/settings/billing" class="hungr-btn hungr-btn-primary">
+            Manage Subscription
+          </a>
         </div>
       </div>
     </div>

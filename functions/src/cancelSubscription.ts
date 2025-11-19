@@ -74,14 +74,21 @@ export const cancelSubscription = functions.https.onCall(async (data, context) =
 
       const result = await response.json();
 
-      if (!response.ok || !result.data?.response) {
-        throw new Error(result.data?.message || 'Failed to cancel subscription.');
+      // PayFast API returns { data: { response: {...}, message: "..." } } on success
+      // or { data: { message: "error message" } } on error
+      if (!response.ok) {
+        throw new Error(result.data?.message || `PayFast API error: ${response.status} ${response.statusText}`);
+      }
+
+      // Check for PayFast error response structure
+      if (result.data && result.data.message && !result.data.response) {
+        throw new Error(result.data.message || 'Failed to cancel subscription.');
       }
 
       return { response, result };
     };
 
-    const { result } = await retryWithBackoff(apiCall);
+    await retryWithBackoff(apiCall);
 
     // Update Firestore
     const batch = db.batch();

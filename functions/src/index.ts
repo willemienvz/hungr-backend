@@ -51,4 +51,6 @@ export { pauseSubscription } from './pauseSubscription';
 export { cancelSubscription } from './cancelSubscription';
 export { unpauseSubscription } from './unpauseSubscription';
 export { updateSubscription } from './updateSubscription';
+export { getSubscriptionDetails } from './getSubscriptionDetails';
+export { getPaymentHistory } from './getPaymentHistory';
 

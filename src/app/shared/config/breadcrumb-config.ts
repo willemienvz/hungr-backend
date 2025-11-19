@@ -19,6 +19,7 @@ export const customBreadcrumbLabels = {
   
   // Settings section
   'settings/general': 'Account Settings',
+  'settings/billing': 'Billing & Subscription',
   'settings/branding': 'Brand Customization',
   'settings/about-us': 'Company Info'
 };

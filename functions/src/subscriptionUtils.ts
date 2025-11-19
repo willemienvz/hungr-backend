@@ -60,7 +60,7 @@ export async function retryWithBackoff<T>(
  */
 export async function logSubscriptionAction(
   db: admin.firestore.Firestore,
-  action: 'pause' | 'cancel' | 'resume' | 'update',
+  action: 'pause' | 'cancel' | 'resume' | 'update' | 'fetch',
   userId: string,
   subscriptionId: string,
   result: 'success' | 'failure',

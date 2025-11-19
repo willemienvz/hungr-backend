@@ -31,36 +31,82 @@ export function generateApiSignature(data: { [key: string]: any }, passphrase: s
 
 /**
  * Retrieves subscription token for a user with fallback logic
- * Priority: subscriptions collection (active) -> users collection (payfastToken)
+ * Priority: subscriptions collection (any status with token) -> users collection (payfastToken)
  */
 export async function getSubscriptionToken(userId: string, db: admin.firestore.Firestore): Promise<string> {
-  // First, try to get from subscriptions collection
-  const subscriptionQuery = await db.collection('subscriptions')
-    .where('userId', '==', userId)
-    .where('status', '==', 'active')
-    .limit(1)
-    .get();
+  // Strategy 1: Try subscriptions collection with index
+  let subscriptionQuery;
+  try {
+    subscriptionQuery = await db.collection('subscriptions')
+      .where('userId', '==', userId)
+      .orderBy('updated_at', 'desc')
+      .limit(10) // Get multiple to find one with a token
+      .get();
+    
+    console.log(`Found ${subscriptionQuery.docs.length} subscription(s) for user ${userId}`);
+  } catch (indexError: any) {
+    // Index not ready - try simple query without orderBy
+    if (indexError.code === 9 || indexError.message?.includes('index')) {
+      console.log(`Index not ready for user ${userId}, using simple query`);
+      subscriptionQuery = await db.collection('subscriptions')
+        .where('userId', '==', userId)
+        .limit(50)
+        .get();
+      
+      // Manual sort by updated_at
+      const docs = subscriptionQuery.docs.sort((a, b) => {
+        const aTime = a.data().updated_at?.toMillis?.() || 0;
+        const bTime = b.data().updated_at?.toMillis?.() || 0;
+        return bTime - aTime;
+      });
+      
+      subscriptionQuery = {
+        empty: docs.length === 0,
+        docs: docs.slice(0, 10)
+      } as any;
+      
+      console.log(`Found ${docs.length} subscription(s) after manual sort for user ${userId}`);
+    } else {
+      throw indexError;
+    }
+  }
   
-  if (!subscriptionQuery.empty) {
-    const token = subscriptionQuery.docs[0].data().token;
+  // Look for the first subscription with a token (regardless of status)
+  for (const doc of subscriptionQuery.docs) {
+    const token = doc.data().token;
     if (token) {
+      console.log(`Found token in subscription ${doc.id} for user ${userId}`);
       return token;
     }
   }
   
-  // Fallback to users collection
-  const userDoc = await db.collection('users').doc(userId).get();
-  const userData = userDoc.data();
-  const payfastToken = userData?.payfastToken;
+  console.log(`No token found in subscriptions collection for user ${userId}, checking user document`);
   
-  if (!payfastToken) {
+  // Strategy 2: Fallback to users collection (fast lookup, no index needed)
+  const userDoc = await db.collection('users').doc(userId).get();
+  
+  if (!userDoc.exists) {
+    console.error(`User document ${userId} does not exist`);
     throw new functions.https.HttpsError(
-      'failed-precondition',
-      'Subscription token not found. Please contact support.'
+      'not-found',
+      'User document not found.'
     );
   }
   
-  return payfastToken;
+  const userData = userDoc.data();
+  const payfastToken = userData?.payfastToken;
+  
+  if (payfastToken) {
+    console.log(`Found token in user document for user ${userId}`);
+    return payfastToken;
+  }
+  
+  // No token found anywhere
+  console.error(`No subscription token found for user ${userId} in subscriptions or users collection`);
+  throw new functions.https.HttpsError(
+    'failed-precondition',
+    'Subscription token not found. Please contact support.'
+  );
 }
 
 /**

@@ -1,0 +1,167 @@
+<div class="settingspage inner-page">
+  <app-content-block title="Billing & Subscription">
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading subscription details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-container">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button class="hungr-btn hungr-btn-secondary" (click)="loadSubscriptionDetails()">Retry</button>
+    </div>
+
+    <!-- Subscription Details Card -->
+    <div *ngIf="!loading && !error" class="subscription-card">
+      <div *ngIf="subscriptionData" class="subscription-content">
+        <div class="subscription-header">
+          <h6>Current Subscription</h6>
+          <span class="status-badge" [ngClass]="getStatusBadgeClass()">
+            {{ getStatusLabel() }}
+          </span>
+        </div>
+
+        <div class="subscription-details">
+          <div class="detail-row">
+            <span class="detail-label">Plan:</span>
+            <span class="detail-value">{{ subscriptionData.plan | titlecase }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Amount:</span>
+            <span class="detail-value">{{ formatAmount(subscriptionData.amount) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="subscriptionData.frequency">
+            <span class="detail-label">Frequency:</span>
+            <span class="detail-value">
+              <span *ngIf="subscriptionData.frequency === '3'">Monthly</span>
+              <span *ngIf="subscriptionData.frequency === '4'">Quarterly</span>
+              <span *ngIf="subscriptionData.frequency === '5'">Bi-Annual</span>
+              <span *ngIf="subscriptionData.frequency === '6'">Annual</span>
+            </span>
+          </div>
+          <div class="detail-row" *ngIf="subscriptionData.nextBillingDate">
+            <span class="detail-label">Next Billing Date:</span>
+            <span class="detail-value">{{ formatDate(subscriptionData.nextBillingDate) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="subscriptionData.startDate">
+            <span class="detail-label">Start Date:</span>
+            <span class="detail-value">{{ formatDate(subscriptionData.startDate) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="subscriptionData.pausedAt">
+            <span class="detail-label">Paused Since:</span>
+            <span class="detail-value">{{ formatDate(subscriptionData.pausedAt) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="subscriptionData.cancelledAt">
+            <span class="detail-label">Cancelled On:</span>
+            <span class="detail-value">{{ formatDate(subscriptionData.cancelledAt) }}</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button
+            class="hungr-btn hungr-btn-tertiary"
+            (click)="pauseSubscription()"
+            *ngIf="canPause()"
+            [disabled]="isPausing || isResuming || isEditing || isCancelling">
+            <mat-spinner *ngIf="isPausing" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isPausing">Pause Subscription</span>
+            <span *ngIf="isPausing">Pausing...</span>
+          </button>
+
+          <button
+            class="hungr-btn hungr-btn-secondary"
+            (click)="resumeSubscription()"
+            *ngIf="canResume()"
+            [disabled]="isPausing || isResuming || isEditing || isCancelling">
+            <mat-spinner *ngIf="isResuming" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isResuming">Resume Subscription</span>
+            <span *ngIf="isResuming">Resuming...</span>
+          </button>
+
+          <button
+            class="hungr-btn hungr-btn-secondary"
+            (click)="editSubscription()"
+            *ngIf="canEdit()"
+            [disabled]="isPausing || isResuming || isEditing || isCancelling">
+            <mat-spinner *ngIf="isEditing" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isEditing">Edit Subscription</span>
+            <span *ngIf="isEditing">Updating...</span>
+          </button>
+
+          <button
+            class="hungr-btn hungr-btn-danger"
+            (click)="cancelSubscription()"
+            *ngIf="canCancel()"
+            [disabled]="isPausing || isResuming || isEditing || isCancelling">
+            <mat-spinner *ngIf="isCancelling" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isCancelling">Cancel Subscription</span>
+            <span *ngIf="isCancelling">Cancelling...</span>
+          </button>
+
+          <a
+            *ngIf="subscriptionData?.status === 'cancelled' || subscriptionData?.status === 'canceled'"
+            routerLink="/sign-up"
+            class="hungr-btn hungr-btn-primary">
+            Resubscribe
+          </a>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!subscriptionData" class="empty-state">
+        <mat-icon>payment</mat-icon>
+        <h6>No Active Subscription</h6>
+        <p>You don't have an active subscription. Subscribe to get started.</p>
+        <a routerLink="/sign-up" class="hungr-btn hungr-btn-primary">Subscribe Now</a>
+      </div>
+    </div>
+  </app-content-block>
+
+  <!-- Payment History -->
+  <app-content-block title="Payment History">
+    <div *ngIf="loadingHistory" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading payment history...</p>
+    </div>
+
+    <div *ngIf="!loadingHistory">
+      <div *ngIf="paymentHistory.length === 0" class="empty-state">
+        <mat-icon>receipt</mat-icon>
+        <p>No payment history available</p>
+      </div>
+
+      <table *ngIf="paymentHistory.length > 0" class="payment-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Transaction ID</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let transaction of paymentHistory">
+            <td>
+              <span *ngIf="transaction.created_at">
+                {{ transaction.created_at | date: 'medium' }}
+              </span>
+              <span *ngIf="!transaction.created_at">N/A</span>
+            </td>
+            <td>{{ transaction.pf_payment_id || transaction.m_payment_id || 'N/A' }}</td>
+            <td>{{ formatAmount(transaction.amount_gross) }}</td>
+            <td>
+              <span class="payment-status" [ngClass]="'status-' + transaction.payment_status.toLowerCase()">
+                {{ formatPaymentStatus(transaction.payment_status) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </app-content-block>
+</div>
+

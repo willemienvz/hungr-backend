@@ -35,6 +35,8 @@ export class FormInputComponent implements ControlValueAccessor {
     @Output() focus = new EventEmitter<Event>();
     @Output() blur = new EventEmitter<Event>();
     @Output() suffixIconClick = new EventEmitter<void>();
+    @Output() keydown = new EventEmitter<KeyboardEvent>();
+    @Output() paste = new EventEmitter<ClipboardEvent>();
 
     value: string = '';
     isFocused: boolean = false;
@@ -80,6 +82,14 @@ export class FormInputComponent implements ControlValueAccessor {
         if (this.suffixIcon) {
             this.suffixIconClick.emit();
         }
+    }
+
+    onKeyDown(event: KeyboardEvent): void {
+        this.keydown.emit(event);
+    }
+
+    onPaste(event: ClipboardEvent): void {
+        this.paste.emit(event);
     }
 
     get inputClass(): string {

@@ -19,6 +19,7 @@ import { MenusComponent } from './components/menus/menus.component';
 import { AddMenuComponent } from './components/menus/add-menu/add-menu.component';
 import { EditMenuComponent } from './components/menus/edit-menu/edit-menu.component';
 import { AboutComponent } from './components/settings/about/about.component';
+import { BillingComponent } from './components/settings/billing/billing.component';
 import { AddSpecialComponent } from './components/specials/add-special/add-special.component';
 import { SpecialsLandingComponent } from './components/specials/specials-landing/specials-landing.component';
 import { EditSpecialComponent } from './components/specials/edit-special/edit-special.component';
@@ -95,6 +96,11 @@ const routes: Routes = [
         path: 'settings/about-us',
         component: AboutComponent,
         data: { title: 'About us' },
+      },
+      {
+        path: 'settings/billing',
+        component: BillingComponent,
+        data: { title: 'Billing & Subscription' },
       },
       {
         path: 'manage-users',
