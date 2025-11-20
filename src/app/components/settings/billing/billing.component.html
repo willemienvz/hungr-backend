@@ -3,7 +3,7 @@
     
     <!-- Loading State -->
     <div *ngIf="loading" class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
+      <app-spinner [diameter]="40"></app-spinner>
       <p>Loading subscription details...</p>
     </div>
 
@@ -67,7 +67,7 @@
             (click)="pauseSubscription()"
             *ngIf="canPause()"
             [disabled]="isPausing || isResuming || isEditing || isCancelling">
-            <mat-spinner *ngIf="isPausing" diameter="20" class="button-spinner"></mat-spinner>
+            <app-spinner *ngIf="isPausing" [diameter]="20" class="button-spinner"></app-spinner>
             <span *ngIf="!isPausing">Pause Subscription</span>
             <span *ngIf="isPausing">Pausing...</span>
           </button>
@@ -77,7 +77,7 @@
             (click)="resumeSubscription()"
             *ngIf="canResume()"
             [disabled]="isPausing || isResuming || isEditing || isCancelling">
-            <mat-spinner *ngIf="isResuming" diameter="20" class="button-spinner"></mat-spinner>
+            <app-spinner *ngIf="isResuming" [diameter]="20" class="button-spinner"></app-spinner>
             <span *ngIf="!isResuming">Resume Subscription</span>
             <span *ngIf="isResuming">Resuming...</span>
           </button>
@@ -87,7 +87,7 @@
             (click)="editSubscription()"
             *ngIf="canEdit()"
             [disabled]="isPausing || isResuming || isEditing || isCancelling">
-            <mat-spinner *ngIf="isEditing" diameter="20" class="button-spinner"></mat-spinner>
+            <app-spinner *ngIf="isEditing" [diameter]="20" class="button-spinner"></app-spinner>
             <span *ngIf="!isEditing">Edit Subscription</span>
             <span *ngIf="isEditing">Updating...</span>
           </button>
@@ -97,7 +97,7 @@
             (click)="cancelSubscription()"
             *ngIf="canCancel()"
             [disabled]="isPausing || isResuming || isEditing || isCancelling">
-            <mat-spinner *ngIf="isCancelling" diameter="20" class="button-spinner"></mat-spinner>
+            <app-spinner *ngIf="isCancelling" [diameter]="20" class="button-spinner"></app-spinner>
             <span *ngIf="!isCancelling">Cancel Subscription</span>
             <span *ngIf="isCancelling">Cancelling...</span>
           </button>
@@ -124,7 +124,7 @@
   <!-- Payment History -->
   <app-content-block title="Payment History">
     <div *ngIf="loadingHistory" class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
+      <app-spinner [diameter]="40"></app-spinner>
       <p>Loading payment history...</p>
     </div>
 

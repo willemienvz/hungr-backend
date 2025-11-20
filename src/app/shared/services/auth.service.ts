@@ -43,14 +43,35 @@ export class AuthService {
 
   /**
    * Checks if an email is already registered with Firebase.
+   * Checks both Firebase Auth and Firestore to ensure we catch all existing emails.
    * @param email The email to check.
    * @returns A Promise<boolean> indicating whether the email is in use.
    */
   async isEmailInUse(email: string): Promise<boolean> {
     try {
-      const signInMethods = await this.afAuth.fetchSignInMethodsForEmail(email);
-      console.log('a', signInMethods);
-      return signInMethods.length > 0;
+      // Normalize email to lowercase for consistent checking
+      const normalizedEmail = email.toLowerCase().trim();
+      
+      // Check Firebase Auth first
+      let authInUse = false;
+      try {
+        const signInMethods = await this.afAuth.fetchSignInMethodsForEmail(normalizedEmail);
+        authInUse = signInMethods.length > 0;
+      } catch (authError) {
+        // Continue to check Firestore even if Auth check fails
+      }
+      
+      // Also check Firestore as fallback (users can exist in Firestore before Auth account is created)
+      let firestoreInUse = false;
+      try {
+        const userInFirestore = await this.getUserByEmail(normalizedEmail);
+        firestoreInUse = userInFirestore !== null;
+      } catch (firestoreError) {
+        // If Firestore check fails, rely on Auth check result
+      }
+      
+      const isInUse = authInUse || firestoreInUse;
+      return isInUse;
     } catch (error) {
       console.error('Error checking email:', error);
       throw new Error('Unable to check email availability at this time.');

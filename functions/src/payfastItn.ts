@@ -424,31 +424,32 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
       const isRecurringForUser = hasSubscriptionType || hasRecurringAmount || hasToken;
       
       // Determine plan name
-      let userPlanName = 'monthly';
+      // For monthly recurring subscriptions, use 'digitalMenu' instead of 'monthly'
+      let userPlanName = 'once-off';
       if (isRecurringForUser) {
         if (itnData.frequency) {
           switch (itnData.frequency) {
             case '3':
-              userPlanName = 'monthly';
+              userPlanName = 'digitalMenu'; // Monthly recurring subscription
               break;
             case '4':
-              userPlanName = 'quarterly';
+              userPlanName = 'digitalMenu'; // Default to digitalMenu for recurring
               break;
             case '5':
-              userPlanName = 'bi-annual';
+              userPlanName = 'digitalMenu'; // Default to digitalMenu for recurring
               break;
             case '6':
-              userPlanName = 'annual';
+              userPlanName = 'digitalMenu'; // Default to digitalMenu for recurring
               break;
             default:
-              userPlanName = 'monthly';
+              userPlanName = 'digitalMenu'; // Default to digitalMenu for recurring
           }
         } else {
-          // No frequency specified, but we have a token - default to monthly (our standard plan)
-          userPlanName = 'monthly';
+          // No frequency specified, but we have a token - default to digitalMenu for monthly (our standard plan)
+          userPlanName = 'digitalMenu';
         }
       } else {
-        userPlanName = 'once-off';
+        userPlanName = 'once-off'; // One-time payment
       }
       
       const newUserData = {
@@ -458,6 +459,8 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
         phoneNumber: itnData.cell_number || '',
         subscriptionStatus: 'active',
         subscriptionPlan: userPlanName,
+        subscriptionType: userPlanName, // Also set subscriptionType for consistency
+        payfastToken: itnData.token || itnData.tokenisation, // Save PayFast token to user document for billing access
         lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
         created_at: admin.firestore.FieldValue.serverTimestamp(),
         updated_at: admin.firestore.FieldValue.serverTimestamp()
@@ -502,32 +505,32 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
     
     // Determine plan based on frequency if available
     // For sign-ups, we always expect monthly recurring subscription (R999/month)
-    // Default to monthly if we have a token (indicates recurring capability)
-    let planName = 'monthly'; // Default to monthly for recurring subscriptions
+    // Use 'digitalMenu' for monthly recurring subscriptions instead of 'monthly'
+    let planName = 'once-off';
     if (isRecurring) {
       if (itnData.frequency) {
         switch (itnData.frequency) {
           case '3':
-            planName = 'monthly';
+            planName = 'digitalMenu'; // Monthly recurring subscription
             break;
           case '4':
-            planName = 'quarterly';
+            planName = 'digitalMenu'; // Default to digitalMenu for recurring
             break;
           case '5':
-            planName = 'bi-annual';
+            planName = 'digitalMenu'; // Default to digitalMenu for recurring
             break;
           case '6':
-            planName = 'annual';
+            planName = 'digitalMenu'; // Default to digitalMenu for recurring
             break;
           default:
-            planName = 'monthly';
+            planName = 'digitalMenu'; // Default to digitalMenu for recurring
         }
       } else {
-        // No frequency specified, but we have a token - default to monthly (our standard plan)
-        planName = 'monthly';
+        // No frequency specified, but we have a token - default to digitalMenu for monthly (our standard plan)
+        planName = 'digitalMenu';
       }
     } else {
-      planName = 'once-off';
+      planName = 'once-off'; // One-time payment
     }
     
     console.log('Determined plan name:', planName, 'isRecurring:', isRecurring);
@@ -614,7 +617,8 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
     await db.collection('users').doc(userId).update({
       subscriptionStatus: 'active',
       subscriptionPlan: planName, // Use the same planName determined above
-      payfastToken: tokenToSave, // Save PayFast token to user document for subscription management
+      subscriptionType: planName, // Also set subscriptionType for consistency
+      payfastToken: tokenToSave, // Save PayFast token to user document for subscription management and billing access
       lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     });

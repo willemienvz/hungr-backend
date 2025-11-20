@@ -81,7 +81,6 @@ import { TestAuthComponent } from './components/test-auth/test-auth.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -150,6 +149,7 @@ import { FileSizePipe } from './shared/pipes/file-size.pipe';
 import { ReviewsComponent } from './components/reviews/reviews.component';
 import { PermissionService } from './shared/services/permission.service';
 import { PayFastTestComponent } from './components/test/payfast-test/payfast-test.component';
+import { SpinnerComponent } from './components/shared/spinner/spinner.component';
 
 @NgModule({
   declarations: [
@@ -260,6 +260,7 @@ import { PayFastTestComponent } from './components/test/payfast-test/payfast-tes
     MediaPreviewDialogComponent,
     ReviewsComponent,
     PayFastTestComponent,
+    SpinnerComponent,
   ],
   imports: [
     BrowserModule,
@@ -291,7 +292,6 @@ import { PayFastTestComponent } from './components/test/payfast-test/payfast-tes
     MatTabsModule,
     MatButtonToggleModule,
     MatPaginatorModule,
-    MatProgressSpinnerModule,
     MatProgressBarModule,
     MatButtonModule,
     MatMenuModule,

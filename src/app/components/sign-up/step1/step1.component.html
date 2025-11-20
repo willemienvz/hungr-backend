@@ -36,9 +36,22 @@
                             type="email"
                             placeholder="email@address.co.za"
                             [required]="true"
-                            [errorMessage]="getFieldError('userEmail')"
-                            formControlName="userEmail">
+                            [errorMessage]="step1Form.get('userEmail')?.hasError('emailInUse') ? '' : getFieldError('userEmail')"
+                            formControlName="userEmail"
+                            (blur)="onEmailBlur()">
                         </app-form-input>
+                        <div *ngIf="step1Form.get('userEmail')?.pending" class="email-checking-indicator" style="display: flex; align-items: center; gap: 8px; margin-top: 4px; color: #666; font-size: 12px;">
+                            <app-spinner [diameter]="16"></app-spinner>
+                            <span>Checking email availability...</span>
+                        </div>
+                        <div *ngIf="step1Form.get('userEmail')?.hasError('emailInUse') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)" class="email-error-message" style="margin-top: 4px; color: #f44336; font-size: 12px;">
+                            <span>This email is already registered.</span>
+                            <a routerLink="/sign-in" class="log-in-link" style="color: #1976d2; text-decoration: underline; margin-left: 4px; cursor: pointer;">Sign in</a>
+                            <span> or try a different email.</span>
+                        </div>
+                        <div *ngIf="step1Form.get('userEmail')?.hasError('emailCheckFailed') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)" class="email-error-message" style="margin-top: 4px; color: #f44336; font-size: 12px;">
+                            <span>{{ getFieldError('userEmail') }}</span>
+                        </div>
                         <app-form-input
                             label="Cellphone number"
                             type="tel"
@@ -88,7 +101,10 @@
                 </div>
             </div>
             <div class="auth-btn-container">
-                <button (click)="onNext()" class="hungr-btn hungr-btn-primary" [disabled]="step1Form.invalid">Next</button>
+                <button (click)="onNext()" class="hungr-btn hungr-btn-primary" [disabled]="step1Form.invalid || step1Form.pending">
+                    <span *ngIf="step1Form.pending">Checking...</span>
+                    <span *ngIf="!step1Form.pending">Next</span>
+                </button>
             </div>
             <div class="auth-redirect">
                 <a class="auth-redirect-link" routerLink="/sign-in">

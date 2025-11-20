@@ -2,14 +2,11 @@ import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/cor
 import { FormBuilder, FormGroup, Validators, AbstractControl  } from '@angular/forms';
 import { FormDataService } from '../../../shared/services/signup/form-data.service';
 import {  Subscription } from 'rxjs';
-import { dateInFutureValidator } from '../../../shared/validators/custom-validators'; 
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../shared/services/auth.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { User } from '../../../shared/services/user';
-import { map } from 'rxjs/operators';
-
 import { Router } from '@angular/router';
+import { emailAvailabilityValidator } from '../../../shared/validators/email-availability.validator';
 
 @Component({
   selector: 'app-step1',
@@ -19,18 +16,21 @@ import { Router } from '@angular/router';
 export class Step1Component  implements OnInit, OnDestroy{
   step1Form: FormGroup;
   showPassword: boolean = false;
-  emailList: string[] = [];
-  emailInUse: boolean = false;
   showPasswordConf: boolean = false;
   private confirmPwdSubscription!: Subscription;
+  private emailSubscription!: Subscription;
   @Output() next: EventEmitter<any> = new EventEmitter<any>();
-  constructor(private router: Router, private firestore: AngularFirestore, public authService: AuthService,private fb: FormBuilder, private formDataService: FormDataService,  private toastr: ToastrService) {
+  constructor(private router: Router, public authService: AuthService, private fb: FormBuilder, private formDataService: FormDataService,  private toastr: ToastrService) {
     this.step1Form = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(10)]],
       userPwdConfrim: ['', Validators.required],
-      userEmail: ['', [Validators.required, Validators.email, this.emailInUseValidator.bind(this)]],
+      userEmail: [
+        '', 
+        [Validators.required, Validators.email]
+        // Async validator will be added on blur or form submission
+      ],
       cellphone: ['+27', [Validators.required, this.cellphoneValidator.bind(this)]],
   }, {
       validator: this.passwordMatchValidator 
@@ -42,7 +42,6 @@ export class Step1Component  implements OnInit, OnDestroy{
       this.step1Form.patchValue(existingData);
     }
 
-    this.getUsers();
     this.confirmPwdSubscription = this.step1Form.get('userPwdConfrim')!.valueChanges.subscribe(() => {
       this.passwordMatchValidator(this.step1Form);
     });
@@ -51,13 +50,34 @@ export class Step1Component  implements OnInit, OnDestroy{
       this.isPasswordValid();
     });
 
-    this.step1Form.get('userEmail')!.valueChanges.subscribe((email) => {
-     if (this.checkEmailInUse(email)){
-      this.emailInUse = true;
-     }else{
-      this.emailInUse = false;
-     }
-    });
+    // Set up debounced email validation on blur or after user stops typing
+    const emailControl = this.step1Form.get('userEmail');
+    if (emailControl) {
+      // Clear async validation errors when user changes email
+      this.emailSubscription = emailControl.valueChanges
+        .pipe(
+          debounceTime(800), // Wait 800ms after user stops typing
+          distinctUntilChanged() // Only validate if value actually changed
+        )
+        .subscribe(() => {
+          // Clear previous async validation errors
+          const errors = emailControl.errors;
+          if (errors && (errors['emailInUse'] || errors['emailCheckFailed'])) {
+            const newErrors: any = { ...errors };
+            delete newErrors['emailInUse'];
+            delete newErrors['emailCheckFailed'];
+            const hasOtherErrors = Object.keys(newErrors).length > 0;
+            emailControl.setErrors(hasOtherErrors ? newErrors : null, { emitEvent: false });
+          }
+          
+          // Only validate if field is touched (user has interacted with it)
+          if (emailControl.touched && emailControl.value && !emailControl.hasError('email') && !emailControl.hasError('required')) {
+            // Add async validator and trigger validation
+            emailControl.setAsyncValidators([emailAvailabilityValidator(this.authService)]);
+            emailControl.updateValueAndValidity();
+          }
+        });
+    }
 
     this.step1Form.get('cellphone')!.valueChanges.subscribe((value) => {
       this.step1Form.get('cellphone')!.setValue(this.formatCellphone(value), { emitEvent: false });
@@ -171,29 +191,23 @@ export class Step1Component  implements OnInit, OnDestroy{
     }
     return null;
   }
-  checkEmailInUse(email: string): boolean {
-    return this.emailList.includes(email);
-  }
-getUsers(){
-  this.firestore
-  .collection('users') 
-  .valueChanges()
-  .pipe(
-    map((users: any[]) => users.map(user => user.email)) 
-  )
-  .subscribe({
-    next: (emails: string[]) => {
-      this.emailList = emails; 
-      console.log('Emails:', emails); 
-    },
-    error: (error) => {
-      console.error('Error fetching emails:', error);
-    },
-  });
-}
   ngOnDestroy(): void {
     if (this.confirmPwdSubscription) {
       this.confirmPwdSubscription.unsubscribe();
+    }
+    if (this.emailSubscription) {
+      this.emailSubscription.unsubscribe();
+    }
+  }
+  
+  onEmailBlur(): void {
+    // Trigger email validation when user blurs the field
+    const emailControl = this.step1Form.get('userEmail');
+    if (emailControl && emailControl.value && !emailControl.hasError('email') && !emailControl.hasError('required')) {
+      emailControl.markAsTouched();
+      // Add async validator and trigger validation
+      emailControl.setAsyncValidators([emailAvailabilityValidator(this.authService)]);
+      emailControl.updateValueAndValidity();
     }
   }
   get passwordControl(): AbstractControl | null {
@@ -218,13 +232,6 @@ getUsers(){
       const isMismatch = passwordControl.value !== passwordConfirm.value;
       passwordConfirm.setErrors(isMismatch ? { 'mismatch': true } : null);
     }
-  }
-  emailInUseValidator(control: AbstractControl): { [key: string]: boolean } | null {
-    const email = control.value;
-    if (this.checkEmailInUse(email)) {
-      return { emailInUse: true }; 
-    }
-    return null;
   }
   
 
@@ -276,11 +283,14 @@ getFieldError(fieldName: string): string {
     if (field.hasError('email')) {
       return 'Enter a valid email address.';
     }
+    if (field.hasError('emailInUse')) {
+      return 'This email is already registered. Sign in or try a different email.';
+    }
+    if (field.hasError('emailCheckFailed')) {
+      return 'Unable to check email availability. Please try again.';
+    }
     if (field.hasError('invalidCellphone')) {
       return 'Enter a valid cellphone number (e.g., +27 12 234 5678).';
-    }
-    if (field.hasError('emailInUse')) {
-      return 'This email is already in use.';
     }
     if (field.hasError('minlength')) {
       return 'Password must be at least 10 characters long.';
@@ -303,14 +313,52 @@ private getFieldLabel(fieldName: string): string {
   };
   return labels[fieldName] || fieldName;
 }
-  onNext() {
+  async onNext() {
+    // Mark all fields as touched to show validation errors
+    Object.keys(this.step1Form.controls).forEach(key => {
+      this.step1Form.get(key)?.markAsTouched();
+    });
+    
+    // Trigger async validation for email field if it has a value
+    const emailControl = this.step1Form.get('userEmail');
+    if (emailControl && emailControl.value && !emailControl.hasError('email') && !emailControl.hasError('required')) {
+      // Mark as dirty and touched to ensure validation runs
+      emailControl.markAsDirty();
+      emailControl.markAsTouched();
+      // Add async validator and trigger validation
+      emailControl.setAsyncValidators([emailAvailabilityValidator(this.authService)]);
+      emailControl.updateValueAndValidity();
+    }
+    
+    // Wait for async validation to complete
+    let waitCount = 0;
+    while (this.step1Form.pending && waitCount < 30) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      waitCount++;
+    }
+    
+    // Also wait for email control specifically
+    if (emailControl) {
+      waitCount = 0;
+      while (emailControl.pending && waitCount < 30) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        waitCount++;
+      }
+    }
+    
+    // Check form validity (includes async email validation)
+    if (this.step1Form.invalid || this.step1Form.pending) {
+      // Form validation will show errors automatically
+      return;
+    }
+    
     if (this.isPasswordMismatch()) {
       this.toastr.error('Passwords do not match');
       return;
-  }
-  const formData = this.step1Form.value;
-  formData.cellphone = formData.cellphone.replace(/\s/g, '');
-  this.formDataService.updateFormData(formData);
-  this.router.navigate(['/register-user/step2']);
+    }
+    const formData = this.step1Form.value;
+    formData.cellphone = formData.cellphone.replace(/\s/g, '');
+    this.formDataService.updateFormData(formData);
+    this.router.navigate(['/register-user/step2']);
   }
 }

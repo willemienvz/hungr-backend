@@ -54,6 +54,58 @@ export class VerifyEmailComponent implements OnInit {
     this.payfastService.notifyPaymentSuccess();
   }
 
+  /**
+   * Maps payment document fields to canonical schema
+   * Handles field name mapping and conflict resolution
+   */
+  private mapPaymentFieldsToCanonical(paymentData: any, formData: any): any {
+    // Map field names from payment document to canonical schema
+    return {
+      // User-provided fields (form data takes precedence)
+      firstName: formData.firstName || paymentData.firstName,
+      Surname: formData.lastName || paymentData.lastName || paymentData['Surname'],
+      cellphoneNumber: formData.cellphone || paymentData.phoneNumber || paymentData.cellphoneNumber,
+      marketingConsent: formData.receiveMarketingInfo !== undefined 
+        ? formData.receiveMarketingInfo 
+        : (paymentData.marketingConsent || false),
+      tipsTutorials: formData.receiveMarketingInfo !== undefined 
+        ? formData.receiveMarketingInfo 
+        : (paymentData.tipsTutorials || false),
+      userInsights: formData.receiveMarketingInfo !== undefined 
+        ? formData.receiveMarketingInfo 
+        : (paymentData.userInsights || false),
+      
+      // Payment/subscription fields (payment data takes precedence)
+      subscriptionStatus: paymentData.subscriptionStatus || 'active',
+      subscriptionType: this.mapSubscriptionPlan(
+        paymentData.subscriptionPlan || paymentData.subscriptionType
+      ),
+      payfastToken: paymentData.payfastToken || paymentData.payfastToken, // Preserve token
+      lastPaymentDate: paymentData.lastPaymentDate,
+      
+      // System fields
+      accountType: paymentData.accountType || 'admin',
+      parentId: paymentData.parentId || '',
+      aboutUsDisplayed: paymentData.aboutUsDisplayed || false,
+      
+      // Timestamps
+      created_at: paymentData.created_at || new Date(),
+      updated_at: new Date()
+    };
+  }
+
+  /**
+   * Maps subscription plan values to canonical schema
+   * 'once-off' stays 'once-off', monthly/recurring → 'digitalMenu'
+   */
+  private mapSubscriptionPlan(plan: string): string {
+    // Map 'once-off' to 'once-off', any monthly/recurring to 'digitalMenu'
+    if (plan === 'once-off') return 'once-off';
+    // If it's a recurring subscription (monthly, quarterly, etc.), use 'digitalMenu'
+    if (plan && plan !== 'once-off') return 'digitalMenu';
+    return 'digitalMenu'; // Default for monthly subscriptions
+  }
+
   private async createUserAccount(formData: any) {
     try {
       // Check if user already exists in Firestore (created by ITN)
@@ -77,58 +129,71 @@ export class VerifyEmailComponent implements OnInit {
           if (existingUserQuery && !existingUserQuery.empty) {
             const existingDoc = existingUserQuery.docs[0];
             const existingDocId = existingDoc.id;
-            const existingData = existingDoc.data();
+            const existingData = (existingDoc.data() || {}) as Record<string, any>;
             
             // If document ID doesn't match Auth UID, we need to migrate
             if (existingDocId !== authUid) {
               console.log(`Migrating user from ${existingDocId} to ${authUid}`);
               this.toastr.info('Merging account data...');
               
-              // 1. Create new document with Auth UID, preserving all existing data including payfastToken
+              // 1. Map payment fields to canonical schema with conflict resolution
+              const mappedData = this.mapPaymentFieldsToCanonical(existingData, formData);
+              
+              // 2. Create new document with Auth UID, preserving all existing data including payfastToken
               const userRef = this.firestore.doc(`users/${authUid}`);
               await userRef.set({
                 ...existingData, // Preserve all existing data including payfastToken, subscriptionStatus, etc.
+                ...mappedData, // Apply mapped fields (form data takes precedence for user fields)
                 uid: authUid,
                 emailVerified: userCredential.user.emailVerified,
-                // Merge form data (form data takes precedence for these fields)
-                firstName: formData.firstName || existingData['firstName'],
-                Surname: formData.lastName || existingData['lastName'],
-                cellphoneNumber: formData.cellphone || existingData['phoneNumber'] || existingData['cellphoneNumber'],
-                marketingConsent: formData.receiveMarketingInfo !== undefined ? formData.receiveMarketingInfo : existingData['marketingConsent'],
-                tipsTutorials: formData.receiveMarketingInfo !== undefined ? formData.receiveMarketingInfo : existingData['tipsTutorials'],
-                userInsights: formData.receiveMarketingInfo !== undefined ? formData.receiveMarketingInfo : existingData['userInsights'],
-                subscriptionType: formData.billingOption || existingData['subscriptionPlan'] || existingData['subscriptionType'],
-                accountType: existingData['accountType'] || 'admin',
-                parentId: existingData['parentId'] || '',
-                aboutUsDisplayed: existingData['aboutUsDisplayed'] || false,
                 updated_at: new Date()
               }, { merge: true });
               
               console.log('User document created/updated with preserved data including payfastToken:', existingData['payfastToken'] ? 'YES' : 'NO');
               
-              // 2. Update all subscriptions to use new userId
+              // 2. Update all subscriptions to use new userId (only if document ID changed)
+              // Subscription updates only happen when document ID actually changes (existingDocId !== authUid)
+              // This check is already done above, so we know we need to update subscriptions
               const subscriptionsQuery = await this.firestore.collection('subscriptions', ref =>
                 ref.where('userId', '==', existingDocId)
               ).get().toPromise();
               
               if (subscriptionsQuery && !subscriptionsQuery.empty) {
-                const batch = this.firestore.firestore.batch();
-                subscriptionsQuery.docs.forEach(doc => {
-                  batch.update(doc.ref, { userId: authUid });
-                  console.log(`Updating subscription ${doc.id} to use userId ${authUid}`);
-                });
-                await batch.commit();
-                console.log(`Updated ${subscriptionsQuery.docs.length} subscription(s) to use new userId`);
-                this.toastr.success(`Migrated ${subscriptionsQuery.docs.length} subscription(s)`);
+                try {
+                  const batch = this.firestore.firestore.batch();
+                  subscriptionsQuery.docs.forEach(doc => {
+                    batch.update(doc.ref, { userId: authUid });
+                    console.log(`Updating subscription ${doc.id} to use userId ${authUid}`);
+                  });
+                  await batch.commit();
+                  console.log(`Updated ${subscriptionsQuery.docs.length} subscription(s) to use new userId`);
+                  this.toastr.success(`Migrated ${subscriptionsQuery.docs.length} subscription(s)`);
+                } catch (batchError) {
+                  // Log error but don't fail entire merge
+                  console.error('Failed to update subscription references:', batchError);
+                  // Continue with merge - subscriptions can be updated manually if needed
+                }
+              } else {
+                // No subscriptions exist for old user ID - skip subscription update logic gracefully
+                console.log('No subscriptions found for old user ID - skipping subscription update');
               }
               
               // 3. Optionally delete old user document (or keep as backup)
               // For now, we'll keep it as a backup and log a warning
-              console.log(`WARNING: Old user document ${existingDocId} still exists. Consider deleting after verification.`);
+              console.warn(`WARNING: Old user document ${existingDocId} still exists. Consider deleting after verification.`);
               
             } else {
               // Document ID matches Auth UID, just update it with merge
-              await this.authService.SetUserData(userCredential.user, formData);
+              // Map payment fields to ensure canonical schema is used
+              const mappedData = this.mapPaymentFieldsToCanonical(existingData, formData);
+              const userRef = this.firestore.doc(`users/${authUid}`);
+              await userRef.set({
+                ...existingData,
+                ...mappedData,
+                uid: authUid,
+                emailVerified: userCredential.user.emailVerified,
+                updated_at: new Date()
+              }, { merge: true });
             }
           } else {
             // Should not happen, but fallback to standard flow

@@ -10,7 +10,7 @@
 
                 <div class="text-center" *ngIf="!isSaving">
                     <button class="hungr-btn hungr-btn-primary" [disabled]="isResending" (click)="resendVerificationEmail()">
-                        <mat-spinner *ngIf="isResending" diameter="20" color="accent"></mat-spinner>
+                        <app-spinner *ngIf="isResending" [diameter]="20"></app-spinner>
                         {{ isResending ? 'Sending...' : 'Resend Email' }}
                     </button>
                 </div>

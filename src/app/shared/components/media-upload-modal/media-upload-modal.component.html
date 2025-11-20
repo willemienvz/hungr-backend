@@ -105,7 +105,7 @@
               <button class="hungr-btn hungr-btn-primary" 
                       (click)="uploadMedia()"
                       [disabled]="uploading || !isValidationValid">
-                <mat-spinner diameter="20" *ngIf="uploading"></mat-spinner>
+                <app-spinner [diameter]="20" *ngIf="uploading"></app-spinner>
                 {{ uploading ? 'Uploading...' : 'Upload Media' }}
               </button>
             </div>
@@ -160,7 +160,7 @@
 
           <!-- Loading State -->
           <div class="loading-container" *ngIf="mediaLibraryLoading">
-            <mat-spinner></mat-spinner>
+            <app-spinner></app-spinner>
             <p>Loading media library...</p>
           </div>
 

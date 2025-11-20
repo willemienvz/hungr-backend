@@ -10,7 +10,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 
@@ -79,7 +78,6 @@ describe('MediaUploadModalComponent', () => {
         MatButtonModule,
         MatSlideToggleModule,
         MatProgressBarModule,
-        MatProgressSpinnerModule,
         BrowserAnimationsModule
       ],
       providers: [
