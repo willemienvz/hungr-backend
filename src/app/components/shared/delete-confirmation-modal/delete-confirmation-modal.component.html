@@ -9,18 +9,15 @@
 
   <!-- Content -->
   <div class="modal-content">
-    <div class="warning-icon">
-      <i class="material-icons">warning</i>
-    </div>
     <p class="confirmation-message">{{ data.message }}</p>
   </div>
 
   <!-- Action Buttons -->
   <div class="modal-actions">
-    <button type="button" class="hungr-btn hungr-btn-tertiary" (click)="onCancel()">
+    <button type="button" class="hungr-btn hungr-btn-secondary" (click)="onCancel()">
       {{ data.cancelButtonText }}
     </button>
-    <button type="button" class="hungr-btn hungr-btn-danger" (click)="onConfirm()">
+    <button type="button" class="hungr-btn hungr-btn-primary" (click)="onConfirm()">
       {{ data.confirmButtonText }}
     </button>
   </div>

@@ -9,3 +9,5 @@ export class SpinnerComponent {
   @Input() diameter: number = 40;
 }
 
+
+

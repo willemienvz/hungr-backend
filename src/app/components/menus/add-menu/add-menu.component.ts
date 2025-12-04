@@ -8,7 +8,7 @@ import { finalize, take } from 'rxjs';
 import { Papa } from 'ngx-papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { BehaviorSubject } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
@@ -96,7 +96,7 @@ export class AddMenuComponent implements OnInit {
     private storage: AngularFireStorage,
     private firestore: AngularFirestore,
     private papa: Papa,
-    private toastr: ToastrService,
+    private toast: ToastService,
     private dialog: MatDialog,
     private router: Router,
     private route: ActivatedRoute,
@@ -169,7 +169,13 @@ export class AddMenuComponent implements OnInit {
   }
 
   onBackButtonClick() {
-    this.navigateWithUnsavedChangesCheck(['/menus']);
+    // If we're on step 1, navigate back to menus list
+    if (this.currentStep === 1) {
+      this.navigateWithUnsavedChangesCheck(['/menus']);
+    } else {
+      // For steps > 1, navigate to previous step
+      this.navigateToStep(this.currentStep - 1);
+    }
   }
 
   async onAddRestaurantClick(event: Event) {
@@ -593,7 +599,7 @@ export class AddMenuComponent implements OnInit {
         this.menuItems = this.menuService.updateMenuItemImage(this.menuItems, itemIndex, url);
       }).catch(error => {
         console.error('Error uploading image:', error);
-        this.toastr.error('Error uploading image');
+        this.toast.error('Error uploading image');
       });
     }
   }
@@ -601,7 +607,7 @@ export class AddMenuComponent implements OnInit {
   saveMenu(): void {
     // Add duplicate name check
     if (this.isDuplicateMenuName) {
-      this.toastr.error('A menu with this name already exists. Please choose a different name.');
+      this.toast.error('A menu with this name already exists. Please choose a different name.');
       return;
     }
 
@@ -731,7 +737,22 @@ export class AddMenuComponent implements OnInit {
       if (step === 4 && this.menuItems.length === 0) {
         this.menuItems = this.menuService.addMenuItem(this.menuItems);
       }
-      this.router.navigate(['/menus/add-menu', step]);
+      // Only check for unsaved changes when navigating backward, not forward (step 3 to 4)
+      const isForwardNavigation = this.currentStep === 3 && step === 4;
+      if (this.hasUnsavedChanges && !isForwardNavigation) {
+        const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+          width: '400px',
+          disableClose: true
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result === true) {
+            this.router.navigate(['/menus/add-menu', step]);
+          }
+        });
+      } else {
+        this.router.navigate(['/menus/add-menu', step]);
+      }
     }
   }
 
@@ -756,7 +777,7 @@ export class AddMenuComponent implements OnInit {
     // Navigate to the menu items step to show the uploaded items
     this.router.navigate(['/menus/add-menu', 4]);
     
-    this.toastr.success(`${event.items.length} menu items ${event.replaceExisting ? 'replaced' : 'added'} successfully!`);
+    this.toast.success(`${event.items.length} menu items ${event.replaceExisting ? 'replaced' : 'added'} successfully!`);
   }
 
   setAsPublished() {
@@ -787,4 +808,5 @@ export class AddMenuComponent implements OnInit {
     // Mark as having unsaved changes
     this.markAsChanged();
   }
+
 }

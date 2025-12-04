@@ -12,10 +12,9 @@
 
   h5 {
     font-family: var(--font-family-primary);
-    font-size: 1var(--spacing-2);
+    font-size: 18px;
     font-weight: 700;
     line-height: 22.5px;
-    letter-spacing: -0.001em;
     text-align: left;
   }
 
@@ -38,7 +37,6 @@
       font-size: var(--spacing-4);
       font-weight: 700;
       line-height: 19.2px;
-      letter-spacing: -0.001em;
       text-align: left;
       color: #2e3646;
       margin: 19px 0 var(--spacing-2) 0;
@@ -53,7 +51,6 @@
       font-size: 15px;
       font-weight: 400;
       line-height: 20.25px;
-      letter-spacing: -0.001em;
       text-align: left;
       min-height: 54px;
       display: flex;
@@ -76,7 +73,6 @@
   font-weight: 700;
   color: #2e3646;
   line-height: 1;
-  letter-spacing: -0.02px;
   margin: 0;
 }
 
@@ -97,10 +93,36 @@
 
 .confirmation-actions {
   display: flex;
-  margin-top: 2var(--spacing-2);
+  margin-top: 30px;
   gap: 15px;
   align-items: center;
   justify-content: center;
 }
 
 /* Button styles now use centralized btn classes from design system */
+
+@media (max-width: 768px) {
+  .delete-confirmation {
+    padding: 20px 15px;
+    max-width: 100%;
+
+    .row {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .col {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+  }
+
+  .confirmation-actions {
+    flex-direction: column;
+    width: 100%;
+
+    button {
+      width: 100%;
+    }
+  }
+}

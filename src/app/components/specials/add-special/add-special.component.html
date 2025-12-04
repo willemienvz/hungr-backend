@@ -128,8 +128,9 @@
           </app-special-summary>
           <app-step-header
             [stepNumber]="3"
-            [stepTitle]="'Special Details'"
-            [showDescription]="false">
+            [stepTitle]="'Select Items'"
+            [description]="'Please specify which items are on promotion'"
+            [showDescription]="true">
           </app-step-header>
         </div>
       </ng-container>
@@ -138,6 +139,7 @@
       [showPrevious]="true"
       [showDraft]="true"
       [showNext]="showNextButton"
+      [nextDisabled]="isStep3Invalid()"
       [isSaving]="isSaving"
       (previous)="previousStep()"
       (draft)="onDraftSave()"
@@ -150,6 +152,7 @@
     <app-step4-add-media
       [uploadedImageUrl]="uploadedImageUrl"
       [mediaId]="mediaId"
+      [fileName]="selectedMediaItem?.originalName || selectedMediaItem?.fileName || null"
       [isSaving]="isSaving"
       (openImageUploadModal)="openImageUploadModal()"
       (deleteMedia)="onDeleteMedia()"

@@ -5,7 +5,7 @@ import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { finalize, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { Papa } from 'ngx-papaparse';
 import * as XLSX from 'xlsx';
 import { Category } from '../../../shared/services/category';
@@ -80,7 +80,7 @@ export class MenuService {
   constructor(
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
-    private toastr: ToastrService,
+    private toast: ToastService,
     private papa: Papa
   ) {}
 
@@ -434,12 +434,12 @@ export class MenuService {
       
       this.firestore.collection('menus').add(sanitizedData)
         .then((docRef) => {
-          this.toastr.success('Menu saved successfully!');
+          this.toast.success('Menu saved successfully!');
           resolve(docRef.id);
         })
         .catch((error) => {
           console.error('Error saving menu:', error);
-          this.toastr.error('Error saving menu');
+          this.toast.error('Error saving menu');
           reject(error);
         });
     });
@@ -452,12 +452,12 @@ export class MenuService {
       
       this.firestore.collection('menus').doc(menuId).update(sanitizedData)
         .then(() => {
-          this.toastr.success('Menu updated successfully!');
+          this.toast.success('Menu updated successfully!');
           resolve();
         })
         .catch((error) => {
           console.error('Error updating menu:', error);
-          this.toastr.error('Error updating menu');
+          this.toast.error('Error updating menu');
           reject(error);
         });
     });
@@ -730,7 +730,7 @@ export class MenuService {
       } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
         this.parseXlsxFile(file, categories).then(resolve).catch(reject);
       } else {
-        this.toastr.error('Unsupported file format. Please use CSV or Excel files.');
+        this.toast.error('Unsupported file format. Please use CSV or Excel files.');
         reject(new Error('Unsupported file format'));
       }
     });
@@ -747,13 +747,13 @@ export class MenuService {
             resolve(menuItems);
           } catch (error) {
             console.error('Error converting CSV data:', error);
-            this.toastr.error('Error parsing CSV file. Please check the format.');
+            this.toast.error('Error parsing CSV file. Please check the format.');
             reject(error);
           }
         },
         error: (error) => {
           console.error('Error parsing CSV:', error);
-          this.toastr.error('Error reading CSV file.');
+          this.toast.error('Error reading CSV file.');
           reject(error);
         }
       });
@@ -796,13 +796,13 @@ export class MenuService {
           resolve(menuItems);
         } catch (error) {
           console.error('Error parsing XLSX file:', error);
-          this.toastr.error('Error parsing Excel file. Please check the format.');
+          this.toast.error('Error parsing Excel file. Please check the format.');
           reject(error);
         }
       };
       
       reader.onerror = () => {
-        this.toastr.error('Error reading Excel file.');
+        this.toast.error('Error reading Excel file.');
         reject(new Error('File read error'));
       };
       
@@ -915,7 +915,7 @@ export class MenuService {
 
     // Show errors if any
     if (errors.length > 0) {
-      this.toastr.error(`Found ${errors.length} errors in the uploaded file. Please check the console for details.`);
+      this.toast.error(`Found ${errors.length} errors in the uploaded file. Please check the console for details.`);
       console.error('Bulk upload errors:', errors);
     }
 

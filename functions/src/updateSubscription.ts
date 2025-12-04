@@ -1,7 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { generateApiSignature, getSubscriptionToken, getPayFastConfig } from './payfast';
+import { generateApiSignature, getSubscriptionToken, getPayFastConfig, formatPayFastTimestamp } from './payfast';
 import { retryWithBackoff, logSubscriptionAction, DatabaseRollback } from './subscriptionUtils';
+import { sendSubscriptionChangeEmail } from './brevo/emailService';
 
 export const updateSubscription = functions.https.onCall(async (data, context) => {
   // Authenticate user
@@ -46,7 +47,7 @@ export const updateSubscription = functions.https.onCall(async (data, context) =
     // Get PayFast configuration
     const payfastConfig = getPayFastConfig();
     const endpoint = `/subscriptions/${token}/update`;
-    const timestamp = new Date().toISOString();
+    const timestamp = formatPayFastTimestamp();
 
     // Prepare headers
     const headers = {
@@ -82,7 +83,8 @@ export const updateSubscription = functions.https.onCall(async (data, context) =
 
     // Make API call to PayFast with retry
     const apiCall = async () => {
-      const response = await fetch(`${payfastConfig.apiHost}${endpoint}`, {
+      const apiUrl = payfastConfig.getApiUrl(endpoint);
+      const response = await fetch(apiUrl, {
         method: 'PATCH',
         headers: {
           ...headers,
@@ -173,6 +175,39 @@ export const updateSubscription = functions.https.onCall(async (data, context) =
     await logSubscriptionAction(db, 'update', userId, subscriptionId, 'success', undefined, {
       updatedFields
     });
+
+    // Send subscription change email (non-blocking)
+    try {
+      const userDoc = await userRef.get();
+      const userData = userDoc.data();
+      const userEmail = userData?.email as string;
+      const firstName = (userData?.firstName as string) || 'User';
+      const oldPlan = subscriptionData.plan || subscriptionData.subscriptionPlan || 'N/A';
+      const newPlan = userUpdate.subscriptionPlan || oldPlan;
+      
+      if (userEmail) {
+        await sendSubscriptionChangeEmail(
+          userEmail,
+          {
+            firstName,
+            oldPlan,
+            newPlan,
+            effectiveDate: new Date().toISOString(),
+            billingChange: updatedFields.includes('amount') || updatedFields.includes('frequency')
+              ? 'Billing details updated'
+              : 'No billing change',
+          },
+          userId
+        );
+        console.log('Subscription change email sent', { userId, email: userEmail });
+      }
+    } catch (emailError: any) {
+      // Don't block subscription update if email fails
+      console.error('Failed to send subscription change email', {
+        userId,
+        error: emailError.message,
+      });
+    }
 
     return {
       success: true,

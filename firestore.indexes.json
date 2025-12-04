@@ -57,6 +57,16 @@
       ]
     },
     {
+      "collectionGroup": "specials",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "OwnerID",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "media",
       "queryScope": "COLLECTION",
       "fields": [

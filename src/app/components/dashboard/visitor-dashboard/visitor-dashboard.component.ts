@@ -119,7 +119,13 @@ export class VisitorDashboardComponent {
         console.log('Total duration:', totalDuration);
 
         // Average view time in ms
-        this.averageTime = totalViews > 0 ? Math.round((totalDuration / totalViews) / 60000) : 0;
+        if (totalViews > 0 && totalDuration > 0) {
+          const avgMs = totalDuration / totalViews;
+          const avgMinutes = Math.round(avgMs / 60000);
+          this.averageTime = isNaN(avgMinutes) || !isFinite(avgMinutes) ? 0 : avgMinutes;
+        } else {
+          this.averageTime = 0;
+        }
 
         // Calculate most popular viewing time from aggregated analytics data
         this.getMostPopularViewingTimeFromAggregates(hourHistogram);
@@ -369,6 +375,13 @@ export class VisitorDashboardComponent {
     this.averageTime = 5; // Example average time
     this.popularTime = '10 AM'; // Example popular time
     this.setChartOptions();
+  }
+
+  getAverageTimeDisplay(): string {
+    if (!this.averageTime || isNaN(this.averageTime) || this.averageTime === 0) {
+      return 'No data available';
+    }
+    return `${this.averageTime} min`;
   }
 }
 

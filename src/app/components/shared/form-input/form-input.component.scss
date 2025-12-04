@@ -1,6 +1,13 @@
+
+:host.full-width {
+    width: 100%;
+    display: block;
+}
+
 .form-input-wrapper {
     width: 100%;
-  
+    display: block;
+    box-sizing: border-box;
 
     .form-label {
         display: block;
@@ -8,11 +15,31 @@
         font-size: var(--form-label-font-size);
         font-weight: var(--form-label-font-weight);
         margin-bottom: var(--form-label-margin-bottom);
-        letter-spacing: -0.016px;
 
         &.required::after {
             content: ' *';
             color: var(--color-error);
+        }
+    }
+
+    &.label-left {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--spacing-4);
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+        }
+
+        .form-label {
+            margin-bottom: 0;
+            flex-shrink: 0;
+            min-width: fit-content;
+        }
+
+        .input-container {
+            flex: 1;
         }
     }
 }
@@ -22,6 +49,7 @@
         display: flex;
         align-items: center;
         width: 100%;
+        box-sizing: border-box;
 
         .prefix-icon,
         .suffix-icon {
@@ -51,10 +79,77 @@
             right: var(--spacing-3);
             opacity:0.25;
         }
+
+        // Add extra right padding to input when suffix icon is present
+        &:has(.suffix-icon) .form-input {
+            padding-right: calc(var(--spacing-3) + 24px + var(--spacing-2));
+        }
+
+        // Tooltip wrapper (top right)
+        .tooltip-wrapper {
+            position: absolute;
+            top: -1.6rem;
+            right: var(--spacing-2);
+            z-index: 10;
+            display: inline-block;
+            line-height: 1;
+
+            .tooltip-icon {
+                font-size: var(--spacing-4);
+                color: #999;
+                cursor: help;
+                transition: color 0.3s ease;
+
+                &:hover {
+                    color: var(--color-secondary);
+                }
+            }
+
+            .tooltip-text {
+                visibility: hidden;
+                opacity: 0;
+                width: 250px;
+                background-color: #333;
+                color: white;
+                text-align: left;
+                border-radius: var(--border-radius-base);
+                padding: var(--spacing-2) var(--spacing-3);
+                position: absolute;
+                z-index: 100;
+                bottom: calc(100% + var(--spacing-2));
+                right: 0;
+                font-size: var(--spacing-3);
+                line-height: 1.4;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+                font-family: var(--hungr-font-family);
+                white-space: normal;
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    top: 100%;
+                    right: var(--spacing-4);
+                    border-width: 5px;
+                    border-style: solid;
+                    border-color: #333 transparent transparent transparent;
+                }
+            }
+
+            &:hover .tooltip-text {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+
+        // Add extra right padding to input when tooltip is present
+        &.has-tooltip .form-input {
+            padding-right: calc(var(--spacing-3) + 24px + var(--spacing-2));
+        }
     }
 
         .form-input {
             width: 100%;
+            max-width: 100%;
             height: var(--form-field-height);
             border: var(--form-field-border-width) solid var(--form-field-border-color);
             border-radius: var(--form-field-border-radius);
@@ -67,6 +162,11 @@
             background: var(--form-field-bg);
             outline: none;
             transition: var(--form-field-transition);
+            box-sizing: border-box;
+
+            &.full-width {
+                width:100%;
+            }
 
             &:focus {
                 border-color: var(--form-field-border-color-focus);
@@ -75,6 +175,7 @@
 
             &::placeholder {
                 color: var(--form-field-placeholder-color);
+                font-weight: 400;
             }
 
             &:disabled {
@@ -109,11 +210,13 @@
 
 // Number input specific styles
 input[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
+        appearance: none;
         margin: 0;
     }
 }

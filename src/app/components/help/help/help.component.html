@@ -1,23 +1,23 @@
 <div class="inner-page">
     <div class="coltwothird">
-        <app-content-block title="Looking for something specific?" [ngStyle]="{'justify-content': 'center', 'align-items': 'center', 'display': 'flex'}">
-            <div class="innerBlock">
-                <div class="rowinput">
-                    <app-form-input
+        <app-content-block [showHeader]="false">
+            <div class="help-search-section">
+                <h2 class="help-header">Looking for something specific?</h2>
+                
+                <div class="search-bar-container">
+                    <input
                         type="text"
-                        placeholder="type your question here"
+                        class="search-input"
+                        placeholder="add new menu"
                         [(ngModel)]="searchTerm"
                         (ngModelChange)="filterFaqs()">
-                    </app-form-input>
-                    <button class="hungr-btn hungr-btn-tertiary" (click)="clearSearch()" type="button">
-                        <i class="material-icons">close</i>
-                    </button>
+                    <i class="material-icons search-icon">search</i>
                 </div>
 
-                <div class="row">
-                    <button class="hungr-btn hungr-btn-tertiary" (click)="showFaqContent('How to upload my logo')">How to upload my logo</button>
-                    <button class="hungr-btn hungr-btn-tertiary" (click)="showFaqContent('How to add a new menu')">How to add a new menu</button>
-                    <button class="hungr-btn hungr-btn-tertiary" (click)="showFaqContent('How to create a QR code')">How to create a QR code</button>
+                <div class="help-links">
+                    <a class="help-link" href="#" (click)="showFaqContent('How to upload my logo', $event)">How to upload my logo</a>
+                    <a class="help-link" href="#" (click)="showFaqContent('How to add a new menu', $event)">How to add a new menu</a>
+                    <a class="help-link" href="#" (click)="showFaqContent('How to create a QR code', $event)">How to create a QR code</a>
                 </div>
             </div>
         </app-content-block>
@@ -65,17 +65,25 @@
     </div>
 
     <div class="colonethird">
-        <app-content-block title="Contact Details">
-            <div class="rowGreyBlock">
-                <div class="col">
-                    <p>Need additional assistance? Feel free to contact us directly.</p>
+        <app-content-block [showHeader]="false" customClass="contact-details-block">
+            <div class="contact-details-card">
+                <div class="contact-details-left">
+                    <h2 class="contact-details-title">Contact Details</h2>
+                    <p class="contact-details-description">Need additional assistance? Feel free to contact us directly.</p>
                 </div>
-                <div class="col">
-                    <a href="https://www.hungr.com/help" target="_blank"><i
-                            class="material-icons">language</i>www.hungr.com/help</a>
-                    <a href="mailto:email@address.co.za" target="_blank"><i
-                            class="material-icons">alternate_email</i>email&#64;address.co.za</a>
-                    <a href="tel:+27123456789" target="_blank"><i class="material-icons">call</i>012 345 6789</a>
+                <div class="contact-details-right">
+                    <a href="https://www.hungr.com/help" target="_blank" class="contact-item">
+                        <i class="material-icons">language</i>
+                        <span>www.hungr.com/help</span>
+                    </a>
+                    <a href="mailto:email@address.co.za" target="_blank" class="contact-item">
+                        <i class="material-icons">alternate_email</i>
+                        <span>email&#64;address.co.za</span>
+                    </a>
+                    <a href="tel:+27123456789" target="_blank" class="contact-item">
+                        <i class="material-icons">call</i>
+                        <span>012 345 6789</span>
+                    </a>
                 </div>
             </div>
         </app-content-block>

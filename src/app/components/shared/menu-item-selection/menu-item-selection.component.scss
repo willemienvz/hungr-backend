@@ -92,13 +92,49 @@
   border-radius: var(--border-radius-lg);
   position: relative;
   
-  h6 {
-    font-family: var(--font-family-primary);
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
-    text-align: center;
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 var(--spacing-3) 0;
+    margin-bottom: var(--spacing-3);
+    border-bottom: 1px solid #e0e0e0;
+    
+    h6 {
+      font-family: var(--font-family-primary);
+      font-size: var(--spacing-5);
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+      font-family: var(--hungr-font-family);
+    }
+    
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+      flex-shrink: 0;
+      color: var(--color-text-secondary);
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+        color: var(--color-text-primary);
+      }
+      
+      i {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
   }
   
   p {
@@ -110,20 +146,6 @@
     margin-bottom: 30px;
     line-height: 1.5;
   }
-}
-
-.close {
-  position: absolute;
-  right: 25px;
-  top: 25px;
-  cursor: pointer;
-  font-size: 2var(--spacing-2);
-  font-weight: bold;
-  color: #aaa;
-}
-
-.close:hover {
-  color: #333;
 }
 
 /* KB - Upload options styling */
@@ -183,6 +205,13 @@
   gap: 15px;
   justify-content: center;
   align-items: center;
+
+  // Mobile responsive: stack buttons in column-reverse
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+    width: 100%;
+    gap: 10px;
+  }
 }
 
 /* KB - Choice options styling (similar to upload options) */
@@ -408,7 +437,6 @@
           font-size: var(--spacing-3);
           color: #666;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
         }
       }
     }

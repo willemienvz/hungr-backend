@@ -2,69 +2,58 @@
   border-radius: var(--border-radius-lg);
   background-color: #fff;
   display: flex;
-  max-width: 399px;
+  max-width: 450px;
   flex-direction: column;
   overflow: hidden;
-  font-family: Poppins, sans-serif;
+  font-family: var(--hungr-font-family);
   text-align: center;
-  padding: 23px 25px;
-  border: 1px solid #dedede;
+  padding: 24px;
+  position: relative;
 }
 
 .confirmation-header {
   display: flex;
-  gap: 41px;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
 }
 
 .confirmation-title {
-  font-size: 1var(--spacing-2);
-  font-weight: 700;
-  color: #2e3646;
-  line-height: 1;
-  letter-spacing: -0.02px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
   margin: 0;
+  text-align: center;
+  flex: 1;
 }
 
 .close-icon {
   width: 15px;
   height: 15px;
   object-fit: contain;
+  cursor: pointer;
 }
 
 .confirmation-message {
-  color: #2e3646;
-  font-size: 15px;
+  color: #333;
+  font-size: 16px;
   font-weight: 400;
-  line-height: var(--spacing-5);
-  margin: var(--spacing-5) auto 0;
-  max-width: 283px;
+  line-height: 1.5;
+  margin: 0 auto 32px;
+  max-width: 350px;
 }
 
 .confirmation-actions {
   display: flex;
-  margin-top: 2var(--spacing-2);
-  gap: 15px;
-}
+  gap: var(--spacing-3);
+  justify-content: center;
 
-.action-button {
-  flex: 1;
-  border-radius: 6px;
-  font-size: var(--spacing-4);
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 10px 30px;
-  border: none;
-  cursor: pointer;
-}
+  button {
+    outline: none;
 
-.cancel {
-  background-color: #e4e4e4;
-  color: #181818;
-}
-
-.confirm {
-  background-color: var(--color-secondary);
-  color: #181818;
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+  }
 }

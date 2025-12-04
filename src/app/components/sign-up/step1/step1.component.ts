@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl  } from '@angular/f
 import { FormDataService } from '../../../shared/services/signup/form-data.service';
 import {  Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { AuthService } from '../../../shared/services/auth.service';
 import { Router } from '@angular/router';
 import { emailAvailabilityValidator } from '../../../shared/validators/email-availability.validator';
@@ -20,7 +20,7 @@ export class Step1Component  implements OnInit, OnDestroy{
   private confirmPwdSubscription!: Subscription;
   private emailSubscription!: Subscription;
   @Output() next: EventEmitter<any> = new EventEmitter<any>();
-  constructor(private router: Router, public authService: AuthService, private fb: FormBuilder, private formDataService: FormDataService,  private toastr: ToastrService) {
+  constructor(private router: Router, public authService: AuthService, private fb: FormBuilder, private formDataService: FormDataService,  private toast: ToastService) {
     this.step1Form = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -31,7 +31,7 @@ export class Step1Component  implements OnInit, OnDestroy{
         [Validators.required, Validators.email]
         // Async validator will be added on blur or form submission
       ],
-      cellphone: ['+27', [Validators.required, this.cellphoneValidator.bind(this)]],
+      cellphone: ['+27', Validators.required],
   }, {
       validator: this.passwordMatchValidator 
   });
@@ -79,117 +79,6 @@ export class Step1Component  implements OnInit, OnDestroy{
         });
     }
 
-    this.step1Form.get('cellphone')!.valueChanges.subscribe((value) => {
-      this.step1Form.get('cellphone')!.setValue(this.formatCellphone(value), { emitEvent: false });
-    });
-  }
-
-  onCellphoneKeyDown(event: KeyboardEvent): void {
-    const key = event.key;
-    const input = event.target as HTMLInputElement;
-    const currentValue = input.value || '';
-    
-    // Allow control keys: backspace, delete, tab, escape, enter, arrow keys, home, end
-    const controlKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
-    if (controlKeys.includes(key)) {
-      return;
-    }
-    
-    // Allow Ctrl/Cmd + A, C, V, X, Z
-    if (event.ctrlKey || event.metaKey) {
-      if (['a', 'c', 'v', 'x', 'z'].includes(key.toLowerCase())) {
-        return;
-      }
-    }
-    
-    // Get current digits count (excluding +27 and spaces)
-    const digitsOnly = currentValue.replace(/\D/g, '');
-    const digitsAfter27 = digitsOnly.startsWith('27') ? digitsOnly.substring(2) : digitsOnly;
-    
-    // Prevent if already have 9 digits after +27 (12 total)
-    if (digitsAfter27.length >= 9) {
-      event.preventDefault();
-      return;
-    }
-    
-    // Only allow digits
-    if (!/^\d$/.test(key)) {
-      event.preventDefault();
-      return;
-    }
-  }
-
-  onCellphonePaste(event: ClipboardEvent): void {
-    event.preventDefault();
-    const input = event.target as HTMLInputElement;
-    const pastedText = event.clipboardData?.getData('text') || '';
-    
-    // Extract only digits from pasted text
-    const digitsOnly = pastedText.replace(/\D/g, '');
-    
-    // Get current value and extract digits
-    const currentValue = input.value || '';
-    const currentDigitsOnly = currentValue.replace(/\D/g, '');
-    const currentDigitsAfter27 = currentDigitsOnly.startsWith('27') ? currentDigitsOnly.substring(2) : currentDigitsOnly;
-    
-    // Calculate how many digits we can add (max 9 total after +27)
-    const remainingSlots = 9 - currentDigitsAfter27.length;
-    const digitsToAdd = digitsOnly.substring(0, remainingSlots);
-    
-    // Combine current digits with new digits
-    let newDigits = '';
-    if (currentDigitsOnly.startsWith('27')) {
-      newDigits = '27' + currentDigitsAfter27 + digitsToAdd;
-    } else {
-      newDigits = '27' + (currentDigitsOnly.length > 0 ? currentDigitsOnly : '') + digitsToAdd;
-    }
-    
-    // Format and set the value
-    const formatted = this.formatCellphone('+' + newDigits);
-    this.step1Form.get('cellphone')!.setValue(formatted);
-  }
-
-  formatCellphone(value: string): string {
-    if (!value) {
-      return '+27';
-    }
-    
-    // Remove all non-digit characters
-    const digitsOnly = value.replace(/\D/g, '');
-    
-    // Extract digits after +27 (skip first 2 digits if they are 27, otherwise use all digits)
-    let number = '';
-    if (digitsOnly.startsWith('27')) {
-      // If starts with 27, take digits after it (max 9 digits)
-      number = digitsOnly.substring(2, 11); // Limit to 9 digits
-    } else {
-      // If doesn't start with 27, use all digits (max 9)
-      number = digitsOnly.substring(0, 9); // Limit to 9 digits
-    }
-    
-    // Build formatted string: +27 XX XXX XXXX
-    let formatted = '+27';
-    
-    if (number.length > 0) {
-      formatted += ' ' + number.substring(0, 2);
-    }
-    if (number.length > 2) {
-      formatted += ' ' + number.substring(2, 5);
-    }
-    if (number.length > 5) {
-      formatted += ' ' + number.substring(5, 9);
-    }
-    
-    return formatted;
-  }
-
-  cellphoneValidator(control: AbstractControl): { [key: string]: any } | null {
-    const value = (control.value || '').replace(/\s/g, '');
-    const validCellphonePattern = /^\+27\d{9}$/;
-    if (!validCellphonePattern.test(value)) {
-      return { invalidCellphone: true };
-    }
-    return null;
   }
   ngOnDestroy(): void {
     if (this.confirmPwdSubscription) {
@@ -353,7 +242,7 @@ private getFieldLabel(fieldName: string): string {
     }
     
     if (this.isPasswordMismatch()) {
-      this.toastr.error('Passwords do not match');
+      this.toast.error('Passwords do not match');
       return;
     }
     const formData = this.step1Form.value;

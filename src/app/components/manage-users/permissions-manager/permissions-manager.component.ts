@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { User, UserRole, UserPermissions } from '../../../shared/services/user';
 import { PermissionService } from '../../../shared/services/permission.service';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import {
     AngularFirestore,
     AngularFirestoreDocument,
@@ -33,7 +33,7 @@ export class PermissionsManagerComponent {
 
     constructor(
         public permissionService: PermissionService,
-        private toastr: ToastrService,
+        private toast: ToastService,
         private firestore: AngularFirestore
     ) { }
 
@@ -89,11 +89,11 @@ export class PermissionsManagerComponent {
         };
 
         userRef.update(updatedData).then(() => {
-            this.toastr.success('Permissions updated successfully!');
+            this.toast.success('Permissions updated successfully!');
             this.isSaving = false;
             this.closePopup.emit();
         }).catch(error => {
-            this.toastr.error('Error updating permissions');
+            this.toast.error('Error updating permissions');
             this.isSaving = false;
         });
     }

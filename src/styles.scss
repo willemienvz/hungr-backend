@@ -210,7 +210,6 @@ input,
 textarea,
 .mdc-typography,
 .mat-mdc-tab .mdc-tab__text-label {
-  letter-spacing: var(--hungr-letter-spacing-normal) !important;
 }
 
 /* Ensure all typography defaults to the Hungr font family */
@@ -219,6 +218,13 @@ body,
 .mdc-typography,
 .mat-typography {
   font-family: var(--hungr-font-family) !important;
+}
+
+/* Prevent horizontal scrolling */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* Material MDC Tabs - enforce Hungr font */
@@ -246,7 +252,7 @@ body,
   font-size: 40px;
   font-weight: 900;
   line-height: 48px;
-  letter-spacing: -0.001em;
+
 }
 
 .colorPicker .mat-mdc-form-field {
@@ -258,7 +264,6 @@ h1 {
   font-size: var(--heading-1-font-size);
   font-weight: var(--heading-1-font-weight);
   line-height: var(--heading-1-line-height);
-  letter-spacing: var(--heading-1-letter-spacing);
   text-transform: var(--heading-1-text-transform);
 }
 
@@ -267,7 +272,6 @@ h3 {
   font-size: var(--heading-2-font-size);
   font-weight: var(--heading-2-font-weight);
   line-height: var(--heading-2-line-height);
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 h6 {
@@ -275,7 +279,6 @@ h6 {
   font-size: var(--heading-3-font-size);
   font-weight: var(--heading-3-font-weight);
   line-height: var(--heading-3-line-height);
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 .font-small-medium {
@@ -283,7 +286,6 @@ h6 {
   font-size: 10px;
   font-weight: 600;
   line-height: 10px;
-  letter-spacing: -0.001em;
 }
 
 .font-small {
@@ -291,7 +293,6 @@ h6 {
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  letter-spacing: -0.001em;
 }
 
 .mat-mdc-text-field-wrapper {
@@ -305,7 +306,6 @@ p {
   font-size: var(--body-font-size);
   font-weight: var(--body-font-weight);
   line-height: var(--body-line-height);
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 label {
@@ -313,7 +313,6 @@ label {
   font-size: var(--label-font-size);
   font-weight: var(--label-font-weight);
   line-height: var(--body-line-height);
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 input[type="text"],
@@ -329,7 +328,6 @@ input[type="number"] {
   font-size: var(--form-field-font-size);
   font-weight: var(--font-weight-normal);
   line-height: var(--form-field-line-height);
-  letter-spacing: var(--letter-spacing-tight);
   padding: var(--form-field-padding);
   color: var(--form-field-color);
   background: var(--form-field-bg);
@@ -353,7 +351,6 @@ textarea {
   font-size: var(--form-field-font-size);
   font-weight: var(--font-weight-normal);
   line-height: var(--form-field-line-height);
-  letter-spacing: var(--letter-spacing-tight);
   padding: var(--form-field-padding);
   color: var(--form-field-color);
   background: var(--form-field-bg);
@@ -402,7 +399,6 @@ textarea {
   font-size: var(--button-md-font-size);
   font-weight: var(--button-font-weight);
   line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
   min-width: var(--button-md-min-width);
   text-transform: uppercase;
   cursor: pointer;
@@ -547,7 +543,6 @@ textarea {
   text-align: left !important;
   margin: 0 !important;
   padding: 0 !important;
-  letter-spacing: var(--hungr-letter-spacing-normal) !important;
 }
 
 .cdk-overlay-pane.media-upload-modal .mat-mdc-tab-body-content {
@@ -557,7 +552,6 @@ textarea {
 }
 
 .cdk-overlay-pane.media-upload-modal .mat-mdc-tab .mdc-tab__text-label {
-  letter-spacing: var(--hungr-letter-spacing-normal) !important;
 }
 
 .cdk-overlay-pane.media-upload-modal .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
@@ -613,7 +607,6 @@ textarea {
   padding: 24px 24px var(--spacing-4) 24px !important;
   margin: 0 !important;
   text-align: left !important;
-  letter-spacing: var(--letter-spacing-normal) !important;
   
 }
 
@@ -660,7 +653,7 @@ textarea {
   width: 32px !important;
   height: 32px !important;
   border-radius: 50% !important;
-  background: var(--color-grey-100) !important;
+  background: transparent;
   border: none !important;
   color: var(--color-text-secondary) !important;
   display: flex !important;
@@ -956,7 +949,7 @@ textarea {
   font-size: 14px;
   font-weight: 400;
   line-height: 10px;
-  letter-spacing: -0.001em;
+
   text-align: right;
   color: var(--color-text-muted);
   width: 100%;
@@ -982,7 +975,6 @@ ngx-colors-panel button {
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
-  letter-spacing: -0.1%;
   color: #444;
   cursor: pointer;
   text-decoration: underline;
@@ -1032,7 +1024,7 @@ ngx-colors-panel button {
   font-size: 10px;
   font-weight: 400;
   line-height: 10px;
-  letter-spacing: -0.001em;
+
   text-align: left;
 }
 
@@ -1041,7 +1033,6 @@ ngx-colors-panel button {
   font-size: 10px;
   font-weight: 400;
   line-height: 10px;
-  letter-spacing: -0.001em;
   text-align: left;
   color: green;
 }
@@ -1049,6 +1040,62 @@ ngx-colors-panel button {
 .toast-container {
   font-family: var(--font-family-primary);
 }
+
+/* ===============================================
+   TOAST NOTIFICATIONS - UNIFIED STYLING
+   Consistent styling for MatSnackBar (unified toast system)
+   =============================================== */
+
+/* Angular Material SnackBar - Primary Red Style */
+.mat-mdc-snack-bar-container,
+.hungr-snackbar {
+  background-color: var(--color-primary) !important;
+  color: var(--color-white) !important;
+  font-family: var(--font-family-primary) !important;
+  font-size: var(--font-size-base) !important;
+  font-weight: var(--font-weight-medium) !important;
+  border-radius: var(--border-radius-md) !important;
+ // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  min-width: 300px !important;
+  max-width: 500px !important;
+//  padding: var(--spacing-4) var(--spacing-5) !important;
+  z-index: var(--z-index-toast) !important;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: var(--color-primary) !important;
+  color: var(--color-white) !important;
+   border-radius: var(--border-radius-md) !important;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+  color: var(--color-white) !important;
+  font-family: var(--font-family-primary) !important;
+  font-size: var(--font-size-base) !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-snack-bar-action {
+  color: var(--color-white) !important;
+  font-family: var(--font-family-primary), sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 300 !important;
+  opacity: 0.9 !important;
+  min-width: 32px !important;
+  padding: 0 8px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-snack-bar-action:hover {
+  opacity: 1 !important;
+}
+
+/* Position SnackBar at bottom center - MatSnackBar positioning is handled via config in component */
+
 
 .label-container {
   width: 100%;
@@ -1074,7 +1121,6 @@ a {
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
-  letter-spacing: -0.1%;
   cursor: pointer;
 }
 
@@ -1137,7 +1183,6 @@ mat-select {
   font-size: 15px;
   font-weight: 400;
   line-height: 20.25px;
-  letter-spacing: -0.001em;
 }
 
 /* Ensure mat-select placeholder uses Poppins font */
@@ -1146,7 +1191,6 @@ mat-select {
   font-size: 15px;
   font-weight: 400;
   line-height: 20.25px;
-  letter-spacing: -0.001em;
 }
 
 /* Ensure mat-select trigger uses Poppins font */
@@ -1155,7 +1199,6 @@ mat-select {
   font-size: 15px;
   font-weight: 400;
   line-height: 20.25px;
-  letter-spacing: -0.001em;
 }
 
 /* Ensure all mat-form-field components use Poppins font */
@@ -1169,7 +1212,6 @@ mat-select {
   font-size: 15px;
   font-weight: 400;
   line-height: 20.25px;
-  letter-spacing: -0.001em;
 }
 
 /* Ensure mat-form-field hints use Poppins font */
@@ -1178,7 +1220,6 @@ mat-select {
   font-size: var(--spacing-3);
   font-weight: 400;
   line-height: var(--spacing-4);
-  letter-spacing: -0.001em;
 }
 
 /* Hide subscript wrapper for mat-select form fields */
@@ -1231,21 +1272,18 @@ mat-select {
   --mat-option-label-text-size: 15px;
   --mat-option-label-text-weight: 400;
   --mat-option-label-text-line-height: 20.25px;
-  --mat-option-label-text-letter-spacing: -0.001em;
   
   /* Override mat-select CSS variables */
   --mat-select-label-text-font: "Poppins", sans-serif;
   --mat-select-label-text-size: 15px;
   --mat-select-label-text-weight: 400;
   --mat-select-label-text-line-height: 20.25px;
-  --mat-select-label-text-letter-spacing: -0.001em;
   
   /* Override mat-form-field CSS variables */
   --mat-form-field-label-text-font: "Poppins", sans-serif;
   --mat-form-field-label-text-size: 15px;
   --mat-form-field-label-text-weight: 400;
   --mat-form-field-label-text-line-height: 20.25px;
-  --mat-form-field-label-text-letter-spacing: -0.001em;
 
   /* ===============================================
      BUTTON DESIGN TOKENS
@@ -1266,7 +1304,7 @@ mat-select {
   --button-icon-size-sm: 16px;
   
   --button-md-font-size: 16px;
-  --button-md-padding: 12px 24px;
+  --button-md-padding: 5px 24px;
   --button-md-min-width: 120px;
   --button-icon-size-md: 20px;
   
@@ -1283,9 +1321,9 @@ mat-select {
   --button-primary-focus-ring: var(--color-secondary);
   
   /* Secondary Button Colors */
-  --button-secondary-bg: var(--color-grey-100);
+  --button-secondary-bg: var(--color-grey-250);
   --button-secondary-color: var(--color-text-primary);
-  --button-secondary-border: 1px solid var(--color-grey-300);
+  --button-secondary-border: none;
   --button-secondary-hover-bg: var(--color-grey-200);
   --button-secondary-active-bg: var(--color-grey-300);
   --button-secondary-focus-ring: var(--color-secondary);
@@ -1362,7 +1400,6 @@ mat-select {
   font-size: 15px !important;
   font-weight: 400 !important;
   line-height: 20.25px !important;
-  letter-spacing: -0.001em !important;
   /* Set to white to match default background */
 }
 
@@ -1372,7 +1409,6 @@ mat-select {
   font-size: 15px !important;
   font-weight: 400 !important;
   line-height: 20.25px !important;
-  letter-spacing: -0.001em !important;
 }
 
 /* Ensure mat-option text uses Poppins */
@@ -1381,7 +1417,6 @@ mat-select {
   font-size: 15px !important;
   font-weight: 400 !important;
   line-height: 20.25px !important;
-  letter-spacing: -0.001em !important;
 }
 
 /* Style the hover color of the options in the dropdown */
@@ -1482,14 +1517,12 @@ input[type="submit"]:disabled {
   font-size: 15px;
   font-weight: 600;
   line-height: 20.25px;
-  letter-spacing: -0.001em;
 }
 
 .submenuHeading {
   font-weight: 500;
   font-size: 14px;
   line-height: 19.6px;
-  letter-spacing: -0.1%;
   color: #444;
   top: 35px;
   position: absolute;
@@ -1507,7 +1540,7 @@ input[type="submit"]:disabled {
 .mdc-text-field--outlined .mat-mdc-form-field-infix,
 .mdc-text-field--no-label .mat-mdc-form-field-infix {
   padding: 0 !important;
-  height: 35px !important;
+
   min-height: unset;
   justify-content: center;
   align-items: center;
@@ -1897,7 +1930,6 @@ input[type="submit"]:disabled {
       font-size: 11px;
       font-weight: var(--font-weight-medium);
       line-height: var(--line-height-normal);
-      letter-spacing: var(--letter-spacing-normal);
       text-align: left;
       color: var(--color-dark);
       padding: var(--spacing-1) 0;
@@ -1929,7 +1961,6 @@ input[type="submit"]:disabled {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-normal);
   text-align: center;
   color: var(--color-text-primary);
   transition: var(--transition-base);
@@ -1966,7 +1997,6 @@ input[type="submit"]:disabled {
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-normal);
     line-height: var(--line-height-normal);
-    letter-spacing: var(--letter-spacing-normal);
   }
 }
 
@@ -2199,6 +2229,8 @@ input[type="submit"]:disabled {
   }
 }
 
+
+
 /* Form Label Styles */
 .form-label {
   display: block;
@@ -2206,7 +2238,6 @@ input[type="submit"]:disabled {
   font-size: var(--form-label-font-size);
   font-weight: var(--form-label-font-weight);
   margin-bottom: var(--form-label-margin-bottom);
-  letter-spacing: -0.016px;
 
   &.required::after {
     content: ' *';
@@ -2373,6 +2404,8 @@ input[type="submit"]:disabled {
   outline: none;
   position: relative;
   overflow: hidden;
+  font-weight: 700;
+  text-transform:uppercase;
   
   /* Default padding - can be overridden by size classes */
   padding: var(--button-md-padding);
@@ -2400,6 +2433,10 @@ input[type="submit"]:disabled {
       transform: none;
     }
   }
+
+  &.full-width {
+    width:250px;
+    }
 
   /* Loading state */
   &.hungr-btn-loading {
@@ -2690,6 +2727,28 @@ input[type="submit"]:disabled {
   }
 }
 
+.hungr-btn-logout {
+  background: #AFDCFF;
+  color: #1E1A35;
+  border: none;
+  text-transform: uppercase;
+  font-weight: 700;
+
+  &:hover:not(:disabled) {
+    background: #9BC8E8;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    background: #8BB5D3;
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(30, 26, 53, 0.3);
+  }
+}
+
 
 /* Button Sizes */
 .hungr-btn-sm {
@@ -2941,29 +3000,23 @@ input[type="submit"]:disabled {
 
 // Grid layout for multiple stats cards
 .stats-grid {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--spacing-5);
   margin-bottom: 24px;
   align-items: stretch; // Make all children the same height
 
-  // Make all direct children (stats cards) 100% height
+  // Make all direct children (stats cards) fill the grid cell height
   >* {
-    flex: 1;
-    min-width: 250px; // Ensure minimum width for cards
+    min-width: 0; // Prevent overflow
     height: 100%;
     display: flex;
     flex-direction: column;
   }
 
   @media (max-width: 768px) {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: var(--spacing-4);
-
-    >* {
-      min-width: unset; // Remove min-width on mobile
-    }
   }
 }
 

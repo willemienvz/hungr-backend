@@ -1,20 +1,40 @@
 /* Import design tokens for block styling */
 @import "../../../../styles/_design-tokens";
 
+.flex1 {
+  flex:1;
+}
+
 .content-block {
   @extend .block;
   width: 100%;
-  margin-bottom: 30px;
+  max-width: 100%;
+  height:100%;
+  flex:1;
+ // margin-bottom: 30px;
   padding: 25px;
   /* Override block padding for content layout */
   background: white;
   /* Override block background for white */
 
+  // Back button container (relatively positioned to push content down)
+  .back-button-container {
+    position: relative;
+    //margin-bottom: var(--spacing-4);
+    width: 100%;
+
+    .backLink {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-5);
+    position: relative;
 
     .section-title {
       color: #181818;
@@ -24,34 +44,61 @@
       margin: 0;
     }
 
-    .header-actions {
+    .header-right {
       display: flex;
       align-items: center;
       gap: 15px;
+      position: relative;
 
-      .filter-dropdown {
+      // Tooltip icon container (top right corner)
+      .tooltip-icon-container {
         display: flex;
         align-items: center;
-        gap: 10px;
+        margin-left: auto;
 
-        mat-select {
-          width: 150px;
-          font-family: var(--font-family-primary);
-        }
-
-        .filter-icon {
+        .tooltip-icon {
           color: var(--color-text-muted);
-          font-size: var(--spacing-5);
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+          cursor: help;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: var(--color-secondary);
+          }
         }
       }
 
-      .action-buttons {
+      .header-actions {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
 
-        .action-btn {
-          // Custom button styling removed to allow global styles to apply
+        .filter-dropdown {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          mat-select {
+            width: 150px;
+            font-family: var(--font-family-primary);
+          }
+
+          .filter-icon {
+            color: var(--color-text-muted);
+            font-size: var(--spacing-5);
+          }
+        }
+
+        .action-buttons {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .action-btn {
+            // Custom button styling removed to allow global styles to apply
+          }
         }
       }
     }
@@ -59,5 +106,12 @@
 
   .content-area {
     width: 100%;
+  }
+
+  // Override border for blockPreview custom class
+  &.blockPreview {
+    border: none !important;
+    z-index: 10;
+    position: relative;
   }
 }

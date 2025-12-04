@@ -44,7 +44,6 @@
     font-weight: 600;
     color: #333;
     font-family: var(--hungr-font-family);
-    letter-spacing: normal;
     width: auto; // avoid stretching across header
   }
 
@@ -81,7 +80,6 @@
     padding: 0 !important;
     width: auto !important;
     text-align: left !important;
-    letter-spacing: normal !important;
   }
 }
 
@@ -118,7 +116,7 @@
         font-weight: 500;
         color: var(--hungr-dark-grey);
         text-transform: none;
-        letter-spacing: normal;
+        letter-spacing: 0px !important;
         transition: color 0.2s ease;
 
         &.mat-tab-label-active {
@@ -159,14 +157,14 @@
   }
 }
 
-// Tabs: remove letter-spacing and set active color to primary
 ::ng-deep .media-upload-modal .mat-mdc-tab .mdc-tab__text-label,
 ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
-  letter-spacing: normal !important;
+  letter-spacing: 0px !important;
 }
 
 ::ng-deep .media-upload-modal .mat-mdc-tab .mdc-tab__text-label {
   color: var(--hungr-dark-grey);
+  letter-spacing: 0px !important;
 }
 
 ::ng-deep .media-upload-modal .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label,
@@ -321,6 +319,11 @@
 
   .file-info {
     flex: 1;
+    display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        text-align: left;
 
     h4 {
       margin: 0 0 4px 0;
@@ -844,7 +847,9 @@ mat-progress-bar {
   }
 
   .modal-buttons {
-    flex-direction: column;
+    flex-direction: column-reverse;
+    width: 100%;
+    gap: 10px;
   }
 }
 

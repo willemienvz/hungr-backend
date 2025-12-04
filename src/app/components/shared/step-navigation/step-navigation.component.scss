@@ -20,6 +20,20 @@
     }
     
   }
+
+  // Mobile responsive: stack buttons in column-reverse
+  @media (max-width: 768px) {
+    .step-buttons {
+      flex-direction: column;
+      
+      .left-buttons,
+      .right-buttons {
+        flex-direction: column-reverse;
+        width: 100%;
+        gap: 10px;
+      }
+    }
+  }
   
   /* KB - Enhanced loading state for all buttons */
   .loading,

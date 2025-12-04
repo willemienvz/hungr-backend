@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { generateApiSignature, getSubscriptionToken, getPayFastConfig } from './payfast';
+import { generateApiSignature, getSubscriptionToken, getPayFastConfig, formatPayFastTimestamp } from './payfast';
 import { retryWithBackoff, logSubscriptionAction, DatabaseRollback } from './subscriptionUtils';
 
 export const unpauseSubscription = functions.https.onCall(async (data, context) => {
@@ -39,7 +39,7 @@ export const unpauseSubscription = functions.https.onCall(async (data, context) 
     // Get PayFast configuration
     const payfastConfig = getPayFastConfig();
     const endpoint = `/subscriptions/${token}/unpause`;
-    const timestamp = new Date().toISOString();
+    const timestamp = formatPayFastTimestamp();
 
     // Prepare headers (no body for unpause)
     const headers = {
@@ -54,7 +54,8 @@ export const unpauseSubscription = functions.https.onCall(async (data, context) 
 
     // Make API call to PayFast with retry
     const apiCall = async () => {
-      const response = await fetch(`${payfastConfig.apiHost}${endpoint}`, {
+      const apiUrl = payfastConfig.getApiUrl(endpoint);
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           ...headers,

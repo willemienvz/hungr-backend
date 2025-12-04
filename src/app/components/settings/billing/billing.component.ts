@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { SubscriptionService, SubscriptionDetailsResponse, Transaction } from '../../../shared/services/subscription.service';
+import { PayFastService } from '../../../shared/services/payfast.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
-import { ChangeSubscriptionDialogComponent, ChangeSubscriptionData } from '../general/change-subscription-dialog/change-subscription-dialog.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -30,6 +30,7 @@ export class BillingComponent implements OnInit, OnDestroy {
 
   constructor(
     private subscriptionService: SubscriptionService,
+    private payfastService: PayFastService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private router: Router
@@ -96,7 +97,9 @@ export class BillingComponent implements OnInit, OnDestroy {
       width: '400px',
       data: {
         title: 'Pause Subscription',
-        message: 'Are you sure you want to pause your subscription? Billing will be paused and menus will be hidden.'
+        message: 'Are you sure you want to pause your subscription? Billing will be paused and menus will be hidden.',
+        confirmText: 'Yes, pause',
+        cancelText: 'Cancel'
       }
     });
 
@@ -137,7 +140,9 @@ export class BillingComponent implements OnInit, OnDestroy {
       width: '400px',
       data: {
         title: 'Resume Subscription',
-        message: 'Are you sure you want to resume your subscription? Billing will resume and menus will become visible again.'
+        message: 'Are you sure you want to resume your subscription? Billing will resume and menus will become visible again.',
+        confirmText: 'Yes, resume',
+        cancelText: 'Cancel'
       }
     });
 
@@ -169,61 +174,32 @@ export class BillingComponent implements OnInit, OnDestroy {
   }
 
   async editSubscription(): Promise<void> {
-    if (!this.subscriptionData || this.subscriptionData.status !== 'active') {
-      this.snackBar.open('No active subscription found. Please resume your subscription first.', 'Dismiss', { duration: 5000 });
+    if (!this.subscriptionData || !this.subscriptionData.token) {
+      this.snackBar.open('Subscription token not found. Please contact support.', 'Dismiss', { duration: 5000 });
       return;
     }
 
-    // Prepare current subscription data for the dialog
-    const dialogData: ChangeSubscriptionData = {
-      currentAmount: this.subscriptionData.amount || 99900,
-      currentFrequency: this.subscriptionData.frequency ? parseInt(this.subscriptionData.frequency) : 3,
-      currentCycles: this.subscriptionData.cycles ? parseInt(this.subscriptionData.cycles) : 0,
-      currentBillingDate: this.subscriptionData.nextBillingDate || undefined
-    };
-
-    const dialogRef = this.dialog.open(ChangeSubscriptionDialogComponent, {
-      width: '600px',
-      data: dialogData,
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(async (result) => {
-      if (result) {
-        // User submitted the form with changes
-        this.isEditing = true;
-        try {
-          // Convert amount to cents if provided
-          if (result.amount !== undefined && result.amount !== null) {
-            result.amount = Math.round(result.amount * 100);
-          }
-
-          const response = await this.subscriptionService.updateSubscription(result);
-          
-          if (response.success) {
-            const updatedFields = response.data?.updatedFields || [];
-            this.snackBar.open(
-              `Subscription updated successfully. Changed: ${updatedFields.join(', ')}`,
-              'Dismiss',
-              { duration: 5000 }
-            );
-            await this.loadSubscriptionDetails();
-          } else {
-            this.snackBar.open(
-              response.error?.message || 'Failed to update subscription. Please try again or contact support.',
-              'Dismiss',
-              { duration: 5000 }
-            );
-          }
-        } catch (error: any) {
-          console.error('Error updating subscription:', error);
-          const errorMessage = error?.message || 'An error occurred while updating your subscription. Please contact support.';
-          this.snackBar.open(errorMessage, 'Dismiss', { duration: 5000 });
-        } finally {
-          this.isEditing = false;
-        }
-      }
-    });
+    this.isEditing = true;
+    try {
+      const token = this.subscriptionData.token;
+      
+      // Open PayFast card update page
+      this.payfastService.updateCardDetails(token);
+      
+      this.snackBar.open('Redirecting to PayFast to update your card details...', 'Dismiss', { duration: 3000 });
+    } catch (error: any) {
+      console.error('Error updating card details:', error);
+      this.snackBar.open(
+        error?.message || 'Failed to open card update page. Please contact support.',
+        'Dismiss',
+        { duration: 5000 }
+      );
+    } finally {
+      // Don't set isEditing to false immediately since the form opens in a new window
+      setTimeout(() => {
+        this.isEditing = false;
+      }, 2000);
+    }
   }
 
   async cancelSubscription(): Promise<void> {
@@ -236,7 +212,9 @@ export class BillingComponent implements OnInit, OnDestroy {
       width: '400px',
       data: {
         title: 'Cancel Subscription',
-        message: 'Are you sure you want to cancel your subscription? This will permanently end your subscription and stop all future billing. You will lose access to all features immediately.'
+        message: 'Are you sure you want to cancel your subscription? This will permanently end your subscription and stop all future billing. You will lose access to all features immediately.',
+        confirmText: 'Yes, cancel',
+        cancelText: 'Keep Subscription'
       }
     });
 
@@ -270,13 +248,17 @@ export class BillingComponent implements OnInit, OnDestroy {
   getStatusBadgeClass(): string {
     if (!this.subscriptionData) return 'status-unknown';
     
-    switch (this.subscriptionData.status.toLowerCase()) {
+    const status = this.subscriptionData.status;
+
+    console.log('status', status);
+    if (!status || typeof status !== 'string') return 'status-unknown';
+    
+    switch (status.toLowerCase()) {
       case 'active':
         return 'status-active';
       case 'paused':
         return 'status-paused';
-      case 'cancelled':
-      case 'canceled':
+      case '2':
         return 'status-cancelled';
       default:
         return 'status-unknown';
@@ -286,21 +268,28 @@ export class BillingComponent implements OnInit, OnDestroy {
   getStatusLabel(): string {
     if (!this.subscriptionData) return 'Unknown';
     
-    switch (this.subscriptionData.status.toLowerCase()) {
+    const status = this.subscriptionData.status;
+    if (!status || typeof status !== 'string') return 'Unknown';
+    
+    switch (status.toLowerCase()) {
       case 'active':
         return 'Active';
       case 'paused':
         return 'Paused';
-      case 'cancelled':
-      case 'canceled':
+      case '2':
         return 'Cancelled';
       default:
-        return this.subscriptionData.status;
+        return String(status);
     }
   }
 
   formatAmount(amount: number): string {
-    // Amount is in cents, convert to rands
+    // Transaction amounts are in cents, convert to rands
+    return `R${(amount).toFixed(2)}`;
+  }
+
+  formatSubscriptionAmount(amount: number): string {
+    // PayFast subscription amounts are in rands (999 = R999.00), not cents
     return `R${(amount / 100).toFixed(2)}`;
   }
 
@@ -322,6 +311,22 @@ export class BillingComponent implements OnInit, OnDestroy {
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   }
 
+  formatPlanName(plan: string | undefined): string {
+    if (!plan) return 'Unknown';
+    
+    // Map plan values to display names
+    const planMap: { [key: string]: string } = {
+      'digitalMenu': 'Digital Menu',
+      'once-off': 'Once-off',
+      'monthly': 'Monthly',
+      'quarterly': 'Quarterly',
+      'bi-annual': 'Bi-Annual',
+      'annual': 'Annual'
+    };
+    
+    return planMap[plan] || plan.charAt(0).toUpperCase() + plan.slice(1);
+  }
+
   canPause(): boolean {
     return this.subscriptionData?.status === 'active' && !this.isPausing;
   }
@@ -331,7 +336,10 @@ export class BillingComponent implements OnInit, OnDestroy {
   }
 
   canEdit(): boolean {
-    return this.subscriptionData?.status === 'active' && !this.isEditing;
+    // Allow card update for active or paused subscriptions
+    return (this.subscriptionData?.status === 'active' || this.subscriptionData?.status === 'paused') 
+           && !this.isEditing 
+           && !!this.subscriptionData?.token;
   }
 
   canCancel(): boolean {

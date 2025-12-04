@@ -2,6 +2,7 @@ import { Component, Inject, OnInit, OnDestroy, ViewChild, ElementRef } from '@an
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatChipInputEvent } from '@angular/material/chips';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -142,12 +143,12 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<MediaUploadModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: MediaUploadModalConfig | ImageUploadData,
     private formBuilder: FormBuilder,
-    private mediaLibraryService: MediaLibraryService
+    private mediaLibraryService: MediaLibraryService,
+    private snackBar: MatSnackBar
   ) {
     this.uploadForm = this.formBuilder.group({
       category: [''],
-      customCategory: [{ value: '', disabled: true }],
-      description: ['']
+      customCategory: [{ value: '', disabled: true }]
     });
 
     this.initializeComponent();
@@ -254,18 +255,18 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
   }
 
   // File handling methods
-  onFileSelected(event: Event): void {
+  async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       if (this.isLegacyMode) {
-        this.processLegacyFiles(Array.from(input.files));
+        await this.processLegacyFiles(Array.from(input.files));
       } else {
-        this.processFile(input.files[0]);
+        await this.processFile(input.files[0]);
       }
     }
   }
 
-  onFileDropped(event: DragEvent): void {
+  async onFileDropped(event: DragEvent): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
     this.isDragOver = false;
@@ -273,9 +274,9 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       if (this.isLegacyMode) {
-        this.processLegacyFiles(Array.from(files));
+        await this.processLegacyFiles(Array.from(files));
       } else {
-        this.processFile(files[0]);
+        await this.processFile(files[0]);
       }
     }
   }
@@ -298,14 +299,43 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
     // Validate file
     const validation = this.validateFile(file);
     if (!validation.valid) {
-      this.error = validation.error || 'File validation failed';
+      const errorMsg = validation.error || 'File validation failed';
+      this.error = errorMsg;
+      this.snackBar.open(errorMsg, 'Close', {
+        duration: 5000,
+        panelClass: ['hungr-snackbar']
+      });
       return;
+    }
+
+    // Check storage limit before proceeding
+    try {
+      const storageCheck = await this.mediaLibraryService.checkStorageLimit(file.size);
+      if (storageCheck.exceeded) {
+        const currentMB = (storageCheck.currentBytes / (1024 * 1024)).toFixed(2);
+        const fileMB = (file.size / (1024 * 1024)).toFixed(2);
+        const errorMsg = `Storage limit exceeded. You have used ${currentMB}MB of 100MB. This file (${fileMB}MB) would exceed your limit. Please delete some media to free up space.`;
+        this.error = errorMsg;
+        this.snackBar.open(errorMsg, 'Close', {
+          duration: 6000,
+          panelClass: ['hungr-snackbar']
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking storage limit:', error);
+      // Continue with upload if storage check fails (shouldn't block user)
     }
 
     // Validate image dimensions
     const dimensionValidation = await this.validateImageDimensions(file);
     if (!dimensionValidation.valid) {
-      this.error = dimensionValidation.error || 'Image dimension validation failed';
+      const errorMsg = dimensionValidation.error || 'Image dimension validation failed';
+      this.error = errorMsg;
+      this.snackBar.open(errorMsg, 'Close', {
+        duration: 5000,
+        panelClass: ['hungr-snackbar']
+      });
       return;
     }
 
@@ -315,10 +345,19 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
         const aspectRatioValidation = await validateImageAspectRatio(file);
         if (!aspectRatioValidation.isValid) {
           this.error = aspectRatioValidation.message;
+          this.snackBar.open(aspectRatioValidation.message, 'Close', {
+            duration: 5000,
+            panelClass: ['hungr-snackbar']
+          });
           return;
         }
       } catch (error) {
-        this.error = 'Error validating image aspect ratio';
+        const errorMsg = 'Error validating image aspect ratio';
+        this.error = errorMsg;
+        this.snackBar.open(errorMsg, 'Close', {
+          duration: 5000,
+          panelClass: ['hungr-snackbar']
+        });
         return;
       }
     }
@@ -334,26 +373,61 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
   }
 
   // Legacy file processing method
-  private processLegacyFiles(files: File[]): void {
+  private async processLegacyFiles(files: File[]): Promise<void> {
     this.error = null;
 
     // Check if adding these files would exceed max limit
     const totalFiles = this.selectedFiles.length + files.length;
     if (this.validationConfig.maxFiles && totalFiles > this.validationConfig.maxFiles) {
-      this.error = `Too many files. Maximum allowed: ${this.validationConfig.maxFiles}`;
+      const errorMsg = `Too many files. Maximum allowed: ${this.validationConfig.maxFiles}`;
+      this.error = errorMsg;
+      this.snackBar.open(errorMsg, 'Close', {
+        duration: 5000,
+        panelClass: ['hungr-snackbar']
+      });
       return;
+    }
+
+    // Check total storage limit for all files
+    const totalNewFileSize = files.reduce((sum, file) => sum + file.size, 0);
+    try {
+      const storageCheck = await this.mediaLibraryService.checkStorageLimit(totalNewFileSize);
+      if (storageCheck.exceeded) {
+        const currentMB = (storageCheck.currentBytes / (1024 * 1024)).toFixed(2);
+        const filesMB = (totalNewFileSize / (1024 * 1024)).toFixed(2);
+        const errorMsg = `Storage limit exceeded. You have used ${currentMB}MB of 100MB. These files (${filesMB}MB) would exceed your limit. Please delete some media to free up space.`;
+        this.error = errorMsg;
+        this.snackBar.open(errorMsg, 'Close', {
+          duration: 6000,
+          panelClass: ['hungr-snackbar']
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking storage limit:', error);
+      // Continue with validation if storage check fails
     }
 
     for (const file of files) {
       // Validate file type
       if (this.validationConfig.allowedTypes && !this.validationConfig.allowedTypes.includes(file.type)) {
-        this.error = `Invalid file type: ${file.name}. Allowed formats: ${this.validationConfig.allowedTypes.join(', ')}`;
+        const errorMsg = `Invalid file type: ${file.name}. Allowed formats: ${this.validationConfig.allowedTypes.join(', ')}`;
+        this.error = errorMsg;
+        this.snackBar.open(errorMsg, 'Close', {
+          duration: 5000,
+          panelClass: ['hungr-snackbar']
+        });
         return;
       }
 
       // Validate file size
       if (this.validationConfig.maxFileSize && file.size > this.validationConfig.maxFileSize) {
-        this.error = `File size too large: ${file.name}. Maximum size: ${this.validationConfig.maxFileSize / (1024 * 1024)}MB`;
+        const errorMsg = `File size too large: ${file.name}. Maximum size: ${this.validationConfig.maxFileSize / (1024 * 1024)}MB`;
+        this.error = errorMsg;
+        this.snackBar.open(errorMsg, 'Close', {
+          duration: 5000,
+          panelClass: ['hungr-snackbar']
+        });
         return;
       }
     }
@@ -485,7 +559,6 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
       const request: MediaUploadRequest = {
         file: this.selectedFile,
         category: this.uploadForm.get('category')?.value || this.uploadForm.get('customCategory')?.value,
-        description: this.uploadForm.get('description')?.value,
         isPublic: true, // Always public since toggle was removed
         componentType: this.componentType,
         componentId: this.componentId,
@@ -503,10 +576,23 @@ export class MediaUploadModalComponent implements OnInit, OnDestroy {
         }
       });
 
+      // Show success toast
+      this.snackBar.open('Media uploaded successfully', 'Close', {
+        duration: 3000,
+        panelClass: ['hungr-snackbar']
+      });
+
       // Close modal with result
       this.closeWithResult(mediaItem);
     } catch (error) {
-      this.error = error instanceof Error ? error.message : 'Upload failed';
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
+      this.error = errorMessage;
+      
+      // Show error toast
+      this.snackBar.open(errorMessage, 'Close', {
+        duration: 5000,
+        panelClass: ['hungr-snackbar']
+      });
     } finally {
       this.uploading = false;
     }

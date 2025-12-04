@@ -19,6 +19,9 @@ export class Step5OverviewComponent {
   @Input() isSaving: boolean = false;
   @Input() editMode: boolean = false;
 
+  // Make SpecialType available in template
+  SpecialType = SpecialType;
+
   getSpecialTypeLabel(type: SpecialType): string {
     switch (type) {
       case SpecialType.PERCENTAGE_DISCOUNT: return 'Percentage Discount';
@@ -27,5 +30,12 @@ export class Step5OverviewComponent {
       case SpecialType.CATEGORY_SPECIAL: return 'Category Special';
       default: return 'Special Type';
     }
+  }
+
+  getPromotionalLabel(): string {
+    if (this.selectedSpecialType === SpecialType.PERCENTAGE_DISCOUNT) {
+      return 'Promotional Discount';
+    }
+    return 'Promotional Price';
   }
 } 

@@ -444,6 +444,36 @@ export class PayFastService {
   }
 
   /**
+   * Opens PayFast card update page with the subscription token
+   * @param token The subscription token
+   */
+  updateCardDetails(token: string): void {
+    try {
+      // Determine PayFast base URL (sandbox or production)
+      const baseUrl = environment.production 
+        ? 'https://www.payfast.co.za' 
+        : 'https://sandbox.payfast.co.za';
+      
+      // Construct return URL to billing dashboard
+      const returnUrl = `${window.location.origin}/settings/billing`;
+      const encodedReturnUrl = encodeURIComponent(returnUrl);
+      
+      // Construct the card update URL with return parameter
+      // Format: https://sandbox.payfast.co.za/eng/recurring/update/{token}?return={returnUrl}
+      const cardUpdateUrl = `${baseUrl}/eng/recurring/update/${token}?return=${encodedReturnUrl}`;
+      
+      console.log('Opening PayFast card update page:', cardUpdateUrl);
+      
+      // Open URL in new tab
+      window.open(cardUpdateUrl, '_blank');
+    } catch (error) {
+      console.error('Error opening PayFast card update page:', error);
+      throw error;
+    }
+  }
+
+
+  /**
    * Cancels a subscription using the token
    * @param token The subscription token
    * @param reason Optional reason for cancellation

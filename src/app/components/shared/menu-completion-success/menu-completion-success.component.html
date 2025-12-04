@@ -2,38 +2,43 @@
   <div class="completion-content">
     <!-- Left Column -->
     <div class="left-column">
-      <!-- Success Header Block -->
-      <div class="success-header-block white-box">
-        <div class="back-section back-button-container">
+      <!-- Next Steps Section -->
+      <div class="next-steps-block white-box">
+        <!-- Back Button -->
+        <div class="back-button-container" *ngIf="showBackButton">
           <button 
             class="back-button backLink" 
             [routerLink]="backRoute"
-            *ngIf="showBackButton"
           >
             <i class="material-icons">arrow_back</i>
             Back
           </button>
-        
         </div>
-        <div class="success-message">
-          <h6>Your menu has been saved!</h6>
-        </div>
-      </div>
 
-      <!-- Next Steps Section -->
-      <div class="next-steps-block white-box">
-        <h6>Next Steps</h6>
-        <p>Now that your menu has been set up, you can generate a QR code that will enable your patrons to access your menu.</p>
-        
-        <!-- QR Code Generation Block -->
-        <div class="qr-block">
-          <p>Generate a QR code for this menu</p>
-          <button 
-            class="hungr-btn hungr-btn-secondary" 
-            (click)="onGenerateQRCode()"
-          >
-            GENERATE QR CODE
-          </button>
+        <h6>Your menu has been saved!</h6>
+
+        <!-- QR Code Display Block -->
+        <div class="qr-block" *ngIf="menuId">
+ 
+          <div class="qr-code-container">
+            <qrcode 
+              [qrdata]="qrCodeData" 
+              (qrCodeURL)="onChangeURL($event)" 
+              [width]="200" 
+              [errorCorrectionLevel]="'M'">
+            </qrcode>
+          </div>
+          <div class="qr-actions">
+            <button 
+              class="hungr-btn hungr-btn-secondary" 
+              (click)="downloadQRCode()"
+            >
+              Download QR Code
+            </button>
+          </div>
+          <p class="qr-management-link">
+            You can manage your QR Codes <a routerLink="/qr-codes">here</a>.
+          </p>
         </div>
         
         <!-- Additional Links -->
@@ -48,13 +53,12 @@
     <!-- Right Column - Preview -->
     <div class="right-column white-box">
       <div class="preview-section">
-        <h6>Menu Preview</h6>
         <div class="preview-container">
           <div class="phone-frame">
             <iframe
               *ngIf="menuId"
               #previewIframe
-              [src]="getPreviewUrl()"
+              [src]="previewUrl"
               frameborder="0"
               class="preview-iframe"
               title="Menu Preview"
@@ -79,6 +83,7 @@
       [showDone]="false"
       [showDraft]="showSaveDraft"
       [showPublish]="showPublishMenu"
+      [publishText]="isMenuPublished ? 'Save Menu' : 'PUBLISH MENU'"
       [isSaving]="isSaving"
       (draft)="onSaveAsDraft()"
       (publish)="onPublishMenu()"

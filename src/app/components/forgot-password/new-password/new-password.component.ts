@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { getAuth, confirmPasswordReset } from 'firebase/auth';
 import { initializeApp, getApps } from 'firebase/app';
 import { environment } from '../../../../environments/environment'; 
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-new-password',
@@ -16,7 +16,7 @@ export class NewPasswordComponent implements OnInit {
   newPassword: string = '';
   passwordError: string = '';
 
-  constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly toastr: ToastrService) {}
+  constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly toast: ToastService) {}
 
   ngOnInit() {
     if (!getApps().length) {
@@ -39,13 +39,13 @@ export class NewPasswordComponent implements OnInit {
         console.log(this.newPassword);
 
         await confirmPasswordReset(auth, this.oobCode, this.newPassword);
-        this.toastr.success('Password reset successful! Redirecting to login');
+        this.toast.success('Password reset successful! Redirecting to login');
         setTimeout(() => this.router.navigate(['/sign-in']), 3000);
       } catch (error) {
-        this.toastr.error('Failed to reset password. Please try again later');
+        this.toast.error('Failed to reset password. Please try again later');
       }
     } else {
-      this.toastr.error('Invalid password reset link.');
+      this.toast.error('Invalid password reset link.');
     }
   }
 

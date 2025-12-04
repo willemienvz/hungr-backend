@@ -7,12 +7,13 @@ import { Router } from '@angular/router';
 import { User } from '../../../shared/services/user';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { MatDialog } from '@angular/material/dialog';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
 import { MediaLibraryService } from '../../../shared/services/media-library.service';
 import { MediaItem } from '../../../shared/types/media';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-about',
@@ -40,7 +41,7 @@ export class AboutComponent {
 
   users: User[] = [];
   mainUserName: string = '';
-  
+
   // Restaurant selection
   restaurants: Restaurant[] = [];
   selectedRestaurantId: string = '';
@@ -53,33 +54,39 @@ export class AboutComponent {
   isLoadingMenus: boolean = false;
 
   // Select options for app-form-select
-  get restaurantSelectOptions() {
-    return this.restaurants.map(restaurant => ({
+  // Select options for app-form-select
+  restaurantOptions: any[] = [];
+  menuOptions: any[] = [];
+
+  updateRestaurantOptions() {
+    this.restaurantOptions = this.restaurants.map(restaurant => ({
       value: restaurant.restaurantID,
       label: `${restaurant.restaurantName} - ${restaurant.city}, ${restaurant.province}${!restaurant.status ? ' (Inactive)' : ''}`,
       disabled: !restaurant.status
     }));
   }
 
-  get menuSelectOptions() {
-    return this.menus.map(menu => ({
+  updateMenuOptions() {
+    this.menuOptions = this.menus.map(menu => ({
       value: menu.menuID || menu.menuId || menu.id || menu._id,
       label: menu.menuName || menu.name || 'Unnamed Menu'
     }));
   }
 
   // Preview URL management
-  private readonly previewUrlBase = 'https://main.d1ovxejc04tu3k.amplifyapp.com/menu/';
-  private cachedPreviewUrl: SafeResourceUrl | null = null;
+  private readonly previewUrlBase = environment.menuUrl;
+  previewUrl: SafeResourceUrl | null = null;
   private lastSelectedMenuId: string | null = null;
-  
+  private cachedPreviewUrl: SafeResourceUrl | null = null;
+  private previewTimestamp: number = Date.now(); // For cache busting to force refresh
+
   constructor(
     private storage: AngularFireStorage,
     private router: Router,
     public authService: AuthService,
     private firestore: AngularFirestore,
     private dialog: MatDialog,
-    private toastr: ToastrService,
+    private toast: ToastService,
     private mediaUploadModalService: MediaUploadModalService,
     private mediaLibraryService: MediaLibraryService,
     private sanitizer: DomSanitizer
@@ -123,49 +130,50 @@ export class AboutComponent {
 
   private fetchRestaurants() {
     this.isLoadingRestaurants = true;
-    
+
     // Get current user's restaurants based on their role and parentId
     const user = JSON.parse(localStorage.getItem('user')!);
     console.log('Current user from localStorage:', user);
-    
+
     // Also try to get user from auth service
     this.authService.getCurrentUserId().then((uid) => {
       if (uid) {
         console.log('Current user ID from auth service:', uid);
-        
+
         // Get user document to check account type
         this.firestore.collection('users').doc(uid).valueChanges().subscribe({
           next: (userDoc: any) => {
             console.log('User document:', userDoc);
-            
+
             let query;
-            
+
             // For about page settings, always restrict to user's own restaurants
             // This ensures users can only edit about pages for restaurants they own
-            query = this.firestore.collection('restaurants', ref => 
+            query = this.firestore.collection('restaurants', ref =>
               ref.where('ownerID', '==', uid)
             );
             console.log('Fetching restaurants for ownerID:', uid);
-            
+
             query.valueChanges().subscribe({
               next: (restaurants: any[]) => {
                 console.log('Found restaurants:', restaurants);
                 this.restaurants = restaurants;
+                this.updateRestaurantOptions();
                 this.isLoadingRestaurants = false;
-                
+
                 // Don't auto-select - let user choose explicitly
               },
               error: (error) => {
                 console.error('Error fetching restaurants:', error);
                 this.isLoadingRestaurants = false;
-                this.toastr.error('Failed to load restaurants');
+                this.toast.error('Failed to load restaurants');
               }
             });
           },
           error: (error) => {
             console.error('Error fetching user document:', error);
             this.isLoadingRestaurants = false;
-            this.toastr.error('Failed to load user information');
+            this.toast.error('Failed to load user information');
           }
         });
       } else {
@@ -180,7 +188,7 @@ export class AboutComponent {
     const id = typeof restaurantId === 'string' ? restaurantId : restaurantId;
     this.selectedRestaurantId = id;
     this.selectedRestaurant = this.restaurants.find(r => r.restaurantID === id) || null;
-    
+
     if (this.selectedRestaurant) {
       this.loadAboutData();
       this.fetchMenus(); // Fetch menus when restaurant changes
@@ -189,128 +197,112 @@ export class AboutComponent {
 
   private fetchMenus() {
     if (!this.selectedRestaurantId) return;
-    
+
     this.isLoadingMenus = true;
-    
-    // Fetch active menus for the selected restaurant
-    // Note: Removed orderBy to avoid index requirement - can be added back after creating the index
-    this.firestore.collection('menus', ref => 
+
+    console.log('Fetching menus for restaurantID:', this.selectedRestaurantId);
+
+    // Fetch menus for the selected restaurant (no status filter to avoid index issues)
+    // Filter client-side like other components do
+    this.firestore.collection('menus', ref =>
       ref.where('restaurantID', '==', this.selectedRestaurantId)
-         .where('status', '==', 'active')
-    ).valueChanges().subscribe({
+    ).valueChanges({ idField: 'menuID' }).subscribe({
       next: (menus: any[]) => {
-        console.log('Found menus for restaurant:', menus);
+        console.log('Found menus for restaurant (before filtering):', menus);
         console.log('Sample menu structure:', menus.length > 0 ? menus[0] : 'No menus');
-        
+
+        // Filter active menus (not drafts and has Status truthy, similar to branding component)
+        // Handle both boolean Status and string Status values
+        const activeMenus = menus.filter(menu => {
+          const isNotDraft = !menu.isDraft;
+          const hasActiveStatus = menu.Status === true || menu.Status === 'active' || (menu.Status && menu.Status !== 'draft' && menu.Status !== false);
+          return isNotDraft && hasActiveStatus;
+        });
+
+        console.log('Active menus after filtering:', activeMenus);
+
         // Sort menus by creation date manually to avoid index requirement
-        this.menus = menus.sort((a, b) => {
+        this.menus = activeMenus.sort((a, b) => {
           const dateA = a.createdAt?.toDate?.() || a.createdAt || new Date(0);
           const dateB = b.createdAt?.toDate?.() || b.createdAt || new Date(0);
           return dateB.getTime() - dateA.getTime(); // Most recent first
         });
+
+        // Ensure each menu has menuID set (use idField value or existing menuID)
+        this.menus = this.menus.map(menu => ({
+          ...menu,
+          menuID: menu.menuID || menu.id || menu._id || menu.firestoreId
+        }));
+
+        this.updateMenuOptions();
         this.isLoadingMenus = false;
-        
-        // Auto-select the first menu if available
-        if (this.menus.length > 0 && !this.selectedMenuId) {
-          // Try different possible field names for menu ID
-          const firstMenu = this.menus[0];
-          this.selectedMenuId = firstMenu.menuID || firstMenu.menuId || firstMenu.id || firstMenu._id;
-          console.log('First menu object:', firstMenu);
-          console.log('Auto-selected first menu:', this.selectedMenuId);
-          
-          // Log all possible ID fields for debugging
-          console.log('Available ID fields:', {
-            menuID: firstMenu.menuID,
-            menuId: firstMenu.menuId,
-            id: firstMenu.id,
-            _id: firstMenu._id
-          });
-          
-          // Force preview URL update after auto-selection
-          setTimeout(() => {
-            this.getPreviewUrl();
-          }, 100);
-        }
+
+        console.log('Final menus array:', this.menus);
+        console.log('Menu count:', this.menus.length);
+
+        // Auto-select will happen in getPreviewUrl() getter when template accesses it
+        // This ensures it works even if selectedMenuId was previously set to empty string
       },
       error: (error) => {
         console.error('Error fetching menus:', error);
         this.isLoadingMenus = false;
-        
+
         // Provide more specific error messages
         if (error.code === 'permission-denied') {
-          this.toastr.error('Permission denied: Unable to access menu data');
+          this.toast.error('Permission denied: Unable to access menu data');
         } else if (error.message && error.message.includes('index')) {
-          this.toastr.error('Database index issue: Please contact support');
+          this.toast.error('Database index issue: Please contact support');
         } else {
-          this.toastr.error('Failed to load menus. Please try again.');
+          this.toast.error('Failed to load menus. Please try again.');
         }
       }
     });
   }
 
   getPreviewUrl(): SafeResourceUrl {
-    console.log('getPreviewUrl called with selectedMenuId:', this.selectedMenuId);
-    console.log('Available menus:', this.menus);
-    
-    // Only update the URL if the menu selection has changed
-    if (this.selectedMenuId !== this.lastSelectedMenuId) {
-      console.log('Updating preview URL due to menu change:', {
-        oldId: this.lastSelectedMenuId,
-        newId: this.selectedMenuId
-      });
-
-      this.lastSelectedMenuId = this.selectedMenuId;
-
-      if (this.selectedMenuId) {
-        const url = `${this.previewUrlBase}${this.selectedMenuId}/about`;
-        console.log('Generated preview URL:', url);
-        this.cachedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-      } else if (this.menus.length > 0) {
-        // If no menu is selected but menus are available, select the first one
-        const firstMenu = this.menus[0];
-        this.selectedMenuId = firstMenu.menuID || firstMenu.menuId || firstMenu.id || firstMenu._id;
-        if (this.selectedMenuId) {
-          const url = `${this.previewUrlBase}${this.selectedMenuId}/about`;
-          console.log('Auto-generated preview URL:', url);
-          this.cachedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-        } else {
-          console.warn('Could not determine menu ID from first menu:', firstMenu);
-          this.cachedPreviewUrl = null;
-        }
-      } else {
-        console.log('No menus available, setting cachedPreviewUrl to null');
-        this.cachedPreviewUrl = null;
-      }
+    // Auto-select first menu if menus are available but no menu is selected
+    if (!this.selectedMenuId && this.menus.length > 0) {
+      const firstMenu = this.menus[0];
+      this.selectedMenuId = firstMenu.menuID || firstMenu.menuId || firstMenu.id || firstMenu._id;
+      console.log('Auto-selected first menu:', this.selectedMenuId);
+      // Reset lastSelectedMenuId to force URL update
+      this.lastSelectedMenuId = null;
     }
 
-    console.log('Returning cachedPreviewUrl:', this.cachedPreviewUrl);
+    // Always include timestamp for cache busting to ensure fresh content
+    if (this.selectedMenuId) {
+      const url = `${this.previewUrlBase}${this.selectedMenuId}/about?t=${this.previewTimestamp}`;
+      this.cachedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      this.lastSelectedMenuId = this.selectedMenuId;
+    } else {
+      this.cachedPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('');
+    }
+
     return this.cachedPreviewUrl || this.sanitizer.bypassSecurityTrustResourceUrl('');
   }
 
+  private refreshPreview() {
+    // Force refresh by updating timestamp
+    this.previewTimestamp = Date.now();
+    console.log('Auto-refreshing preview...');
+  }
+
   onMenuSelectionChange(event: any) {
-    if (event.value === this.selectedMenuId) {
+    const newValue = event.value || (typeof event === 'string' ? event : null);
+    if (newValue === this.selectedMenuId) {
       console.log('Same menu selected, skipping update');
       return;
     }
 
-    console.log('Selected menu:', event.value);
-    this.selectedMenuId = event.value;
-    
-    // Force preview URL update
-    setTimeout(() => {
-      this.getPreviewUrl();
-    }, 100);
-  }
-
-  // Method to manually refresh the preview
-  refreshPreview() {
-    console.log('Manually refreshing preview...');
-    this.getPreviewUrl();
+    console.log('Selected menu:', newValue);
+    this.selectedMenuId = newValue;
+    // Force refresh when menu changes
+    this.refreshPreview();
   }
 
   private loadAboutData() {
     if (!this.selectedRestaurantId) return;
-    
+
     // Load about data for the selected restaurant
     this.firestore.collection('aboutPages').doc(this.selectedRestaurantId).valueChanges().subscribe({
       next: (aboutData: any) => {
@@ -334,13 +326,13 @@ export class AboutComponent {
           this.mainImageUrl = '';
           this.additionalImageUrls = []; // Updated to use array
         }
-        
+
         this.saveOriginalValues();
         this.hasUnsavedChanges = false;
       },
       error: (error) => {
         console.error('Error loading about data:', error);
-        this.toastr.error('Failed to load about page data');
+        this.toast.error('Failed to load about page data');
       }
     });
   }
@@ -403,10 +395,10 @@ export class AboutComponent {
   private async onMainImageUploaded(mediaItem: MediaItem): Promise<void> {
     try {
       this.isSaving = true;
-      
+
       // Update about with media library reference
       this.mainImageUrl = mediaItem.url;
-      
+
       // Track usage in media library - handle permission errors gracefully
       try {
         await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
@@ -423,21 +415,21 @@ export class AboutComponent {
 
       this.isSaving = false;
       this.markAsChanged(); // Add this to enable save button
-      this.toastr.success('Main image uploaded successfully!');
+      this.toast.success('Main image uploaded successfully!');
     } catch (error) {
       console.error('Error updating main image:', error);
       this.isSaving = false;
-      this.toastr.error('Failed to update main image. Please try again.');
+      this.toast.error('Failed to update main image. Please try again.');
     }
   }
 
   private async onAdditionalImageUploaded(mediaItem: MediaItem): Promise<void> {
     try {
       this.isSaving = true;
-      
+
       // Add new image to the array
       this.additionalImageUrls.push(mediaItem.url);
-      
+
       // Track usage in media library - handle permission errors gracefully
       try {
         await this.mediaLibraryService.trackMediaUsage(mediaItem.id, {
@@ -454,17 +446,17 @@ export class AboutComponent {
 
       this.isSaving = false;
       this.markAsChanged(); // Add this to enable save button
-      this.toastr.success('Additional image uploaded successfully!');
+      this.toast.success('Additional image uploaded successfully!');
     } catch (error) {
       console.error('Error updating additional image:', error);
       this.isSaving = false;
-      this.toastr.error('Failed to update additional image. Please try again.');
+      this.toast.error('Failed to update additional image. Please try again.');
     }
   }
 
   update() {
     if (!this.selectedRestaurantId) {
-      this.toastr.error('Please select a restaurant first');
+      this.toast.error('Please select a restaurant first');
       return;
     }
 
@@ -490,12 +482,14 @@ export class AboutComponent {
       .then(() => {
         this.isSaving = false;
         this.markAsSaved();
-        this.toastr.success(`About page updated successfully for ${this.selectedRestaurant?.restaurantName || 'restaurant'}`);
+        this.toast.success(`About page updated successfully for ${this.selectedRestaurant?.restaurantName || 'restaurant'}`);
+        // Auto-refresh preview after saving
+        this.refreshPreview();
       })
       .catch((error) => {
         this.isSaving = false;
         console.error('Error updating about page data:', error);
-        this.toastr.error('Failed to update about page');
+        this.toast.error('Failed to update about page');
       });
   }
 
@@ -550,12 +544,14 @@ export class AboutComponent {
     this.isContactDetailsVisible = this.originalValues.isContactDetailsVisible ?? true;
     this.mainImageUrl = this.originalValues.mainImageUrl || '';
     this.additionalImageUrls = this.originalValues.additionalImageUrls || []; // Updated to use array
-    
+
     // Reset change tracking
     this.hasUnsavedChanges = false;
     this.setupChangeTracking();
-    
-    this.toastr.info('Changes discarded');
+
+    this.toast.info('Changes discarded');
+    // Auto-refresh preview after discarding
+    this.refreshPreview();
   }
 
   async navigateWithUnsavedChangesCheck(route: string) {

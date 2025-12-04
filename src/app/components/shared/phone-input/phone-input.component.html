@@ -1,0 +1,16 @@
+<div class="phone-input-wrapper">
+  <app-form-input
+    [label]="label"
+    type="tel"
+    [placeholder]="placeholder"
+    [required]="required"
+    [disabled]="disabled"
+    [errorMessage]="errorMessage"
+    [ngModel]="value"
+    (valueChange)="onInputChange($event)"
+    (keydown)="onKeyDown($event)"
+    (paste)="onPaste($event)"
+    (blur)="onBlur($event)">
+  </app-form-input>
+</div>
+

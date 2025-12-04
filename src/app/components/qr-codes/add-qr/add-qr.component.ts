@@ -3,6 +3,7 @@ import { SafeUrl } from '@angular/platform-browser';
 import { Menu } from '../../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { environment } from '../../../../environments/environment';
+import { SelectOption } from '../../shared/form-select/form-select.component';
 
 @Component({
   selector: 'app-add-qr',
@@ -38,9 +39,21 @@ export class AddQrComponent {
     this.showPopup = false;
   }
 
-  selectMenu(menu: Menu) {
-    this.selectedMenu = menu;
-    this.validationError = false;
+  selectMenu(menuValue: any) {
+    // Handle both Menu object and menu ID
+    const menu = typeof menuValue === 'object' ? menuValue : this.filteredMenus.find(m => m.menuID === menuValue);
+    if (menu) {
+      this.selectedMenu = menu;
+      this.validationError = false;
+    }
+  }
+
+  // Get menu options for app-form-select
+  get menuOptions(): SelectOption[] {
+    return this.filteredMenus.map(menu => ({
+      value: menu,
+      label: menu.menuName
+    }));
   }
 
   saveSettings() {

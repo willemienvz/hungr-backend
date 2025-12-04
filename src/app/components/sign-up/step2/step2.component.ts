@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormDataService } from '../../../shared/services/signup/form-data.service';
 import { AuthService } from '../../../shared/services/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { ToastService } from '../../../shared/services/toast.service';
 
 import { Router } from '@angular/router';
 import { PayFastService, PayFastPaymentData } from '../../../shared/services/payfast.service';
@@ -24,7 +26,9 @@ export class Step2Component {
     private readonly fb: FormBuilder,
     private readonly formDataService: FormDataService,
     private readonly authService: AuthService,
-    private readonly payfastService: PayFastService
+    private readonly payfastService: PayFastService,
+    private readonly auth: AngularFireAuth,
+    private readonly toast: ToastService
   ) {
     this.step2Form = this.fb.group({
       billingOption: ['digitalMenu', Validators.required], // Default to digital menu option
@@ -70,39 +74,72 @@ export class Step2Component {
     this.router.navigate(['/register-user/step1']);
   }
 
-  onComplete() {
-    const step2Data = this.step2Form.value;
-    
-    // Get existing data from step 1
-    const existingData = this.formDataService.getFormData();
-    
-    // Merge step 2 data with existing data
-    const combinedData = { ...existingData, ...step2Data };
-    
-    // Update form data service with merged data
-    this.formDataService.updateFormData(combinedData);
-    
-    // Store complete form data in localStorage
-    localStorage.setItem('formData', JSON.stringify(combinedData));
-    
-    // Check if user selected the order & pay option (coming soon)
-    if (step2Data.billingOption === 'orderPay') {
-      // Navigate to a coming soon page or show a notification
-      alert('Thank you for your interest! The Order & Pay solution is coming soon. We will notify you when it becomes available.');
+  async onComplete() {
+    if (this.step2Form.invalid) {
+      // Show validation errors
+      this.toast.error('Please fill in all required fields');
       return;
     }
     
-    this.onCheckout();
+    this.isSaving = true;
+    try {
+      const step2Data = this.step2Form.value;
+      const existingData = this.formDataService.getFormData();
+      const combinedData = { ...existingData, ...step2Data };
+      this.formDataService.updateFormData(combinedData);
+      
+      // Check if user selected orderPay (coming soon)
+      if (step2Data.billingOption === 'orderPay') {
+        alert('Thank you for your interest! The Order & Pay solution is coming soon.');
+        this.isSaving = false;
+        return;
+      }
+      
+      // STEP 1: Create Firebase Auth account FIRST
+      const userCredential = await this.auth.createUserWithEmailAndPassword(
+        combinedData.userEmail,
+        combinedData.password
+      );
+      
+      if (!userCredential.user) {
+        throw new Error('Failed to create user account');
+      }
+      
+      const authUid = userCredential.user.uid;
+      
+      // STEP 2: Create user document in Firestore with Auth UID
+      await this.authService.SetUserData(userCredential.user, combinedData);
+      
+      console.log('User account and document created with UID:', authUid);
+      
+      // STEP 3: Store form data and Auth UID for after payment
+      localStorage.setItem('formData', JSON.stringify(combinedData));
+      localStorage.setItem('authUid', authUid);
+      
+      // STEP 4: Now redirect to PayFast (user document already exists)
+      await this.onCheckout();
+      
+    } catch (error: any) {
+      console.error('Error during signup:', error);
+      this.isSaving = false;
+      
+      if (error.code === 'auth/email-already-in-use') {
+        // User already exists - might be from previous attempt
+        // Try to proceed with payment anyway (user document exists)
+        await this.onCheckout();
+      } else {
+        this.toast.error(error.message || 'Failed to create account. Please try again.');
+      }
+    }
   }
 
   async onCheckout() {
-    this.isSaving = true;
+    // User document already created, just proceed with payment
+    const formData = this.formDataService.getFormData();
+    
     try {
-      const formData = this.formDataService.getFormData();
-      
-      // Create PayFast payment data for R999/month recurring billing
       const paymentData: PayFastPaymentData = {
-        amount: 999, // R999 per month
+        amount: 999,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.userEmail,
@@ -114,6 +151,7 @@ export class Step2Component {
     } catch (error) {
       console.error('Error during checkout:', error);
       this.isSaving = false;
+      throw error;
     }
   }
 }

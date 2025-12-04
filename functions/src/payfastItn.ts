@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as CryptoJS from 'crypto-js';
+import { sendSubscriptionChangeEmail } from './brevo/emailService';
 
 // PayFast configuration
 const PAYFAST_CONFIG = {
@@ -408,68 +409,12 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
       .where('email', '==', itnData.email_address)
       .get();
     
-    let userId: string;
+    let userId: string | null = null;
     
     if (userQuery.empty) {
-      // Create new user if they don't exist
-      console.log('Creating new user for email:', itnData.email_address);
-      
-      // Create Firestore user document only
-      // Firebase Auth user will be created by the verify-email-address component
-      // Determine if recurring (check subscription_type, token, or recurring_amount)
-      // If we have a token, it's definitely a recurring subscription (PayFast only issues tokens for subscriptions)
-      const hasToken = !!(itnData.token || itnData.tokenisation);
-      const hasSubscriptionType = itnData.subscription_type === '1';
-      const hasRecurringAmount = !!itnData.recurring_amount;
-      const isRecurringForUser = hasSubscriptionType || hasRecurringAmount || hasToken;
-      
-      // Determine plan name
-      // For monthly recurring subscriptions, use 'digitalMenu' instead of 'monthly'
-      let userPlanName = 'once-off';
-      if (isRecurringForUser) {
-        if (itnData.frequency) {
-          switch (itnData.frequency) {
-            case '3':
-              userPlanName = 'digitalMenu'; // Monthly recurring subscription
-              break;
-            case '4':
-              userPlanName = 'digitalMenu'; // Default to digitalMenu for recurring
-              break;
-            case '5':
-              userPlanName = 'digitalMenu'; // Default to digitalMenu for recurring
-              break;
-            case '6':
-              userPlanName = 'digitalMenu'; // Default to digitalMenu for recurring
-              break;
-            default:
-              userPlanName = 'digitalMenu'; // Default to digitalMenu for recurring
-          }
-        } else {
-          // No frequency specified, but we have a token - default to digitalMenu for monthly (our standard plan)
-          userPlanName = 'digitalMenu';
-        }
-      } else {
-        userPlanName = 'once-off'; // One-time payment
-      }
-      
-      const newUserData = {
-        email: itnData.email_address,
-        firstName: itnData.name_first,
-        lastName: itnData.name_last,
-        phoneNumber: itnData.cell_number || '',
-        subscriptionStatus: 'active',
-        subscriptionPlan: userPlanName,
-        subscriptionType: userPlanName, // Also set subscriptionType for consistency
-        payfastToken: itnData.token || itnData.tokenisation, // Save PayFast token to user document for billing access
-        lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
-        created_at: admin.firestore.FieldValue.serverTimestamp(),
-        updated_at: admin.firestore.FieldValue.serverTimestamp()
-      };
-      
-      const newUserRef = await db.collection('users').add(newUserData);
-      userId = newUserRef.id;
-      
-      console.log('New user created with ID:', userId);
+      // User doesn't exist - this shouldn't happen if sign-up flow is correct
+      // But handle gracefully: create subscription with email only, log warning
+      console.warn(`User not found for email ${itnData.email_address}. Payment will be processed, but user document will be updated when sign-up completes.`);
     } else {
       const userDoc = userQuery.docs[0];
       userId = userDoc.id;
@@ -537,8 +482,7 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
     
     // Create or update subscription
     const subscriptionData: any = {
-      userId: userId,
-      email: itnData.email_address,
+      email: itnData.email_address, // Always include email for lookup
       status: 'active',
       plan: planName,
       amount: parseFloat(itnData.amount_gross),
@@ -548,6 +492,11 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
       needsManualReview: false, // Initialize manual review flag
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     };
+    
+    // Only add userId if we found the user
+    if (userId) {
+      subscriptionData.userId = userId;
+    }
 
     // Add recurring billing specific fields
     if (isRecurring) {
@@ -558,11 +507,21 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
       subscriptionData.nextBillingDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
     }
 
-    // Check if subscription already exists
-    const existingSubscription = await db
-      .collection('subscriptions')
-      .where('userId', '==', userId)
-      .get();
+    // Check if subscription already exists (by email and paymentId, or by userId if available)
+    let existingSubscription;
+    if (userId) {
+      existingSubscription = await db
+        .collection('subscriptions')
+        .where('userId', '==', userId)
+        .get();
+    } else {
+      // If no userId, find by email and paymentId
+      existingSubscription = await db
+        .collection('subscriptions')
+        .where('email', '==', itnData.email_address)
+        .where('paymentId', '==', itnData.pf_payment_id)
+        .get();
+    }
 
     if (existingSubscription.empty) {
       // Create new subscription
@@ -577,6 +536,11 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
       // Preserve original creation date and start date
       subscriptionData.created_at = existingData.created_at;
       subscriptionData.startDate = existingData.startDate || existingData.created_at;
+      
+      // Update userId if it was null before
+      if (!existingData.userId && userId) {
+        subscriptionData.userId = userId;
+      }
       
       // Reset failure counter on successful payment
       subscriptionData.consecutiveFailures = 0;
@@ -596,7 +560,7 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
         await db.collection('audit_logs').add({
           type: 'subscription_management',
           action: 'failure_counter_reset',
-          userId: userId,
+          userId: userId || 'unknown',
           subscriptionId: subscriptionDoc.id,
           result: 'success',
           source: 'payfast_itn',
@@ -612,18 +576,53 @@ async function updateUserSubscription(itnData: PayFastItnData): Promise<void> {
       }
     }
 
-    // Update user document
-    const tokenToSave = itnData.token || itnData.tokenisation;
-    await db.collection('users').doc(userId).update({
-      subscriptionStatus: 'active',
-      subscriptionPlan: planName, // Use the same planName determined above
-      subscriptionType: planName, // Also set subscriptionType for consistency
-      payfastToken: tokenToSave, // Save PayFast token to user document for subscription management and billing access
-      lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
-      updated_at: admin.firestore.FieldValue.serverTimestamp()
-    });
+    // Update user document ONLY if userId exists
+    if (userId) {
+      const userRef = db.collection('users').doc(userId);
+      const userDoc = await userRef.get();
+      const userData = userDoc.data();
+      const oldPlan = userData?.subscriptionPlan || userData?.subscriptionType || 'N/A';
+      
+      const tokenToSave = itnData.token || itnData.tokenisation;
+      await userRef.update({
+        subscriptionStatus: 'active',
+        subscriptionPlan: planName, // Use the same planName determined above
+        subscriptionType: planName, // Also set subscriptionType for consistency
+        payfastToken: tokenToSave, // Save PayFast token to user document for subscription management and billing access
+        lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
+        updated_at: admin.firestore.FieldValue.serverTimestamp()
+      });
+      console.log('User subscription updated successfully:', userId);
 
-    console.log('User subscription updated successfully:', userId);
+      // Send subscription change email (non-blocking)
+      try {
+        const userEmail = itnData.email_address;
+        const firstName = (userData?.firstName as string) || itnData.name_first || 'User';
+        
+        if (userEmail && oldPlan !== planName) {
+          await sendSubscriptionChangeEmail(
+            userEmail,
+            {
+              firstName,
+              oldPlan,
+              newPlan: planName,
+              effectiveDate: new Date().toISOString(),
+              billingChange: isRecurring ? 'Recurring subscription activated' : 'One-time payment processed',
+            },
+            userId
+          );
+          console.log('Subscription change email sent', { userId, email: userEmail });
+        }
+      } catch (emailError: any) {
+        // Don't block subscription update if email fails
+        console.error('Failed to send subscription change email', {
+          userId,
+          error: emailError.message,
+        });
+      }
+    } else {
+      console.log('User document not found - subscription created without userId. Will be linked when user signs up.');
+    }
 
   } catch (error) {
     console.error('Error updating user subscription:', error);

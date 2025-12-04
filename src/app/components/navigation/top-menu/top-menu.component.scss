@@ -42,8 +42,19 @@
     justify-content: flex-end;
 }
 
+.profile-container {
+    position: relative;
+    display: inline-block;
+}
+
 .navbar .inner h1{
     color: #444444;
+}
+
+.logo {
+    width: 150px;
+    height: auto;
+    max-width: 150px;
 }
 
 .breadcrumb-container {
@@ -108,9 +119,9 @@
 
 .profiledd{
     position: absolute;
-    top: 84px;
-    background-color: white;
+    top: calc(100% + 10px);
     right: 0;
+    background-color: white;
     padding:25px;
     display: flex;
     flex-direction: column;
@@ -118,7 +129,7 @@
     border-radius: 0 0 5px 5px;
     border: 1px solid #EBEDEE;
     min-width: 400px;
-    z-index: 100;
+    z-index: 9999;
 }
 
 .profiledd h6{
@@ -192,12 +203,22 @@ border-radius: 50%;
     .navbar {
         padding: var(--spacing-3) var(--spacing-5); // Reduce padding on mobile
         
-        .inner:first-of-type {
+        .left-section {
             gap: var(--spacing-5); // Reduce gap on mobile
+            flex: 1; // Take available space
+        }
+        
+        .right-section {
+            gap: 10px; // Gap between hamburger and account button
+            justify-content: flex-end; // Align to right
         }
         
         .breadcrumb-container {
             display: none; // Hide breadcrumbs on mobile
+        }
+        
+        .logo {
+            width: 120px !important; // Smaller logo on mobile
         }
         
         .search-bar {
@@ -212,7 +233,6 @@ border-radius: 50%;
         width: 40px;
         height: 40px;
         cursor: pointer;
-        margin-right: 10px;
         
         i {
             font-size: 24px;

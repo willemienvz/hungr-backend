@@ -7,17 +7,16 @@
   <!-- Textarea element -->
   <textarea
     [placeholder]="placeholder"
-    [value]="value"
     [disabled]="disabled"
     [required]="required"
     [rows]="rows"
-    [maxLength]="maxLength"
-    [minLength]="minLength"
+    [attr.maxlength]="maxLength ?? null"
+    [attr.minlength]="minLength ?? null"
     [class]="textareaClass"
+    [value]="value"
     (input)="onInputChange($event)"
     (focus)="onFocus($event)"
-    (blur)="onBlur($event)">
-  </textarea>
+    (blur)="onBlur($event)"></textarea>
 
   <!-- Character count -->
   <div *ngIf="showCharacterCount" class="character-count"

@@ -1,11 +1,11 @@
-<div class="form-input-wrapper" [class]="customClass">
+<div [class]="wrapperClass">
   <!-- Label -->
   <label *ngIf="label" class="form-label" [class.required]="required">
     {{ label }}
   </label>
 
   <!-- Input container -->
-  <div class="input-container">
+  <div class="input-container" [class.has-tooltip]="tooltipText">
     <!-- Prefix icon -->
     <i *ngIf="prefixIcon" class="material-icons prefix-icon">
       {{ prefixIcon }}
@@ -34,6 +34,14 @@
     <i *ngIf="suffixIcon" class="material-icons suffix-icon clickable" (click)="onSuffixIconClick()">
       {{ suffixIcon }}
     </i>
+
+    <!-- Tooltip icon (top right) -->
+    <div *ngIf="tooltipText" class="tooltip-wrapper">
+      <i class="material-icons tooltip-icon">help_outline</i>
+      <div class="tooltip-text">
+        {{ tooltipText }}
+      </div>
+    </div>
   </div>
 
   <!-- Error message -->

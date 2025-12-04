@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { User, UserRole, UserPermissions } from '../../../shared/services/user';
 import {
   AngularFirestore,
@@ -33,7 +33,7 @@ export class ViewUsersComponent {
   showCustomPermissions: boolean = false;
 
   constructor(
-    private readonly toastr: ToastrService,
+    private readonly toast: ToastService,
     private readonly firestore: AngularFirestore,
     private permissionService: PermissionService
   ) { }
@@ -89,12 +89,12 @@ export class ViewUsersComponent {
     userRef
       .update(updatedData)
       .then(() => {
-        this.toastr.success('User updated successfully!');
+        this.toast.success('User updated successfully!');
         this.isSaving = false;
         this.switchToViewMode(); // Switch back to view mode after successful update
       })
       .catch((error) => {
-        this.toastr.error('Error updating user');
+        this.toast.error('Error updating user');
         this.isSaving = false;
       });
   }

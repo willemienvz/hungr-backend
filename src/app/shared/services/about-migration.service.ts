@@ -3,7 +3,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { About } from './about';
 import { Restaurant } from './restaurant';
 import { User } from './user';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class AboutMigrationService {
 
   constructor(
     private firestore: AngularFirestore,
-    private toastr: ToastrService
+    private toast: ToastService
   ) {}
 
   /**
@@ -21,7 +21,7 @@ export class AboutMigrationService {
    */
   async migrateAboutData(): Promise<void> {
     try {
-      this.toastr.info('Starting about data migration...');
+      this.toast.info('Starting about data migration...');
       
       // Get all users with about data
       const usersSnapshot = await this.firestore.collection('users').get().toPromise();
@@ -78,15 +78,15 @@ export class AboutMigrationService {
       }
 
       if (errors.length > 0) {
-        this.toastr.warning(`Migration completed with ${errors.length} errors. Check console for details.`);
+        this.toast.warning(`Migration completed with ${errors.length} errors. Check console for details.`);
         console.error('Migration errors:', errors);
       } else {
-        this.toastr.success(`Successfully migrated about data for ${migratedCount} restaurants!`);
+        this.toast.success(`Successfully migrated about data for ${migratedCount} restaurants!`);
       }
 
     } catch (error) {
       console.error('Migration failed:', error);
-      this.toastr.error('About data migration failed. Check console for details.');
+      this.toast.error('About data migration failed. Check console for details.');
       throw error;
     }
   }
@@ -118,7 +118,7 @@ export class AboutMigrationService {
    */
   async cleanupOldAboutData(): Promise<void> {
     try {
-      this.toastr.warning('Cleaning up old about data from user documents...');
+      this.toast.warning('Cleaning up old about data from user documents...');
       
       const usersSnapshot = await this.firestore.collection('users').get().toPromise();
       let cleanedCount = 0;
@@ -139,11 +139,11 @@ export class AboutMigrationService {
         }
       }
 
-      this.toastr.success(`Cleaned up about data from ${cleanedCount} user documents!`);
+      this.toast.success(`Cleaned up about data from ${cleanedCount} user documents!`);
       
     } catch (error) {
       console.error('Cleanup failed:', error);
-      this.toastr.error('Cleanup failed. Check console for details.');
+      this.toast.error('Cleanup failed. Check console for details.');
       throw error;
     }
   }

@@ -1,12 +1,23 @@
+.max-width-100 {
+  width: 100%;
+}
+
 .formGroup {
   width: 100%;
   display: flex;
   flex-direction: column;
 
+  input {
+    width: 100%;
+  }
 
   label {
     color: var(--color-text-muted);
     margin-bottom: var(--spacing-3);
+  }
+
+  input {
+    width:100%;
   }
 }
 
@@ -14,12 +25,63 @@
   display: flex;
   flex-flow: column;
   width: 100%;
-  max-height: 110vh;
+
   gap: 10px;
 }
 
 .settingspage h6 {
   margin-bottom: 25px;
+}
+
+// Profile form grid layout
+.profile-form {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-2);
+  width: 100%;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+    row-gap: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 1rem;
+  }
+}
+
+.button-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  // margin-top: var(--spacing-5);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-5);
+
+  &.no-margin {
+    margin-top:0;
+  }
+
+  &.between {
+    justify-content: space-between;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-2);
+    
+    button {
+      width: 100%;
+    }
+  }
 }
 
 .error-message {
@@ -41,33 +103,78 @@
     font-size: 10px;
     font-weight: 500;
     line-height: 1;
-    letter-spacing: -0.1%;
     cursor: pointer;
     text-decoration: underline;
     color: var(--color-text-muted);
   }
 }
 
-.toggleHolder .toggle-container:last-of-type {
-  border-bottom: none;
+.toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-3);
+  width: 100%;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .toggle-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4);
   border-radius: var(--border-radius-md);
   background: #f3f4f5;
+
+  label {
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  // Custom toggle styling to match design
+  ::ng-deep mat-slide-toggle {
+    .mat-slide-toggle-bar {
+      background-color: #e0e0e0 !important;
+      border-radius: 20px;
+      height: 24px;
+      width: 48px;
+      transition: background-color 0.3s ease;
+    }
+
+    .mat-slide-toggle-thumb {
+      background-color: #ffffff !important;
+      width: 20px;
+      height: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    &.mat-checked {
+      .mat-slide-toggle-bar {
+        background-color: #16D3D2 !important;
+      }
+
+      .mat-slide-toggle-thumb {
+        background-color: #ffffff !important;
+        transform: translateX(24px);
+      }
+    }
+
+    &.mat-disabled {
+      opacity: 0.5;
+    }
+  }
 }
 
-.toggleHolder p {
-  font-size: 10px;
-  padding-left: var(--spacing-3);
-}
-
-.toggleHolder {
-  display: flex;
-  flex-direction: row;
-  gap: 17px;
-}
-
+// Legacy row class - kept for backwards compatibility if needed elsewhere
 .row {
   width: 100%;
   display: flex;
@@ -145,7 +252,6 @@
     font-size: 11px;
     font-weight: 400;
     line-height: 10px;
-    letter-spacing: -2%;
     color: #181818;
     width: 100%;
     cursor: pointer;
@@ -208,61 +314,8 @@
   gap: 15px;
 }
 
-.leftCol {
-  width: 59%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 15px;
-
-  .row {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    gap: var(--grid-gap-md);
-    justify-content: flex-start;
-    align-items: center;
-
-    .formGroup {
-      width: var(--layout-equal-split);
-    }
-  }
-}
-
-.rightCol {
-  width: 39%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 15px;
-
-  .row {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-    justify-content: flex-start;
-    align-items: center;
-
-    .formGroup {
-      width: calc(100%);
-    }
-  }
-}
-
-.formBlock {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-  align-items: flex-start;
-}
-
-.btnRow {
-  margin-top: var(--spacing-5);
-  align-items: flex-end;
-  justify-content: flex-end;
-}
+// Legacy column classes - removed in favor of grid layout
+// Keeping for backwards compatibility if needed
 
 .rowInner {
   width: 100%;
@@ -304,7 +357,6 @@
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   
   &.active {
     background-color: #16D3D2;
@@ -319,5 +371,16 @@
   &.cancelled {
     background-color: #f44336;
     color: white;
+  }
+}
+
+.reset-password-link {
+  color: var(--color-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  
+  &:hover {
+    color: var(--color-secondary-hover);
   }
 }

@@ -6,6 +6,8 @@ import { SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { AddQrComponent } from './add-qr/add-qr.component';
 import { TableColumn, TableAction } from '../shared/data-table/data-table.component';
+import { environment } from '../../../environments/environment';
+import * as QRCode from 'qrcode';
 
 @Component({
   selector: 'app-qr-codes',
@@ -48,6 +50,13 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
       label: 'View QR Code',
       icon: 'visibility',
       color: 'secondary',
+      visible: (menu: Menu) => menu.qrAssigned
+    },
+    {
+      key: 'download',
+      label: 'Download QR Code',
+      icon: 'download',
+      color: 'primary',
       visible: (menu: Menu) => menu.qrAssigned
     },
     {
@@ -178,6 +187,9 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
       case 'view':
         this.viewQR.openPopup(row.menuID);
         break;
+      case 'download':
+        this.downloadQRCode(row.menuID, row.menuName);
+        break;
       case 'create':
         this.openAddQrModal();
         // Optionally pre-select the menu
@@ -209,8 +221,32 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  download(url: string) {
-    console.log(url);
+  /**
+   * Download QR code for a menu
+   */
+  downloadQRCode(menuId: string, menuName: string): void {
+    const qrData = environment.menuUrl + menuId;
+    const fileName = `${menuName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_qrcode.png`;
+
+    QRCode.toDataURL(qrData, {
+      width: 400,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    })
+      .then((dataUrl: string) => {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error: any) => {
+        console.error('Error generating QR code:', error);
+      });
   }
 
   togglePopupMenu(index: number) {

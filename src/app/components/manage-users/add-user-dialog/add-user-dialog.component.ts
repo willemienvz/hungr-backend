@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../../shared/services/auth.service';
 import { NgForm } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { PermissionService } from '../../../shared/services/permission.service';
 import { EmailService, InvitationEmailData } from '../../../shared/services/email.service';
 import { UserRole, UserPermissions } from '../../../shared/services/user';
@@ -32,7 +32,7 @@ export class AddUserDialogComponent {
 
   constructor(
     public authService: AuthService,
-    private readonly toastr: ToastrService,
+    private readonly toast: ToastService,
     private permissionService: PermissionService,
     private emailService: EmailService
   ) { }
@@ -97,7 +97,7 @@ export class AddUserDialogComponent {
     this.emailService.sendInvitationEmail(invitationData).subscribe({
       next: (response) => {
         console.log('Invitation email sent successfully:', response);
-        this.toastr.success('Invitation sent successfully!');
+        this.toast.success('Invitation sent successfully!');
 
         // Store invitation data in Firestore
         this.storeInvitationData(userData, invitationToken);
@@ -107,7 +107,7 @@ export class AddUserDialogComponent {
       },
       error: (error) => {
         console.error('Failed to send invitation email:', error);
-        this.toastr.error('Failed to send invitation. Please try again.');
+        this.toast.error('Failed to send invitation. Please try again.');
 
         // Fallback: still create the user but mark as pending
         this.createPendingUser(userData, invitationToken);

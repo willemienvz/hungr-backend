@@ -321,3 +321,5 @@ await db.collection('users').doc(userId).update({
 - Log migration operations for audit
 - Handle race conditions gracefully (last write wins, merge on conflict)
 
+
+

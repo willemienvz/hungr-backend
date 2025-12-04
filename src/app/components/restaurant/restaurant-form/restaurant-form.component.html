@@ -1,14 +1,17 @@
 <div class="inner-page">
   <form #userForm="ngForm" (ngSubmit)="onSubmit()">
     <div class="col">
-      <app-content-block [title]="mode === 'add' ? 'Add Restaurant Details' : 'Edit Restaurant Details'">
-        <a class="backLink" (click)="navigateWithUnsavedChangesCheck('/restaurants')"
-          ><i class="material-icons">chevron_left</i> Back</a
-        >
+      <app-content-block [title]="mode === 'add' ? 'Add Restaurant Details' : 'Edit Restaurant Details'" 
+      (backButtonClick)="navigateWithUnsavedChangesCheck('/restaurants')"
+      [showBackButton]="true"
+      [backButtonText]="'Back'">
+       
         <div class="row">
           <div class="col">
             <div class="formGroup">
               <app-form-input
+                class="full-width"
+                fullWidth="true"
                 label="Restaurant Name"
                 type="text"
                 placeholder="Name your restaurant..."
@@ -24,6 +27,7 @@
           <div class="col">
             <div class="formGroup">
               <app-form-input
+                class="full-width"
                 label="Street Address"
                 type="text"
                 placeholder="1882 Bodenstein St"
@@ -37,6 +41,7 @@
             <div class="formGroup">
               <app-form-select
                 label="Province"
+                class="full-width"
                 placeholder="Select Province"
                 [required]="true"
                 [errorMessage]="getFieldError('province')"
@@ -52,6 +57,7 @@
               <app-form-input
                 label="City"
                 type="text"
+                class="full-width"
                 placeholder="Boksburg"
                 [required]="true"
                 [errorMessage]="getFieldError('city')"
@@ -64,6 +70,7 @@
               <app-form-input
                 label="Zip Code"
                 type="text"
+                class="full-width"
                 placeholder="1213"
                 [required]="true"
                 [errorMessage]="getFieldError('zip')"
@@ -79,21 +86,20 @@
     
     <div class="col">
       <app-content-block title="Assign menu" [ngStyle]="{'gap': '0'}">
-        <label style="color: var(--color-text-muted); margin-bottom: 8px"
-          >Please assign a menu to this restaurant.</label
-        >
-        <div class="rowMenu">
-          <div style="width: 32%">
+      
+        <div class="rowMenu space-between">
+          <div class="menu-select-container">
             <app-form-select
-              label="Select Menu"
+              label="Please assign a menu to this restaurant."
               placeholder="Choose a menu"
               [options]="menuOptions"
+              class="full-width"
               [(ngModel)]="selectedMenu"
               (selectionChange)="selectMenu($event.value)"
               name="selectedMenu">
             </app-form-select>
           </div>
-          <p>
+          <p class="displaced">
             Need to create a new menu for this restaurant?
             <a
               (click)="onAddMenuClick($event)"
@@ -116,15 +122,14 @@
               [(ngModel)]="restaurantStatus"
               color="#16D3D2"
               name="restaurantStatus"
+              (change)="onRestaurantStatusChange($event)"
             ></mat-slide-toggle>
           </div>
         </app-content-block>
-        <app-content-block title="Number of tables in the restaurant" customClass="contactBlock" [ngStyle]="{'height': '140px', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'space-between'}">
+        <app-content-block title="Number of tables in the restaurant" >
           <div class="row" style="align-items: center">
-            <p style="width: 60%">Please enter a numerical value</p>
-            <div style="width: 40%">
               <app-form-input
-                label=""
+                label="Please enter a numerical value"
                 type="number"
                 placeholder="Number of tables"
                 [required]="true"
@@ -132,41 +137,63 @@
                 [min]="1"
                 [max]="100"
                 [step]="1"
+                [labelLeft]="true"
+              
+
+                class="full-width"
                 name="selectedNumberTable"
                 [(ngModel)]="selectedNumberTable"
-                (input)="onNumberTableInput($event)">
+                (input)="onNumberTableInput($event)"
+                customClass="tables-input">
               </app-form-input>
-            </div>
           </div>
         </app-content-block>
       </div>
 
-      <app-content-block title="Number of tables in the restaurant" customClass="contactBlock" *ngIf="mode === 'add'" [ngStyle]="{'height': '140px', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'space-between'}">
-        <div class="row" style="align-items: center">
-          <p style="width: 60%">Please enter a numerical value</p>
-          <div style="width: 40%">
-            <app-form-input
-              label=""
-              type="number"
-              placeholder="Number of tables"
-              [required]="true"
-              [errorMessage]="getFieldError('selectedNumberTable')"
-              [min]="1"
-              [max]="100"
-              [step]="1"
-              name="selectedNumberTable"
-              [(ngModel)]="selectedNumberTable"
-              (input)="onNumberTableInput($event)">
-            </app-form-input>
+    
+
+      <div class="blockItemsRow" *ngIf="mode === 'add'">
+        <app-content-block title="Restaurant Status" [ngStyle]="{'height': '140px', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'space-between'}">
+          <div class="toggle-container">
+            <label [style.color]="restaurantStatus ? '#16D3D2' : '#444444'">{{
+              restaurantStatus ? "Active" : "Inactive"
+            }}</label>
+            <mat-slide-toggle
+              [(ngModel)]="restaurantStatus"
+              color="#16D3D2"
+              name="restaurantStatus"
+              (change)="onRestaurantStatusChange($event)"
+            ></mat-slide-toggle>
           </div>
-        </div>
-      </app-content-block>
+        </app-content-block>
+        <app-content-block title="Number of tables in the restaurant" class="flex1" [ngStyle]="{'flex': '1', 'height': '140px', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'space-between'}">
+          <div class="row" style="align-items: center">
+              <app-form-input
+                label="Please enter a numerical value"
+                type="number"
+                class="full-width"
+                fullWidth="true"
+                placeholder="Number of tables"
+                [required]="true"
+                [errorMessage]="getFieldError('selectedNumberTable')"
+                [min]="1"
+                [max]="100"
+                [step]="1"
+                [labelLeft]="true"
+                name="selectedNumberTable"
+                [(ngModel)]="selectedNumberTable"
+                (input)="onNumberTableInput($event)"
+                customClass="tables-input">
+              </app-form-input>
+          </div>
+        </app-content-block>
+      </div>
 
       <div class="formGroup btnHolder" style="margin-top: 30px;">
         <button (click)="navigateWithUnsavedChangesCheck('/restaurants')" 
            class="hungr-btn hungr-btn-secondary">Cancel</button>
         <button type="button" (click)="saveDraft()" class="hungr-btn hungr-btn-secondary" *ngIf="mode === 'edit'">
-          Save as draft
+          SAVE AS DRAFT
         </button>
         <button type="submit" class="hungr-btn hungr-btn-primary" [disabled]="!isFormValid()">
           {{ mode === 'add' ? 'Save Restaurant' : 'Update Restaurant' }}

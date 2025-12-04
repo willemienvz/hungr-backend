@@ -9,6 +9,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { MediaLibraryService } from '../../shared/services/media-library.service';
 import { MediaItem, MediaFilters } from '../../shared/types/media';
@@ -28,6 +29,9 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   deletingMediaId: string | null = null;  // Track which media is being deleted
+  
+  // Storage info
+  storageLimitInfo: { currentBytes: number; maxBytes: number; remainingBytes: number } | null = null;
 
   // Filter and search properties
   searchControl = new FormControl('');
@@ -70,7 +74,8 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
     private mediaLibraryService: MediaLibraryService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog,
-    private mediaUploadModalService: MediaUploadModalService
+    private mediaUploadModalService: MediaUploadModalService,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
@@ -122,6 +127,9 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
       // Extract unique categories and tags
       this.extractFilterOptions();
 
+      // Load storage limit info
+      await this.loadStorageLimitInfo();
+
       this.applyFilters();
     } catch (error) {
       this.error = 'Failed to load media library. Please try again.';
@@ -158,8 +166,7 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(item =>
         item.fileName.toLowerCase().includes(query) ||
-        item.originalName.toLowerCase().includes(query) ||
-        item.description?.toLowerCase().includes(query)
+        item.originalName.toLowerCase().includes(query)
       );
     }
 
@@ -324,6 +331,9 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
           // Re-extract filter options
           this.extractFilterOptions();
 
+          // Refresh storage limit info after deletion
+          await this.loadStorageLimitInfo();
+
           this.cdr.detectChanges();
         } catch (error) {
           console.error('Error deleting media:', error);
@@ -378,21 +388,53 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
         // Files were selected - upload them
         this.loading = true;
         try {
+          let successCount = 0;
+          let failCount = 0;
+          
           for (const file of result.files) {
-            await this.mediaLibraryService.uploadMedia({
-              file,
-              componentType: 'media-library',
-              componentId: 'media-library-upload',
-              fieldName: 'media',
-              isPublic: false
+            try {
+              await this.mediaLibraryService.uploadMedia({
+                file,
+                componentType: 'media-library',
+                componentId: 'media-library-upload',
+                fieldName: 'media',
+                isPublic: false
+              });
+              successCount++;
+            } catch (error) {
+              failCount++;
+              const errorMessage = error instanceof Error ? error.message : 'Upload failed';
+              this.snackBar.open(`Failed to upload ${file.name}: ${errorMessage}`, 'Close', {
+                duration: 5000,
+                panelClass: ['hungr-snackbar']
+              });
+            }
+          }
+          
+          // Show summary toast
+          if (successCount > 0 && failCount === 0) {
+            this.snackBar.open(`Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}`, 'Close', {
+              duration: 3000,
+              panelClass: ['hungr-snackbar']
+            });
+          } else if (successCount > 0 && failCount > 0) {
+            this.snackBar.open(`Uploaded ${successCount} file${successCount > 1 ? 's' : ''}, ${failCount} failed`, 'Close', {
+              duration: 5000,
+              panelClass: ['hungr-snackbar']
             });
           }
           
-          // Refresh the media library after successful upload
+          // Refresh the media library after upload attempts
           await this.loadMedia();
+          // Refresh storage limit info after upload
+          await this.loadStorageLimitInfo();
         } catch (error) {
           console.error('Error uploading media:', error);
-          alert('Upload failed. Please try again.');
+          const errorMessage = error instanceof Error ? error.message : 'Upload failed. Please try again.';
+          this.snackBar.open(errorMessage, 'Close', {
+            duration: 5000,
+            panelClass: ['hungr-snackbar']
+          });
         } finally {
           this.loading = false;
           this.cdr.detectChanges();
@@ -472,19 +514,64 @@ export class MediaLibraryComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get total storage size of all media files
+   * Load storage limit information
+   */
+  private async loadStorageLimitInfo(): Promise<void> {
+    try {
+      const limitInfo = await this.mediaLibraryService.checkStorageLimit(0);
+      this.storageLimitInfo = {
+        currentBytes: limitInfo.currentBytes,
+        maxBytes: limitInfo.maxBytes,
+        remainingBytes: limitInfo.remainingBytes
+      };
+    } catch (error) {
+      console.error('Error loading storage limit info:', error);
+    }
+  }
+
+  /**
+   * Format bytes to human-readable string
+   */
+  private formatBytes(bytes: number): string {
+    if (bytes >= 1073741824) { // GB
+      return (bytes / 1073741824).toFixed(2) + ' GB';
+    } else if (bytes >= 1048576) { // MB
+      return (bytes / 1048576).toFixed(2) + ' MB';
+    } else if (bytes >= 1024) { // KB
+      return (bytes / 1024).toFixed(2) + ' KB';
+    }
+    return bytes + ' bytes';
+  }
+
+  /**
+   * Get total storage size of all media files (for filtered media)
    */
   getTotalStorageSize(): string {
     const totalBytes = this.filteredMedia.reduce((sum, media) => sum + (media.fileSize || 0), 0);
+    return this.formatBytes(totalBytes);
+  }
 
-    if (totalBytes >= 1073741824) { // GB
-      return (totalBytes / 1073741824).toFixed(2) + ' GB';
-    } else if (totalBytes >= 1048576) { // MB
-      return (totalBytes / 1048576).toFixed(2) + ' MB';
-    } else if (totalBytes >= 1024) { // KB
-      return (totalBytes / 1024).toFixed(2) + ' KB';
+  /**
+   * Get storage used display - shows only the used amount to keep card alignment
+   */
+  getStorageUsedDisplay(): string {
+    if (!this.storageLimitInfo) {
+      return this.getTotalStorageSize();
     }
-    return totalBytes + ' bytes';
+    // Show only used storage in main value to keep it aligned with other cards
+    return this.formatBytes(this.storageLimitInfo.currentBytes);
+  }
+
+  /**
+   * Get storage limit subtitle - shows limit and percentage
+   */
+  getStorageLimitSubtitle(): string {
+    if (!this.storageLimitInfo) {
+      return '';
+    }
+    const limit = this.formatBytes(this.storageLimitInfo.maxBytes);
+    const percentage = ((this.storageLimitInfo.currentBytes / this.storageLimitInfo.maxBytes) * 100).toFixed(1);
+    return `of ${limit} (${percentage}%)`;
   }
 
   /**

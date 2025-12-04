@@ -31,9 +31,9 @@ export const SUPPORTED_IMAGE_TYPES = [
 ];
 
 /**
- * Maximum file size for uploads (10MB)
+ * Maximum file size for uploads (2.5MB)
  */
-export const MAX_FILE_SIZE = 10 * 1024 * 1024;
+export const MAX_FILE_SIZE = 2.5 * 1024 * 1024;
 
 /**
  * Maximum file size for thumbnails (1MB)

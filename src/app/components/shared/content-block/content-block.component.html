@@ -1,32 +1,56 @@
-<div class="content-block" [ngClass]="customClass">
-  <div class="section-header" *ngIf="showHeader">
-    <h6 class="section-title">{{ title }}</h6>
+<div class="content-block" [ngClass]="customClass || class">
+  <!-- Back Button (relatively positioned to push content down) -->
+  <div class="back-button-container" *ngIf="showBackButton">
+    <a 
+      class="backLink"
+      (click)="onBackButtonClick($event)"
+      [style.cursor]="'pointer'"
+      [attr.href]="backRoute || '#'">
+      <span class="material-symbols-outlined">
+        arrow_back
+    </span>
+      {{ backButtonText }}
+    </a>
+  </div>
+
+  <div class="section-header" *ngIf="showHeader && (title || tooltipText || showActions || showFilter)">
+    <h6 class="section-title" *ngIf="title">{{ title }}</h6>
     
-    <div class="header-actions" *ngIf="showActions || showFilter">
-      <div class="filter-dropdown" *ngIf="showFilter && filterOptions.length > 0">
-        <mat-select 
-          [placeholder]="'Filter by'" 
-          [value]="selectedFilter"
-          (selectionChange)="onFilterChange($event.value)">
-          <mat-option 
-            *ngFor="let option of filterOptions" 
-            [value]="option.value">
-            {{ option.label }}
-          </mat-option>
-        </mat-select>
-        <mat-icon class="filter-icon">filter_list</mat-icon>
+    <div class="header-right" *ngIf="tooltipText || showActions || showFilter">
+      <!-- Tooltip Icon (top right corner) -->
+      <div class="tooltip-icon-container" *ngIf="tooltipText">
+        <mat-icon 
+          class="tooltip-icon"
+          [matTooltip]="tooltipText"
+          matTooltipPosition="above">
+          info
+        </mat-icon>
       </div>
       
-      <div class="action-buttons" *ngIf="showActions && actions.length > 0">
-        <a 
-          *ngFor="let action of actions"
-          class="action-btn"
-          [ngClass]="action.class"
-          [routerLink]="action.routerLink"
-          (click)="onActionClick(action)"
-          [style.cursor]="'pointer'">
-          {{ action.label }}
-        </a>
+      <!-- Existing Actions and Filter -->
+      <div class="header-actions" *ngIf="showActions || showFilter">
+        <div class="filter-dropdown" *ngIf="showFilter && filterOptions.length > 0">
+          <app-form-select
+            [placeholder]="'Filter by'"
+            [options]="filterSelectOptions"
+            [(ngModel)]="selectedFilter"
+            (selectionChange)="onFilterChange($event.value)"
+            appearance="outline">
+          </app-form-select>
+          <mat-icon class="filter-icon">filter_list</mat-icon>
+        </div>
+        
+        <div class="action-buttons" *ngIf="showActions && actions.length > 0">
+          <a 
+            *ngFor="let action of actions"
+            class="action-btn"
+            [ngClass]="action.class"
+            [routerLink]="action.routerLink"
+            (click)="onActionClick(action)"
+            [style.cursor]="'pointer'">
+            {{ action.label }}
+          </a>
+        </div>
       </div>
     </div>
   </div>

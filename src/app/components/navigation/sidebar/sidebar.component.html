@@ -1,4 +1,25 @@
-<nav class="sidebar" [class.mobile-open]="isMobileMenuOpen">
+<!-- Backdrop overlay for mobile -->
+<div 
+  class="sidebar-backdrop" 
+  *ngIf="isMobileMenuOpen"
+  (click)="closeMobileMenu()"
+  aria-label="Close menu">
+</div>
+
+<nav 
+  class="sidebar" 
+  [class.mobile-open]="isMobileMenuOpen"
+  (click)="onSidebarClick($event)">
+  <!-- Close button for mobile -->
+  <button 
+    class="sidebar-close-button"
+    *ngIf="isMobileMenuOpen"
+    (click)="closeMobileMenu(); $event.stopPropagation()"
+    aria-label="Close menu"
+    type="button">
+    <i class="material-icons">close</i>
+  </button>
+  
   <div class="subsidebarcontainer">
     <p class="heading">Analytics</p>
     <a routerLink="/dashboard" routerLinkActive="activeMenu"
@@ -10,11 +31,7 @@
     <a routerLink="/visitor-insights" routerLinkActive="activeMenu"
       ><i class="material-icons">group</i>Visitor Insights</a
     >
-    @if (!accountType1) {
-    <a routerLink="/sales-insights" routerLinkActive="activeMenu"
-      ><i class="material-icons">query_stats</i>Sales Insights</a
-    >
-    }
+    
   </div>
   <div class="subsidebarcontainer">
     <p class="heading">My Restaurants</p>
@@ -64,9 +81,10 @@
     <a routerLink="/settings/about" routerLinkActive="activeMenu"
       ><i class="material-icons">info</i>About Page</a
     >
+    <!--
     <a routerLink="/manage-users" routerLinkActive="activeMenu"
       ><i class="material-icons">manage_accounts</i>Manage users</a
-    >
+    >-->
     <a routerLink="/help" routerLinkActive="activeMenu"
       ><i class="material-icons">support_agent</i>Help</a
     >

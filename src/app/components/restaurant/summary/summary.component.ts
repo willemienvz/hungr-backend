@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { MatDialog } from '@angular/material/dialog';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 
 @Component({
@@ -15,7 +15,7 @@ export class SummaryComponent  implements OnInit{
   isPopupMenuOpen: boolean[] = [];
   isSaving: boolean = false;
   restaurants: Restaurant[] = [];
-  constructor(private firestore: AngularFirestore,  private elementRef: ElementRef, private dialog: MatDialog, private toastr: ToastrService) {
+  constructor(private firestore: AngularFirestore,  private elementRef: ElementRef, private dialog: MatDialog, private toast: ToastService) {
   }
   ngOnInit() {
     this.isSaving = true;
@@ -70,10 +70,10 @@ export class SummaryComponent  implements OnInit{
     this.togglePopupMenu(index);
     this.firestore.collection('restaurants').doc(id).delete()
         .then(() => {
-            this.toastr.success('Restaurant successfully deleted!');
+            this.toast.success('Restaurant successfully deleted!');
         })
         .catch((error) => {
-            this.toastr.error('Error removing restaurant');
+            this.toast.error('Error removing restaurant');
             console.error("Error removing restaurant: ", error);
         });
   }

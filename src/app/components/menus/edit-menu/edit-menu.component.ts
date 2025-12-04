@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { finalize } from 'rxjs';
@@ -7,19 +7,21 @@ import { v4 as uuidv4 } from 'uuid';
 import { Category } from '../../../shared/services/category';
 import { Restaurant } from '../../../shared/services/restaurant';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { MenuService, MenuItemInterface, SideItem, PreparationItem, VariationItem, SauceItem } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-edit-menu',
   templateUrl: './edit-menu.component.html',
   styleUrls: ['./edit-menu.component.scss'],
 })
-export class EditMenuComponent implements OnInit {
+export class EditMenuComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef;
   step = 1;
   logoUrl: string | null = null;
@@ -59,9 +61,15 @@ export class EditMenuComponent implements OnInit {
   selectedCategoryFilter: number | null = null;
   searchTerm: string = '';
   filteredMenuItems: MenuItemInterface[] = [];
+  categorySelectOptions: Array<{ value: string; label: string }> = [{ value: 'all', label: 'All Categories' }];
   
   // Navigation safety properties
   hasUnsavedChanges: boolean = false;
+  private isNavigating: boolean = false; // Flag to prevent navigation loops
+  private destroy$ = new Subject<void>(); // For unsubscribing from observables
+  
+  // Menu status tracking
+  isMenuPublished: boolean = false;
   
   constructor(
     private readonly firestore: AngularFirestore,
@@ -69,33 +77,86 @@ export class EditMenuComponent implements OnInit {
     private readonly papa: Papa,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly toastr: ToastrService,
+    private readonly toast: ToastService,
     private readonly menuService: MenuService,
     private readonly dialog: MatDialog
   ) {}
 
   ngOnInit() {
-    this.route.params.subscribe((params) => {
-      this.menuID = params['menuID'];
-      
-      // Read step from route parameter
-      const step = params['step'];
-      if (step) {
-        const stepNumber = parseInt(step, 10);
-        if (stepNumber >= 1 && stepNumber <= 5) {
-          this.currentStep = stepNumber;
-        } else {
-          // Invalid step, redirect to step 1
-          this.router.navigate(['/menus/edit-menu', this.menuID, 1], { replaceUrl: true });
+    console.log('EditMenuComponent ngOnInit called');
+    
+    // Subscribe to route params with proper cleanup
+    this.route.params
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        console.log('Route params changed:', params);
+        const newMenuID = params['menuID'];
+        const step = params['step'];
+        
+        // Only update if menuID changed (to avoid reloading data unnecessarily)
+        if (newMenuID && newMenuID !== this.menuID) {
+          console.log('MenuID changed from', this.menuID, 'to', newMenuID);
+          this.menuID = newMenuID;
+          // Load menu data when menuID changes
+          this.loadMenuData();
         }
-      } else {
-        // No step specified, default to step 1
-        this.currentStep = 1;
-        this.router.navigate(['/menus/edit-menu', this.menuID, 1], { replaceUrl: true });
-      }
-    });
-    this.loadMenuData();
+        
+        // Read step from route parameter
+        if (step) {
+          const stepNumber = parseInt(step, 10);
+          console.log('Step from route:', stepNumber, 'Current step:', this.currentStep);
+          if (stepNumber >= 1 && stepNumber <= 5) {
+            // Only update if step actually changed to prevent unnecessary updates
+            if (this.currentStep !== stepNumber) {
+              console.log('Updating currentStep to', stepNumber);
+              this.currentStep = stepNumber;
+            }
+          } else {
+            // Invalid step, redirect to step 1
+            console.warn('Invalid step number:', stepNumber);
+            if (!this.isNavigating && this.menuID) {
+              this.isNavigating = true;
+              this.router.navigate(['/menus/edit-menu', this.menuID, 1], { replaceUrl: true })
+                .then(() => {
+                  this.isNavigating = false;
+                })
+                .catch(() => {
+                  this.isNavigating = false;
+                });
+            }
+          }
+        } else {
+          // No step specified, default to step 1
+          console.log('No step in route, defaulting to step 1');
+          if (this.currentStep !== 1 && !this.isNavigating && this.menuID) {
+            this.currentStep = 1;
+            this.isNavigating = true;
+            this.router.navigate(['/menus/edit-menu', this.menuID, 1], { replaceUrl: true })
+              .then(() => {
+                this.isNavigating = false;
+              })
+              .catch(() => {
+                this.isNavigating = false;
+              });
+          }
+        }
+      });
+    
+    // Load menu data and restaurants on initial component load only
+    // Only if menuID is already available from route snapshot
+    const routeSnapshot = this.route.snapshot;
+    if (routeSnapshot.params['menuID']) {
+      this.menuID = routeSnapshot.params['menuID'];
+      console.log('Loading menu data for menuID:', this.menuID);
+      this.loadMenuData();
+    }
     this.fetchRestaurants();
+  }
+
+  ngOnDestroy() {
+    // Clean up all subscriptions
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Navigation safety methods
@@ -133,7 +194,13 @@ export class EditMenuComponent implements OnInit {
   }
 
   onBackButtonClick() {
-    this.navigateWithUnsavedChangesCheck(['/menus']);
+    // If we're on step 1, navigate back to menus list
+    if (this.currentStep === 1) {
+      this.navigateWithUnsavedChangesCheck(['/menus']);
+    } else {
+      // For steps > 1, navigate to previous step
+      this.navigateToStep(this.currentStep - 1);
+    }
   }
 
   addPreparation(data: {itemIndex: number, prepData: {name: string}}): void {
@@ -296,6 +363,17 @@ export class EditMenuComponent implements OnInit {
         this.originalMenuName = menu.menuName;
         this.selectedRestaurant = menu.restaurantID;
         
+        // Track if menu is already published
+        // Menu is published if: not a draft AND has an active status
+        // Status can be: 'active', 'Active', 'published', true, or any truthy value except 'draft'/'Draft'/false
+        const status = menu.Status;
+        this.isMenuPublished = !menu.isDraft && 
+          status && 
+          status !== 'draft' && 
+          status !== 'Draft' && 
+          status !== false;
+        console.log('Menu status check:', { isDraft: menu.isDraft, Status: status, isMenuPublished: this.isMenuPublished });
+        
         // Check for ID conflicts in the original data
         const originalCategories = menu.categories || [];
         const conflictCheck = this.menuService.checkCategoryIdConflicts(originalCategories);
@@ -319,6 +397,9 @@ export class EditMenuComponent implements OnInit {
         // Display the final category structure for debugging
         this.menuService.displayCategoryStructure(this.categories);
         
+        // Update category select options
+        this.updateCategorySelectOptions();
+        
         // Convert existing preparations from objects to strings if needed
         const items = menu.items || [];
         this.menuItems = items.map(item => ({
@@ -328,6 +409,14 @@ export class EditMenuComponent implements OnInit {
         this.addRestaurantLater = menu.addRestaurantLater || false;
         this.initializeArrays();
         this.applyFilters(); // Initialize filters
+        
+        // Validate form fields after loading menu data to ensure button state is correct
+        // Use setTimeout to ensure validation runs after Angular change detection
+        setTimeout(() => {
+          this.validateMenuName();
+          this.validateRestaurant();
+        }, 0);
+        
         console.log('Loaded menu data:', menu);
         console.log('Fixed categories:', this.categories);
       }
@@ -338,6 +427,16 @@ export class EditMenuComponent implements OnInit {
     this.newSubcategoryName = this.menuService.initializeArrays(this.categories.length);
     this.isPopupMenuOpen = Array(this.categories.length).fill(false);
     this.isAddInputVisible = Array(this.categories.length).fill(false);
+  }
+
+  private updateCategorySelectOptions(): void {
+    const options = [{ value: 'all', label: 'All Categories' }];
+    this.categorySelectOptions = options.concat(
+      this.categories.map(category => ({
+        value: category.id.toString(),
+        label: category.name
+      }))
+    );
   }
 
   getFile(itemIndex: number): void {
@@ -354,6 +453,10 @@ export class EditMenuComponent implements OnInit {
     this.menuService.fetchRestaurants(ownerId).subscribe((restaurants) => {
       this.restaurants = restaurants;
       console.log(restaurants);
+      // Re-validate restaurant after restaurants are loaded to ensure button state is correct
+      if (this.selectedRestaurant) {
+        this.validateRestaurant();
+      }
     });
   }
 
@@ -385,6 +488,8 @@ export class EditMenuComponent implements OnInit {
   // Add method to handle name changes
   onMenuNameChange(name: string): void {
     this.menuName = name;
+    // Validate menu name to update error state immediately
+    this.menuNameError = !this.menuService.validateMenuName(name);
     this.checkDuplicateMenuName(name);
   }
 
@@ -420,8 +525,94 @@ export class EditMenuComponent implements OnInit {
   }
 
   nextStepLast() {
-    this.saveMenu();
-    this.router.navigate(['/menus/edit-menu', this.menuID, this.currentStep + 1]);
+    console.log('nextStepLast called, currentStep:', this.currentStep);
+    
+    // Only navigate if we're not already on the last step
+    if (this.currentStep >= 5) {
+      console.log('Already on step 5, returning');
+      return; // Already on last step, prevent infinite loop
+    }
+    
+    // Prevent multiple simultaneous saves or navigations
+    if (this.isSaving || this.isNavigating) {
+      console.log('Navigation blocked: isSaving=', this.isSaving, 'isNavigating=', this.isNavigating);
+      return;
+    }
+
+    // Add duplicate name check
+    if (this.isDuplicateMenuName) {
+      this.toast.error('A menu with this name already exists. Please choose a different name.');
+      return;
+    }
+
+    // Validate menuID exists before proceeding
+    if (!this.menuID) {
+      console.error('Cannot save: menuID is missing');
+      this.toast.error('Menu ID is missing. Please try again.');
+      return;
+    }
+
+    console.log('Starting save and navigation to step 5');
+    this.isSaving = true;
+    this.isNavigating = true;
+
+    // Double-check that category IDs are still unique before saving
+    const conflictCheck = this.menuService.checkCategoryIdConflicts(this.categories);
+    if (conflictCheck.hasConflicts) {
+      console.warn('Category ID conflicts detected before saving, re-applying fix...');
+      this.categories = this.menuService.fixCategoryIds(this.categories);
+      this.updateCategorySelectOptions();
+    }
+
+    const updatedMenu = {
+      menuName: this.menuName,
+      restaurantID: this.addRestaurantLater ? '' : this.selectedRestaurant,
+      categories: this.categories,
+      items: this.menuItems,
+      addRestaurantLater: this.addRestaurantLater
+    };
+
+    console.log('Saving menu with fixed categories:', this.categories);
+
+    // Wait for save to complete before navigating to prevent infinite loops
+    this.menuService.updateMenu(this.menuID, updatedMenu)
+      .then(() => {
+        console.log('Menu saved successfully, navigating to step 5');
+        this.isSaving = false;
+        this.markAsSaved();
+        console.log('Menu updated successfully with fixed category IDs!');
+        // Navigate to step 5 only after save completes, using replaceUrl to prevent back button issues
+        // Use a small delay to ensure the save operation is fully complete
+        return new Promise<void>((resolve) => {
+          setTimeout(() => {
+            console.log('Attempting navigation to step 5');
+            this.router.navigate(['/menus/edit-menu', this.menuID, 5], { replaceUrl: true })
+              .then(() => {
+                console.log('Navigation to step 5 successful');
+                resolve();
+              })
+              .catch((navError) => {
+                console.error('Navigation error:', navError);
+                this.isNavigating = false;
+                this.toast.error('Failed to navigate to completion page.');
+                resolve();
+              });
+          }, 100);
+        });
+      })
+      .then(() => {
+        // Reset navigation flag after navigation completes
+        setTimeout(() => {
+          console.log('Resetting navigation flag');
+          this.isNavigating = false;
+        }, 200);
+      })
+      .catch((error) => {
+        console.error('Error updating menu:', error);
+        this.isSaving = false;
+        this.isNavigating = false;
+        this.toast.error('Failed to save menu. Please try again.');
+      });
   }
 
   previousStep() {
@@ -435,7 +626,22 @@ export class EditMenuComponent implements OnInit {
       if (step === 4 && this.menuItems.length === 0) {
         this.menuItems = this.menuService.addMenuItem(this.menuItems);
       }
-      this.router.navigate(['/menus/edit-menu', this.menuID, step]);
+      // Only check for unsaved changes when navigating backward, not forward (step 3 to 4)
+      const isForwardNavigation = this.currentStep === 3 && step === 4;
+      if (this.hasUnsavedChanges && !isForwardNavigation) {
+        const dialogRef = this.dialog.open(UnsavedChangesDialogComponent, {
+          width: '400px',
+          disableClose: true
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result === true) {
+            this.router.navigate(['/menus/edit-menu', this.menuID, step]);
+          }
+        });
+      } else {
+        this.router.navigate(['/menus/edit-menu', this.menuID, step]);
+      }
     }
   }
 
@@ -456,7 +662,7 @@ export class EditMenuComponent implements OnInit {
   saveMenu() {
     // Add duplicate name check
     if (this.isDuplicateMenuName) {
-      this.toastr.error('A menu with this name already exists. Please choose a different name.');
+      this.toast.error('A menu with this name already exists. Please choose a different name.');
       return;
     }
 
@@ -467,6 +673,7 @@ export class EditMenuComponent implements OnInit {
     if (conflictCheck.hasConflicts) {
       console.warn('Category ID conflicts detected before saving, re-applying fix...');
       this.categories = this.menuService.fixCategoryIds(this.categories);
+      this.updateCategorySelectOptions();
     }
 
     const updatedMenu = {
@@ -495,6 +702,7 @@ export class EditMenuComponent implements OnInit {
     this.categories = this.menuService.addCategory(this.categories, this.newCategoryName);
     this.newCategoryName = '';
     this.initializeArrays();
+    this.updateCategorySelectOptions();
     this.markAsChanged();
   }
 
@@ -524,8 +732,16 @@ export class EditMenuComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        // Check if the category being deleted is currently selected in the filter
+        const deletedCategoryId = this.categories[index]?.id;
         this.categories = this.menuService.deleteCategory(this.categories, index);
         this.initializeArrays();
+        this.updateCategorySelectOptions();
+        // Reset filter if deleted category was selected
+        if (this.selectedCategoryFilter === deletedCategoryId) {
+          this.selectedCategoryFilter = null;
+        }
+        this.applyFilters();
         this.markAsChanged();
       }
     });
@@ -572,6 +788,7 @@ export class EditMenuComponent implements OnInit {
       addRestaurantLater: this.addRestaurantLater
     };
     this.menuService.updateMenu(this.menuID, updatedMenu);
+    this.isMenuPublished = false;
     this.markAsSaved();
   }
 
@@ -586,6 +803,7 @@ export class EditMenuComponent implements OnInit {
       addRestaurantLater: this.addRestaurantLater
     };
     this.menuService.updateMenu(this.menuID, updatedMenu);
+    this.isMenuPublished = true;
     this.markAsSaved();
   }
 
@@ -618,7 +836,7 @@ export class EditMenuComponent implements OnInit {
         this.markAsChanged();
       }).catch(error => {
         console.error('Error uploading image:', error);
-        this.toastr.error('Error uploading image');
+        this.toast.error('Error uploading image');
       });
     }
   }
@@ -656,7 +874,7 @@ export class EditMenuComponent implements OnInit {
     // Navigate to the menu items step to show the uploaded items
     this.navigateToStep(4);
     
-    this.toastr.success(`${event.items.length} menu items ${event.replaceExisting ? 'replaced' : 'added'} successfully!`);
+    this.toast.success(`${event.items.length} menu items ${event.replaceExisting ? 'replaced' : 'added'} successfully!`);
     this.markAsChanged();
   }
 
@@ -760,4 +978,5 @@ export class EditMenuComponent implements OnInit {
     // Mark as having unsaved changes
     this.markAsChanged();
   }
+
 }

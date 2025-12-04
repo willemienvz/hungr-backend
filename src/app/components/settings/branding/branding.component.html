@@ -3,8 +3,9 @@
 
   
   <div class="all-other">
-    <div class="row">
-      <app-content-block title="Logo" customClass="logo-block">
+    <div class="branding-grid">
+      <!-- Row 1: Logo (1/3) + Brand Colours (2/3) -->
+      <app-content-block title="Logo" class="logo-block grid-col-1">
         <p>Please upload your logo.</p>
 
         <div class="row" style="margin-top: var(--spacing-5)">
@@ -36,248 +37,381 @@
         </div>
       </app-content-block>
 
-      <app-content-block title="Brand Colours">
-        <div class="row">
-          <i
-            class="material-icons"
-            (mouseenter)="tooltipOpen['brandColors'] = true"
-            (mouseleave)="tooltipOpen['brandColors'] = false"
-            >information
-            <app-tooltip
-              [text]="'These are your brand colors used throughout the interface.'"
-              *ngIf="tooltipOpen['brandColors']"
-              [isVisible]="tooltipOpen['brandColors']"
-            ></app-tooltip
-          ></i>
+      <app-content-block title="Background Color" class="grid-col-2">
+        <div class="row inputRow">
+          <p class="input-label">Background Color</p>
+          <div class="input-controls">
+            <div class="colorPicker">
+              <input
+                [(colorPicker)]="backgroundColor"
+                [style.background]="backgroundColor"
+                class="colourPicker"
+                (ngModelChange)="applyChanges('Background Color', $event)"
+                (colorPickerChange)="applyChanges('Background Color', $event)"
+                (cpColorChange)="applyChanges('Background Color', $event)"
+              />
+            </div>
+            <span class="hex-code">{{backgroundColor}}</span>
+          </div>
         </div>
         
         <div class="row inputRow">
-          <p>Background Colour</p>
-          <div class="colorPicker">
-            <input
-              [(colorPicker)]="backgroundColor"
-              [style.background]="backgroundColor"
-              class="colourPicker"
-              (ngModelChange)="applyChanges('Background Color', $event)"
-              (colorPickerChange)="applyChanges('Background Color', $event)"
-              (cpColorChange)="applyChanges('Background Color', $event)"
-            />
+          <p class="input-label">Nav Bar Color</p>
+          <div class="input-controls">
+            <div class="colorPicker">
+              <input
+                [(colorPicker)]="navBarColor"
+                [style.background]="navBarColor"
+                class="colourPicker"
+                (ngModelChange)="applyChanges('Nav Bar Color', $event)"
+                (colorPickerChange)="applyChanges('Nav Bar Color', $event)"
+                (cpColorChange)="applyChanges('Nav Bar Color', $event)"
+              />
+            </div>
+            <span class="hex-code">{{navBarColor}}</span>
           </div>
-          <span class="hex-code">{{backgroundColor}}</span>
-       
         </div>
         
         <div class="row inputRow">
-          <p>Primary Colour</p>
-          <div class="colorPicker">
-            <input
-              [(colorPicker)]="primaryColor"
-              [style.background]="primaryColor"
-              class="colourPicker"
-              (ngModelChange)="applyChanges('Primary Color', $event)"
-              (colorPickerChange)="applyChanges('Primary Color', $event)"
-              (cpColorChange)="applyChanges('Primary Color', $event)"
-            />
+          <p class="input-label">Primary Color</p>
+          <div class="input-controls">
+            <div class="colorPicker">
+              <input
+                [(colorPicker)]="primaryColor"
+                [style.background]="primaryColor"
+                class="colourPicker"
+                (ngModelChange)="applyChanges('Primary Color', $event)"
+                (colorPickerChange)="applyChanges('Primary Color', $event)"
+                (cpColorChange)="applyChanges('Primary Color', $event)"
+              />
+            </div>
+            <span class="hex-code">{{primaryColor}}</span>
           </div>
-          <span class="hex-code">{{primaryColor}}</span>
-     
         </div>
         
         <div class="row inputRow">
-          <p>Secondary Colour</p>
-          <div class="colorPicker">
-            <input
-              [(colorPicker)]="secondaryColor"
-              [style.background]="secondaryColor"
-              class="colourPicker"
-              (ngModelChange)="applyChanges('Secondary Color', $event)"
-              (colorPickerChange)="applyChanges('Secondary Color', $event)"
-              (cpColorChange)="applyChanges('Secondary Color', $event)"
-            />
+          <p class="input-label">Secondary Color</p>
+          <div class="input-controls">
+            <div class="colorPicker">
+              <input
+                [(colorPicker)]="secondaryColor"
+                [style.background]="secondaryColor"
+                class="colourPicker"
+                (ngModelChange)="applyChanges('Secondary Color', $event)"
+                (colorPickerChange)="applyChanges('Secondary Color', $event)"
+                (cpColorChange)="applyChanges('Secondary Color', $event)"
+              />
+            </div>
+            <span class="hex-code">{{secondaryColor}}</span>
           </div>
-          <span class="hex-code">{{secondaryColor}}</span>
-       
         </div>
         
         <div class="row inputRow">
-          <p>Accent Colour</p>
-          <div class="colorPicker">
-            <input
-              [(colorPicker)]="accentColor"
-              [style.background]="accentColor"
-              class="colourPicker"
-              (ngModelChange)="applyChanges('Accent Color', $event)"
-              (colorPickerChange)="applyChanges('Accent Color', $event)"
-              (cpColorChange)="applyChanges('Accent Color', $event)"
-            />
+          <p class="input-label">Accent Color</p>
+          <div class="input-controls">
+            <div class="colorPicker">
+              <input
+                [(colorPicker)]="accentColor"
+                [style.background]="accentColor"
+                class="colourPicker"
+                (ngModelChange)="applyChanges('Accent Color', $event)"
+                (colorPickerChange)="applyChanges('Accent Color', $event)"
+                (cpColorChange)="applyChanges('Accent Color', $event)"
+              />
+            </div>
+            <span class="hex-code">{{accentColor}}</span>
           </div>
-          <span class="hex-code">{{accentColor}}</span>
-         
         </div>
       </app-content-block>
-    </div>
 
-    <div class="outerRow">
-      <div class="outerCol">
-        <div class="row">
-          <app-content-block title="Text Styles">
+      <!-- Row 2: Button Styles (full width) -->
+      <app-content-block title="Button Styles" class="grid-col-full button-styles-row">
+        <!-- Primary Button Section -->
+        <div class="button-style-group">
+          <h6>Primary Button</h6>
+          <div class="button-style-columns">
+            <div class="button-style-col-left">
+              <div class="form-field-row">
+                <label class="field-label">Typeface</label>
+                <div class="field-input">
+                  <app-form-select
+                    placeholder="Select typeface..."
+                    [options]="typefaceOptions"
+                    [(ngModel)]="primaryButtonTypeface"
+                    (selectionChange)="applyChanges('Primary Button Typeface', $event.value)"
+                    appearance="outline">
+                  </app-form-select>
+                </div>
+              </div>
+              <div class="form-field-row">
+                <label class="field-label">Letter Case</label>
+                <div class="field-input">
+                  <app-form-select
+                    placeholder="Select letter case..."
+                    [options]="letterCaseOptions"
+                    [(ngModel)]="primaryButtonCase"
+                    (selectionChange)="applyChanges('Primary Button Case', $event.value)"
+                    appearance="outline">
+                  </app-form-select>
+                </div>
+              </div>
+            </div>
+            <div class="button-style-col-right">
+              <div class="button-color-section">
+                <div class="button-color-row">
+                  <label class="field-label">Main Colour</label>
+                  <div class="field-input">
+                    <input
+                      [(colorPicker)]="primaryButtonMainColor"
+                      [style.background]="primaryButtonMainColor"
+                      class="colourPicker"
+                      [cpPosition]="'right'"
+                      (ngModelChange)="applyChanges('Primary Button Main Color', $event)"
+                      (colorPickerChange)="applyChanges('Primary Button Main Color', $event)"
+                      (cpColorChange)="applyChanges('Primary Button Main Color', $event)"
+                    />
+                    <span class="hex-code">{{primaryButtonMainColor}}</span>
+                  </div>
+                </div>
+                <div class="button-color-row">
+                  <label class="field-label">Text Colour</label>
+                  <div class="field-input">
+                    <input
+                      [(colorPicker)]="primaryButtonTextColor"
+                      [style.background]="primaryButtonTextColor"
+                      class="colourPicker"
+                      [cpPosition]="'right'"
+                      (ngModelChange)="applyChanges('Primary Button Text Color', $event)"
+                      (colorPickerChange)="applyChanges('Primary Button Text Color', $event)"
+                      (cpColorChange)="applyChanges('Primary Button Text Color', $event)"
+                    />
+                    <span class="hex-code">{{primaryButtonTextColor}}</span>
+                  </div>
+                </div>
+                <div class="button-example-container">
+                  <p class="example-label">Example:</p>
+                  <button 
+                    class="button-example primary-button-example"
+                    [style.background-color]="primaryButtonMainColor"
+                    [style.color]="primaryButtonTextColor"
+                    [style.font-family]="primaryButtonTypeface"
+                    [style.text-transform]="primaryButtonCase">
+                    SAVE
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary Button Section -->
+        <div class="button-style-group">
+          <h6>Secondary Button</h6>
+          <div class="button-style-columns">
+            <div class="button-style-col-left">
+              <div class="form-field-row">
+                <label class="field-label">Typeface</label>
+                <div class="field-input">
+                  <app-form-select
+                    placeholder="Select typeface..."
+                    [options]="typefaceOptions"
+                    [(ngModel)]="secondaryButtonTypeface"
+                    (selectionChange)="applyChanges('Secondary Button Typeface', $event.value)"
+                    appearance="outline">
+                  </app-form-select>
+                </div>
+              </div>
+              <div class="form-field-row">
+                <label class="field-label">Letter Case</label>
+                <div class="field-input">
+                  <app-form-select
+                    placeholder="Select letter case..."
+                    [options]="letterCaseOptions"
+                    [(ngModel)]="secondaryButtonCase"
+                    (selectionChange)="applyChanges('Secondary Button Case', $event.value)"
+                    appearance="outline">
+                  </app-form-select>
+                </div>
+              </div>
+            </div>
+            <div class="button-style-col-right">
+              <div class="button-color-section">
+                <div class="button-color-row">
+                  <label class="field-label">Main Colour</label>
+                  <div class="field-input">
+                    <input
+                      [(colorPicker)]="secondaryButtonMainColor"
+                      [style.background]="secondaryButtonMainColor"
+                      class="colourPicker"
+                      [cpPosition]="'right'"
+                      (ngModelChange)="applyChanges('Secondary Button Main Color', $event)"
+                      (colorPickerChange)="applyChanges('Secondary Button Main Color', $event)"
+                      (cpColorChange)="applyChanges('Secondary Button Main Color', $event)"
+                    />
+                    <span class="hex-code">{{secondaryButtonMainColor}}</span>
+                  </div>
+                </div>
+                <div class="button-color-row">
+                  <label class="field-label">Text Colour</label>
+                  <div class="field-input">
+                    <input
+                      [(colorPicker)]="secondaryButtonTextColor"
+                      [style.background]="secondaryButtonTextColor"
+                      class="colourPicker"
+                      [cpPosition]="'right'"
+                      (ngModelChange)="applyChanges('Secondary Button Text Color', $event)"
+                      (colorPickerChange)="applyChanges('Secondary Button Text Color', $event)"
+                      (cpColorChange)="applyChanges('Secondary Button Text Color', $event)"
+                    />
+                    <span class="hex-code">{{secondaryButtonTextColor}}</span>
+                  </div>
+                </div>
+                <div class="button-example-container">
+                  <p class="example-label">Example:</p>
+                  <button 
+                    class="button-example secondary-button-example"
+                    [style.background-color]="secondaryButtonMainColor"
+                    [style.color]="secondaryButtonTextColor"
+                    [style.font-family]="secondaryButtonTypeface"
+                    [style.text-transform]="secondaryButtonCase">
+                    SAVE
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </app-content-block>
+
+      <!-- Row 3: Text Styles (full width) -->
+      <app-content-block title="Text Styles" class="grid-col-full text-styles-row">
             <div class="conTextHold">
               <div class="colText" style="flex: 1">
                 <div class="row">
                   <h6>Main Headings</h6>
                 </div>
-                <div class="row">
-                  <label class="label">Typeface</label>
-                  <div class="selectField">
-                    <mat-select
-                      [(value)]="mainHeadingTypeface"
-                      (selectionChange)="
-                        applyChanges('Main Heading Typeface', $event.value)
-                      "
-                    >
-                      <mat-option
-                        *ngFor="let typeface of typefaces"
-                        [value]="typeface"
-                      >
-                        {{ typeface }}
-                      </mat-option>
-                    </mat-select>
+                <div class="form-field-row">
+                  <label class="field-label">Typeface</label>
+                  <div class="field-input">
+                    <app-form-select
+                      placeholder="Select typeface..."
+                      [options]="typefaceOptions"
+                      [(ngModel)]="mainHeadingTypeface"
+                      (selectionChange)="applyChanges('Main Heading Typeface', $event.value)"
+                      appearance="outline">
+                    </app-form-select>
                   </div>
                 </div>
-                <div class="row">
-                  <label class="label">Letter Case</label>
-                  <div class="selectField">
-                    <mat-select
-                      [(value)]="mainHeadingCase"
-                      (selectionChange)="
-                        applyChanges('Main Heading Case', $event.value)
-                      "
-                    >
-                      <mat-option
-                        *ngFor="let caseOption of letterCases"
-                        [value]="caseOption.value"
-                      >
-                        {{ caseOption.display }}
-                      </mat-option>
-                    </mat-select>
+                <div class="form-field-row">
+                  <label class="field-label">Letter Case</label>
+                  <div class="field-input">
+                    <app-form-select
+                      placeholder="Select letter case..."
+                      [options]="letterCaseOptions"
+                      [(ngModel)]="mainHeadingCase"
+                      (selectionChange)="applyChanges('Main Heading Case', $event.value)"
+                      appearance="outline">
+                    </app-form-select>
                   </div>
                 </div>
-                <div class="rowCol">
-                  <label class="label">Colour</label>
-                  <input
-                    [(colorPicker)]="mainHeadingColor"
-                    [style.background]="mainHeadingColor"
-                    class="colourPicker"
-                    [cpPosition]="'right'"
-                    (ngModelChange)="applyChanges('Main Heading Color', $event)"
-                    (colorPickerChange)="applyChanges('Main Heading Color', $event)"
-                    (cpColorChange)="applyChanges('Main Heading Color', $event)"
-                  />
-                  <span class="hex-code">{{mainHeadingColor}}</span>
+                <div class="form-field-row">
+                  <label class="field-label">Colour</label>
+                  <div class="field-input">
+                    <input
+                      [(colorPicker)]="mainHeadingColor"
+                      [style.background]="mainHeadingColor"
+                      class="colourPicker"
+                      [cpPosition]="'right'"
+                      (ngModelChange)="applyChanges('Main Heading Color', $event)"
+                      (colorPickerChange)="applyChanges('Main Heading Color', $event)"
+                      (cpColorChange)="applyChanges('Main Heading Color', $event)"
+                    />
+                    <span class="hex-code">{{mainHeadingColor}}</span>
+                  </div>
                 </div>
                 <div class="row">
                   <h6>Sub-Headings Style</h6>
                 </div>
-                <div class="row">
-                  <label class="label">Typeface</label>
-                  <div class="selectField">
-                    <mat-select
-                      [(value)]="subHeadingTypeface"
-                      (selectionChange)="
-                        applyChanges('Sub Heading Typeface', $event.value)
-                      "
-                    >
-                      <mat-option
-                        *ngFor="let typeface of typefaces"
-                        [value]="typeface"
-                      >
-                        {{ typeface }}
-                      </mat-option>
-                    </mat-select>
+                <div class="form-field-row">
+                  <label class="field-label">Typeface</label>
+                  <div class="field-input">
+                    <app-form-select
+                      placeholder="Select typeface..."
+                      [options]="typefaceOptions"
+                      [(ngModel)]="subHeadingTypeface"
+                      (selectionChange)="applyChanges('Sub Heading Typeface', $event.value)"
+                      appearance="outline">
+                    </app-form-select>
                   </div>
                 </div>
-                <div class="row">
-                  <label class="label">Letter Case</label>
-                  <div class="selectField">
-                    <mat-select
-                      [(value)]="subHeadingCase"
-                      (selectionChange)="
-                        applyChanges('Sub Heading Case', $event.value)
-                      "
-                    >
-                      <mat-option
-                        *ngFor="let caseOption of letterCases"
-                        [value]="caseOption.value"
-                      >
-                        {{ caseOption.display }}
-                      </mat-option>
-                    </mat-select>
+                <div class="form-field-row">
+                  <label class="field-label">Letter Case</label>
+                  <div class="field-input">
+                    <app-form-select
+                      placeholder="Select letter case..."
+                      [options]="letterCaseOptions"
+                      [(ngModel)]="subHeadingCase"
+                      (selectionChange)="applyChanges('Sub Heading Case', $event.value)"
+                      appearance="outline">
+                    </app-form-select>
                   </div>
                 </div>
-                <div class="rowCol">
-                  <label class="label">Colour</label>
-                  <input
-                    [(colorPicker)]="subHeadingColor"
-                    [style.background]="subHeadingColor"
-                    class="colourPicker"
-                    [cpPosition]="'right'"
-                    (ngModelChange)="applyChanges('Sub Heading Color', $event)"
-                    (colorPickerChange)="applyChanges('Sub Heading Color', $event)"
-                    (cpColorChange)="applyChanges('Sub Heading Color', $event)"
-                  />
-                  <span class="hex-code">{{subHeadingColor}}</span>
+                <div class="form-field-row">
+                  <label class="field-label">Colour</label>
+                  <div class="field-input">
+                    <input
+                      [(colorPicker)]="subHeadingColor"
+                      [style.background]="subHeadingColor"
+                      class="colourPicker"
+                      [cpPosition]="'right'"
+                      (ngModelChange)="applyChanges('Sub Heading Color', $event)"
+                      (colorPickerChange)="applyChanges('Sub Heading Color', $event)"
+                      (cpColorChange)="applyChanges('Sub Heading Color', $event)"
+                    />
+                    <span class="hex-code">{{subHeadingColor}}</span>
+                  </div>
                 </div>
                 <div class="row">
                   <h6>Body</h6>
                 </div>
-                <div class="row">
-                  <label class="label">Typeface</label>
-                  <div class="selectField">
-                    <mat-select
-                      [(value)]="bodyTypeface"
-                      (selectionChange)="
-                        applyChanges('Body Typeface', $event.value)
-                      "
-                    >
-                      <mat-option
-                        *ngFor="let typeface of typefaces"
-                        [value]="typeface"
-                      >
-                        {{ typeface }}
-                      </mat-option>
-                    </mat-select>
+                <div class="form-field-row">
+                  <label class="field-label">Typeface</label>
+                  <div class="field-input">
+                    <app-form-select
+                      placeholder="Select typeface..."
+                      [options]="typefaceOptions"
+                      [(ngModel)]="bodyTypeface"
+                      (selectionChange)="applyChanges('Body Typeface', $event.value)"
+                      appearance="outline">
+                    </app-form-select>
                   </div>
                 </div>
-                <div class="row">
-                  <label class="label">Letter Case</label>
-                  <div class="selectField">
-                    <mat-select
-                      [(value)]="bodyCase"
-                      (selectionChange)="
-                        applyChanges('Body Case', $event.value)
-                      "
-                    >
-                      <mat-option
-                        *ngFor="let caseOption of letterCases"
-                        [value]="caseOption.value"
-                      >
-                        {{ caseOption.display }}
-                      </mat-option>
-                    </mat-select>
+                <div class="form-field-row">
+                  <label class="field-label">Letter Case</label>
+                  <div class="field-input">
+                    <app-form-select
+                      placeholder="Select letter case..."
+                      [options]="letterCaseOptions"
+                      [(ngModel)]="bodyCase"
+                      (selectionChange)="applyChanges('Body Case', $event.value)"
+                      appearance="outline">
+                    </app-form-select>
                   </div>
                 </div>
-                <div class="rowCol">
-                  <label class="label">Colour</label>
-                  <input
-                    [(colorPicker)]="bodyColor"
-                    [style.background]="bodyColor"
-                    class="colourPicker"
-                    [cpPosition]="'right'"
-                    (ngModelChange)="applyChanges('Body Color', $event)"
-                    (colorPickerChange)="applyChanges('Body Color', $event)"
-                    (cpColorChange)="applyChanges('Body Color', $event)"
-                  />
-                  <span class="hex-code">{{bodyColor}}</span>
+                <div class="form-field-row">
+                  <label class="field-label">Colour</label>
+                  <div class="field-input">
+                    <input
+                      [(colorPicker)]="bodyColor"
+                      [style.background]="bodyColor"
+                      class="colourPicker"
+                      [cpPosition]="'right'"
+                      (ngModelChange)="applyChanges('Body Color', $event)"
+                      (colorPickerChange)="applyChanges('Body Color', $event)"
+                      (cpColorChange)="applyChanges('Body Color', $event)"
+                    />
+                    <span class="hex-code">{{bodyColor}}</span>
+                  </div>
                 </div>
               </div>
               <div class="colText previewTexrt">
@@ -314,26 +448,23 @@
               </div>
             </div>
           </app-content-block>
-        </div>
-      </div>
     </div>
   </div>
 
-  <div class="sidebar">
-    <div class="outerLive">
+  <div class="sidebar-wrapper">
+    <div class="sidebar">
+      <div class="outerLive">
       <app-content-block title="Real-time Preview" customClass="blockPreview">
         <div class="row">
           <div class="select-container">
-            <mat-form-field appearance="outline">
-              <mat-label>Select Menu to Preview</mat-label>
-              <mat-select [(value)]="selectedMenuId" (selectionChange)="logSelection($event)">
-                <mat-option *ngIf="menus.length === 0" [disabled]="true">No active menus available</mat-option>
-                <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
-                  {{ menu.menuName }}
-                </mat-option>
-              </mat-select>
-              <mat-hint *ngIf="menus.length === 0">Please create and activate a menu first</mat-hint>
-            </mat-form-field>
+            <app-form-select
+              placeholder="Select a menu..."
+              [options]="menuOptions"
+              [(ngModel)]="selectedMenuId"
+              (selectionChange)="logSelection($event.value)"
+              [disabled]="menus.length === 0">
+            </app-form-select>
+            <p *ngIf="menus.length === 0" class="hint-text">Please create and activate a menu first</p>
           </div>
         </div>
         <div class="preview">
@@ -368,6 +499,7 @@
         >
           {{ isSaving ? 'Saving...' : (isPreviewMode ? 'Save Preview' : 'Save Changes') }}
         </button>
+      </div>
       </div>
     </div>
   </div>

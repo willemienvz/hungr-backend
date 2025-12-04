@@ -12,16 +12,6 @@
 // FORM LAYOUTS
 // ============================================================================
 
-.formGroup {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: var(--spacing-3, 12px);
-  margin-bottom: var(--spacing-4, 16px);
-}
-
 // ============================================================================
 // GRID LAYOUTS
 // ============================================================================
@@ -134,13 +124,13 @@
 }
 
 .section-header {
-  margin-bottom: var(--spacing-5, 20px);
+  margin-bottom: 0;
 
   .section-title {
     display: flex;
     align-items: center;
     gap: var(--spacing-2, 8px);
-    font-size: var(--font-size-lg, 18px);
+    font-size: var(--font-size-xl, 18px);
     font-weight: var(--font-weight-bold, 700);
     color: var(--color-text-primary, #1f2937);
     margin: 0 0 var(--spacing-2, 8px) 0;
@@ -207,6 +197,9 @@
   margin-top: var(--spacing-6);
 }
 
+.neg-mt-1 { 
+  margin-top:-1rem;
+}
 // ============================================================================
 // RESPONSIVE UTILITIES
 // ============================================================================

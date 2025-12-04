@@ -20,8 +20,12 @@
 <!-- KB - Upload File Modal -->
 <div class="modal" [class.open]="showUploadModal">
   <div class="modal-content">
-    <span class="close" (click)="closeUploadModal()">&times;</span>
-    <h6>Upload a file</h6>
+    <div class="modal-header">
+      <h6>Upload a file</h6>
+      <button type="button" class="close-btn" (click)="closeUploadModal()" aria-label="Close">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
     <p>Please upload a file to automatically add your menu items.</p>
     
     <div class="upload-options" *ngIf="!isProcessingFile">
@@ -62,8 +66,12 @@
 <!-- KB - Preview Modal -->
 <div class="modal" [class.open]="showPreviewModal">
   <div class="modal-content preview-modal">
-    <span class="close" (click)="cancelImport()">&times;</span>
-    <h6>Preview Import</h6>
+    <div class="modal-header">
+      <h6>Preview Import</h6>
+      <button type="button" class="close-btn" (click)="cancelImport()" aria-label="Close">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
     <p>We found {{parsedMenuItems.length}} menu items in your file. Review the items below before importing.</p>
     
     <div class="preview-content">
@@ -136,8 +144,12 @@
 <!-- KB - Choice Modal (Replace or Append) -->
 <div class="modal" [class.open]="showChoiceModal">
   <div class="modal-content">
-    <span class="close" (click)="closeChoiceModal()">&times;</span>
-    <h6>File processed successfully!</h6>
+    <div class="modal-header">
+      <h6>File processed successfully!</h6>
+      <button type="button" class="close-btn" (click)="closeChoiceModal()" aria-label="Close">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
     <p>We found {{parsedMenuItems.length}} menu items in your file. You already have {{existingMenuItems.length}} items in your menu.</p>
     
     <div class="choice-options">
@@ -167,8 +179,12 @@
 <!-- KB - Success Modal -->
 <div class="modal" [class.open]="showSuccessModal">
   <div class="modal-content">
-    <span class="close" (click)="closeSuccessModal()">&times;</span>
-    <h6>File Successfully uploaded</h6>
+    <div class="modal-header">
+      <h6>File Successfully uploaded</h6>
+      <button type="button" class="close-btn" (click)="closeSuccessModal()" aria-label="Close">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
     <p>Your menu items have been successfully uploaded.</p>
     
     <div class="modal-buttons">

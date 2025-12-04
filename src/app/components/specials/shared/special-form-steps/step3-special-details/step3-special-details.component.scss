@@ -9,14 +9,16 @@
     /* Uses centralized block styling */
   }
 
-  .rowSpecial {
+  ::ng-deep .rowSpecial {
     justify-content: center;
     align-items: center;
     display: flex;
     flex-direction: column;
 
     form {
-      width: min(7var(--spacing-5), 92%);
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
       justify-content: center;
       align-items: center;
       display: flex;
@@ -30,10 +32,12 @@
   }
 }
 
-.row {
+::ng-deep .row {
   display: flex;
   gap: var(--spacing-4);
   width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
   justify-content: center;
   align-items: flex-start;
 
@@ -47,6 +51,47 @@
     flex: 1 1 0;
   }
 
+  // Ensure all mat-form-field inputs have the same height
+  mat-form-field {
+    width: 100%;
+    
+    .mat-mdc-text-field-wrapper {
+      min-height: 40px;
+      height: 40px;
+    }
+    
+    .mat-mdc-form-field-infix {
+      padding-top: 10px;
+      padding-bottom: 10px;
+      min-height: 40px;
+    }
+    
+    input {
+      height: 40px;
+      line-height: 40px;
+    }
+  }
+  
+  // Remove grey hover background
+  .mat-mdc-text-field-wrapper:hover {
+    background-color: transparent !important;
+  }
+  
+  .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper {
+    background-color: transparent !important;
+  }
+  
+  // Ensure app-price-input has same height
+  app-price-input {
+    ::ng-deep .form-input-wrapper {
+      .input-container {
+        .form-input {
+          height: 40px;
+          min-height: 40px;
+        }
+      }
+    }
+  }
 }
 
 .inputHolder {
@@ -87,12 +132,19 @@
   width: 100%;
   margin-top: var(--spacing-5);
 
+  .item-list-title {
+    margin: 0 0 var(--spacing-4) 0;
+    font-size: var(--font-size-base);
+    font-weight: 400;
+    color: var(--color-text-primary, #222);
+  }
+
   .list {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    border: 1px solid var(--hungr-dark-grey);
+    border: 1px solid var(--color-quaternary);
     border-radius: var(--border-radius-md);
     margin-bottom: 10px;
 
@@ -105,29 +157,37 @@
     .btnRemove {
       appearance: none;
       border: none;
-      background: #ffe6e6;
-      color: #b91c1c;
+      background: transparent;
+      color: var(--color-text-primary, #222);
       cursor: pointer;
-      width: 24px;
-      height: 24px;
-      line-height: 24px;
-      border-radius: 6px;
-      font-size: var(--spacing-4);
+      width: auto;
+      height: auto;
+      line-height: 1;
+      border-radius: 0;
+      font-size: 24px;
+      font-weight: 400;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      padding: 0;
+      margin: 0;
+
+      &:hover {
+        opacity: 0.7;
+      }
     }
 
     .item-name {
       margin: 0;
-      font-weight: 500;
+      font-weight: 400;
+      color: var(--color-text-primary, #222);
     }
 
     .item-amount {
       margin: 0;
       font-variant-numeric: tabular-nums;
-      color: #111827;
-      font-weight: 500;
+      color: var(--color-quaternary);
+      font-weight: 400;
     }
   }
 }
@@ -139,13 +199,90 @@
 
 // Tighten mat-form-field density for compact layout
 :host ::ng-deep .compact-field .mat-mdc-form-field-infix {
-  padding-top: var(--spacing-2);
-  padding-bottom: var(--spacing-2);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  min-height: 40px;
 }
 
 :host ::ng-deep .compact-field .mat-mdc-text-field-wrapper {
   min-height: 40px;
+  height: 40px;
+}
 
+// Remove grey hover and focus background from all mat-form-fields
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: transparent !important;
+  padding: 0 !important;
+  
+  &:hover {
+    background-color: transparent !important;
+  }
+  
+  &:focus-within {
+    background-color: transparent !important;
+    padding: 0 !important;
+  }
+}
+
+:host ::ng-deep .mat-mdc-form-field {
+  &:hover .mat-mdc-text-field-wrapper {
+    background-color: transparent !important;
+    padding: 0 !important;
+  }
+  
+  &.mat-focused .mat-mdc-text-field-wrapper {
+    background-color: transparent !important;
+    padding: 0 !important;
+  }
+  
+  .mat-mdc-text-field-wrapper {
+    background-color: transparent !important;
+    padding: 0 !important;
+  }
+  
+  // Remove the background fill on focus
+  .mat-mdc-form-field-focus-overlay {
+    background-color: transparent !important;
+    opacity: 0 !important;
+  }
+}
+
+// Add proper padding to input container for text readability
+:host ::ng-deep .mat-mdc-text-field-input-container {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+// Remove any background color changes on the form field surface
+:host ::ng-deep .mdc-text-field {
+  background-color: transparent !important;
+  
+  &:hover {
+    background-color: transparent !important;
+  }
+  
+  &.mdc-text-field--focused {
+    background-color: transparent !important;
+  }
+}
+
+// Ensure consistent height for all form fields
+:host ::ng-deep mat-form-field {
+  .mat-mdc-text-field-wrapper {
+    min-height: 40px;
+    height: 40px;
+  }
+  
+  .mat-mdc-form-field-infix {
+    min-height: 40px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  
+  input {
+    height: 40px;
+    line-height: 40px;
+  }
 }
 
 // Keep labels static (no floating)
@@ -157,4 +294,212 @@
 
 :host ::ng-deep .mat-mdc-form-field-has-icon-suffix .mat-mdc-form-field-infix {
   padding-right: 6px;
+}
+
+// Percentage input wrapper with add button
+.percentage-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: flex-end;
+
+  // Toggle buttons inline
+  .discount-type-toggle {
+    flex-shrink: 0;
+  }
+
+  mat-form-field {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0; // Force flex to control width
+    
+    ::ng-deep .mat-mdc-text-field-wrapper {
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    ::ng-deep .mat-mdc-form-field-flex {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    ::ng-deep .mat-mdc-form-field-infix {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    ::ng-deep input {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  }
+
+  app-price-input {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0; // Force flex to control width
+    
+    ::ng-deep .price-input-container {
+      width: 100%;
+      max-width: 100%;
+      
+      .field-holder {
+        margin-bottom: 0;
+        width: 100%;
+      }
+      
+      .input-wrapper {
+        width: 100%;
+      }
+      
+      .price-input {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+  }
+
+  .percentage-suffix {
+    padding-right: 8px !important;
+  }
+
+  .add-item-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: var(--border-radius-base);
+    background: var(--button-primary-bg, var(--color-secondary));
+    color: var(--button-primary-color, #fff);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    i.material-icons {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    &:hover:not(:disabled) {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}
+
+// Add proper padding for textarea elements
+:host ::ng-deep .mat-mdc-form-field textarea {
+  padding: 8px 12px !important;
+  box-sizing: border-box;
+}
+
+// Discount type toggle styling - inline with input
+.discount-type-toggle {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  align-items: center;
+  margin-bottom: 0;
+
+  .toggle-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    border: 1px solid var(--color-quaternary);
+    background: #fff;
+    color: var(--color-text-muted);
+    border-radius: var(--border-radius-base);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      border-color: var(--color-secondary);
+      background: #f0fffe;
+    }
+
+    &.active {
+      background: var(--button-primary-bg, var(--color-secondary));
+      color: var(--button-primary-color, #fff);
+      border-color: var(--button-primary-bg, var(--color-secondary));
+    }
+  }
+}
+
+.discount-input-wrapper {
+  width: 100%;
+}
+
+// Combo items full width
+.combo-items-full-width {
+  width: 100%;
+  max-width: 100%;
+  
+  app-form-select {
+    width: 100%;
+  }
+}
+
+// Gap between combo items and percentage discount
+.combo-discount-field {
+  margin-top: 1rem;
+}
+
+// Hide empty mat-form-field-infix divs (created by Angular Material)
+:host ::ng-deep .mat-mdc-form-field-infix:empty {
+  display: none !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-form-field-infix {
+  &:not(:has(.mat-mdc-select-value)):not(:has(input)):not(:has(textarea)) {
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+// Ensure form-select matches other input styling
+:host ::ng-deep app-form-select {
+  width: 100%;
+  
+  .form-select-wrapper {
+    width: 100%;
+    
+    .select-field {
+      width: 100%;
+      
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+      }
+      
+      ::ng-deep .mat-mdc-select-trigger {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
 }

@@ -30,6 +30,8 @@ export class FormInputComponent implements ControlValueAccessor {
     @Input() step?: number;
     @Input() pattern?: string;
     @Input() customClass?: string;
+    @Input() labelLeft: boolean = false;
+    @Input() tooltipText?: string;
 
     @Output() valueChange = new EventEmitter<string>();
     @Output() focus = new EventEmitter<Event>();
@@ -109,6 +111,20 @@ export class FormInputComponent implements ControlValueAccessor {
 
         if (this.disabled) {
             classes.push('disabled');
+        }
+
+        return classes.join(' ');
+    }
+
+    get wrapperClass(): string {
+        const classes = ['form-input-wrapper'];
+
+        if (this.customClass) {
+            classes.push(this.customClass);
+        }
+
+        if (this.labelLeft) {
+            classes.push('label-left');
         }
 
         return classes.join(' ');

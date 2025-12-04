@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Restaurant } from '../../shared/services/restaurant';
 import { MatDialog } from '@angular/material/dialog';
 import { ViewComponent } from './view/view.component';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../shared/services/toast.service';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 import { TableColumn, TableAction } from '../shared/data-table/data-table.component';
 import { UnsavedChangesDialogComponent } from '../unsaved-changes-dialog/unsaved-changes-dialog.component';
@@ -98,7 +98,7 @@ export class RestaurantComponent {
     }
   ];
   constructor(
-    private readonly toastr: ToastrService,
+    private readonly toast: ToastService,
     private firestore: AngularFirestore,
     private router: Router,
     private elementRef: ElementRef,
@@ -154,8 +154,6 @@ export class RestaurantComponent {
         // Separate active and draft restaurants
         this.activeRestaurants = restaurants.filter(restaurant => restaurant.status === true);
         this.draftRestaurants = restaurants.filter(restaurant => restaurant.status === false);
-        console.log('Active restaurants:', this.activeRestaurants);
-        console.log('Draft restaurants:', this.draftRestaurants);
         this.isLoading = false;
       });
   }
@@ -232,7 +230,7 @@ export class RestaurantComponent {
       .doc(restaurantId)
       .update({ status: true })
       .then(() => {
-        this.toastr.success('Restaurant activated successfully');
+        this.toast.success('Restaurant activated successfully');
         // Remove from draft list and add to active list
         const restaurant = this.draftRestaurants[index];
         this.draftRestaurants.splice(index, 1);
@@ -240,7 +238,7 @@ export class RestaurantComponent {
       })
       .catch((error) => {
         console.error('Error activating restaurant:', error);
-        this.toastr.error('Failed to activate restaurant');
+        this.toast.error('Failed to activate restaurant');
       });
   }
 
@@ -250,10 +248,10 @@ export class RestaurantComponent {
       .doc(id)
       .delete()
       .then(() => {
-        this.toastr.success('Restaurant successfully deleted!');
+        this.toast.success('Restaurant successfully deleted!');
       })
       .catch((error) => {
-        this.toastr.error('Error removing restaurant');
+        this.toast.error('Error removing restaurant');
         console.error('Error removing restaurant: ', error);
       });
   }

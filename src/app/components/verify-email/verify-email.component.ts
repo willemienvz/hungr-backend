@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../shared/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../shared/services/toast.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { PayFastService } from '../../shared/services/payfast.service';
@@ -20,7 +20,7 @@ export class VerifyEmailComponent implements OnInit {
     public authService: AuthService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly toastr: ToastrService,
+    private readonly toast: ToastService,
     private readonly auth: AngularFireAuth,
     private readonly firestore: AngularFirestore,
     private readonly payfastService: PayFastService
@@ -34,12 +34,12 @@ export class VerifyEmailComponent implements OnInit {
     const formDataString = localStorage.getItem('formData');
     if (!formDataString) {
       if (!isDevMode) {
-        this.toastr.error('No registration data found');
+        this.toast.error('No registration data found');
         this.router.navigate(['/register-user/step1']);
         return;
       } else {
         // In dev mode, show a message but don't redirect
-        this.toastr.info('Dev mode: No registration data found, but continuing anyway');
+        this.toast.info('Dev mode: No registration data found, but continuing anyway');
         return;
       }
     }
@@ -108,136 +108,136 @@ export class VerifyEmailComponent implements OnInit {
 
   private async createUserAccount(formData: any) {
     try {
-      // Check if user already exists in Firestore (created by ITN)
-      const existingUser = await this.authService.getUserByEmail(formData.userEmail);
+      // Get Auth UID from localStorage (set during sign-up before payment)
+      let authUid = localStorage.getItem('authUid');
       
-      if (existingUser) {
-        // User exists in Firestore (created by ITN), create Firebase Auth account
-        const userCredential = await this.auth.createUserWithEmailAndPassword(
-          formData.userEmail,
-          formData.password
-        );
-
-        if (userCredential.user) {
-          const authUid = userCredential.user.uid;
-          
-          // CRITICAL: Get the existing user document to preserve data (especially payfastToken)
-          const existingUserQuery = await this.firestore.collection('users', ref => 
-            ref.where('email', '==', formData.userEmail)
-          ).get().toPromise();
-          
-          if (existingUserQuery && !existingUserQuery.empty) {
-            const existingDoc = existingUserQuery.docs[0];
-            const existingDocId = existingDoc.id;
-            const existingData = (existingDoc.data() || {}) as Record<string, any>;
-            
-            // If document ID doesn't match Auth UID, we need to migrate
-            if (existingDocId !== authUid) {
-              console.log(`Migrating user from ${existingDocId} to ${authUid}`);
-              this.toastr.info('Merging account data...');
-              
-              // 1. Map payment fields to canonical schema with conflict resolution
-              const mappedData = this.mapPaymentFieldsToCanonical(existingData, formData);
-              
-              // 2. Create new document with Auth UID, preserving all existing data including payfastToken
-              const userRef = this.firestore.doc(`users/${authUid}`);
-              await userRef.set({
-                ...existingData, // Preserve all existing data including payfastToken, subscriptionStatus, etc.
-                ...mappedData, // Apply mapped fields (form data takes precedence for user fields)
-                uid: authUid,
-                emailVerified: userCredential.user.emailVerified,
-                updated_at: new Date()
-              }, { merge: true });
-              
-              console.log('User document created/updated with preserved data including payfastToken:', existingData['payfastToken'] ? 'YES' : 'NO');
-              
-              // 2. Update all subscriptions to use new userId (only if document ID changed)
-              // Subscription updates only happen when document ID actually changes (existingDocId !== authUid)
-              // This check is already done above, so we know we need to update subscriptions
-              const subscriptionsQuery = await this.firestore.collection('subscriptions', ref =>
-                ref.where('userId', '==', existingDocId)
-              ).get().toPromise();
-              
-              if (subscriptionsQuery && !subscriptionsQuery.empty) {
-                try {
-                  const batch = this.firestore.firestore.batch();
-                  subscriptionsQuery.docs.forEach(doc => {
-                    batch.update(doc.ref, { userId: authUid });
-                    console.log(`Updating subscription ${doc.id} to use userId ${authUid}`);
-                  });
-                  await batch.commit();
-                  console.log(`Updated ${subscriptionsQuery.docs.length} subscription(s) to use new userId`);
-                  this.toastr.success(`Migrated ${subscriptionsQuery.docs.length} subscription(s)`);
-                } catch (batchError) {
-                  // Log error but don't fail entire merge
-                  console.error('Failed to update subscription references:', batchError);
-                  // Continue with merge - subscriptions can be updated manually if needed
-                }
-              } else {
-                // No subscriptions exist for old user ID - skip subscription update logic gracefully
-                console.log('No subscriptions found for old user ID - skipping subscription update');
-              }
-              
-              // 3. Optionally delete old user document (or keep as backup)
-              // For now, we'll keep it as a backup and log a warning
-              console.warn(`WARNING: Old user document ${existingDocId} still exists. Consider deleting after verification.`);
-              
-            } else {
-              // Document ID matches Auth UID, just update it with merge
-              // Map payment fields to ensure canonical schema is used
-              const mappedData = this.mapPaymentFieldsToCanonical(existingData, formData);
-              const userRef = this.firestore.doc(`users/${authUid}`);
-              await userRef.set({
-                ...existingData,
-                ...mappedData,
-                uid: authUid,
-                emailVerified: userCredential.user.emailVerified,
-                updated_at: new Date()
-              }, { merge: true });
-            }
-          } else {
-            // Should not happen, but fallback to standard flow
-            console.warn('Existing user query returned empty, using standard flow');
-            await this.authService.SetUserData(userCredential.user, formData);
-          }
-          
-          // Send verification email
-          await userCredential.user.sendEmailVerification();
-
-          // Clear stored form data
-          localStorage.removeItem('formData');
-
-          this.toastr.success('Account created successfully! Please check your email for verification.');
+      if (!authUid) {
+        // Fallback: try to get current user
+        const currentUser = await this.auth.currentUser;
+        if (!currentUser) {
+          throw new Error('No user found. Please complete sign-up again.');
         }
-      } else {
-        // Create new user account (original flow - no existing user from ITN)
-        const userCredential = await this.auth.createUserWithEmailAndPassword(
-          formData.userEmail,
-          formData.password
-        );
-
-        if (userCredential.user) {
-          // Send verification email
-          await userCredential.user.sendEmailVerification();
-          
-          // Update user profile with additional data
-          await this.authService.SetUserData(userCredential.user, formData);
-
-          // Clear stored form data
-          localStorage.removeItem('formData');
-
-          this.toastr.success('Account created successfully! Please check your email for verification.');
+        authUid = currentUser.uid;
+      }
+      
+      // Check if user document already exists (created before payment)
+      const userRef = this.firestore.doc(`users/${authUid}`);
+      const userDoc = await userRef.get().toPromise();
+      
+      if (!userDoc || !userDoc.exists) {
+        // User document doesn't exist - create it (fallback scenario)
+        const currentUser = await this.auth.currentUser;
+        if (currentUser) {
+          await this.authService.SetUserData(currentUser, formData);
+        } else {
+          throw new Error('User account not found');
         }
       }
-    } catch (error: any) {
-      console.error('Error creating account:', error);
       
-      // Handle specific error: user already exists in Firebase Auth
+      // Send verification email
+      const currentUser = await this.auth.currentUser;
+      if (currentUser && !currentUser.emailVerified) {
+        await currentUser.sendEmailVerification();
+      }
+      
+      // Link any subscriptions created without userId (from PayFast ITN before sign-up - edge case)
+      try {
+        const orphanedSubscriptions = await this.firestore.collection('subscriptions', ref =>
+          ref.where('email', '==', formData.userEmail)
+        ).get().toPromise();
+        
+        if (orphanedSubscriptions && !orphanedSubscriptions.empty) {
+          const batch = this.firestore.firestore.batch();
+          let linkedCount = 0;
+          orphanedSubscriptions.docs.forEach(doc => {
+            const subData = doc.data() as any;
+            // Link subscriptions that don't have userId or have different userId
+            if (!subData.userId || subData.userId !== authUid) {
+              batch.update(doc.ref, { userId: authUid });
+              console.log(`Linking subscription ${doc.id} to user ${authUid}`);
+              linkedCount++;
+            }
+          });
+          if (linkedCount > 0) {
+            await batch.commit();
+            console.log(`Linked ${linkedCount} subscription(s) to user ${authUid}`);
+          }
+        }
+      } catch (linkError) {
+        console.error('Failed to link orphaned subscriptions:', linkError);
+        // Non-critical - continue
+      }
+      
+      // Update user document with subscription data from PayFast ITN
+      // PayFast ITN should have already updated the user document, but ensure it's complete
+      try {
+        let userSubscriptions;
+        try {
+          // Try with orderBy first (requires index)
+          userSubscriptions = await this.firestore.collection('subscriptions', ref =>
+            ref.where('userId', '==', authUid)
+              .orderBy('updated_at', 'desc')
+              .limit(1)
+          ).get().toPromise();
+        } catch (indexError: any) {
+          // Index not ready - get all and sort manually
+          if (indexError.code === 9 || indexError.message?.includes('index')) {
+            const allSubs = await this.firestore.collection('subscriptions', ref =>
+              ref.where('userId', '==', authUid)
+            ).get().toPromise();
+            
+            if (allSubs && !allSubs.empty) {
+              // Sort by updated_at manually
+              const sorted = allSubs.docs.sort((a, b) => {
+                const aData = a.data() as any;
+                const bData = b.data() as any;
+                const aTime = aData.updated_at?.toMillis?.() || 0;
+                const bTime = bData.updated_at?.toMillis?.() || 0;
+                return bTime - aTime;
+              });
+              userSubscriptions = {
+                empty: false,
+                docs: [sorted[0]]
+              } as any;
+            } else {
+              userSubscriptions = { empty: true, docs: [] } as any;
+            }
+          } else {
+            throw indexError;
+          }
+        }
+        
+        if (userSubscriptions && !userSubscriptions.empty) {
+          const latestSubscription = userSubscriptions.docs[0].data();
+          await userRef.update({
+            subscriptionStatus: latestSubscription.status || 'active',
+            subscriptionPlan: latestSubscription.plan || formData.billingOption,
+            subscriptionType: latestSubscription.plan || formData.billingOption,
+            payfastToken: latestSubscription.token || null,
+            lastPaymentDate: latestSubscription.updated_at || null,
+            emailVerified: currentUser?.emailVerified || false,
+            updated_at: new Date()
+          });
+          console.log('User document updated with subscription data');
+        }
+      } catch (updateError) {
+        console.error('Failed to update user with subscription data:', updateError);
+        // Non-critical - PayFast ITN should have already updated it
+      }
+      
+      // Clear stored form data
+      localStorage.removeItem('formData');
+      localStorage.removeItem('authUid');
+      
+      this.toast.success('Account created successfully! Please check your email for verification.');
+    } catch (error: any) {
+      console.error('Error in verify-email:', error);
+      
       if (error.code === 'auth/email-already-in-use') {
-        this.toastr.warning('This email is already registered. Please sign in instead.');
+        this.toast.warning('This email is already registered. Please sign in instead.');
         this.router.navigate(['/sign-in']);
       } else {
-        this.toastr.error(error.message || 'Failed to create account. Please contact support.');
+        this.toast.error(error.message || 'Failed to complete account setup. Please contact support.');
       }
     }
   }
@@ -248,12 +248,12 @@ export class VerifyEmailComponent implements OnInit {
       const user = await this.auth.currentUser;
       if (user) {
         await user.sendEmailVerification();
-        this.toastr.success('Verification email sent! Please check your inbox.');
+        this.toast.success('Verification email sent! Please check your inbox.');
       } else {
-        this.toastr.error('No user found. Please try signing in again.');
+        this.toast.error('No user found. Please try signing in again.');
       }
     } catch (error: any) {
-      this.toastr.error(error.message || 'Error sending verification email. Please try again.');
+      this.toast.error(error.message || 'Error sending verification email. Please try again.');
       console.error('Error:', error);
     } finally {
       this.isResending = false;

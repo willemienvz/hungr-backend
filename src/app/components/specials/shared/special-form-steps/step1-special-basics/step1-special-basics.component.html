@@ -15,42 +15,28 @@
         </app-form-input>
       </div>
       <div class="formGroup">
-        <p class="label">Select Menu</p>
-        <mat-form-field subscriptSizing="dynamic" style="width: 100%;">
-          <mat-select
-            class="select-arrow-fix"
-            formControlName="menu"
-            (selectionChange)="onMenuChange()">
-            <mat-option *ngFor="let menu of menus" [value]="menu.menuID">
-              {{ menu.menuName }}
-            </mat-option>
-          </mat-select>
-          <div
-            class="error-message"
-            *ngIf="specialForm.get('menu')?.touched && specialForm.get('menu')?.invalid"
-          >
-            Menu selection is required.
-          </div>
-        </mat-form-field>
+        <app-form-select
+          label="Select Menu"
+          placeholder="Select a menu..."
+          [options]="menuOptions"
+          formControlName="menu"
+          [required]="true"
+          [errorMessage]="specialForm.get('menu')?.touched && specialForm.get('menu')?.invalid ? 'Menu selection is required.' : ''"
+          [showError]="specialForm.get('menu')?.touched && specialForm.get('menu')?.invalid"
+          (selectionChange)="onMenuChange()">
+        </app-form-select>
       </div>
       <div class="formGroup">
-        <p class="label">Type of Special</p>
-        <mat-form-field subscriptSizing="dynamic" style="width: 100%;">
-          <mat-select
-            class="select-arrow-fix"
-            formControlName="typeSpecial"
-            (selectionChange)="onSpecialTypeChange()">
-            <mat-option *ngFor="let type of specialTypes" [value]="type.id">
-              {{ type.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <div
-          class="error-message"
-          *ngIf="specialForm.get('typeSpecial')?.touched && specialForm.get('typeSpecial')?.invalid"
-        >
-          Type of special is required.
-        </div>
+        <app-form-select
+          label="Type of Special"
+          placeholder="Select type of special..."
+          [options]="specialTypeOptions"
+          formControlName="typeSpecial"
+          [required]="true"
+          [errorMessage]="specialForm.get('typeSpecial')?.touched && specialForm.get('typeSpecial')?.invalid ? 'Type of special is required.' : ''"
+          [showError]="specialForm.get('typeSpecial')?.touched && specialForm.get('typeSpecial')?.invalid"
+          (selectionChange)="onSpecialTypeChange()">
+        </app-form-select>
       </div>
       <div class="formGroup dateRow">
        

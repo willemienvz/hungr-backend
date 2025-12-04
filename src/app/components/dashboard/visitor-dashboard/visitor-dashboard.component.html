@@ -13,7 +13,7 @@
         <div class="col-small">
             <app-stats-insight-card
                 title="Average Viewing Time"
-                [value]="averageTime + ' min'"
+                [value]="getAverageTimeDisplay()"
                 type="text-block"
                 variant="primary"
             ></app-stats-insight-card>

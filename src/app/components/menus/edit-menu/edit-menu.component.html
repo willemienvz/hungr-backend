@@ -29,6 +29,7 @@
     <app-step-navigation
       [showDraft]="true"
       [showPublish]="true"
+      [publishText]="isMenuPublished ? 'Save Menu' : 'PUBLISH MENU'"
       [nextDisabled]="menuNameError || restaurantError || isDuplicateMenuName"
       [isSaving]="isSaving"
       (draft)="setAsDraft()"
@@ -39,8 +40,13 @@
 
   <div *ngIf="currentStep === 2">
     <div class="headerBlock">
-      <app-progress-bar [progress]="currentStep" [backRoute]="'/menus'"
-      (stepClick)="navigateToStep($event)" (backButtonClick)="onBackButtonClick()"></app-progress-bar>
+      <app-progress-bar 
+        [showBackButton]="true"
+        [progress]="currentStep" 
+        [backRoute]="'/menus'"
+        (stepClick)="navigateToStep($event)" 
+        (backButtonClick)="onBackButtonClick()">
+      </app-progress-bar>
       <app-step-header
         [stepNumber]="2"
         [stepTitle]="'Edit your menu categories'"
@@ -68,6 +74,7 @@
     <app-step-navigation
       [showDraft]="true"
       [showPublish]="true"
+      [publishText]="isMenuPublished ? 'Save Menu' : 'PUBLISH MENU'"
       [isSaving]="isSaving"
       (draft)="setAsDraft()"
       (publish)="setAsPublished()"
@@ -100,6 +107,16 @@
       (menuItemsUploaded)="onMenuItemsUploaded($event)"
     ></app-menu-item-selection>
 
+    <app-step-navigation
+      [showCancel]="true"
+      [showDraft]="true"
+      [showPublish]="true"
+      [publishText]="isMenuPublished ? 'Save Menu' : 'PUBLISH MENU'"
+      [isSaving]="isSaving"
+      (draft)="setAsDraft()"
+      (publish)="setAsPublished()"
+      (next)="nextStep()"
+    ></app-step-navigation>
   </div>
 
   <div *ngIf="currentStep === 4">
@@ -132,41 +149,27 @@
       <div class="col2row">
         <div class="col">
           <div class="formGroup">
-            <label>Menu Category</label>
-            <mat-form-field subscriptSizing="dynamic">
-              <mat-select
-                class="select-arrow-fix"
-                [ngModel]="selectedCategoryFilter === null ? 'all' : selectedCategoryFilter"
-                (ngModelChange)="onCategoryFilterChange($event)"
-              >
-                <mat-option [value]="'all'">All Categories</mat-option>
-                <mat-option
-                  *ngFor="let category of categories"
-                  [value]="category.id"
-                >
-                  {{ category.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+            <app-form-select
+              label="Menu Category"
+              class="full-width"
+              placeholder="Select category..."
+              [options]="categorySelectOptions"
+              [ngModel]="selectedCategoryFilter === null ? 'all' : selectedCategoryFilter.toString()"
+              (selectionChange)="onCategoryFilterChange($event.value)">
+            </app-form-select>
           </div>
         </div>
         <div class="col">
           <div class="formGroup">
-            <div class="search-input-container">
-              <app-form-input
-                type="text"
-                label="Search"
-                placeholder="Search menu items..."
-                [ngModel]="searchTerm"
-                (ngModelChange)="onSearchTermChange($event)">
-              </app-form-input>
-              <app-svg-icon
-                iconName="search"
-                size="var(--spacing-4)"
-                color="#999"
-                class="search-icon"
-              ></app-svg-icon>
-            </div>
+            <app-form-input
+              type="text"
+              label="Search"
+              class="full-width"
+              placeholder="Search menu items..."
+              suffixIcon="search"
+              [ngModel]="searchTerm"
+              (ngModelChange)="onSearchTermChange($event)">
+            </app-form-input>
           </div>
         </div>
       </div>
@@ -267,6 +270,7 @@
     <app-step-navigation
       [showDraft]="true"
       [showPublish]="true"
+      [publishText]="isMenuPublished ? 'Save Menu' : 'PUBLISH MENU'"
       [isSaving]="isSaving"
       (draft)="setAsDraft()"
       (publish)="setAsPublished()"
@@ -279,6 +283,7 @@
       [backRoute]="'/menus'"
       [menuId]="menuID"
       [isSaving]="isSaving"
+      [isMenuPublished]="isMenuPublished"
       [showSaveDraft]="true"
       [showPublishMenu]="true"
       (saveAsDraft)="setAsDraft()"

@@ -1,6 +1,19 @@
+:host.full-width {
+    width: 100%;
+    display: block;
+    
+    .form-select-wrapper {
+        width: 100%;
+    }
+    
+    ::ng-deep .mat-mdc-form-field {
+        width: 100%;
+    }
+}
+
 .form-select-wrapper {
     width: 100%;
-    margin-bottom: var(--spacing-3);
+   
 
     .form-label {
         display: block;
@@ -71,7 +84,7 @@
             min-height: var(--form-field-height);
             display: flex;
             align-items: center;
-            padding: var(--form-field-padding);
+            padding:0;
             font-family: var(--form-field-font-family);
             font-size: var(--form-field-font-size);
             font-weight: var(--form-field-font-weight);
@@ -97,21 +110,48 @@
             font-size: var(--form-field-font-size);
             font-weight: var(--form-field-font-weight);
             line-height: var(--form-field-line-height);
+           
         }
 
         ::ng-deep .mat-mdc-select-placeholder {
             color: var(--form-field-placeholder-color);
             font-size: var(--form-field-font-size);
             font-family: var(--form-field-font-family);
+         
         }
 
-        // Custom dropdown arrow - match form-input suffix icon style
+        // Custom dropdown chevron - replace default arrow with chevron icon
         ::ng-deep .mat-mdc-select-arrow-wrapper {
             .mat-mdc-select-arrow {
-                color: var(--color-grey-500);
-                font-size: var(--spacing-5);
-                margin-left: var(--spacing-2);
+                display: none; // Hide default arrow
             }
+            
+            // Add custom chevron icon
+            &::after {
+                content: 'expand_more';
+                font-family: 'Material Symbols Outlined';
+                font-weight: normal;
+                font-style: normal;
+                font-size: 24px;
+                line-height: 1;
+                letter-spacing: normal;
+                text-transform: none;
+                display: inline-block;
+                white-space: nowrap;
+                word-wrap: normal;
+                direction: ltr;
+                font-feature-settings: 'liga';
+                -webkit-font-feature-settings: 'liga';
+                -webkit-font-smoothing: antialiased;
+                color: var(--color-grey-500);
+                margin-left: var(--spacing-2);
+                transition: transform 0.2s ease, color 0.2s ease;
+            }
+        }
+        
+        // Rotate chevron when select is open
+        &.mat-focused ::ng-deep .mat-mdc-select-arrow-wrapper::after {
+            transform: rotate(180deg);
         }
 
         // Disabled state - match form-input
@@ -120,7 +160,7 @@
                 color: var(--form-field-color-disabled);
             }
 
-            ::ng-deep .mat-mdc-select-arrow {
+            ::ng-deep .mat-mdc-select-arrow-wrapper::after {
                 color: var(--color-grey-300);
             }
         }

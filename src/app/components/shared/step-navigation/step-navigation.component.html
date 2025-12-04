@@ -8,7 +8,7 @@
         SAVE AS DRAFT
       </button>
       <button *ngIf="showPublish" class="hungr-btn hungr-btn-primary" (click)="onPublish()" [disabled]="isDisabled">
-        PUBLISH MENU
+        {{ publishText }}
       </button>
       <button *ngIf="showSubmit" class="hungr-btn hungr-btn-primary" (click)="onSubmit()" [disabled]="isDisabled">
         {{ submitText }}

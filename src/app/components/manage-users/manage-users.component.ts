@@ -4,7 +4,7 @@ import {
   AngularFirestoreDocument,
 } from '@angular/fire/compat/firestore';
 import { User, UserRole, UserPermissions } from '../../shared/services/user';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../shared/services/toast.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ViewUsersComponent } from './view-users/view-users.component';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../shared/delete-confirmation-modal/delete-confirmation-modal.component';
@@ -119,7 +119,7 @@ export class ManageUsersComponent implements OnInit {
 
   constructor(
     private readonly firestore: AngularFirestore,
-    private toastr: ToastrService,
+    private toast: ToastService,
     private dialog: MatDialog,
     private permissionService: PermissionService,
     private emailService: EmailService
@@ -184,10 +184,10 @@ export class ManageUsersComponent implements OnInit {
       `users/${uid}`
     );
     userRef.delete().then(() => {
-      this.toastr.success('User deleted successfully!');
+      this.toast.success('User deleted successfully!');
     }).catch(error => {
       console.error('Error deleting user:', error);
-      this.toastr.error('Error deleting user');
+      this.toast.error('Error deleting user');
     });
   }
 
@@ -233,7 +233,7 @@ export class ManageUsersComponent implements OnInit {
    */
   resendInvitation(user: User) {
     if (!user.invitationToken || !user.invitedAt) {
-      this.toastr.error('No invitation data found for this user');
+      this.toast.error('No invitation data found for this user');
       return;
     }
 
@@ -250,11 +250,11 @@ export class ManageUsersComponent implements OnInit {
     this.emailService.sendInvitationReminderEmail(invitationData).subscribe({
       next: (response) => {
         console.log('Invitation reminder sent successfully:', response);
-        this.toastr.success('Invitation reminder sent successfully!');
+        this.toast.success('Invitation reminder sent successfully!');
       },
       error: (error) => {
         console.error('Failed to send invitation reminder:', error);
-        this.toastr.error('Failed to send invitation reminder. Please try again.');
+        this.toast.error('Failed to send invitation reminder. Please try again.');
       }
     });
   }

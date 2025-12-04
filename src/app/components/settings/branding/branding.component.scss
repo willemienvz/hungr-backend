@@ -35,7 +35,6 @@ h5 {
   font-size: 1var(--spacing-2);
   font-weight: 700;
   line-height: 22.5px;
-  letter-spacing: -0.001em;
   text-align: left;
   color: #444444;
   margin-bottom: 1em;
@@ -46,7 +45,6 @@ h6 {
   font-size: 14px;
   font-weight: 600;
   line-height: 22.5px;
-  letter-spacing: -0.001em;
   text-align: left;
   color: #444444;
 }
@@ -57,7 +55,6 @@ h6 {
   font-size: 15px;
   font-weight: 600;
   line-height: 20.25px;
-  letter-spacing: -0.001em;
   text-align: left;
   color: #444444;
   margin: 0 0 11px 0;
@@ -82,7 +79,6 @@ h6 {
     font-size: 10px;
     font-weight: 500;
     line-height: 1;
-    letter-spacing: -0.1%;
     cursor: pointer;
     text-decoration: underline;
     color: var(--color-text-muted);
@@ -199,7 +195,6 @@ h6 {
     font-size: 11px;
     font-weight: 400;
     line-height: 10px;
-    letter-spacing: -2%;
     color: #181818;
     width: 100%;
     cursor: pointer;
@@ -258,10 +253,30 @@ h6 {
   border-radius: var(--border-radius-md);
   gap: 10px;
 
+  .input-label {
+    width: 40%;
+    flex-shrink: 0;
+    margin: 0;
+    font-family: var(--font-family-primary);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--color-text-primary);
+  }
+
+  .input-controls {
+    width: 60%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
   .hex-code {
     font-size: var(--spacing-3);
     color: var(--color-text-muted);
     font-family: var(--font-family-primary);
+    white-space: nowrap;
   }
 }
 
@@ -307,35 +322,263 @@ h6 {
 }
 
 .inner-page {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  /* fill viewport height */
   gap: 30px;
   padding: var(--spacing-5);
+  align-items: stretch;
+  /* allow children like sidebar to fill height */
+
+  // Ensure all form-select inputs have grey border
+  ::ng-deep app-form-select {
+    .mat-mdc-text-field-wrapper {
+      border: 1px solid var(--form-field-border-color) !important;
+      border-radius: var(--form-field-border-radius) !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-5);
+  }
 }
 
 .all-other {
-  flex: 2; // Takes up 2/3 of the space
+  grid-column: 1 / 3; // Spans columns 1-2
   display: flex;
   flex-direction: column;
   gap: var(--spacing-5);
   min-width: 0; // Prevent flex item from overflowing
+
+  .content-block {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    grid-column: 1;
+  }
+}
+
+.sidebar-wrapper {
+  grid-column: 3; // Column 3
+  grid-row: 1 / -1; // All rows
+  position: relative;
+  align-self: stretch;
+  height: 100%;
+
+  @media (max-width: 768px) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+.branding-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--spacing-5);
+  width: 100%;
+
+  .grid-col-1 {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .grid-col-2 {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .grid-col-full {
+    grid-column: 1 / -1; // Spans all columns
+  }
+
+  // Button Styles section (row 2)
+  .button-styles-row {
+    grid-row: 2;
+  }
+
+  // Text Styles section (row 3)
+  .text-styles-row {
+    grid-row: 3;
+  }
+
+  // Responsive: stack on mobile
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+
+    .grid-col-1,
+    .grid-col-2,
+    .grid-col-full {
+      grid-column: 1;
+    }
+
+    .grid-col-1 {
+      grid-row: 1;
+    }
+
+    .grid-col-2 {
+      grid-row: 2;
+    }
+
+    .button-styles-row {
+      grid-row: 3;
+    }
+
+    .text-styles-row {
+      grid-row: 4;
+    }
+  }
+}
+
+// Button Styles Section
+.button-style-group {
+  margin-bottom: var(--spacing-6);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  h6 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: var(--spacing-4);
+    color: #444444;
+  }
+}
+
+.button-style-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-6);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.button-style-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.button-style-col-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-color-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.button-color-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-4);
+  width: 100%;
+
+  .field-label {
+    width: 30%;
+    flex-shrink: 0;
+    font-family: var(--font-family-primary);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--color-text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .field-input {
+    width: 70%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+
+    .hex-code {
+      font-size: var(--spacing-3);
+      color: #181818;
+      font-family: monospace;
+      white-space: nowrap;
+    }
+  }
+}
+
+.button-example-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-2);
+
+  .example-label {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+}
+
+.button-example {
+  padding: var(--spacing-3) var(--spacing-5);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: default;
+  min-width: 100px;
+  text-align: center;
 }
 
 .sidebar {
-  flex: 1; // Takes up 1/3 of the space
+  width: 100%;
   display: flex;
   flex-direction: column;
-  background: #f8f9fb;
-  border-left: 1px solid #dedede;
+  background: white;
+  border-left: none;
   padding: 0px;
-  min-width: 0; // Prevent flex item from overflowing
   gap: var(--spacing-5);
-  max-height: calc(100vh - 150px);
+  position: sticky;
+  top: 0;
+  /* Remove explicit height to let it stretch within grid */
+  max-height: calc(100vh - 85px);
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  .outerLive {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
 
   .btnBlock {
+    flex-shrink: 0;
     margin-top: auto; // Push to bottom
     padding-top: var(--spacing-5);
+    padding-bottom: var(--spacing-5);
+    background: white;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    position: relative;
+    top: 0;
+    height: auto;
+    max-height: none;
+    margin-top: var(--spacing-5);
   }
 }
 
@@ -347,6 +590,15 @@ h6 {
   background: white;
   border-radius: var(--border-radius-lg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: none !important;
+  position: relative;
+  z-index: 10;
+
+  // Override any inherited borders
+  &,
+  * {
+    border: none !important;
+  }
 
   .row {
     &:first-child {
@@ -364,9 +616,8 @@ h6 {
   overflow: hidden;
 
   .phonePreviewContainer {
-    flex: 1;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 9 / 16;
     position: relative;
     border-radius: var(--border-radius-lg);
     overflow: hidden;
@@ -405,7 +656,6 @@ h6 {
       font-size: 15px;
       font-weight: 400;
       line-height: 20.25px;
-      letter-spacing: -0.001em;
       text-align: left;
       color: var(--color-text-muted);
     }
@@ -469,6 +719,12 @@ h6 {
   gap: 15px;
   width: 100%;
   align-items: stretch;
+
+  .content-block {
+    width: 100%;
+    max-width: 100%;
+    flex: 1;
+  }
 }
 
 .preview {
@@ -503,6 +759,10 @@ h6 {
 
 
   ::ng-deep {
+    .form-label {
+      display: none;
+    }
+
     .mat-mdc-form-field {
       width: 100%;
       background: white;
@@ -512,6 +772,9 @@ h6 {
     .mat-mdc-text-field-wrapper {
       background-color: white !important;
       padding: 0 15px;
+      margin-bottom: var(--spacing-4);
+      border: 1px solid var(--form-field-border-color) !important;
+      border-radius: var(--form-field-border-radius) !important;
     }
 
     .mat-mdc-form-field-flex {
@@ -555,6 +818,12 @@ h6 {
   justify-content: flex-start;
   gap: var(--spacing-3);
 
+  h6 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #444444;
+  }
+
   label {
     width: 90px;
   }
@@ -566,12 +835,20 @@ h6 {
   .colorPicker {
     flex: 1;
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .conTextHold {
   display: flex;
   justify-content: center;
   gap: var(--spacing-5);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
 .previewTexrt {
@@ -643,6 +920,62 @@ h6 {
   }
 }
 
+.form-field-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+  margin-bottom: var(--spacing-3);
+
+  .field-label {
+    width: 30%;
+    flex-shrink: 0;
+    font-family: var(--font-family-primary);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--color-text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .field-input {
+    width: 70%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+
+    app-form-select {
+      width: 100%;
+
+      // Add border to form-select inputs
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        border: 1px solid var(--form-field-border-color) !important;
+        border-radius: var(--form-field-border-radius) !important;
+      }
+    }
+
+    .hex-code {
+      font-size: var(--spacing-3);
+      color: #181818;
+      font-family: monospace;
+      white-space: nowrap;
+    }
+
+    // Hide the label inside form-select since we have our own
+    ::ng-deep .form-label {
+      display: none;
+    }
+
+    // Hide the label for this specific select
+    .form-label {
+      display: none;
+    }
+  }
+}
+
 .colourPicker {
   width: 23px;
   height: 23px;
@@ -690,7 +1023,6 @@ h6 {
     font-style: normal;
     font-weight: 400;
     line-height: 140%;
-    letter-spacing: -0.013px;
     margin: 0;
 
     &:first-of-type {
@@ -741,6 +1073,7 @@ h6 {
   border-radius: var(--border-radius-base);
   overflow: hidden;
   max-width: 200px;
+  background: #f5f5f5; // Half grey background for transparent images
 
   img {
     width: 100%;

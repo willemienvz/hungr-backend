@@ -132,7 +132,6 @@
       font-weight: 400;
       font-size: 15px;
       line-height: 20.25px;
-      letter-spacing: -0.1%;
       margin: 0;
       font-family: var(--hungr-font-family);
     }
@@ -647,13 +646,20 @@
 // Unified Layout Styles
 .media-filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
-  align-items: end;
+
 
   .filter-group {
     min-width: 0;
+    .form-select-wrapper {
+      margin-bottom:0;
+    }
+    &.special {
+      grid-column: 1/3;
+    }
   }
+
 
   .filter-actions {
     display: flex;
@@ -664,7 +670,9 @@
   .view-toggle-group {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-end;
+    grid-column: 5;
+    grid-row: 1;
   }
 
   @media (max-width: 76var(--spacing-2)) {

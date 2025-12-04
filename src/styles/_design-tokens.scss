@@ -24,6 +24,7 @@
     --color-grey-50: #FAFAFA;
     --color-grey-100: #F5F5F5;
     --color-grey-200: #EBEDEE;
+    --color-grey-250: #E4E4E4;
     /* Light grey */
     --color-grey-300: #E0E0E0;
     --color-grey-400: #BDBDBD;
@@ -56,6 +57,8 @@
     --color-bg-secondary: #F2F3F4;
     --color-bg-tertiary: #EBEDEE;
     --color-bg-overlay: rgba(0, 0, 0, 0.4);
+
+
 
     /* Border Colors */
     --color-border-light: #EBEDEE;
@@ -105,10 +108,8 @@
     --line-height-loose: 1.5;
 
     /* Letter Spacing */
-    --letter-spacing-tight: -0.02em;
-    --letter-spacing-normal: normal;
-    --letter-spacing-wide: 0.02em;
-    --letter-spacing-wider: 0.5px;
+
+    --mat-select-trigger-text-tracking: 0;
 }
 
 /* Spacing Scale */
@@ -252,7 +253,7 @@
     /* Form Field Colors */
     --form-field-bg: var(--color-white);
     --form-field-bg-disabled: var(--color-grey-100);
-    --form-field-border-color: var(--color-dark);
+    --form-field-border-color: #9A9A9A;
     --form-field-border-color-focus: var(--color-secondary);
     --form-field-border-color-error: var(--color-error);
     --form-field-color: var(--color-text-primary);
@@ -274,10 +275,9 @@
 
     /* Form Label */
     --form-label-color: #9A9A9A;
-    --form-label-font-size: 16px;
+    --form-label-font-size: 15px;
     --form-label-font-weight: 400;
     --form-label-margin-bottom: 7px;
-    --form-label-letter-spacing: -0.016px;
 
     /* Form Error Message */
     --form-error-color: var(--color-error);
@@ -318,10 +318,10 @@
     --button-primary-focus-ring: rgba(var(--color-secondary), 0.3);
 
     /* Secondary Buttons */
-    --button-secondary-bg: var(--color-grey-100);
+    --button-secondary-bg: var(--color-grey-250);
     --button-secondary-color: var(--color-text-primary);
-    --button-secondary-border: 1px solid var(--color-border-medium);
-    --button-secondary-hover-bg: var(--color-grey-200);
+    --button-secondary-border: none;
+    --button-secondary-hover-bg: var(--color-grey-250);
     --button-secondary-active-bg: var(--color-grey-300);
     --button-secondary-focus-ring: rgba(var(--color-grey-600), 0.3);
 
@@ -384,7 +384,7 @@
     --block-border: 1px solid var(--color-border-light);
     --block-border-radius: var(--border-radius-lg);
     --block-shadow: var(--shadow-sm);
-    --block-shadow-hover: var(--shadow-md);
+    --block-shadow-hover: var(--shadow-sm);
     --block-padding: var(--spacing-6);
     --block-gap: var(--spacing-5);
     --block-transition: var(--transition-normal);
@@ -408,7 +408,7 @@
 
     /* Hover effects */
     &:hover {
-        box-shadow: var(--block-shadow-hover);
+    //    box-shadow: var(--block-shadow-hover);
     }
 
 
@@ -482,7 +482,6 @@
     --heading-1-font-size: var(--font-size-3xl);
     --heading-1-font-weight: var(--font-weight-bold);
     --heading-1-line-height: 22px;
-    --heading-1-letter-spacing: var(--letter-spacing-wide);
     --heading-1-text-transform: uppercase;
 
     --heading-2-font-size: var(--font-size-2xl);
@@ -518,7 +517,6 @@
     --hungr-darker-grey: var(--color-grey-800);
     --hungr-red: var(--color-primary);
     --hungr-font-family: var(--font-family-primary);
-    --hungr-letter-spacing-normal: var(--letter-spacing-normal);
 
     /* Legacy Material Design Tokens */
     --mat-option-selected-state-label-text-color: var(--color-secondary);
@@ -541,7 +539,7 @@
     font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: color 0.3s ease;
-    margin-bottom: var(--spacing-5);
+  
     text-transform:uppercase;
 
     &.no-absolute {

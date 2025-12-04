@@ -13,7 +13,7 @@
     margin-bottom: var(--spacing-4);
 
     .modal-title {
-      font-size: 18px;
+      font-size: 24px;
       font-weight: 600;
       color: #333;
       margin: 0;
@@ -29,9 +29,15 @@
       border-radius: var(--border-radius-base);
       color: #666;
       transition: color 0.2s ease;
+      outline: none;
 
       &:hover {
         color: #333;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
       }
 
       i {
@@ -42,51 +48,52 @@
 
   .status-section {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 
     .status-label {
-      font-size: 14px;
+      font-size: 18px;
       color: #666;
       margin-right: 8px;
     }
 
     .status-value {
-      font-size: 14px;
+      font-size: 18px;
       font-weight: 600;
     }
   }
 
   .modal-content {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 
     .info-section {
-      margin-bottom: var(--spacing-5);
+      margin-bottom: var(--spacing-6);
+      text-align: center;
 
       &:last-child {
         margin-bottom: 0;
       }
 
       .section-title {
-        font-size: 14px;
+        font-size: 18px;
         font-weight: 600;
         color: #333;
-        margin: 0 0 var(--spacing-3) 0;
+        margin: 0 0 var(--spacing-4) 0;
       }
 
       .tags-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
 
         .tag {
           background-color: #f5f5f5;
           color: #333;
-          padding: 6px var(--spacing-3);
+          padding: 12px 20px;
           border-radius: var(--border-radius-base);
-          font-size: var(--spacing-3);
+          font-size: 16px;
           font-weight: 500;
-          border: 1px solid #e0e0e0;
-
+          border: none;
+          text-align: center;
           font-family: var(--hungr-font-family);
         }
       }
@@ -96,10 +103,15 @@
   .modal-actions {
     display: flex;
     gap: var(--spacing-3);
-    justify-content: flex-end;
+    justify-content: center;
 
     button {
-      // Custom button styling removed to allow global styles to apply
+      outline: none;
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
     }
   }
 } 

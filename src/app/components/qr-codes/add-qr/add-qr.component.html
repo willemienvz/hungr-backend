@@ -18,13 +18,14 @@
           <div>
             <p>Assign this code to...</p>
             <p *ngIf="filteredMenus.length < 1">There are no unassigned menus</p>
-            <mat-form-field appearance="fill" *ngIf="filteredMenus.length > 0">
-              <mat-select [(ngModel)]="selectedMenu" (selectionChange)="selectMenu($event.value)">
-                <mat-option *ngFor="let menu of filteredMenus" [value]="menu">
-                  {{ menu.menuName }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+            <app-form-select
+              *ngIf="filteredMenus.length > 0"
+              label="Select Menu"
+              placeholder="Select a menu..."
+              [options]="menuOptions"
+              [(ngModel)]="selectedMenu"
+              (selectionChange)="selectMenu($event.value)">
+            </app-form-select>
             <p class="error-message" *ngIf="validationError">Please select a menu to assign</p>
             <p class="success-message" *ngIf="saveSuccess">QR code assigned to {{selectedMenu?.menuName}}</p>
           </div>

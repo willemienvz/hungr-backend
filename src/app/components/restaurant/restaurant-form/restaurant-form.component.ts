@@ -7,7 +7,7 @@ import { Restaurant } from '../../../shared/services/restaurant';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveProgressDialogComponent } from '../../save-progress-dialog/save-progress-dialog.component';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SelectOption } from '../../shared/form-select/form-select.component';
@@ -37,6 +37,7 @@ export class RestaurantFormComponent implements OnInit {
   isDuplicateName: boolean = false;
   originalRestaurantName: string = '';
   duplicateCheckTimeout: any;
+  isInitializing: boolean = false;
 
   saProvinces: string[] = [
     'Eastern Cape',
@@ -59,7 +60,7 @@ export class RestaurantFormComponent implements OnInit {
     private dialog: MatDialog,
     private router: Router,
     private route: ActivatedRoute,
-    private readonly toastr: ToastrService,
+    private readonly toast: ToastService,
     private snackBar: MatSnackBar
   ) {
     for (let i = 1; i <= this.configService.numberOfTables; i++) {
@@ -119,7 +120,10 @@ export class RestaurantFormComponent implements OnInit {
   }
 
   private markAsChanged() {
-    this.hasUnsavedChanges = true;
+    // Don't mark as changed during initialization (when loading initial data)
+    if (!this.isInitializing) {
+      this.hasUnsavedChanges = true;
+    }
   }
 
   private markAsSaved() {
@@ -173,6 +177,9 @@ export class RestaurantFormComponent implements OnInit {
 
 
   private fetchRestaurant(id: string) {
+    // Set flag to prevent change tracking during initial data load
+    this.isInitializing = true;
+    
     this.firestore
       .collection<Restaurant>('restaurants', (ref) =>
         ref.where('restaurantID', '==', id)
@@ -194,6 +201,10 @@ export class RestaurantFormComponent implements OnInit {
         // Fix: Find the menu object that matches the menuID
         const menuID = this.currentRestaurant.menuID;
         this.selectedMenu = this.menus.find(menu => menu.menuID === menuID) || menuID;
+        
+        // Reset initialization flag and ensure form is not marked as changed
+        this.isInitializing = false;
+        this.hasUnsavedChanges = false;
       });
   }
 
@@ -207,6 +218,11 @@ export class RestaurantFormComponent implements OnInit {
     // Remove any non-numeric characters
     const value = event.target.value.replace(/[^0-9]/g, '');
     this.selectedNumberTable = value;
+    this.markAsChanged();
+  }
+
+  onRestaurantStatusChange(event: any) {
+    this.restaurantStatus = event.checked;
     this.markAsChanged();
   }
 
@@ -307,7 +323,7 @@ export class RestaurantFormComponent implements OnInit {
     const restaurantCollection = this.firestore.collection('restaurants');
 
     const handleSuccess = () => {
-      this.toastr.success('Your new restaurant has been successfully created as a draft.');
+      this.toast.success('Your new restaurant has been successfully created as a draft.');
       this.markAsSaved();
     };
 
@@ -317,7 +333,7 @@ export class RestaurantFormComponent implements OnInit {
         .update(this.newRestaurant)
         .then(handleSuccess)
         .catch((error) => {
-          this.toastr.error('An error occurred while updating the restaurant.');
+          this.toast.error('An error occurred while updating the restaurant.');
           console.error('Error updating restaurant: ', error);
         });
     } else {
@@ -332,7 +348,7 @@ export class RestaurantFormComponent implements OnInit {
         })
         .then(handleSuccess)
         .catch((error) => {
-          this.toastr.error('An error occurred while saving the restaurant.');
+          this.toast.error('An error occurred while saving the restaurant.');
           console.error('Error adding restaurant: ', error);
         });
     }
@@ -361,7 +377,7 @@ export class RestaurantFormComponent implements OnInit {
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
-        this.toastr.success('Your restaurant has been updated as a draft.');
+        this.toast.success('Your restaurant has been updated as a draft.');
         this.markAsSaved();
       })
       .catch((error) => {
@@ -385,14 +401,14 @@ export class RestaurantFormComponent implements OnInit {
         !this.restaurant.province ||
         !this.restaurant.zip
       ) {
-        this.toastr.error('Please complete all required fields before saving.');
+        this.toast.error('Please complete all required fields before saving.');
         reject();
         return;
       }
 
       // Add duplicate name check
       if (this.isDuplicateName) {
-        this.toastr.error('A restaurant with this name already exists. Please choose a different name.');
+        this.toast.error('A restaurant with this name already exists. Please choose a different name.');
         reject();
         return;
       }
@@ -408,7 +424,7 @@ export class RestaurantFormComponent implements OnInit {
         ownerID: this.currentUser?.uid || '', // Current user is owner
         province: this.restaurant.province || '',
         restaurantName: this.restaurant.name || '',
-        status: true, // Always active for new restaurants
+        status: this.restaurantStatus, // Use toggle value
         streetAdress: this.restaurant.street || '',
         zip: this.restaurant.zip || '',
         assignedUsers: [this.currentUser?.uid || ''], // Auto-assign current user
@@ -425,12 +441,12 @@ export class RestaurantFormComponent implements OnInit {
             .update(this.newRestaurant);
         })
         .then(() => {
-          this.toastr.success('Your new restaurant has been successfully created.');
+          this.toast.success('Your new restaurant has been successfully created.');
           this.markAsSaved();
           resolve();
         })
         .catch((error) => {
-          this.toastr.error('An error occurred while saving the restaurant.');
+          this.toast.error('An error occurred while saving the restaurant.');
           console.error('Error adding restaurant: ', error);
           reject(error);
         });
@@ -442,7 +458,7 @@ export class RestaurantFormComponent implements OnInit {
     
     // Add duplicate name check
     if (this.isDuplicateName) {
-      this.toastr.error('A restaurant with this name already exists. Please choose a different name.');
+      this.toast.error('A restaurant with this name already exists. Please choose a different name.');
       return;
     }
     
@@ -467,7 +483,7 @@ export class RestaurantFormComponent implements OnInit {
       .doc(this.currentRestaurantID)
       .update(tempRestaurant)
       .then(() => {
-        this.toastr.success('Your restaurant has been updated.');
+        this.toast.success('Your restaurant has been updated.');
         this.markAsSaved();
       })
       .catch((error) => {

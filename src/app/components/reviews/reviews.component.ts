@@ -1,20 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ReviewsService } from '../../shared/services/reviews.service';
 import { Review, ReviewStatus } from '../../shared/types/review.interface';
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { map, switchMap, debounceTime, distinctUntilChanged, startWith, tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, combineLatest, Subject, of, EMPTY } from 'rxjs';
+import { map, switchMap, debounceTime, distinctUntilChanged, startWith, tap, takeUntil, catchError, first, shareReplay } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
 import { Menu } from '../../shared/services/menu';
+import { SelectOption } from '../shared/form-select/form-select.component';
 
 @Component({
   selector: 'app-reviews',
   templateUrl: './reviews.component.html',
   styleUrls: ['./reviews.component.scss']
 })
-export class ReviewsComponent implements OnInit {
+export class ReviewsComponent implements OnInit, OnDestroy {
   reviews$: Observable<Review[]>;
   pendingReviews$: Observable<Review[]>;
   approvedReviews$: Observable<Review[]>;
@@ -23,18 +24,46 @@ export class ReviewsComponent implements OnInit {
   paginatedReviews$: Observable<Review[]>;
   totalPages$: Observable<number>;
   currentFilter: ReviewStatus | 'all' = 'all';
+  menuItemFilter: string = 'all';
   loading = false;
   searchControl = new FormControl('');
   private menuItemFilter$ = new BehaviorSubject<string>('all');
   pageIndex$ = new BehaviorSubject<number>(1);
   pageSize = 20;
   currentUserId = 'admin'; // fallback
+  private destroy$ = new Subject<void>();
   reviewFilterOptions = [
     { value: 'all', label: 'All' },
     { value: 'pending', label: 'Pending' },
     { value: 'approved', label: 'Approved' },
     { value: 'rejected', label: 'Rejected' }
   ];
+
+  // Convert getters to properties to prevent infinite change detection loops
+  reviewFilterSelectOptions: SelectOption[] = [];
+  menuItemFilterSelectOptions: SelectOption[] = [];
+
+  // Initialize static review filter options
+  private initializeReviewFilterOptions(): void {
+    this.reviewFilterSelectOptions = this.reviewFilterOptions.map(option => ({
+      value: option.value,
+      label: option.label
+    }));
+  }
+
+  // Update menu item filter options when menu items change
+  private updateMenuItemFilterOptions(): void {
+    const options: SelectOption[] = [
+      { value: 'all', label: 'All menu items' }
+    ];
+    this.menuItems.forEach(item => {
+      options.push({
+        value: item.itemId,
+        label: item.name
+      });
+    });
+    this.menuItemFilterSelectOptions = options;
+  }
 
   private reviewsSubject$ = new BehaviorSubject<Review[]>([]);
   private pendingReviewsSubject$ = new BehaviorSubject<Review[]>([]);
@@ -46,6 +75,9 @@ export class ReviewsComponent implements OnInit {
     private authService: AuthService,
     private firestore: AngularFirestore
   ) {
+    // Initialize static review filter options
+    this.initializeReviewFilterOptions();
+
     // Use subjects that we can update without recreating observables
     this.reviews$ = this.reviewsSubject$.asObservable();
     this.pendingReviews$ = this.pendingReviewsSubject$.asObservable();
@@ -66,33 +98,135 @@ export class ReviewsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Initialize menu item filter options with default "all" option
+    this.updateMenuItemFilterOptions();
+    
     // Load current user and scope lists by owner
     this.authService.getCurrentUserId().then(uid => {
-      if (uid) {
-        this.currentUserId = uid;
-        
-        // Subscribe to the service observables and update our subjects
-        this.reviewsService.getReviews({ ownerId: uid }).subscribe(reviews => {
-          this.reviewsSubject$.next(reviews);
-        });
-        
-        this.reviewsService.getReviews({ status: 'pending', ownerId: uid }).subscribe(reviews => {
-          this.pendingReviewsSubject$.next(reviews);
-        });
-        
-        this.reviewsService.getReviews({ status: 'approved', ownerId: uid }).subscribe(reviews => {
-          this.approvedReviewsSubject$.next(reviews);
-        });
-        
-        this.reviewsService.getReviews({ status: 'rejected', ownerId: uid }).subscribe(reviews => {
-          this.rejectedReviewsSubject$.next(reviews);
-        });
-        
-        this.loadRestaurantsForOwner(uid);
-        this.loadMenuItemsForOwner(uid);
+      if (!uid) {
+        console.error('No authenticated user found');
+        this.loading = false;
+        return;
       }
-      this.loadReviews();
+      
+      this.currentUserId = uid;
+      this.loading = true;
+      
+      // First, load restaurants to get restaurant IDs for filtering
+      this.loadRestaurantsForOwner(uid);
+      this.loadMenuItemsForOwner(uid);
+      
+      // Fetch restaurants ONCE and then set up review subscriptions
+      // Use distinctUntilChanged to prevent duplicate emissions
+      // Use shareReplay to prevent multiple subscriptions
+      this.firestore
+        .collection<Restaurant>('restaurants', ref => ref.where('ownerID', '==', uid))
+        .valueChanges()
+        .pipe(
+          takeUntil(this.destroy$),
+          distinctUntilChanged((prev, curr) => {
+            if (!prev || !curr) return false;
+            if (prev.length !== curr.length) return false;
+            // Compare by restaurant IDs
+            const prevIds = prev.map(p => p.restaurantID).sort().join(',');
+            const currIds = curr.map(c => c.restaurantID).sort().join(',');
+            return prevIds === currIds;
+          }),
+          switchMap(restaurants => {
+            const restaurantIds = restaurants.map(r => r.restaurantID).filter(id => !!id);
+            
+            if (restaurantIds.length === 0) {
+              // No restaurants, return empty arrays
+              return of({
+                all: [] as Review[],
+                pending: [] as Review[],
+                approved: [] as Review[],
+                rejected: [] as Review[]
+              });
+            }
+            
+            // Use combineLatest to get all review types at once, then filter
+            return combineLatest([
+              this.reviewsService.getReviews().pipe(
+                takeUntil(this.destroy$),
+                catchError(() => of([] as Review[])),
+                shareReplay(1)
+              ),
+              this.reviewsService.getReviews({ status: 'pending' }).pipe(
+                takeUntil(this.destroy$),
+                catchError(() => of([] as Review[])),
+                shareReplay(1)
+              ),
+              this.reviewsService.getReviews({ status: 'approved' }).pipe(
+                takeUntil(this.destroy$),
+                catchError(() => of([] as Review[])),
+                shareReplay(1)
+              ),
+              this.reviewsService.getReviews({ status: 'rejected' }).pipe(
+                takeUntil(this.destroy$),
+                catchError(() => of([] as Review[])),
+                shareReplay(1)
+              )
+            ]).pipe(
+              map(([allReviews, pendingReviews, approvedReviews, rejectedReviews]) => ({
+                all: this.filterReviewsByRestaurants(allReviews, restaurantIds, uid),
+                pending: this.filterReviewsByRestaurants(pendingReviews, restaurantIds, uid),
+                approved: this.filterReviewsByRestaurants(approvedReviews, restaurantIds, uid),
+                rejected: this.filterReviewsByRestaurants(rejectedReviews, restaurantIds, uid)
+              })),
+              distinctUntilChanged((prev, curr) => {
+                // Only update if reviews actually changed
+                if (!prev || !curr) return false;
+                const prevAllIds = prev.all.map(r => r.id).sort().join(',');
+                const currAllIds = curr.all.map(r => r.id).sort().join(',');
+                return prevAllIds === currAllIds;
+              }),
+              catchError((error) => {
+                console.error('Error in combineLatest for reviews:', error);
+                return of({
+                  all: [] as Review[],
+                  pending: [] as Review[],
+                  approved: [] as Review[],
+                  rejected: [] as Review[]
+                });
+              })
+            );
+          })
+        )
+        .subscribe({
+          next: (filtered) => {
+            this.reviewsSubject$.next(filtered.all);
+            this.pendingReviewsSubject$.next(filtered.pending);
+            this.approvedReviewsSubject$.next(filtered.approved);
+            this.rejectedReviewsSubject$.next(filtered.rejected);
+            this.loading = false;
+          },
+          error: (error) => {
+            console.error('Error loading reviews:', error);
+            this.loading = false;
+            // Set empty arrays to prevent undefined errors
+            this.reviewsSubject$.next([]);
+            this.pendingReviewsSubject$.next([]);
+            this.approvedReviewsSubject$.next([]);
+            this.rejectedReviewsSubject$.next([]);
+          }
+        });
+    }).catch(error => {
+      console.error('Error getting current user ID:', error);
       this.loading = false;
+    });
+  }
+
+  /**
+   * Filters reviews to only include those for the user's restaurants or with the user's ownerId
+   */
+  private filterReviewsByRestaurants(reviews: Review[], restaurantIds: string[], ownerId: string): Review[] {
+    return reviews.filter(review => {
+      // Check if review belongs to one of the user's restaurants
+      const belongsToUserRestaurant = review.restaurantId && restaurantIds.includes(review.restaurantId);
+      // Check if review has the user's ownerId
+      const belongsToUser = review.ownerId === ownerId;
+      return belongsToUserRestaurant || belongsToUser;
     });
   }
 
@@ -114,7 +248,8 @@ export class ReviewsComponent implements OnInit {
   }
 
   onMenuItemFilterChange(value: string): void {
-    this.menuItemFilter$.next(value || 'all');
+    this.menuItemFilter = value || 'all';
+    this.menuItemFilter$.next(this.menuItemFilter);
     this.pageIndex$.next(1);
   }
 
@@ -234,20 +369,54 @@ export class ReviewsComponent implements OnInit {
   menuItems: { itemId: string; name: string }[] = [];
 
   private loadRestaurantsForOwner(ownerId: string): void {
+    if (!ownerId) {
+      console.warn('Cannot load restaurants: ownerId not provided');
+      return;
+    }
+    
     this.firestore
       .collection<Restaurant>('restaurants', ref => ref.where('ownerID', '==', ownerId))
       .valueChanges()
+      .pipe(
+        takeUntil(this.destroy$),
+        distinctUntilChanged((prev, curr) => {
+          if (!prev || !curr) return false;
+          if (prev.length !== curr.length) return false;
+          // Compare by restaurant IDs to avoid false positives
+          const prevIds = prev.map(r => r.restaurantID).sort().join(',');
+          const currIds = curr.map(r => r.restaurantID).sort().join(',');
+          return prevIds === currIds;
+        })
+      )
       .subscribe(restaurants => {
         restaurants.forEach(r => {
           if (r.restaurantID) this.restaurantNameMap[r.restaurantID] = r.restaurantName;
         });
+      }, error => {
+        console.error('Error loading restaurants:', error);
       });
   }
 
   private loadMenuItemsForOwner(ownerId: string): void {
+    if (!ownerId) {
+      console.warn('Cannot load menu items: ownerId not provided');
+      return;
+    }
+    
     this.firestore
       .collection<Menu>('menus', ref => ref.where('OwnerID', '==', ownerId))
       .valueChanges()
+      .pipe(
+        takeUntil(this.destroy$),
+        distinctUntilChanged((prev, curr) => {
+          if (!prev || !curr) return false;
+          if (prev.length !== curr.length) return false;
+          // Compare by menu IDs to avoid false positives
+          const prevIds = prev.map(m => (m as any).menuID).sort().join(',');
+          const currIds = curr.map(m => (m as any).menuID).sort().join(',');
+          return prevIds === currIds;
+        })
+      )
       .subscribe(menus => {
         this.menuItems = [];
         menus.forEach(menu => {
@@ -262,6 +431,10 @@ export class ReviewsComponent implements OnInit {
             }
           });
         });
+        // Update menu item filter options when menu items change
+        this.updateMenuItemFilterOptions();
+      }, error => {
+        console.error('Error loading menu items:', error);
       });
   }
 
@@ -271,21 +444,41 @@ export class ReviewsComponent implements OnInit {
   }
 
   private ensureModeratorNamesCached(reviews: Review[]): void {
-    reviews.forEach(r => {
-      const uid = r.moderatedBy;
-      if (uid && !this.userNameMap[uid]) {
-        this.firestore
-          .collection<any>('users', ref => ref.where('uid', '==', uid))
-          .valueChanges()
-          .pipe(startWith([] as any[]))
-          .subscribe(users => {
-            const u = users && users[0];
-            if (u) {
-              const display = [u.firstName, u.Surname].filter(Boolean).join(' ').trim() || u.email || uid;
-              this.userNameMap[uid] = display;
-            }
-          });
-      }
+    // Get unique UIDs that need to be loaded
+    const uidsToLoad = reviews
+      .map(r => r.moderatedBy)
+      .filter((uid): uid is string => !!uid && !this.userNameMap[uid]);
+    
+    // Remove duplicates
+    const uniqueUids = [...new Set(uidsToLoad)];
+    
+    // Load each unique UID only once
+    uniqueUids.forEach(uid => {
+      // Mark as loading to prevent duplicate requests
+      this.userNameMap[uid] = 'Loading...';
+      
+      this.firestore
+        .collection<any>('users', ref => ref.where('uid', '==', uid))
+        .valueChanges()
+        .pipe(
+          first(), // Only take first emission to prevent ongoing subscriptions
+          takeUntil(this.destroy$),
+          catchError(() => {
+            // If error, just use the UID as fallback
+            this.userNameMap[uid] = uid;
+            return EMPTY;
+          })
+        )
+        .subscribe(users => {
+          const u = users && users[0];
+          if (u) {
+            const display = [u.firstName, u.Surname].filter(Boolean).join(' ').trim() || u.email || uid;
+            this.userNameMap[uid] = display;
+          } else {
+            // Fallback to UID if user not found
+            this.userNameMap[uid] = uid;
+          }
+        });
     });
   }
 
@@ -317,5 +510,10 @@ export class ReviewsComponent implements OnInit {
 
   onSearchInput(value: string): void {
     this.searchControl.setValue(value);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 } 

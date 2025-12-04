@@ -1,9 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
+import { takeUntil, distinctUntilChanged, debounceTime, take, first, switchMap } from 'rxjs/operators';
 import { Branding } from '../../../shared/services/branding';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../../shared/services/toast.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -11,16 +12,19 @@ import { environment } from '../../../../environments/environment';
 import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
 import { MediaLibraryService } from '../../../shared/services/media-library.service';
 import { MediaItem } from '../../../shared/types/media';
-import { AuthService } from '../../../shared/services/auth.service';
+import { AuthManagerService } from '../../../shared/services/auth-manager.service';
+import { StateManagerService } from '../../../shared/services/state-manager.service';
+import { DataAccessService } from '../../../shared/services/data-access.service';
 
 import { BrandingPreviewMessage } from '../../../types/branding-preview';
+import { SelectOption } from '../../shared/form-select/form-select.component';
 
 @Component({
   selector: 'app-branding',
   templateUrl: './branding.component.html',
   styleUrls: ['./branding.component.scss'],
 })
-export class BrandingComponent implements OnInit {
+export class BrandingComponent implements OnInit, OnDestroy {
   @ViewChild('previewIframe') previewIframe: ElementRef;
 
   isSaving: boolean = false;
@@ -50,12 +54,24 @@ export class BrandingComponent implements OnInit {
 
   // Color settings
   backgroundColor: string = '#FFFFFF';
+  navBarColor: string = '#FFFFFF';
   primaryColor: string = '#000000';
-  secondaryColor: string = '#666666';
-  accentColor: string = '#FF0000';
+  secondaryColor: string = '#D32F2F';
+  accentColor: string = '#B8E6B8';
   mainHeadingColor: string = '#000000';
   subHeadingColor: string = '#333333';
   bodyColor: string = '#666666';
+  
+  // Button styling
+  primaryButtonTypeface: string = 'Barlow Bold';
+  primaryButtonCase: string = 'uppercase';
+  primaryButtonMainColor: string = '#1FCC96';
+  primaryButtonTextColor: string = '#000000';
+  
+  secondaryButtonTypeface: string = 'Barlow Bold';
+  secondaryButtonCase: string = 'capitalize';
+  secondaryButtonMainColor: string = '#16D3D2';
+  secondaryButtonTextColor: string = '#000000';
 
   // Typeface settings - Updated with Google fonts
   typefaces: string[] = [
@@ -89,99 +105,164 @@ export class BrandingComponent implements OnInit {
   private readonly previewUrlBase = environment.menuUrl;
   private cachedPreviewUrl: SafeResourceUrl | null = null;
   private lastSelectedMenuId: string | null = null;
+  private destroy$ = new Subject<void>();
+
+  // Convert getters to properties to prevent infinite change detection loops
+  menuOptions: SelectOption[] = [];
+  typefaceOptions: SelectOption[] = [];
+  letterCaseOptions: SelectOption[] = [];
+
+  // Initialize static options in constructor
+  private initializeStaticOptions(): void {
+    this.typefaceOptions = this.typefaces.map(typeface => ({
+      value: typeface,
+      label: typeface
+    }));
+
+    this.letterCaseOptions = this.letterCases.map(caseOption => ({
+      value: caseOption.value,
+      label: caseOption.display
+    }));
+  }
+
+  // Update menu options when menus change
+  private updateMenuOptions(): void {
+    if (this.menus.length === 0) {
+      this.menuOptions = [{ value: '', label: 'No active menus available', disabled: true }];
+    } else {
+      this.menuOptions = this.menus.map(menu => ({
+        value: menu.menuID,
+        label: menu.menuName
+      }));
+    }
+  }
 
   constructor(
-    private storage: AngularFireStorage,
     private firestore: AngularFirestore,
-    private toastr: ToastrService,
+    private storage: AngularFireStorage,
+    private toast: ToastService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
     private mediaUploadModalService: MediaUploadModalService,
     private mediaLibraryService: MediaLibraryService,
-    private authService: AuthService
-  ) { }
+    private authManager: AuthManagerService,
+    private stateManager: StateManagerService,
+    private dataAccess: DataAccessService
+  ) {
+    // Initialize static options once
+    this.initializeStaticOptions();
+  }
 
   ngOnInit() {
-    // Subscribe to authentication state changes
-    this.authService.afAuth.authState.subscribe((user) => {
-      if (user) {
-        this.user = user;
-        this.OwnerID = user.uid;
-        console.log('User authenticated with Firebase, owner ID:', this.OwnerID);
-        console.log('User auth state:', user);
-
-        // First fetch branding data
-        this.fetchBrandingData();
-        // Then fetch available menus
-        this.fetchMenus();
-        // Also fetch branding collection data
-        this.fetchBranding();
-      } else {
+    // Wait for auth to be ready before checking authentication
+    this.authManager.isAuthReady().pipe(
+      first(ready => ready === true), // Wait for auth to be ready
+      switchMap(() => this.authManager.isAuthenticated()),
+      first(),
+      takeUntil(this.destroy$)
+    ).subscribe(isAuthenticated => {
+      if (!isAuthenticated) {
         console.error('No authenticated user found');
-        this.toastr.error('Please log in to access branding settings');
+        this.toast.error('Please log in to access branding settings');
+        return;
       }
+      
+      this.loadRestaurantData();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    
+    // Clean up any remaining timers to prevent memory leaks
+    if (this.previewSaveTimer) {
+      clearTimeout(this.previewSaveTimer);
+      this.previewSaveTimer = null;
+    }
   }
 
   // Debug method to check authentication status
   private async checkAuthStatus(): Promise<boolean> {
     try {
-      const currentUser = await this.authService.afAuth.currentUser;
-      console.log('Current auth user:', currentUser);
+      // Use authManager instead of authService
+      const isAuthenticated = await this.authManager.isAuthenticated().pipe(take(1)).toPromise() as boolean;
+      console.log('Current auth status:', isAuthenticated);
       console.log('Component OwnerID:', this.OwnerID);
       console.log('Component user:', this.user);
-      return !!currentUser;
+      return isAuthenticated;
     } catch (error) {
       console.error('Error checking auth status:', error);
       return false;
     }
   }
 
-  private verifyMenuCollection() {
-    console.log('Verifying menu collection structure...');
-    this.firestore
-      .collection('menus')
-      .get()
-      .toPromise()
-      .then(snapshot => {
-        console.log('Total menus in collection:', snapshot?.size);
-        snapshot?.forEach(doc => {
-          const data = doc.data();
-          console.log('Menu document:', {
-            id: doc.id,
-            parentID: data['parentID'],
-            name: data['name']
-          });
-        });
-      })
-      .catch(error => {
-        console.error('Error verifying menu collection:', error);
-      });
+  private loadRestaurantData(): void {
+    // Use first() to prevent multiple emissions
+    this.dataAccess.getCurrentRestaurantId().pipe(
+      first(),
+      takeUntil(this.destroy$)
+    ).subscribe(restaurantId => {
+      if (!restaurantId) {
+        this.stateManager.setError('Restaurant ID not found');
+        this.toast.error('Unable to load restaurant data');
+        return;
+      }
+      
+      this.OwnerID = restaurantId;
+      console.log('Restaurant ID loaded:', this.OwnerID);
+
+      // First fetch branding data
+      this.fetchBrandingData();
+      // Then fetch available menus
+      this.fetchMenus();
+      // Also fetch branding collection data
+      this.fetchBranding();
+    });
   }
 
   fetchMenus() {
+    // Prevent multiple calls
+    if (!this.OwnerID) {
+      console.warn('Cannot fetch menus: OwnerID not set');
+      return;
+    }
+    
     console.log('Fetching menus for owner ID:', this.OwnerID);
-    this.firestore
-      .collection('menus', (ref) =>
-        ref.where('OwnerID', '==', this.OwnerID)
-      )
-      .valueChanges({ idField: 'menuID' })
-      .subscribe((menus: any[]) => {
-        // Filter active menus (not drafts and has Status true)
-        this.activeMenus = menus.filter(menu => !menu.isDraft && menu.Status);
-        this.menus = this.activeMenus;
+    this.dataAccess.getCollection('menus').pipe(
+      takeUntil(this.destroy$),
+      distinctUntilChanged((prev, curr) => {
+        // Only update if menus actually changed
+        if (!prev || !curr) return false;
+        if (prev.length !== curr.length) return false;
+        // Compare by menu IDs to avoid false positives
+        const prevIds = prev.map((m: any) => m.menuID).sort().join(',');
+        const currIds = curr.map((m: any) => m.menuID).sort().join(',');
+        return prevIds === currIds;
+      })
+    ).subscribe((menus: any[]) => {
+      // Filter menus for this restaurant
+      const restaurantMenus = menus.filter(menu => menu.OwnerID === this.OwnerID);
+      
+      // Filter active menus (not drafts and has Status true)
+      this.activeMenus = restaurantMenus.filter(menu => !menu.isDraft && menu.Status);
+      this.menus = this.activeMenus;
 
-        console.log('Active menus:', this.activeMenus);
+      console.log('Active menus:', this.activeMenus);
 
-        // Set default selected menu if available and not already set
-        if (this.menus.length > 0 && !this.selectedMenuId) {
-          this.selectedMenuId = this.menus[0].menuID;
-          console.log('Default menu selected:', this.selectedMenuId);
-        }
-      }, error => {
-        console.error('Error fetching menus:', error);
-      });
+      // Update menu options when menus change
+      this.updateMenuOptions();
+
+      // Set default selected menu if available and not already set
+      if (this.menus.length > 0 && !this.selectedMenuId) {
+        this.selectedMenuId = this.menus[0].menuID;
+        console.log('Default menu selected:', this.selectedMenuId);
+      }
+    }, error => {
+      console.error('Error fetching menus:', error);
+      this.toast.error('Failed to load menus. Please refresh the page.');
+    });
   }
 
   getPreviewUrl(): SafeResourceUrl {
@@ -210,14 +291,15 @@ export class BrandingComponent implements OnInit {
     return this.cachedPreviewUrl || this.sanitizer.bypassSecurityTrustResourceUrl('');
   }
 
-  logSelection(event: any) {
-    if (event.value === this.selectedMenuId) {
+  logSelection(value: any) {
+    const newValue = value || (typeof value === 'object' ? value.value : value);
+    if (newValue === this.selectedMenuId) {
       console.log('Same menu selected, skipping update');
       return;
     }
 
-    console.log('Selected menu:', event.value);
-    this.selectedMenuId = event.value;
+    console.log('Selected menu:', newValue);
+    this.selectedMenuId = newValue;
     // No need to force change detection here
   }
 
@@ -278,28 +360,43 @@ export class BrandingComponent implements OnInit {
       await this.saveLogoWithMediaLibrary(mediaItem);
 
       this.isSaving = false;
-      this.toastr.success('Logo uploaded successfully!');
+      this.toast.success('Logo uploaded successfully!');
 
       // Trigger preview mode for image changes
       this.triggerPreviewForImageChange();
     } catch (error) {
       console.error('Error updating logo:', error);
       this.isSaving = false;
-      this.toastr.error('Failed to update logo. Please try again.');
+      this.toast.error('Failed to update logo. Please try again.');
     }
   }
 
 
 
   fetchBranding() {
-    this.firestore
-      .collection<Branding>('branding', (ref) =>
-        ref.where('parentID', '==', this.OwnerID)
-      )
-      .valueChanges()
-      .subscribe((brand) => {
-        this.brand = brand;
-      });
+    // Prevent multiple calls
+    if (!this.OwnerID) {
+      console.warn('Cannot fetch branding: OwnerID not set');
+      return;
+    }
+    
+    this.dataAccess.getCollection('branding').pipe(
+      takeUntil(this.destroy$),
+      distinctUntilChanged((prev, curr) => {
+        // Only update if branding actually changed
+        if (!prev || !curr) return false;
+        if (prev.length !== curr.length) return false;
+        // Compare by document IDs to avoid false positives
+        const prevIds = prev.map((b: any) => b.id || b.parentID).sort().join(',');
+        const currIds = curr.map((b: any) => b.id || b.parentID).sort().join(',');
+        return prevIds === currIds;
+      })
+    ).subscribe((brand) => {
+      // Filter branding for this restaurant
+      this.brand = (brand as any[]).filter(b => b.parentID === this.OwnerID);
+    }, error => {
+      console.error('Error fetching branding collection:', error);
+    });
   }
 
   openTooltip(tooltip: string) {
@@ -352,14 +449,14 @@ export class BrandingComponent implements OnInit {
       }
 
       this.isSaving = false;
-      this.toastr.success('Logo removed successfully!');
+      this.toast.success('Logo removed successfully!');
 
       // Trigger preview mode for image changes
       this.triggerPreviewForImageChange();
     } catch (error) {
       console.error('Error removing logo:', error);
       this.isSaving = false;
-      this.toastr.error('Failed to remove logo. Please try again.');
+      this.toast.error('Failed to remove logo. Please try again.');
     }
   }
 
@@ -390,6 +487,10 @@ export class BrandingComponent implements OnInit {
         this.backgroundColor = value;
         this.sendPreviewUpdate('backgroundColor', value);
         break;
+      case 'Nav Bar Color':
+        this.navBarColor = value;
+        this.sendPreviewUpdate('navBarColor', value);
+        break;
       case 'Primary Color':
         this.primaryColor = value;
         this.sendPreviewUpdate('primaryColor', value);
@@ -401,6 +502,38 @@ export class BrandingComponent implements OnInit {
       case 'Accent Color':
         this.accentColor = value;
         this.sendPreviewUpdate('accentColor', value);
+        break;
+      case 'Primary Button Typeface':
+        this.primaryButtonTypeface = value;
+        this.sendPreviewUpdate('primaryButtonTypeface', value);
+        break;
+      case 'Primary Button Case':
+        this.primaryButtonCase = this.getCase(value);
+        this.sendPreviewUpdate('primaryButtonCase', this.primaryButtonCase);
+        break;
+      case 'Primary Button Main Color':
+        this.primaryButtonMainColor = value;
+        this.sendPreviewUpdate('primaryButtonMainColor', value);
+        break;
+      case 'Primary Button Text Color':
+        this.primaryButtonTextColor = value;
+        this.sendPreviewUpdate('primaryButtonTextColor', value);
+        break;
+      case 'Secondary Button Typeface':
+        this.secondaryButtonTypeface = value;
+        this.sendPreviewUpdate('secondaryButtonTypeface', value);
+        break;
+      case 'Secondary Button Case':
+        this.secondaryButtonCase = this.getCase(value);
+        this.sendPreviewUpdate('secondaryButtonCase', this.secondaryButtonCase);
+        break;
+      case 'Secondary Button Main Color':
+        this.secondaryButtonMainColor = value;
+        this.sendPreviewUpdate('secondaryButtonMainColor', value);
+        break;
+      case 'Secondary Button Text Color':
+        this.secondaryButtonTextColor = value;
+        this.sendPreviewUpdate('secondaryButtonTextColor', value);
         break;
       case 'Main Heading Color':
         this.mainHeadingColor = value;
@@ -622,9 +755,18 @@ export class BrandingComponent implements OnInit {
   getBrandingSettings(): any {
     return {
       backgroundColor: this.backgroundColor,
+      navBarColor: this.navBarColor,
       primaryColor: this.primaryColor,
       secondaryColor: this.secondaryColor,
       accentColor: this.accentColor,
+      primaryButtonTypeface: this.primaryButtonTypeface,
+      primaryButtonCase: this.primaryButtonCase,
+      primaryButtonMainColor: this.primaryButtonMainColor,
+      primaryButtonTextColor: this.primaryButtonTextColor,
+      secondaryButtonTypeface: this.secondaryButtonTypeface,
+      secondaryButtonCase: this.secondaryButtonCase,
+      secondaryButtonMainColor: this.secondaryButtonMainColor,
+      secondaryButtonTextColor: this.secondaryButtonTextColor,
       mainHeadingColor: this.mainHeadingColor,
       subHeadingColor: this.subHeadingColor,
       bodyColor: this.bodyColor,
@@ -648,9 +790,18 @@ export class BrandingComponent implements OnInit {
     this.brandingData = brandingData;
 
     this.backgroundColor = brandingData?.backgroundColor ?? '#FFFFFF';
-    this.primaryColor = brandingData?.primaryColor ?? '#000000';
-    this.secondaryColor = brandingData?.secondaryColor ?? '#666666';
-    this.accentColor = brandingData?.accentColor ?? '#FF0000';
+    this.navBarColor = brandingData?.navBarColor ?? '#FFFFFF';
+    this.primaryColor = brandingData?.primaryColor ?? brandingData?.primaryButtonMainColor ?? '#000000';
+    this.secondaryColor = brandingData?.secondaryColor ?? brandingData?.secondaryButtonMainColor ?? '#D32F2F';
+    this.accentColor = brandingData?.accentColor ?? '#B8E6B8';
+    this.primaryButtonTypeface = brandingData?.primaryButtonTypeface ?? 'Barlow Bold';
+    this.primaryButtonCase = brandingData?.primaryButtonCase ?? 'uppercase';
+    this.primaryButtonMainColor = brandingData?.primaryButtonMainColor ?? '#1FCC96';
+    this.primaryButtonTextColor = brandingData?.primaryButtonTextColor ?? '#000000';
+    this.secondaryButtonTypeface = brandingData?.secondaryButtonTypeface ?? 'Barlow Bold';
+    this.secondaryButtonCase = brandingData?.secondaryButtonCase ?? 'capitalize';
+    this.secondaryButtonMainColor = brandingData?.secondaryButtonMainColor ?? '#16D3D2';
+    this.secondaryButtonTextColor = brandingData?.secondaryButtonTextColor ?? '#000000';
     this.mainHeadingColor = brandingData?.mainHeadingColor ?? '#000000';
     this.subHeadingColor = brandingData?.subHeadingColor ?? '#333333';
     this.bodyColor = brandingData?.bodyColor ?? '#666666';
@@ -690,10 +841,10 @@ export class BrandingComponent implements OnInit {
         .then(() => {
           this.isSaving = false;
           this.storeOriginalSettings(); // Update original settings
-          this.toastr.success('Branding successfully updated');
+          this.toast.success('Branding successfully updated');
         })
         .catch((err) => {
-          this.toastr.error(
+          this.toast.error(
             'An error occurred, please try again later or contact admin'
           );
           this.isSaving = false;
@@ -711,13 +862,13 @@ export class BrandingComponent implements OnInit {
               .collection('branding')
               .add(brandingDetails)
               .then((docRef) => {
-                this.toastr.success('Branding successfully updated');
+                this.toast.success('Branding successfully updated');
                 this.isSaving = false;
                 this.lastSavedDocId = docRef.id;
                 this.storeOriginalSettings(); // Update original settings
               })
               .catch((err) => {
-                this.toastr.error(
+                this.toast.error(
                   'An error occurred, please try again later or contact admin'
                 );
                 this.isSaving = false;
@@ -729,12 +880,12 @@ export class BrandingComponent implements OnInit {
               .doc(this.lastSavedDocId)
               .update(brandingDetails)
               .then(() => {
-                this.toastr.success('Branding successfully updated');
+                this.toast.success('Branding successfully updated');
                 this.isSaving = false;
                 this.storeOriginalSettings(); // Update original settings
               })
               .catch((err) => {
-                this.toastr.error(
+                this.toast.error(
                   'An error occurred, please try again later or contact admin'
                 );
                 this.isSaving = false;
@@ -742,7 +893,7 @@ export class BrandingComponent implements OnInit {
           }
         })
         .catch((err) => {
-          this.toastr.error('Error fetching existing branding data');
+          this.toast.error('Error fetching existing branding data');
         });
     }
   }
@@ -760,15 +911,15 @@ export class BrandingComponent implements OnInit {
           if (doc.exists) {
             const brandingData = doc.data();
             this.loadBrandingSettings(brandingData);
-            this.toastr.info('Changes discarded');
+            this.toast.info('Changes discarded');
           }
         })
         .catch((error) => {
-          this.toastr.error('Error discarding changes');
+          this.toast.error('Error discarding changes');
           console.error('Discard error:', error);
         });
     } else {
-      this.toastr.warning('No saved branding data to discard');
+      this.toast.warning('No saved branding data to discard');
     }
   }
 
@@ -788,13 +939,13 @@ export class BrandingComponent implements OnInit {
 
   savePreviewSettings(): void {
     if (!this.isPreviewMode) return;
-    // Debounce rapid writes during slider/color changes
+    // Debounce rapid writes during slider/color changes with longer debounce to prevent excessive updates
     if (this.previewSaveTimer) {
       clearTimeout(this.previewSaveTimer);
     }
     this.previewSaveTimer = setTimeout(() => {
       this.savePreviewSettingsImmediate();
-    }, 400);
+    }, 800); // Increased debounce time
   }
 
   private savePreviewSettingsImmediate(): void {
@@ -837,7 +988,7 @@ export class BrandingComponent implements OnInit {
 
   savePreviewAsDefault(): void {
     if (!this.isPreviewMode || !this.hasUnsavedChanges) {
-      this.toastr.warning('No changes to save');
+      this.toast.warning('No changes to save');
       return;
     }
 
@@ -856,10 +1007,10 @@ export class BrandingComponent implements OnInit {
           this.hasUnsavedChanges = false;
           this.clearPreviewMode();
           this.storeOriginalSettings(); // Store new settings as original
-          this.toastr.success('Branding successfully updated');
+          this.toast.success('Branding successfully updated');
         })
         .catch((err) => {
-          this.toastr.error('An error occurred, please try again later or contact admin');
+          this.toast.error('An error occurred, please try again later or contact admin');
           this.isSaving = false;
         });
     } else {
@@ -873,10 +1024,10 @@ export class BrandingComponent implements OnInit {
           this.hasUnsavedChanges = false;
           this.clearPreviewMode();
           this.storeOriginalSettings(); // Store new settings as original
-          this.toastr.success('Branding successfully saved');
+          this.toast.success('Branding successfully saved');
         })
         .catch((err) => {
-          this.toastr.error('An error occurred, please try again later or contact admin');
+          this.toast.error('An error occurred, please try again later or contact admin');
           this.isSaving = false;
         });
     }
@@ -886,9 +1037,9 @@ export class BrandingComponent implements OnInit {
     if (this.originalSettings) {
       this.loadBrandingSettings(this.originalSettings);
       this.clearPreviewMode();
-      this.toastr.info('Changes reverted to original settings');
+      this.toast.info('Changes reverted to original settings');
     } else {
-      this.toastr.warning('No original settings to revert to');
+      this.toast.warning('No original settings to revert to');
     }
   }
 

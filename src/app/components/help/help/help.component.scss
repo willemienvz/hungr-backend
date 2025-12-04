@@ -2,6 +2,16 @@
   display: grid;
   grid-template-columns: var(--grid-col-7) var(--grid-col-5);
   gap: var(--grid-gap-md);
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-5);
+  }
+
+  @media (max-width: 768px) {
+    gap: var(--spacing-4);
+  }
 
   .row {
     display: flex;
@@ -9,6 +19,12 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-3);
+    }
   }
 
   .coltwothird {
@@ -16,23 +32,96 @@
     flex-direction: column;
     gap: var(--grid-gap-md);
 
-    .innerBlock {
-      max-width: 80%;
+    // Make first content block match height
+    ::ng-deep .content-block:first-child {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .help-search-section {
       width: 100%;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: var(--grid-gap-lg);
       flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-5);
+      padding: var(--spacing-5) 0;
+      flex: 1;
 
-      h6 {
+      .help-header {
+        text-align: center;
+        font-family: var(--font-family-primary);
+        font-size: 18px;
+        font-weight: 700;
         color: #444444;
+        margin: 0;
       }
 
-      .row {
-        margin-top: var(--margin-xs);
+      .search-bar-container {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        align-items: center;
+
+        .search-input {
+          width: 100%;
+          padding: 12px 40px 12px 15px;
+          border: 1px solid #e4e4ea;
+          border-radius: var(--border-radius-md);
+          background-color: white;
+          font-family: var(--font-family-primary);
+          font-size: 14px;
+          color: #444444;
+          outline: none;
+          transition: border-color 0.2s;
+
+          &:focus {
+            border-color: #1FCC96;
+          }
+
+          &::placeholder {
+            color: #999;
+          }
+        }
+
+        .search-icon {
+          position: absolute;
+          right: 12px;
+          color: #999;
+          font-size: 20px;
+          pointer-events: none;
+        }
+      }
+
+      .help-links {
+        display: flex;
+        flex-direction: row;
         justify-content: center;
-        gap: var(--grid-gap-xl);
+        align-items: center;
+        gap: var(--spacing-6);
+        flex-wrap: wrap;
+
+        .help-link {
+          color: #444444;
+          text-decoration: underline;
+          font-family: var(--font-family-primary);
+          font-size: 14px;
+          font-weight: 400;
+          cursor: pointer;
+          transition: color 0.2s;
+          white-space: nowrap;
+
+          &:hover {
+            color: #1FCC96;
+          }
+        }
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+          gap: var(--spacing-4);
+          align-items: center;
+        }
       }
     }
 
@@ -49,14 +138,151 @@
     display: flex;
     gap: var(--grid-gap-md);
     flex-direction: column;
+
+    @media (max-width: 1024px) {
+      width: 100%;
+    }
+
+    // Make content blocks match height
+    ::ng-deep .content-block {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
   }
 
+  // Contact Details Card Styles
+  ::ng-deep .content-block.contact-details-block {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+
+    .content-area {
+      padding: 0 !important;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .contact-details-card {
+    width: 100%;
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-6) var(--spacing-6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-6);
+    align-items: flex-start;
+    flex: 1;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-5);
+      padding: var(--spacing-5);
+    }
+
+    @media (max-width: 768px) {
+      padding: var(--spacing-4);
+      gap: var(--spacing-4);
+    }
+  }
+
+  .contact-details-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    align-items: flex-start;
+
+    .contact-details-title {
+      font-family: var(--font-family-primary);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #444444;
+      margin: 0;
+      text-align: left;
+    }
+
+    .contact-details-description {
+      font-family: var(--font-family-primary);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #444444;
+      margin: 0;
+      text-align: left;
+    }
+  }
+
+  .contact-details-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+    align-items: flex-start;
+
+    @media (max-width: 1024px) {
+      width: 100%;
+    }
+  }
+
+  .contact-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-3);
+    color: #444444;
+    text-decoration: none;
+    font-family: var(--font-family-primary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    transition: color 0.2s ease;
+    width: 100%;
+
+    &:hover {
+      color: #1FCC96;
+    }
+
+    &:focus {
+      outline: 2px solid #1FCC96;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    i {
+      font-size: 18px;
+      color: inherit;
+      flex-shrink: 0;
+      width: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    span {
+      flex: 1;
+      word-break: break-word;
+    }
+  }
+
+  // Legacy styles for backward compatibility
   .rowGreyBlock {
     width: 100%;
     display: grid;
     grid-template-columns: var(--grid-col-5) var(--grid-col-7);
     align-items: flex-start;
     gap: var(--grid-gap-lg);
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-4);
+    }
 
     .col {
       display: flex;
@@ -128,7 +354,6 @@
           font-weight: 400;
           line-height: 18.2px;
           color: #444444;
-          letter-spacing: -0.001em;
         }
       }
 
@@ -294,20 +519,5 @@
 
   &.open {
     /* Transform removed for consistency */
-  }
-}
-
-.rowinput {
-  width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-
-  i {
-    position: absolute;
-    right: 10px;
-    cursor: pointer;
   }
 }

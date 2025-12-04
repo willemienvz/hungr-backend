@@ -9,7 +9,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { Component } from '@angular/core';
 import { DataService } from './data.service';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from './toast.service';
 import firebase from 'firebase/compat/app';
 import { environment } from '../../../environments/environment';
 
@@ -25,7 +25,7 @@ export class AuthService {
     public router: Router,
     public ngZone: NgZone,
     public dataService: DataService,
-    private toastr: ToastrService
+    private toast: ToastService
   ) {
     /* Saving user data in localstorage when 
     logged in and setting up null when logged out */
@@ -105,18 +105,18 @@ export class AuthService {
           await user.reload();
 
           if (!user.emailVerified) {
-            this.toastr.warning(
+            this.toast.warning(
               'Your email is not verified. You may have limited access.'
             );
           } else {
-            this.toastr.success('Login successful!');
+            this.toast.success('Login successful!');
           }
 
           this.router.navigate(['dashboard']);
         }
       })
       .catch((error) => {
-        this.toastr.error('Invalid email and/or password combination.');
+        this.toast.error('Invalid email and/or password combination.');
       });
   }
 
@@ -150,7 +150,7 @@ export class AuthService {
       
       return result;
     } catch (error) {
-      this.toastr.error(error.message);
+      this.toast.error(error.message);
       throw error;
     }
   }
@@ -240,10 +240,10 @@ export class AuthService {
         url: 'http://localhost:4200/password-reset',
       })
       .then(() => {
-        this.toastr.success('Password reset email sent, check your inbox.');
+        this.toast.success('Password reset email sent, check your inbox.');
       })
       .catch((error) => {
-        this.toastr.error(error);
+        this.toast.error(error);
       });
   }
   // Returns true when user is looged in and email is verified

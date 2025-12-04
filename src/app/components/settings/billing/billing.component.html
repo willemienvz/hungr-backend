@@ -17,32 +17,30 @@
     <!-- Subscription Details Card -->
     <div *ngIf="!loading && !error" class="subscription-card">
       <div *ngIf="subscriptionData" class="subscription-content">
-        <div class="subscription-header">
-          <h6>Current Subscription</h6>
-          <span class="status-badge" [ngClass]="getStatusBadgeClass()">
-            {{ getStatusLabel() }}
-          </span>
-        </div>
+   
 
         <div class="subscription-details">
           <div class="detail-row">
             <span class="detail-label">Plan:</span>
-            <span class="detail-value">{{ subscriptionData.plan | titlecase }}</span>
+            <span class="detail-value">{{ formatPlanName(subscriptionData.plan) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value">  <span class="status-badge" [ngClass]="getStatusBadgeClass()">
+              {{ getStatusLabel() }}
+            </span></span>
           </div>
           <div class="detail-row">
             <span class="detail-label">Amount:</span>
-            <span class="detail-value">{{ formatAmount(subscriptionData.amount) }}</span>
+            <span class="detail-value">{{ formatSubscriptionAmount(subscriptionData.amount) }}</span>
           </div>
           <div class="detail-row" *ngIf="subscriptionData.frequency">
             <span class="detail-label">Frequency:</span>
             <span class="detail-value">
-              <span *ngIf="subscriptionData.frequency === '3'">Monthly</span>
-              <span *ngIf="subscriptionData.frequency === '4'">Quarterly</span>
-              <span *ngIf="subscriptionData.frequency === '5'">Bi-Annual</span>
-              <span *ngIf="subscriptionData.frequency === '6'">Annual</span>
+              <span>Monthly</span>
             </span>
           </div>
-          <div class="detail-row" *ngIf="subscriptionData.nextBillingDate">
+          <div class="detail-row" *ngIf="subscriptionData.nextBillingDate && !subscriptionData.cancelledAt">
             <span class="detail-label">Next Billing Date:</span>
             <span class="detail-value">{{ formatDate(subscriptionData.nextBillingDate) }}</span>
           </div>
@@ -83,16 +81,6 @@
           </button>
 
           <button
-            class="hungr-btn hungr-btn-secondary"
-            (click)="editSubscription()"
-            *ngIf="canEdit()"
-            [disabled]="isPausing || isResuming || isEditing || isCancelling">
-            <app-spinner *ngIf="isEditing" [diameter]="20" class="button-spinner"></app-spinner>
-            <span *ngIf="!isEditing">Edit Subscription</span>
-            <span *ngIf="isEditing">Updating...</span>
-          </button>
-
-          <button
             class="hungr-btn hungr-btn-danger"
             (click)="cancelSubscription()"
             *ngIf="canCancel()"
@@ -103,11 +91,23 @@
           </button>
 
           <a
-            *ngIf="subscriptionData?.status === 'cancelled' || subscriptionData?.status === 'canceled'"
+            *ngIf="subscriptionData?.status === '2'"
             routerLink="/sign-up"
             class="hungr-btn hungr-btn-primary">
             Resubscribe
           </a>
+
+
+          <button
+            class="hungr-btn hungr-btn-secondary"
+            (click)="editSubscription()"
+            *ngIf="canEdit()"
+            [disabled]="isPausing || isResuming || isEditing || isCancelling">
+            <app-spinner *ngIf="isEditing" [diameter]="20" class="button-spinner"></app-spinner>
+            <span *ngIf="!isEditing">Update Card Details</span>
+            <span *ngIf="isEditing">Opening...</span>
+          </button>
+
         </div>
       </div>
 

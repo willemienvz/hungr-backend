@@ -65,7 +65,6 @@ import { AddSpecialComponent } from './components/specials/add-special/add-speci
 import { MatChipsModule } from '@angular/material/chips';
 import { SpecialsLandingComponent } from './components/specials/specials-landing/specials-landing.component';
 import { EditSpecialComponent } from './components/specials/edit-special/edit-special.component';
-import { ToastrModule } from 'ngx-toastr';
 import { HelpComponent } from './components/help/help/help.component';
 import { TutorialsComponent } from './components/help/tutorials/tutorials.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -86,11 +85,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { MenuInsightsComponent } from './components/dashboard/menu-insights/menu-insights.component';
 import { SalesInsightsComponent } from './components/dashboard/sales-insights/sales-insights.component';
 import { ConfirmDeleteDialogComponent } from './components/restaurant/confirm-delete-dialog/confirm-delete-dialog.component';
-import { SuccessAddRestaurantDialogComponent } from './components/restaurant/add/success-add-restaurant-dialog/success-add-restaurant-dialog.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ViewComponent } from './components/restaurant/view/view.component';
 import { ResetSuccessComponent } from './components/forgot-password/reset-success/reset-success.component';
@@ -150,6 +149,7 @@ import { ReviewsComponent } from './components/reviews/reviews.component';
 import { PermissionService } from './shared/services/permission.service';
 import { PayFastTestComponent } from './components/test/payfast-test/payfast-test.component';
 import { SpinnerComponent } from './components/shared/spinner/spinner.component';
+import { PhoneInputComponent } from './components/shared/phone-input/phone-input.component';
 
 @NgModule({
   declarations: [
@@ -204,7 +204,6 @@ import { SpinnerComponent } from './components/shared/spinner/spinner.component'
     MenuInsightsComponent,
     SalesInsightsComponent,
     ConfirmDeleteDialogComponent,
-    SuccessAddRestaurantDialogComponent,
     ViewComponent,
     ResetSuccessComponent,
     ConfirmEmailComponent,
@@ -261,6 +260,7 @@ import { SpinnerComponent } from './components/shared/spinner/spinner.component'
     ReviewsComponent,
     PayFastTestComponent,
     SpinnerComponent,
+    PhoneInputComponent,
   ],
   imports: [
     BrowserModule,
@@ -297,13 +297,13 @@ import { SpinnerComponent } from './components/shared/spinner/spinner.component'
     MatMenuModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatSnackBarModule,
     DragDropModule,
     ColorPickerModule,
     MatTooltipModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),
     }),
-    ToastrModule.forRoot(),
   ],
   providers: [FormDataService, DatePipe, PermissionService],
   bootstrap: [AppComponent],

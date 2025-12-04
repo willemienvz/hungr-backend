@@ -40,6 +40,7 @@ export class GeneralComponent {
   hasUnsavedChanges: boolean = false;
   private originalFormValues: any = {};
   subscriptionData: any = null;
+  isSavingNotifications: boolean = false;
   constructor(
     private router: Router,
     public authService: AuthService,
@@ -82,7 +83,6 @@ export class GeneralComponent {
     this.accountForm = this.formBuilder.group({
       name: ['', Validators.required],
       surname: ['', Validators.required],
-      password: ['', Validators.required],
       email: [{ value: '', disabled: true }, Validators.required],
       phone: ['', Validators.required],
     });
@@ -153,10 +153,11 @@ export class GeneralComponent {
     }
 
     this.isSaving = true;
+    const phoneValue = this.accountForm.get('phone')?.value || '';
     const userToSave: Partial<User> = {
       firstName: this.accountForm.get('name')?.value,
       Surname: this.accountForm.get('surname')?.value,
-      cellphoneNumber: this.accountForm.get('phone')?.value,
+      cellphoneNumber: phoneValue.replace(/\s/g, ''),
       marketingConsent: this.currentUserData.marketingConsent,
       tipsTutorials: this.currentUserData.tipsTutorials,
       userInsights: this.currentUserData.userInsights,
@@ -437,5 +438,41 @@ export class GeneralComponent {
       'expiryDate': 'Expiry Date'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  onResetPassword(): void {
+    const userEmail = this.currentUserData?.email || this.accountForm.get('email')?.value;
+    if (userEmail) {
+      this.authService.ForgotPassword(userEmail);
+    } else {
+      console.error('No email available for password reset');
+    }
+  }
+
+  saveNotificationSettings(): void {
+    if (!this.currentUserData) {
+      console.error('No user data available');
+      return;
+    }
+
+    this.isSavingNotifications = true;
+    const notificationSettings: Partial<User> = {
+      marketingConsent: this.currentUserData.marketingConsent,
+      tipsTutorials: this.currentUserData.tipsTutorials,
+      userInsights: this.currentUserData.userInsights,
+    };
+
+    this.firestore
+      .doc(`users/${this.currentUserData.uid}`)
+      .update(notificationSettings)
+      .then(() => {
+        this.isSavingNotifications = false;
+        this.notificationService.addNotification('Notification settings updated');
+      })
+      .catch((error) => {
+        this.isSavingNotifications = false;
+        console.error('Error updating notification settings:', error);
+        this.notificationService.addNotification('Failed to update notification settings');
+      });
   }
 }

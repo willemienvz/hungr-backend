@@ -5,7 +5,6 @@
     <form [formGroup]="specialForm">
       <!-- Percentage Discount -->
       <div *ngIf="selectedSpecialType === SpecialType.PERCENTAGE_DISCOUNT"  class="inputHolder">
-        <p class="section-title">Select Items and Percentage</p>
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
             <label>Search and select menu items</label>
@@ -42,24 +41,32 @@
 
           <div class="fieldHolder field field-shrink compact-field">
             <label>Percentage discount</label>
-            <mat-form-field>
-              <input
-                matInput
-                type="number"
-                min="0"
-                max="100"
-                formControlName="percentage"
-                (keydown.enter)="onAddItem()"
-              />
-              <span matSuffix>%</span>
-            </mat-form-field>
+            <div class="percentage-input-wrapper">
+              <mat-form-field>
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  max="100"
+                  formControlName="percentage"
+                  (keydown.enter)="onAddItem()"
+                />
+                <span matSuffix class="percentage-suffix">%</span>
+              </mat-form-field>
+              <button 
+                type="button"
+                class="add-item-btn"
+                (click)="onAddItem()"
+                [disabled]="!canAddItem()">
+                <i class="material-icons">add</i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Price Discount (Add Mode) -->
       <div *ngIf="selectedSpecialType === SpecialType.PRICE_DISCOUNT && !editMode" class="inputHolder">
-        <p class="section-title">Select Items and Prices</p>
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
             <label>Search and select menu items</label>
@@ -94,140 +101,179 @@
             </mat-form-field>
           </div>
 
-          <app-price-input
-            class="compact"
-            formControlName="amount"
-            placeholder="R 0.00"
-            label="Price"
-            [required]="true"
-            (keydown.enter)="onAddItem()">
-          </app-price-input>
+          <div class="fieldHolder field field-shrink compact-field">
+            <label>Price</label>
+            <div class="percentage-input-wrapper">
+              <app-price-input
+                class="compact"
+                formControlName="amount"
+                placeholder="R 0.00"
+                label=""
+                [required]="true"
+                (keydown.enter)="onAddItem()">
+              </app-price-input>
+              <button 
+                type="button"
+                class="add-item-btn"
+                (click)="onAddItem()"
+                [disabled]="!canAddItem()">
+                <i class="material-icons">add</i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Price Discount (Edit Mode) -->
       <div *ngIf="selectedSpecialType === SpecialType.PRICE_DISCOUNT && editMode"  class="inputHolder">
-        <p class="section-title">Select Items and Prices</p>
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
-            <label>Item</label>
-            <mat-form-field>
-              <mat-select formControlName="typeSpecialDetails">
-                <mat-option
-                  *ngFor="let item of selectedMenu?.items"
-                  [value]="item.name"
-                >
-                  {{ item.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+            <app-form-select
+              label="Item"
+              placeholder="Select an item..."
+              [options]="menuItemOptions"
+              formControlName="typeSpecialDetails">
+            </app-form-select>
           </div>
-          <app-price-input
-            class="compact"
-            formControlName="amount"
-            placeholder="R 0.00"
-            label="Price"
-            [required]="true"
-            (keydown.enter)="onAddItem()">
-          </app-price-input>
+          <div class="fieldHolder field field-shrink compact-field">
+            <label>Price</label>
+            <div class="percentage-input-wrapper">
+              <app-price-input
+                class="compact"
+                formControlName="amount"
+                placeholder="R 0.00"
+                label=""
+                [required]="true"
+                (keydown.enter)="onAddItem()">
+              </app-price-input>
+              <button 
+                type="button"
+                class="add-item-btn"
+                (click)="onAddItem()"
+                [disabled]="!canAddItem()">
+                <i class="material-icons">add</i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Category Special -->
       <div *ngIf="selectedSpecialType === SpecialType.CATEGORY_SPECIAL" class="inputHolder">
-        <p class="section-title">Category Special Details</p>
-
-        <!-- Category Selection -->
-        <div class="fieldHolder field field-grow full-width">
-          <label>Select Categories</label>
-          <mat-form-field>
-            <mat-select formControlName="selectedCategories" multiple>
-              <mat-option
-                *ngFor="let category of availableCategories"
-                [value]="category.id"
-              >
-                {{ category.name }} ({{ category.itemCount || 0 }} items)
-              </mat-option>
-            </mat-select>
-            <mat-hint>Select one or more categories for this special</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <!-- Custom Promotional Text for Category Specials -->
-        <div class="fieldHolder field field-grow full-width">
-          <label>Custom Promotional Text (Optional)</label>
-          <mat-form-field>
-            <textarea
-              matInput
-              formControlName="customPromotionalText"
-              placeholder="Enter compelling text to promote this category special..."
-              rows="3"
-              maxlength="500"
-            ></textarea>
-            <mat-error *ngIf="specialForm.get('customPromotionalText')?.hasError('maxlength')">
-              Custom text cannot exceed 500 characters
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <!-- Discount Amount -->
+        <!-- Category Selection and Discount in Row -->
         <div class="row">
           <div class="fieldHolder field field-grow full-width">
-            <label>Discount Type</label>
-            <mat-form-field>
-              <mat-select formControlName="discountType">
-                <mat-option value="percentage">Percentage Discount</mat-option>
-                <mat-option value="fixed">Fixed Amount Discount</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <app-form-select
+              label="Select a category"
+              placeholder="Select category..."
+              [options]="categoryOptions"
+              formControlName="selectedCategory"
+              [multiple]="false">
+            </app-form-select>
           </div>
 
-          <div class="fieldHolder field field-shrink compact-field" *ngIf="specialForm.get('discountType')?.value === 'percentage'">
-            <label>Percentage discount</label>
-            <mat-form-field>
-              <input
-                matInput
-                type="number"
-                min="0"
-                max="100"
-                formControlName="amount"
-                (keydown.enter)="onAddItem()"
-              />
-              <span matSuffix>%</span>
-            </mat-form-field>
-          </div>
+          <div class="fieldHolder field field-shrink compact-field">
+            <!-- Percentage Discount -->
+            <div *ngIf="specialForm.get('discountType')?.value === 'percentage'" class="discount-input-wrapper">
+              <label>Percentage discount</label>
+              <div class="percentage-input-wrapper">
+                <!-- Discount Type Toggle -->
+                <div class="discount-type-toggle">
+                  <button
+                    type="button"
+                    class="toggle-btn"
+                    [class.active]="specialForm.get('discountType')?.value === 'percentage'"
+                    (click)="setDiscountType('percentage')">
+                    %
+                  </button>
+                  <button
+                    type="button"
+                    class="toggle-btn"
+                    [class.active]="specialForm.get('discountType')?.value === 'fixed'"
+                    (click)="setDiscountType('fixed')">
+                    R
+                  </button>
+                </div>
+                <mat-form-field>
+                  <input
+                    matInput
+                    type="number"
+                    min="0"
+                    max="100"
+                    formControlName="amount"
+                    (keydown.enter)="onAddItem()"
+                  />
+                  <span matSuffix class="percentage-suffix">%</span>
+                </mat-form-field>
+                <button 
+                  type="button"
+                  class="add-item-btn"
+                  (click)="onAddItem()"
+                  [disabled]="!canAddItem()">
+                  <i class="material-icons">add</i>
+                </button>
+              </div>
+            </div>
 
-          <app-price-input
-            *ngIf="specialForm.get('discountType')?.value === 'fixed'"
-            class="compact"
-            formControlName="amount"
-            placeholder="R 0.00"
-            label="Fixed Discount"
-            [required]="true"
-            (keydown.enter)="onAddItem()">
-          </app-price-input>
+            <!-- Fixed Price Discount -->
+            <div *ngIf="specialForm.get('discountType')?.value === 'fixed'" class="discount-input-wrapper">
+              <label>Price Discount</label>
+              <div class="percentage-input-wrapper">
+                <!-- Discount Type Toggle -->
+                <div class="discount-type-toggle">
+                  <button
+                    type="button"
+                    class="toggle-btn"
+                    [class.active]="specialForm.get('discountType')?.value === 'percentage'"
+                    (click)="setDiscountType('percentage')">
+                    %
+                  </button>
+                  <button
+                    type="button"
+                    class="toggle-btn"
+                    [class.active]="specialForm.get('discountType')?.value === 'fixed'"
+                    (click)="setDiscountType('fixed')">
+                    R
+                  </button>
+                </div>
+                <app-price-input
+                  class="compact"
+                  formControlName="amount"
+                  placeholder="R 0.00"
+                  label=""
+                  [required]="true"
+                  (keydown.enter)="onAddItem()">
+                </app-price-input>
+                <button 
+                  type="button"
+                  class="add-item-btn"
+                  (click)="onAddItem()"
+                  [disabled]="!canAddItem()">
+                  <i class="material-icons">add</i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Combo Special -->
-      <div *ngIf="selectedSpecialType === SpecialType.COMBO_DEAL">
-        <h6 class="section-title">Combo Details</h6>
-        <div class="row">
-          <div class="fieldHolder field field-grow full-width">
-            <label>Items in combo</label>
-            <mat-form-field>
-              <mat-select formControlName="typeSpecialDetails" multiple>
-                <mat-option
-                  *ngFor="let item of selectedMenu?.items"
-                  [value]="item.name"
-                >
-                  {{ item.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-          <div class="fieldHolder field field-shrink compact-field">
-            <label>Percentage discount</label>
+      <div *ngIf="selectedSpecialType === SpecialType.COMBO_DEAL" class="inputHolder">
+        <!-- Items in combo - Full width -->
+        <div class="fieldHolder field field-grow full-width combo-items-full-width">
+          <app-form-select
+            label="Items in combo"
+            placeholder="Select items..."
+            [options]="menuItemOptions"
+            formControlName="typeSpecialDetails"
+            [multiple]="true">
+          </app-form-select>
+        </div>
+
+        <!-- Percentage discount -->
+        <div class="fieldHolder field field-shrink compact-field combo-discount-field">
+          <label>Percentage discount</label>
+          <div class="percentage-input-wrapper">
             <mat-form-field>
               <input
                 matInput
@@ -237,34 +283,22 @@
                 formControlName="percentage"
                 (keydown.enter)="onAddItem()"
               />
-              <span matSuffix>%</span>
+              <span matSuffix class="percentage-suffix">%</span>
             </mat-form-field>
+            <button 
+              type="button"
+              class="add-item-btn"
+              (click)="onAddItem()"
+              [disabled]="!canAddItem()">
+              <i class="material-icons">add</i>
+            </button>
           </div>
-        </div>
-
-        <!-- Custom Promotional Text for Combo Specials -->
-        <div class="fieldHolder field field-grow full-width">
-          <label>Custom Promotional Text (Optional)</label>
-          <mat-form-field>
-            <textarea
-              matInput
-              formControlName="customPromotionalText"
-              placeholder="Enter compelling text to promote this combo deal..."
-              rows="3"
-              maxlength="500"
-            ></textarea>
-            <mat-error *ngIf="specialForm.get('customPromotionalText')?.hasError('maxlength')">
-              Custom text cannot exceed 500 characters
-            </mat-error>
-          </mat-form-field>
         </div>
       </div>
       
-      <p class="helper-text">Press Enter to add an item</p>
-      
       <!-- Display List of Added Items -->
       <div *ngIf="addedItems.length > 0" class="item-list">
-        <h6>Items</h6>
+        <p class="item-list-title">Items</p>
         <div class="list" *ngFor="let item of addedItems; let i = index">
           <div class="left">
             <button type="button" class="btnRemove" (click)="onRemoveItem(i)" aria-label="Remove item">×</button>

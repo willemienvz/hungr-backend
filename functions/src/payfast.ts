@@ -3,6 +3,29 @@ import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 
 /**
+ * Formats timestamp for PayFast API
+ * PayFast requires format: YYYY-MM-DDTHH:MM:SS[+HH:MM]
+ * Example: 2025-11-20T13:38:21+02:00
+ */
+export function formatPayFastTimestamp(date: Date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+  // Get timezone offset in format +HH:MM or -HH:MM
+  const offset = date.getTimezoneOffset();
+  const offsetHours = Math.floor(Math.abs(offset) / 60);
+  const offsetMinutes = Math.abs(offset) % 60;
+  const offsetSign = offset <= 0 ? '+' : '-';
+  const offsetString = `${offsetSign}${String(offsetHours).padStart(2, '0')}:${String(offsetMinutes).padStart(2, '0')}`;
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${offsetString}`;
+}
+
+/**
  * PayFast API signature generation utility
  * Uses alphabetical sort for Management API (different from form POST)
  */
@@ -80,9 +103,9 @@ export async function getSubscriptionToken(userId: string, db: admin.firestore.F
     }
   }
   
-  console.log(`No token found in subscriptions collection for user ${userId}, checking user document`);
+  console.log(`No token found in subscriptions collection for user ${userId}, trying email fallback`);
   
-  // Strategy 2: Fallback to users collection (fast lookup, no index needed)
+  // Strategy 2: Get user document to get email, then query subscriptions by email
   const userDoc = await db.collection('users').doc(userId).get();
   
   if (!userDoc.exists) {
@@ -94,6 +117,44 @@ export async function getSubscriptionToken(userId: string, db: admin.firestore.F
   }
   
   const userData = userDoc.data();
+  const userEmail = userData?.email;
+  
+  // Try querying subscriptions by email (in case subscription was created without userId)
+  if (userEmail) {
+    try {
+      const emailSubscriptionQuery = await db.collection('subscriptions')
+        .where('email', '==', userEmail)
+        .limit(10)
+        .get();
+      
+      // Look for subscription with token
+      for (const doc of emailSubscriptionQuery.docs) {
+        const subData = doc.data();
+        const token = subData.token;
+        if (token) {
+          console.log(`Found token in subscription ${doc.id} by email for user ${userId}`);
+          
+          // Update subscription to add userId if missing (for future queries)
+          if (!subData.userId) {
+            try {
+              await doc.ref.update({ userId: userId });
+              console.log(`Updated subscription ${doc.id} with userId ${userId}`);
+            } catch (updateError) {
+              console.warn(`Failed to update subscription ${doc.id} with userId:`, updateError);
+              // Continue anyway - we have the token
+            }
+          }
+          
+          return token;
+        }
+      }
+    } catch (emailQueryError) {
+      console.warn(`Failed to query subscriptions by email:`, emailQueryError);
+      // Continue to next strategy
+    }
+  }
+  
+  // Strategy 3: Fallback to users collection payfastToken
   const payfastToken = userData?.payfastToken;
   
   if (payfastToken) {
@@ -119,7 +180,10 @@ export function getPayFastConfig(): {
   passphrase: string;
   sandbox: boolean;
   apiHost: string;
+  getApiUrl: (endpoint: string) => string;
 } {
+  const baseApiHost = 'https://api.payfast.co.za';
+  
   try {
     // Try to get from Firebase Functions config (production)
     const config = functions.config().payfast;
@@ -130,9 +194,11 @@ export function getPayFastConfig(): {
         merchantKey: config.merchant_key,
         passphrase: config.passphrase,
         sandbox,
-        apiHost: sandbox 
-          ? 'https://api.sandbox.payfast.co.za'
-          : 'https://api.payfast.co.za'
+        apiHost: baseApiHost,
+        getApiUrl: (endpoint: string) => {
+          const url = `${baseApiHost}${endpoint}`;
+          return sandbox ? `${url}?testing=true` : url;
+        }
       };
     }
   } catch (error) {
@@ -149,9 +215,11 @@ export function getPayFastConfig(): {
     merchantKey: 'nn7rftlml9ki3',
     passphrase: 'T3st1ngT3st1ng',
     sandbox,
-    apiHost: sandbox 
-      ? 'https://api.sandbox.payfast.co.za'
-      : 'https://api.payfast.co.za'
+    apiHost: baseApiHost,
+    getApiUrl: (endpoint: string) => {
+      const url = `${baseApiHost}${endpoint}`;
+      return sandbox ? `${url}?testing=true` : url;
+    }
   };
 }
 

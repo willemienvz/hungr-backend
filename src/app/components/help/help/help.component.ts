@@ -45,9 +45,22 @@ toggleFaq(index: number) {
     });
   }
 
-  showFaqContent(stringName:string){
+  showFaqContent(stringName: string, event?: Event){
+    if (event) {
+      event.preventDefault();
+    }
     this.searchTerm = stringName;
     this.filterFaqs();
+    // Open the first matching FAQ if found
+    setTimeout(() => {
+      const matchingFaq = this.filteredFaqs.find(faq => 
+        faq.question.toLowerCase().includes(stringName.toLowerCase())
+      );
+      if (matchingFaq) {
+        const index = this.filteredFaqs.indexOf(matchingFaq);
+        this.toggleFaq(index);
+      }
+    }, 0);
   }
 
   closeFaqContent(){

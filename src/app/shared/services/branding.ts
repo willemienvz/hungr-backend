@@ -1,6 +1,9 @@
 export interface Branding {
     parentID: string;
     backgroundColor: string;
+    navBarColor: string;
+    
+    // Generic color properties
     primaryColor: string;
     secondaryColor: string;
     accentColor: string;
@@ -11,6 +14,17 @@ export interface Branding {
     // Media library integration
     logoMediaId?: string; // New field for media library reference
     logoMediaItem?: any; // Enhanced media data (MediaItem type)
+    
+    // Button styling
+    primaryButtonTypeface: string;
+    primaryButtonCase: string;
+    primaryButtonMainColor: string;
+    primaryButtonTextColor: string;
+    
+    secondaryButtonTypeface: string;
+    secondaryButtonCase: string;
+    secondaryButtonMainColor: string;
+    secondaryButtonTextColor: string;
     
     // Text styling
     mainHeadingColor: string;

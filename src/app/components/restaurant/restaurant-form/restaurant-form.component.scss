@@ -18,16 +18,24 @@
   }
 }
 
+.content-block {
+  height:100%;
+}
+
 .row {
   display: flex;
   width: 100%;
   flex-direction: row;
-  gap: var(--spacing-2);
-  justify-content: center;
+  gap: var(--spacing-4);
+  justify-content: flex-start;
   align-items: flex-start;
 
   .formGroup {
     width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
   }
 }
 
@@ -58,6 +66,7 @@
 
   .rowMenu {
     margin-top: 15px;
+
   }
 }
 
@@ -73,7 +82,21 @@
 }
 
 .toggle-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
   background-color: #f3f4f5;
+  border-radius: 4px;
+  
+  label {
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 0;
+    flex: 1;
+  }
 }
 
 .btnHolder {
@@ -81,6 +104,12 @@
   justify-content: center;
   gap: var(--spacing-5);
   flex-direction: row;
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+    margin-top:0;
+    margin-bottom: 30px;
+  }
 }
 
 .success-message {
@@ -95,16 +124,20 @@ label {
   font-weight: 400;
   font-size: 15px;
   line-height: 20.25px;
-  letter-spacing: -0.1%;
 }
 
 .rowMenu {
   display: flex;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: var(--spacing-5);
   flex-direction: row;
   width: 100%;
+
+  &.space-between {
+    justify-content: space-between;
+  }
+
 
   p {
     color: var(--color-text-muted);
@@ -112,9 +145,40 @@ label {
     margin-top: 10px;
   }
 
+  .menu-select-container {
+    width: 32%;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
   mat-form-field {
     width: 32%;
   }
+
+  .displaced {
+    align-self: flex-end;
+    margin-bottom:1rem;
+
+    a { 
+      color:var(--color-secondary);
+    }
+  }
+
+  // Responsive mixin for flex-direction: column on mobile devices
+  @media (max-width: 768px) {
+
+      flex-direction: column;
+      gap: var(--spacing-3);
+
+      .displaced {
+        align-self: flex-start;
+        margin-bottom: 0;
+      }
+    
+  }
+
 }
 
 .blockItems {
@@ -127,8 +191,8 @@ label {
 }
 
 .blockItemsRow {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   justify-content: space-between;
   gap: var(--spacing-5);
   flex-direction: row;
@@ -137,6 +201,16 @@ label {
   .block {
     width: calc(50% - var(--spacing-5));
   }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    .block {
+      width: 100%;
+    }
+  }
+
+  // a responsive mixin here that will make this display flex direction column
+
 }
 
 .col2row {
@@ -173,7 +247,6 @@ input[type="number"]::-webkit-inner-spin-button {
   font-weight: 400;
   font-size: 13px;
   line-height: 18.2px;
-  letter-spacing: -0.1%;
   color: var(--color-text-muted);
   margin-top: 41px;
 
@@ -181,7 +254,6 @@ input[type="number"]::-webkit-inner-spin-button {
     font-weight: 400;
     font-size: 13px;
     line-height: 18.2px;
-    letter-spacing: -0.1%;
     color: var(--color-text-muted);
   }
 }
@@ -243,4 +315,28 @@ input[type="number"]::-webkit-inner-spin-button {
   justify-content: center;
   align-items: center;
   display: flex !important;
+}
+
+// Tables input field styling - make it wider
+::ng-deep .tables-input {
+  .form-input-wrapper {
+    width: 100%;
+    
+    .input-container {
+      width: 100%;
+      
+      .form-input {
+        min-width: 200px;
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  }
+  
+  &.label-left {
+    .input-container {
+      flex: 1;
+      min-width: 0;
+    }
+  }
 }

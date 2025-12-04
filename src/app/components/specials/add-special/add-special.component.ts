@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { catchError, finalize, startWith, map } from 'rxjs/operators';
+import { catchError, finalize, startWith, map, takeUntil } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
-import { ToastrService } from 'ngx-toastr';
-import { of, Observable } from 'rxjs';
+import { ToastService } from '../../../shared/services/toast.service';
+import { of, Observable, Subject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
 import { MediaLibraryService } from '../../../shared/services/media-library.service';
@@ -24,10 +24,13 @@ import { AddedItem } from '../../../types/special';
   templateUrl: './add-special.component.html',
   styleUrls: ['./add-special.component.scss'],
 })
-export class AddSpecialComponent implements OnInit {
+export class AddSpecialComponent implements OnInit, OnDestroy {
   isSaving: boolean = false;
   currentStep = 1;
   selectedSpecialType: SpecialType = SpecialType.PERCENTAGE_DISCOUNT;
+  
+  // Subscription management
+  private destroy$ = new Subject<void>();
   uploadDone: boolean = false;
   specialForm: FormGroup;
   specialTypes: SpecialTypeOption[] = SPECIAL_TYPE_OPTIONS;
@@ -63,7 +66,7 @@ export class AddSpecialComponent implements OnInit {
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private fb: FormBuilder,
-    private toastr: ToastrService,
+    private toast: ToastService,
     private dialog: MatDialog,
     private router: Router,
     private route: ActivatedRoute,
@@ -88,6 +91,7 @@ export class AddSpecialComponent implements OnInit {
         isAllDay: [true],
         customPromotionalText: ['', [Validators.maxLength(500)]],
         selectedCategories: [[]],
+        selectedCategory: [''], // Single category selection for Category Special
         discountType: ['percentage'],
       },
       {
@@ -98,22 +102,24 @@ export class AddSpecialComponent implements OnInit {
 
   ngOnInit() {
     // Read step from route parameter
-    this.route.params.subscribe((params) => {
-      const step = params['step'];
-      if (step) {
-        const stepNumber = parseInt(step, 10);
-        if (stepNumber >= 1 && stepNumber <= 5) {
-          this.currentStep = stepNumber;
+    this.route.params
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const step = params['step'];
+        if (step) {
+          const stepNumber = parseInt(step, 10);
+          if (stepNumber >= 1 && stepNumber <= 5) {
+            this.currentStep = stepNumber;
+          } else {
+            // Invalid step, redirect to step 1
+            this.router.navigate(['/specials/add-new-special/1'], { replaceUrl: true });
+          }
         } else {
-          // Invalid step, redirect to step 1
+          // No step specified, default to step 1
+          this.currentStep = 1;
           this.router.navigate(['/specials/add-new-special/1'], { replaceUrl: true });
         }
-      } else {
-        // No step specified, default to step 1
-        this.currentStep = 1;
-        this.router.navigate(['/specials/add-new-special/1'], { replaceUrl: true });
-      }
-    });
+      });
 
     this.fetchMenus();
     this.trackFormChanges();
@@ -129,10 +135,17 @@ export class AddSpecialComponent implements OnInit {
     this.setupMenuItemAutocomplete();
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private trackFormChanges() {
-    this.specialForm.valueChanges.subscribe(() => {
-      this.hasUnsavedChanges = true;
-    });
+    this.specialForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.hasUnsavedChanges = true;
+      });
   }
 
   private markAsChanged() {
@@ -150,11 +163,13 @@ export class AddSpecialComponent implements OnInit {
         disableClose: true
       });
 
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result === true) {
-          this.router.navigate([route]);
-        }
-      });
+      dialogRef.afterClosed()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((result) => {
+          if (result === true) {
+            this.router.navigate([route]);
+          }
+        });
     } else {
       this.router.navigate([route]);
     }
@@ -189,32 +204,29 @@ export class AddSpecialComponent implements OnInit {
         this.selectedMenuItem = null;
       }
     } else if (selectedType === SpecialType.CATEGORY_SPECIAL) {
-      // Category Special
-      const selectedCategories = this.specialForm.get('selectedCategories')?.value;
+      // Category Special - Single category selection
+      const selectedCategory = this.specialForm.get('selectedCategory')?.value;
       const discountType = this.specialForm.get('discountType')?.value || 'percentage';
       const amount = this.specialForm.get('amount')?.value;
 
-      if (selectedCategories && selectedCategories.length > 0 && amount) {
-        // Create a category special for each selected category
-        selectedCategories.forEach((categoryId: string) => {
-          const category = this.selectedMenu?.categories?.find((cat: any) => cat.id === categoryId);
-          const categoryName = category?.name || categoryId;
+      if (selectedCategory && amount) {
+        const category = this.selectedMenu?.categories?.find((cat: any) => (cat.id || cat.name) === selectedCategory);
+        const categoryName = category?.name || selectedCategory;
 
-          const displayAmount = discountType === 'percentage' ? `${amount}%` : `R${amount}`;
-          const itemName = `Category: ${categoryName}`;
+        const displayAmount = discountType === 'percentage' ? `${amount}%` : `R${amount}`;
+        const itemName = `Category: ${categoryName}`;
 
-          this.addedItems.push({
-            name: itemName,
-            categoryId: categoryId,
-            amount: displayAmount,
-            discountType: discountType,
-            selectedCategories: [categoryId] // Store selected categories for backend
-          });
+        this.addedItems.push({
+          name: itemName,
+          categoryId: selectedCategory,
+          amount: displayAmount,
+          discountType: discountType,
+          selectedCategories: [selectedCategory] // Store for backend compatibility
         });
 
         // Reset form fields
         this.specialForm.patchValue({
-          selectedCategories: [],
+          selectedCategory: '',
           amount: '',
           discountType: 'percentage'
         });
@@ -271,6 +283,7 @@ export class AddSpecialComponent implements OnInit {
     this.firestore
       .collection<Menu>('menus', (ref) => ref.where('OwnerID', '==', OwnerID))
       .valueChanges()
+      .pipe(takeUntil(this.destroy$))
       .subscribe((menus) => {
         this.menus = menus;
         // Auto-select first menu if available
@@ -317,51 +330,53 @@ export class AddSpecialComponent implements OnInit {
   openImageUploadModal() {
     const dialogRef = this.mediaUploadModalService.openSpecialImageUpload('new-special');
 
-    dialogRef.afterClosed().subscribe({
-      next: (result: any) => {
-        if (result) {
-          // Handle different result formats from the modal
-          let mediaItem: MediaItem | null = null;
-          
-          if (result.id && result.url) {
-            // Direct MediaItem result
-            mediaItem = result;
-          } else if (result.mediaItem) {
-            // Enhanced format with mediaItem property
-            mediaItem = result.mediaItem;
-          } else if (result.action === 'save' && result.existingMediaUrl) {
-            // Existing image kept (no new upload)
-            this.uploadedImageUrl = result.existingMediaUrl;
-            this.uploadDone = true;
-            this.markAsChanged();
-            this.toastr.success('Image updated successfully!');
-            return;
-          } else if (result.action === 'remove') {
-            // Image was removed
-            this.selectedMediaItem = null;
-            this.mediaId = null;
-            this.uploadedImageUrl = null;
-            this.uploadDone = false;
-            this.markAsChanged();
-            this.toastr.success('Image removed successfully!');
-            return;
-          }
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result: any) => {
+          if (result) {
+            // Handle different result formats from the modal
+            let mediaItem: MediaItem | null = null;
+            
+            if (result.id && result.url) {
+              // Direct MediaItem result
+              mediaItem = result;
+            } else if (result.mediaItem) {
+              // Enhanced format with mediaItem property
+              mediaItem = result.mediaItem;
+            } else if (result.action === 'save' && result.existingMediaUrl) {
+              // Existing image kept (no new upload)
+              this.uploadedImageUrl = result.existingMediaUrl;
+              this.uploadDone = true;
+              this.markAsChanged();
+              this.toast.success('Image updated successfully!');
+              return;
+            } else if (result.action === 'remove') {
+              // Image was removed
+              this.selectedMediaItem = null;
+              this.mediaId = null;
+              this.uploadedImageUrl = null;
+              this.uploadDone = false;
+              this.markAsChanged();
+              this.toast.success('Image removed successfully!');
+              return;
+            }
 
-          if (mediaItem) {
-            this.selectedMediaItem = mediaItem;
-            this.mediaId = mediaItem.id;
-            this.uploadedImageUrl = mediaItem.url;
-            this.uploadDone = true;
-            this.markAsChanged();
-            this.toastr.success('Image uploaded successfully!');
+            if (mediaItem) {
+              this.selectedMediaItem = mediaItem;
+              this.mediaId = mediaItem.id;
+              this.uploadedImageUrl = mediaItem.url;
+              this.uploadDone = true;
+              this.markAsChanged();
+              this.toast.success('Image uploaded successfully!');
+            }
           }
+        },
+        error: (error) => {
+          console.error('Error in image upload modal:', error);
+          this.toast.error('Failed to open image upload modal. Please try again.');
         }
-      },
-      error: (error) => {
-        console.error('Error in image upload modal:', error);
-        this.toastr.error('Failed to open image upload modal. Please try again.');
-      }
-    });
+      });
   }
 
   // Add method to handle media deletion
@@ -376,11 +391,11 @@ export class AddSpecialComponent implements OnInit {
           this.uploadedImageUrl = null;
           this.uploadDone = false;
           this.markAsChanged();
-          this.toastr.success('Image deleted successfully!');
+          this.toast.success('Image deleted successfully!');
         })
         .catch((error) => {
           console.error('Error deleting media:', error);
-          this.toastr.error('Failed to delete image. Please try again.');
+          this.toast.error('Failed to delete image. Please try again.');
         });
     } else {
       // Just reset state if no media ID (local upload)
@@ -389,7 +404,7 @@ export class AddSpecialComponent implements OnInit {
       this.uploadedImageUrl = null;
       this.uploadDone = false;
       this.markAsChanged();
-      this.toastr.success('Image removed successfully!');
+      this.toast.success('Image removed successfully!');
     }
   }
 
@@ -438,30 +453,34 @@ export class AddSpecialComponent implements OnInit {
     }
 
     // Use the new SpecialsService with media library integration
-    this.specialsService.createSpecial(data, this.mediaId || undefined).subscribe({
-      next: (specialId) => {
-        // Track media usage if media was uploaded
-        if (this.mediaId) {
-          this.specialsService.trackMediaUsage(this.mediaId, specialId, 'image').subscribe({
-            next: () => {
-              console.log('Media usage tracked successfully');
-            },
-            error: (error) => {
-              console.warn('Failed to track media usage:', error);
-            }
-          });
-        }
+    this.specialsService.createSpecial(data, this.mediaId || undefined)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (specialId) => {
+          // Track media usage if media was uploaded
+          if (this.mediaId) {
+            this.specialsService.trackMediaUsage(this.mediaId, specialId, 'image')
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: () => {
+                  console.log('Media usage tracked successfully');
+                },
+                error: (error) => {
+                  console.warn('Failed to track media usage:', error);
+                }
+              });
+          }
 
-        this.isSaving = false;
-        this.markAsSaved();
-        this.showSuccess('Special saved successfully!');
-      },
-      error: (error) => {
-        console.error('Error saving special:', error);
-        this.isSaving = false;
-        this.toastr.error('Failed to save special');
-      }
-    });
+          this.isSaving = false;
+          this.markAsSaved();
+          this.showSuccess('Special saved successfully!');
+        },
+        error: (error) => {
+          console.error('Error saving special:', error);
+          this.isSaving = false;
+          this.toast.error('Failed to save special');
+        }
+      });
   }
 
   // Removed cancelUpload() method - handled by ImageUploadModalComponent
@@ -511,12 +530,12 @@ export class AddSpecialComponent implements OnInit {
       .then(() => {
         this.isSaving = false;
         this.markAsSaved();
-        this.toastr.success('Draft saved successfully.');
+        this.toast.success('Draft saved successfully.');
       })
       .catch((error) => {
         console.error('Error saving draft to Firestore:', error);
         this.isSaving = false;
-        this.toastr.error('Failed to save draft.');
+        this.toast.error('Failed to save draft.');
       });
   }
 
@@ -549,7 +568,7 @@ export class AddSpecialComponent implements OnInit {
     if (this.currentStep > 1) {
       this.previousStep();
     } else {
-      this.router.navigate(['/specials']);
+      this.navigateWithUnsavedChangesCheck('/specials');
     }
   }
 
@@ -587,6 +606,11 @@ export class AddSpecialComponent implements OnInit {
     return !selectedDaysValid || !timesValid || this.specialForm.errors?.['timeRangeInvalid'];
   }
 
+  isStep3Invalid(): boolean {
+    // Step 3 is invalid if no items have been added
+    return this.addedItems.length === 0;
+  }
+
   onSpecialTypeChange() {
     const typeControl = this.specialForm.get('typeSpecial');
     if (typeControl?.value) {
@@ -599,6 +623,7 @@ export class AddSpecialComponent implements OnInit {
         percentage: '',
         amount: '',
         featureSpecialUnder: '',
+        selectedCategory: '',
         selectedCategories: [],
         discountType: 'percentage'
       });
@@ -618,7 +643,7 @@ export class AddSpecialComponent implements OnInit {
           });
         } else if (this.selectedSpecialType === SpecialType.CATEGORY_SPECIAL && this.selectedMenu.categories?.length > 0) {
           this.specialForm.patchValue({
-            featureSpecialUnder: this.selectedMenu.categories[0].id
+            selectedCategory: this.selectedMenu.categories[0].id || this.selectedMenu.categories[0].name
           });
         }
       }

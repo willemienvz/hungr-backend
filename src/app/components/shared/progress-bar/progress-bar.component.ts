@@ -31,21 +31,23 @@ export class ProgressBarComponent {
     return this.allowStepNavigation && step < this.progress;
   }
 
-  onBackButtonClick(): void {
+  onBackButtonClick(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     if (this.progress > 1) {
       // Go back one step
-      this.stepClick.emit(this.progress - 1);
+      const previousStep = this.progress - 1;
+      this.stepClick.emit(previousStep);
     } else {
-      console.log('onBackButtonClick', this.progress);
-      
       // Check if parent component is handling the back button click
       if (this.backButtonClick.observers.length > 0) {
         // Parent component is listening, let it handle the navigation
-        console.log('Parent component handling back button, emitting event');
         this.backButtonClick.emit();
       } else {
         // No parent handler, navigate directly as fallback
-        console.log('No parent handler, navigating directly');
         this.router.navigate([this.backRoute]);
       }
     }

@@ -82,11 +82,11 @@ const routes: Routes = [
         component: VisitorDashboardComponent,
         data: { title: 'Visitor Insights' },
       },
-      {
+    /*  {
         path: 'sales-insights',
         component: SalesInsightsComponent,
         data: { title: 'Sales Insights' },
-      },
+      },*/
       {
         path: 'settings/general',
         component: GeneralComponent,

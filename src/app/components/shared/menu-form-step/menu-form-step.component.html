@@ -1,9 +1,10 @@
 <div class="block step1-container block-open-top">
-  <div class="col2row">
+  <div class="col3row">
     <div class="col">
       <div class="formGroup">
         <app-form-input
           label="Menu Name"
+          class="full-width"
           type="text"
           placeholder="Name your menu"
           [required]="true"
@@ -27,13 +28,13 @@
           (selectionChange)="onValidateRestaurant()">
         </app-form-select>
       </div>
- 
+
     </div>
-    <div class="col-resturant-set pLine">
-    <p class="pLinkText" >
-      Need to create a new restaurant?
-      <a class="add-restaurant-link" (click)="onAddRestaurantClick($event)">Click here.</a>
-    </p>
+    <div class="col col-resturant-set pLine">
+      <p class="pLinkText" >
+        Need to create a new restaurant?
+        <a class="add-restaurant-link" (click)="onAddRestaurantClick($event)">Click here.</a>
+      </p>
     </div>
   </div>
-</div> 
+</div>

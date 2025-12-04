@@ -47,8 +47,8 @@
 .subscription-card {
   background: white;
   border-radius: var(--border-radius-md);
-  padding: var(--spacing-5);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ // padding: var(--spacing-5);
+ // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .subscription-content {
@@ -77,7 +77,6 @@
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 
   &.status-active {
     background: #d4edda;
@@ -104,8 +103,8 @@
 .subscription-details {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
-  padding: var(--spacing-4);
+  gap:0;
+  padding: 0 var(--spacing-4);
   background: #f8f9fb;
   border-radius: var(--border-radius-md);
 }
@@ -114,7 +113,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-2) 0;
+  padding: var(--spacing-4) 0;
   border-bottom: 1px solid #e5e7eb;
 
   &:last-child {
@@ -138,9 +137,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-3);
-  margin-top: var(--spacing-4);
-  padding-top: var(--spacing-4);
-  border-top: 1px solid #e5e7eb;
+  margin-top: 0;
+
 
   .hungr-btn {
     position: relative;
@@ -207,7 +205,6 @@
       font-size: 13px;
       color: var(--color-text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
   }
 
@@ -239,7 +236,6 @@
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 
   &.status-complete {
     background: #d4edda;

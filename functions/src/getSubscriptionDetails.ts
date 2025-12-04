@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { generateApiSignature, getSubscriptionToken, getPayFastConfig } from './payfast';
+import { generateApiSignature, getSubscriptionToken, getPayFastConfig, formatPayFastTimestamp } from './payfast';
 import { retryWithBackoff, logSubscriptionAction } from './subscriptionUtils';
 
 export const getSubscriptionDetails = functions.https.onCall(async (data, context) => {
@@ -19,8 +19,8 @@ export const getSubscriptionDetails = functions.https.onCall(async (data, contex
       token = await getSubscriptionToken(userId, db);
     } catch (tokenError: any) {
       // If token not found, return a response indicating no subscription
-      if (tokenError?.code === 'failed-precondition') {
-        console.log(`No subscription token found for user ${userId}`);
+      if (tokenError?.code === 'failed-precondition' || tokenError?.code === 'not-found') {
+        console.log(`No subscription token found for user ${userId}:`, tokenError.message);
         return {
           success: false,
           message: 'No active subscription found.',
@@ -31,7 +31,8 @@ export const getSubscriptionDetails = functions.https.onCall(async (data, contex
           }
         };
       }
-      // Re-throw other errors
+      // Log and re-throw other errors
+      console.error(`Error getting subscription token for user ${userId}:`, tokenError);
       throw tokenError;
     }
     
@@ -71,7 +72,46 @@ export const getSubscriptionDetails = functions.https.onCall(async (data, contex
     let subscriptionDoc = null;
     let subscriptionId = 'unknown';
     
-    if (!subscriptionQuery.empty) {
+    // If no subscription found by userId, try by email as fallback
+    if (subscriptionQuery.empty) {
+      console.log(`No subscription found by userId ${userId}, trying email fallback`);
+      try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+          const userEmail = userDoc.data()?.email;
+          if (userEmail) {
+            const emailQuery = await db.collection('subscriptions')
+              .where('email', '==', userEmail)
+              .limit(10)
+              .get();
+            
+            if (!emailQuery.empty) {
+              // Sort by updated_at manually
+              const sorted = emailQuery.docs.sort((a, b) => {
+                const aTime = a.data().updated_at?.toMillis?.() || 0;
+                const bTime = b.data().updated_at?.toMillis?.() || 0;
+                return bTime - aTime;
+              });
+              subscriptionDoc = sorted[0];
+              subscriptionId = subscriptionDoc.id;
+              
+              // Update subscription to add userId if missing
+              const subData = subscriptionDoc.data();
+              if (!subData.userId) {
+                try {
+                  await subscriptionDoc.ref.update({ userId: userId });
+                  console.log(`Updated subscription ${subscriptionId} with userId ${userId}`);
+                } catch (updateError) {
+                  console.warn(`Failed to update subscription with userId:`, updateError);
+                }
+              }
+            }
+          }
+        }
+      } catch (emailQueryError) {
+        console.warn('Failed to query subscriptions by email:', emailQueryError);
+      }
+    } else {
       subscriptionDoc = subscriptionQuery.docs[0];
       subscriptionId = subscriptionDoc.id;
     }
@@ -79,7 +119,7 @@ export const getSubscriptionDetails = functions.https.onCall(async (data, contex
     // Get PayFast configuration
     const payfastConfig = getPayFastConfig();
     const endpoint = `/subscriptions/${token}/fetch`;
-    const timestamp = new Date().toISOString();
+    const timestamp = formatPayFastTimestamp();
 
     // Prepare headers (no body for fetch)
     const headers = {
@@ -94,60 +134,144 @@ export const getSubscriptionDetails = functions.https.onCall(async (data, contex
 
     // Make API call to PayFast with retry
     const apiCall = async () => {
-      const response = await fetch(`${payfastConfig.apiHost}${endpoint}`, {
-        method: 'GET',
-        headers: {
-          ...headers,
-          'signature': signature,
-          'Content-Type': 'application/json'
+      try {
+        const apiUrl = payfastConfig.getApiUrl(endpoint);
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            ...headers,
+            'signature': signature,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        let result;
+        try {
+          result = await response.json();
+        } catch (jsonError) {
+          const text = await response.text();
+          console.error(`Failed to parse PayFast response as JSON. Status: ${response.status}, Body: ${text}`);
+          throw new Error(`Invalid JSON response from PayFast API: ${response.status} ${response.statusText}`);
         }
-      });
 
-      const result = await response.json();
+        // PayFast API returns { data: { response: {...}, message: "..." } } on success
+        // or { data: { message: "error message" } } on error
+        if (!response.ok) {
+          throw new Error(result.data?.message || `PayFast API error: ${response.status} ${response.statusText}`);
+        }
 
-      // PayFast API returns { data: { response: {...}, message: "..." } } on success
-      // or { data: { message: "error message" } } on error
-      if (!response.ok) {
-        throw new Error(result.data?.message || `PayFast API error: ${response.status} ${response.statusText}`);
+        // Check for PayFast error response structure
+        if (result.data && result.data.message && !result.data.response) {
+          throw new Error(result.data.message || 'Failed to fetch subscription details.');
+        }
+
+        return { response, result };
+      } catch (fetchError: any) {
+        console.error(`PayFast API call failed:`, fetchError);
+        throw fetchError;
       }
-
-      // Check for PayFast error response structure
-      if (result.data && result.data.message && !result.data.response) {
-        throw new Error(result.data.message || 'Failed to fetch subscription details.');
-      }
-
-      return { response, result };
     };
 
-    const { result } = await retryWithBackoff(apiCall);
+    let result;
+    try {
+      const apiResult = await retryWithBackoff(apiCall);
+      result = apiResult.result;
+    } catch (apiError: any) {
+      console.error(`Failed to fetch subscription details from PayFast after retries:`, apiError);
+      // If PayFast API fails, return data from Firestore only
+      if (subscriptionDoc) {
+        const subData = subscriptionDoc.data();
+        // Normalize status from Firestore
+        const firestoreStatus = subData?.status 
+          ? String(subData.status).toLowerCase() 
+          : 'unknown';
+        
+        // Normalize amount from Firestore - if > 1000, assume cents and convert to rands
+        const firestoreAmount = subData?.recurringAmount || subData?.amount || 0;
+        const normalizedAmount = firestoreAmount > 1000 ? firestoreAmount / 100 : firestoreAmount;
+        
+        return {
+          success: true,
+          message: 'Subscription details retrieved from Firestore (PayFast API unavailable).',
+          data: {
+            token: token,
+            status: firestoreStatus,
+            amount: normalizedAmount,
+            frequency: subData?.frequency || '3',
+            cycles: subData?.cycles || '0',
+            run_date: subData?.billingDate || null,
+            nextBillingDate: subData?.nextBillingDate?.toDate ? 
+                             subData.nextBillingDate.toDate().toISOString() : 
+                             subData?.nextBillingDate || null,
+            subscriptionId: subscriptionId,
+            plan: subData?.plan || 'monthly',
+            startDate: subData?.startDate?.toDate ? 
+                      subData.startDate.toDate().toISOString() : 
+                      subData?.startDate || null,
+            pausedAt: subData?.pausedAt?.toDate ? 
+                      subData.pausedAt.toDate().toISOString() : 
+                      subData?.pausedAt || null,
+            cancelledAt: subData?.cancelledAt?.toDate ? 
+                         subData.cancelledAt.toDate().toISOString() : 
+                         subData?.cancelledAt || null,
+          }
+        };
+      }
+      throw new functions.https.HttpsError('internal', `Failed to fetch subscription details: ${apiError.message}`);
+    }
 
     // Extract subscription details from PayFast response
     const payfastData = result.data?.response || {};
+    
+    // Normalize status - PayFast might return number (1 = active) or string
+    let normalizedStatus = 'unknown';
+    if (payfastData.status !== undefined && payfastData.status !== null) {
+      if (typeof payfastData.status === 'number') {
+        normalizedStatus = payfastData.status === 1 ? 'active' : String(payfastData.status);
+      } else {
+        normalizedStatus = String(payfastData.status).toLowerCase();
+      }
+    } else if (subscriptionDoc?.data()?.status) {
+      normalizedStatus = String(subscriptionDoc.data().status).toLowerCase();
+    }
+    
+    // Normalize amount - PayFast returns in rands (999 = R999.00), but might be string "999.00"
+    // Firestore might have it in cents (99900) or rands (999)
+    let normalizedAmount = 0;
+    if (payfastData.amount !== undefined && payfastData.amount !== null) {
+      normalizedAmount = typeof payfastData.amount === 'string' 
+        ? parseFloat(payfastData.amount) 
+        : payfastData.amount;
+    } else {
+      const firestoreAmount = subscriptionDoc?.data()?.recurringAmount || subscriptionDoc?.data()?.amount || 0;
+      // If amount is > 1000, assume it's in cents and convert to rands
+      normalizedAmount = firestoreAmount > 1000 ? firestoreAmount / 100 : firestoreAmount;
+    }
     
     // Combine PayFast data with Firestore data for complete subscription info
     const subscriptionDetails = {
       // From PayFast API
       token: token,
-      status: payfastData.status || subscriptionDoc?.data()?.status || 'unknown',
-      amount: payfastData.amount || subscriptionDoc?.data()?.recurringAmount || subscriptionDoc?.data()?.amount || 0,
+      status: normalizedStatus,
+      amount: normalizedAmount,
       frequency: payfastData.frequency || subscriptionDoc?.data()?.frequency || '3',
       cycles: payfastData.cycles || subscriptionDoc?.data()?.cycles || '0',
       run_date: payfastData.run_date || subscriptionDoc?.data()?.billingDate || null,
       nextBillingDate: payfastData.run_date ? new Date(payfastData.run_date).toISOString() : 
                        (subscriptionDoc?.data()?.nextBillingDate?.toDate ? 
-                        subscriptionDoc.data().nextBillingDate.toDate().toISOString() : 
+                        subscriptionDoc?.data()?.nextBillingDate.toDate().toISOString() : 
                         subscriptionDoc?.data()?.nextBillingDate || null),
       // From Firestore (additional metadata)
       subscriptionId: subscriptionId,
       plan: subscriptionDoc?.data()?.plan || 'monthly',
       startDate: subscriptionDoc?.data()?.startDate?.toDate ? 
-                 subscriptionDoc.data().startDate.toDate().toISOString() : 
+                 subscriptionDoc?.data()?.startDate.toDate().toISOString() : 
                  subscriptionDoc?.data()?.startDate || null,
       pausedAt: subscriptionDoc?.data()?.pausedAt?.toDate ? 
-                subscriptionDoc.data().pausedAt.toDate().toISOString() : 
+                subscriptionDoc?.data()?.pausedAt.toDate().toISOString() : 
                 subscriptionDoc?.data()?.pausedAt || null,
       cancelledAt: subscriptionDoc?.data()?.cancelledAt?.toDate ? 
-                   subscriptionDoc.data().cancelledAt.toDate().toISOString() : 
+                   subscriptionDoc?.data()?.cancelledAt.toDate().toISOString() : 
                    subscriptionDoc?.data()?.cancelledAt || null,
     };
 
@@ -162,16 +286,41 @@ export const getSubscriptionDetails = functions.https.onCall(async (data, contex
   } catch (error: any) {
     console.error('Error fetching subscription details:', error);
     
-    // Log failed action
-    const subscriptionId = await db.collection('subscriptions')
-      .where('userId', '==', userId)
-      .orderBy('updated_at', 'desc')
-      .limit(1)
-      .get()
-      .then(snap => snap.empty ? 'unknown' : snap.docs[0].id)
-      .catch(() => 'unknown');
+    // Log failed action (try to get subscriptionId, but don't fail if query fails)
+    let subscriptionId = 'unknown';
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        const userEmail = userDoc.data()?.email;
+        if (userEmail) {
+          // Try by email first (in case subscription doesn't have userId)
+          const emailQuery = await db.collection('subscriptions')
+            .where('email', '==', userEmail)
+            .limit(1)
+            .get();
+          if (!emailQuery.empty) {
+            subscriptionId = emailQuery.docs[0].id;
+          } else {
+            // Try by userId
+            const userIdQuery = await db.collection('subscriptions')
+              .where('userId', '==', userId)
+              .limit(1)
+              .get();
+            if (!userIdQuery.empty) {
+              subscriptionId = userIdQuery.docs[0].id;
+            }
+          }
+        }
+      }
+    } catch (queryError) {
+      console.warn('Failed to get subscriptionId for logging:', queryError);
+    }
     
-    await logSubscriptionAction(db, 'fetch', userId, subscriptionId, 'failure', error.message);
+    try {
+      await logSubscriptionAction(db, 'fetch', userId, subscriptionId, 'failure', error.message);
+    } catch (logError) {
+      console.error('Failed to log subscription action:', logError);
+    }
 
     // Re-throw HttpsError as-is
     if (error instanceof functions.https.HttpsError) {

@@ -590,3 +590,5 @@ firebase functions:config:set payfast.merchant_id="..." payfast.merchant_key="..
   - `src/app/shared/services/subscription.service.ts`
   - `src/app/components/settings/general/general.component.ts`
 
+
+

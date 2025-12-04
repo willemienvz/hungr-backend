@@ -117,3 +117,5 @@ See [data-model.md](../data-model.md#conflict-resolution-rules) for complete con
 5. Field mapping works correctly → All fields mapped to canonical schema
 6. Token preservation works → payfastToken preserved during merge
 
+
+

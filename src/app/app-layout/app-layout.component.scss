@@ -1,14 +1,15 @@
 .main-content{
-    width: 100%;
+    width: calc(100% - 255px);
     min-height: 100vh;
-    height: 100%;
-    padding-left: 255px;
+    margin-left: 255px;
     padding-top: 85px;
     background-color: #F3F4F5;
+    overflow-x: hidden;
     
     // Mobile responsive padding
     @media (max-width: 768px) {
-        padding-left: 0; // Remove fixed padding on mobile
-        padding-top: 85px;
+        width: 100%;
+        margin-left: 0; // Remove fixed margin on mobile
+        padding-top: 65px;
     }
 }

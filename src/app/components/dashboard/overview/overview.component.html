@@ -18,7 +18,7 @@
       <!-- Average Viewing Time Card -->
       <app-stats-insight-card
         title="Average Viewing Time"
-        [value]="(averageTime || 0) + ' min'"
+        [value]="getAverageTimeDisplay()"
         type="colored-block"
         variant="primary"
         tooltipText="Average time users spend viewing your menu"
@@ -34,6 +34,23 @@
       ></app-stats-insight-card>
 
    
+    </div>
+  </div>
+
+  <!-- Overview Graphs Section -->
+  <div class="overview-graphs-section" *ngIf="!isLoading && viewingTotalCurrentWeek > 0">
+    <div class="overview-graphs-grid">
+      <!-- Visitor Insights Chart -->
+      <div class="chart-block overview-chart">
+        <h6 class="chart-title">Visitor Insights</h6>
+        <div echarts [options]="visitorInsightsChartOptions" class="chart-container"></div>
+      </div>
+
+      <!-- Menu Insights Chart -->
+      <div class="chart-block overview-chart">
+        <h6 class="chart-title">Menu Insights</h6>
+        <div echarts [options]="menuInsightsChartOptions" class="chart-container"></div>
+      </div>
     </div>
   </div>
 

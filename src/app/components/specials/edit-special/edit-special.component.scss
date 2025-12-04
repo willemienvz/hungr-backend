@@ -85,7 +85,6 @@
   font-weight: 400;
   font-size: var(--spacing-4);
   line-height: 100%;
-  letter-spacing: -0.1%;
   vertical-align: middle;
   font-family: var(--font-family-primary);
 }
@@ -242,7 +241,6 @@
     font-weight: 700;
     font-size: 1var(--spacing-2);
     line-height: 100%;
-    letter-spacing: -0.1%;
     text-align: center;
     text-transform: capitalize;
     margin-bottom: var(--spacing-5);
@@ -252,7 +250,6 @@
     font-weight: 400;
     font-size: var(--spacing-4);
     line-height: 100%;
-    letter-spacing: -2%;
     text-align: center;
     color: black;
     margin-bottom: var(--spacing-5);
@@ -352,7 +349,6 @@
     line-height: 135%;
     text-align: center;
     width: 100%;
-    letter-spacing: -0.015px;
   }
 
   .summary-card {
@@ -381,7 +377,6 @@
       font-weight: 400;
       font-size: 15px;
       line-height: 135%;
-      letter-spacing: -0.1%;
       vertical-align: middle;
     }
   }
@@ -391,7 +386,6 @@
   font-size: 15px;
   font-weight: 400;
   line-height: 20.25px;
-  letter-spacing: -0.001em;
   text-align: right;
   color: #9747ff;
 }
@@ -419,7 +413,6 @@
   font-weight: 400;
   font-size: 15px;
   line-height: 20.25px;
-  letter-spacing: -0.1%;
 }
 
 ::ng-deep .mat-mdc-select {

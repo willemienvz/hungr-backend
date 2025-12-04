@@ -2,9 +2,8 @@
   <!-- Page Header -->
   <div class="page-header">
     <!-- Back Button -->
-    <div class="header-left">
-      <a *ngIf="showBackButton"
-         [routerLink]="backRoute"
+    <div class="header-left" *ngIf="showBackButton">
+      <a [routerLink]="backRoute"
          class="back-button"
          [class]="backRoute ? '' : 'back-link'">
         <i class="material-icons">chevron_left</i>

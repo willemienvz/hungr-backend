@@ -1,10 +1,6 @@
 <nav class="navbar">
-    <div class="inner">
-        <!-- Hamburger Menu Button (Mobile Only) -->
-        <div class="hamburger-menu" (click)="toggleMobileMenu()" *ngIf="isMobile">
-            <i class="material-icons">menu</i>
-        </div>
-        <img src="../../../assets/images/shared/logo.png" alt="" style="width: 150px;" />
+    <div class="inner left-section">
+        <img src="../../../assets/images/shared/logo.png" alt="" class="logo" />
         <div class="breadcrumb-container">
             <!-- Debug info -->
         
@@ -24,8 +20,8 @@
             </ng-template>
         </div>
     </div>
-    <div class="inner">
-
+    <div class="inner right-section">
+<!--
         <div class="search-bar">
             <app-form-input
                 type="text"
@@ -33,19 +29,25 @@
                 *ngIf="isSearchBarExpanded">
             </app-form-input>
             <div class="icon yellowIcon" (click)="toggleSearchBar()"><i class="material-icons">search</i></div>
-        </div>
+        </div> -->
 
-        <div class="icon yellowIcon"><i class="material-icons" (click)="toggleNotifications()">notifications</i></div>
-        <div class="icon" (click)="toggleProfile()"><i class="material-icons">person</i></div>
+        <!-- <div class="icon yellowIcon"><i class="material-icons" (click)="toggleNotifications()">notifications</i></div> -->
+        <!-- Hamburger Menu Button (Mobile Only) -->
+        <div class="hamburger-menu" (click)="toggleMobileMenu()" *ngIf="isMobile">
+            <i class="material-icons">menu</i>
+        </div>
+        <div class="profile-container">
+            <div class="icon" (click)="toggleProfile()"><i class="material-icons">person</i></div>
+            <nav class="profiledd" *ngIf="isProfileExpanded">
+                <h6>{{userProfile.firstName}} {{userProfile.Surname }} {{ !userProfile.ParentID ? ' - Admin' : '' }}</h6>
+                <a routerLink="/settings/general">Edit profile</a>
+               <!-- <a routerLink="/manage-users">Add a user</a>-->
+                <a (click)="authService.SignOut()">Log out</a>
+            </nav>
+        </div>
     </div>
 </nav>
-<nav class="profiledd" *ngIf="isProfileExpanded">
-    <h6>{{userProfile.firstName}} {{userProfile.Surname }} {{ !userProfile.ParentID ? ' - Admin' : '' }}</h6>
-    <a routerLink="/settings/general">Edit profile</a>
-    <a routerLink="/manage-users">Add a user</a>
-    <a (click)="authService.SignOut()">Log out</a>
-</nav>
-<nav class="profiledd" *ngIf="isNotificationsExpanded">
+<!-- <nav class="profiledd" *ngIf="isNotificationsExpanded">
     <h6>Notifications </h6>
     <div *ngIf="notifications && notifications.length > 0; else noNotifications">
         @for (item of notifications; track $index) {
@@ -64,4 +66,4 @@
     <ng-template #noNotifications>
         <p>No notifications</p>
     </ng-template>
-</nav>
+</nav> -->

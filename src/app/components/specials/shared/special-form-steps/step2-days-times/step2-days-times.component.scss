@@ -9,14 +9,16 @@
     /* Uses centralized block styling */
   }
 
-  .rowSpecial {
+  ::ng-deep .rowSpecial {
     justify-content: center;
     align-items: center;
     display: flex;
     flex-direction: column;
 
     form {
-      width: 40%;
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
       justify-content: center;
       align-items: center;
       display: flex;
@@ -36,7 +38,6 @@
   font-weight: 400;
   font-size: 15px;
   line-height: 20.25px;
-  letter-spacing: -0.1%;
 }
 
 .error-message {
@@ -60,7 +61,6 @@
   font-weight: 400;
   font-size: var(--spacing-4);
   line-height: 100%;
-  letter-spacing: -0.1%;
   vertical-align: middle;
   font-family: var(--font-family-primary);
 }
@@ -69,8 +69,10 @@
   font-weight: 800;
 }
 
-.timeRow {
+::ng-deep .timeRow {
   width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
   display: flex;
   flex-direction: row;
   gap: 1em;

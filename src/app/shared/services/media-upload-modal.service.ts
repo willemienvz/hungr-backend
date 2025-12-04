@@ -172,7 +172,7 @@ export class MediaUploadModalService {
       componentId,
       fieldName: 'image',
       allowedTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
-      maxFileSize: 4 * 1024 * 1024, // 4MB
+      maxFileSize: 2.5 * 1024 * 1024, // 2.5MB
       maxDimensions: { width: 1000, height: 750 },
       allowMultiple: false,
       maxFiles: 1,

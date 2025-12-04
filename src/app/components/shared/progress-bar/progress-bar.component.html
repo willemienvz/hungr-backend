@@ -1,6 +1,6 @@
 <!-- KB - Add back button at the top if showBackButton is true -->
 <div *ngIf="showBackButton" class="back-button-container">
-  <a class="backLink" (click)="onBackButtonClick()" style="cursor: pointer;">
+  <a class="backLink" (click)="onBackButtonClick($event)" style="cursor: pointer;">
     <i class="material-icons">arrow_back</i> {{ backText }}
   </a>
 </div>

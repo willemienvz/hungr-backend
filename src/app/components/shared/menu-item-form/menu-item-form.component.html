@@ -20,9 +20,8 @@
           <app-svg-icon 
           iconName="delete" 
           class="dltIcon" 
-          size="18px" 
-          (click)="onRemoveMenuItem()"
-        ></app-svg-icon>
+          size="18px">
+        </app-svg-icon>
         </button>
       </div>
     </div>
@@ -40,7 +39,7 @@
        
         </div>
         <div class="addRowInner">
-          <div class="addittionalRow">
+          <div class="addittionalRow" *ngIf="hasVisibleAdditionalButtons">
             <button *ngIf="!menuItem.displayDetails.preparation" type="button" class="toggle-btn" (click)="onToggleDetail('preparation')">
               + add preparation
             </button>
@@ -69,8 +68,7 @@
               <app-svg-icon 
               iconName="delete" 
               class="dltIcon" 
-              size="18px" 
-              (click)="onRemoveMenuItem()"
+              size="18px">
             ></app-svg-icon>
             </button>
           </div>
@@ -80,28 +78,15 @@
       <div class="itemFormGrid">
         <div class="col first">
           <div class="fieldHolder">
-            <label>Select Menu Category</label>
-      
-            <mat-form-field subscriptSizing="dynamic">
-            <mat-select
-              class="select-arrow-fix"
-              [(value)]="menuItem.categoryId"
+            <app-form-select
+              label="Select Menu Category"
+              class="full-width"
               placeholder="Select Category"
-              (selectionChange)="onCategorySelectionChange($event)"
-            >
-              <ng-container *ngFor="let category of categories">
-                <mat-option [value]="category.id">
-                  {{ category.name }}
-                </mat-option>
-                <mat-option
-                  *ngFor="let subcategory of category.subcategories"
-                  [value]="subcategory.id"
-                >
-                  &nbsp;&nbsp;{{ subcategory.name }}
-                </mat-option>
-              </ng-container>
-            </mat-select>
-          </mat-form-field>
+              [options]="categoryOptions"
+              [ngModel]="menuItem.categoryId"
+              (selectionChange)="onCategorySelectChange($event.value)"
+              [ngModelOptions]="{ standalone: true }">
+            </app-form-select>
           </div> 
         
         </div>
@@ -111,6 +96,7 @@
             <app-form-input
               type="text"
               label="Item Name"
+              class="full-width"
               placeholder="Item Name"
               [(ngModel)]="menuItem.name"
               [ngModelOptions]="{ standalone: true }">
@@ -136,7 +122,7 @@
            
             <div class="upload-btn" (click)="onGetFile()" [class.disabled]="isUploadingImage">
               <i class="material-symbols-outlined">{{ isUploadingImage ? 'hourglass_empty' : 'upload' }}</i>
-              <p>{{ isUploadingImage ? 'Uploading...' : 'Add Image' }}</p>
+              <p>{{ isUploadingImage ? 'Uploading...' : 'Upload Image' }}</p>
             </div>
 
           </div>
@@ -148,6 +134,7 @@
           <!-- KB: Optional description text, only shown if provided in config -->
           
           <div class="add-input-group">
+            <div class="label-input-wrapper">
               <app-form-input
                 type="text"
                 label="Add Label"
@@ -157,7 +144,19 @@
                 [ngModelOptions]="{ standalone: true }"
                 (keyup.enter)="onAddLabel()">
               </app-form-input>
-              <label class="helper-text">press enter to add</label>
+              <button 
+                type="button"
+                class="add-label-btn"
+                (mousedown)="$event.preventDefault()"
+                (click)="onAddLabel(); $event.stopPropagation()"
+                [disabled]="!newLabel || newLabel.trim() === ''">
+                <app-svg-icon 
+                  iconName="plus" 
+                  size="16px" 
+                  [color]="'var(--button-primary-color)'">
+                </app-svg-icon>
+              </button>
+            </div>
           </div>
           <div class="detail-label-add">
             <div
@@ -170,9 +169,9 @@
               </button>
             </div>
           </div>
-        </div> 
-      </div> 
-
+          </div>
+        </div>
+        
         <div class="col fifth">
           <div class="fieldHolder">
             <app-form-textarea

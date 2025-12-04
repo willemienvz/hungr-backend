@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { MenuItemInterface, MenuService, SideItem } from '../../menus/shared/menu.service';
 import { Category } from '../../../shared/services/category';
 import { DetailConfig, DetailType } from '../menu-item-detail/menu-item-detail.component';
@@ -9,13 +9,14 @@ import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../del
 import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
 import { MediaLibraryService } from '../../../shared/services/media-library.service';
 import { MediaItem } from '../../../shared/types/media';
+import { SelectOption } from '../form-select/form-select.component';
 
 @Component({
   selector: 'app-menu-item-form',
   templateUrl: './menu-item-form.component.html',
   styleUrls: ['./menu-item-form.component.scss']
 })
-export class MenuItemFormComponent implements OnInit {
+export class MenuItemFormComponent implements OnInit, OnChanges {
 
   @Input() menuItem!: MenuItemInterface;
   @Input() itemIndex!: number;
@@ -74,6 +75,9 @@ export class MenuItemFormComponent implements OnInit {
 
   /* KB: Add collapsed state for collapsible form functionality */
   isCollapsed = true;
+
+  /* KB: Cached category options to prevent change detection loops */
+  categoryOptions: SelectOption[] = [];
 
   /* KB: Define configurations for each detail type to use with the reusable component */
   preparationConfig: DetailConfig = {
@@ -137,7 +141,8 @@ export class MenuItemFormComponent implements OnInit {
     private menuService: MenuService,
     private dialog: MatDialog,
     private mediaUploadModalService: MediaUploadModalService,
-    private mediaLibraryService: MediaLibraryService
+    private mediaLibraryService: MediaLibraryService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -156,9 +161,19 @@ export class MenuItemFormComponent implements OnInit {
     // Initialize custom headings from menuItem
     this.updateConfigCustomHeadings();
 
+    // Initialize category options
+    this.updateCategoryOptions();
+
     // Debug: Log current category assignment if it exists
     if (this.menuItem.categoryId) {
       this.logCategoryAssignment();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Update category options when categories input changes
+    if (changes['categories'] && !changes['categories'].firstChange) {
+      this.updateCategoryOptions();
     }
   }
 
@@ -326,8 +341,13 @@ export class MenuItemFormComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result?.action === 'save') {
-        // Handle new files
-        if (result.mediaItems && result.mediaItems.length > 0) {
+        // Handle new files - check for mediaItem (singular) or mediaItems (plural)
+        if (result.mediaItem) {
+          // Single media item from upload or library selection
+          this.isUploadingImage = true;
+          this.onMenuImagesUploaded([result.mediaItem]);
+        } else if (result.mediaItems && result.mediaItems.length > 0) {
+          // Multiple media items (backward compatibility)
           this.isUploadingImage = true;
           this.onMenuImagesUploaded(result.mediaItems);
         }
@@ -336,14 +356,41 @@ export class MenuItemFormComponent implements OnInit {
           this.menuItem.imageUrls = [...result.existingMediaUrls];
           // Update legacy imageUrl for backward compatibility
           this.menuItem.imageUrl = this.menuItem.imageUrls.length > 0 ? this.menuItem.imageUrls[0] : null;
+          // Trigger change detection
+          this.cdr.detectChanges();
         }
       } else if (result?.action === 'remove') {
         this.removeAllImages();
       } else if (result && !result.action) {
-        // Handle single media item selection from library
+        // Handle single media item selection from library (direct MediaItem return)
+        // Support both MediaItem format and simple object with id/url
         if (result.id && result.url) {
           this.isUploadingImage = true;
-          this.onMenuImagesUploaded([result]);
+          // If result is already a MediaItem, use it directly
+          if (result.userId && result.fileName) {
+            this.onMenuImagesUploaded([result as MediaItem]);
+          } else {
+            // Create a minimal MediaItem from the result
+            // Note: This assumes the result has at least id and url
+            // The media library service should provide full MediaItem objects
+            const mediaItem: Partial<MediaItem> = {
+              id: result.id,
+              url: result.url,
+              userId: result.userId || '',
+              fileName: result.fileName || result.originalName || 'image',
+              originalName: result.originalName || result.fileName || 'image',
+              fileSize: result.fileSize || 0,
+              mimeType: result.mimeType || 'image/jpeg',
+              uploadedAt: result.uploadedAt || new Date(),
+              uploadedBy: result.uploadedBy || '',
+              usage: result.usage || [],
+              isPublic: result.isPublic !== undefined ? result.isPublic : true
+            };
+            // Only proceed if we have the minimum required fields
+            if (mediaItem.id && mediaItem.url && mediaItem.userId) {
+              this.onMenuImagesUploaded([mediaItem as MediaItem]);
+            }
+          }
         }
       }
     });
@@ -370,9 +417,12 @@ export class MenuItemFormComponent implements OnInit {
       }
 
       this.isUploadingImage = false;
+      // Trigger change detection to update the preview
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error updating menu images:', error);
       this.isUploadingImage = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -509,5 +559,49 @@ export class MenuItemFormComponent implements OnInit {
       this.allergenConfig.customHeading = this.menuItem.customHeadings.allergen || '';
       this.saucesConfig.customHeading = this.menuItem.customHeadings.sauce || '';
     }
+  }
+
+  // Update category options when categories change (prevents change detection loops)
+  private updateCategoryOptions(): void {
+    const options: SelectOption[] = [];
+    this.categories.forEach(category => {
+      // Add main category
+      options.push({
+        value: category.id,
+        label: category.name
+      });
+      // Add subcategories with indentation
+      category.subcategories?.forEach(subcategory => {
+        options.push({
+          value: subcategory.id,
+          label: `  ${subcategory.name}`
+        });
+      });
+    });
+    this.categoryOptions = options;
+  }
+
+  // Handle category selection change for app-form-select
+  onCategorySelectChange(value: any): void {
+    if (this.menuItem.categoryId !== value) {
+      this.menuItem.categoryId = value;
+      // Use setTimeout to prevent change detection loops
+      setTimeout(() => {
+        this.onCategorySelectionChange({ value });
+      }, 0);
+    }
+  }
+
+  // Check if additional row should be visible (at least one button should be shown)
+  get hasVisibleAdditionalButtons(): boolean {
+    if (!this.menuItem?.displayDetails) {
+      return true; // Show if displayDetails doesn't exist
+    }
+    return !this.menuItem.displayDetails.preparation ||
+           !this.menuItem.displayDetails.variation ||
+           !this.menuItem.displayDetails.pairing ||
+           !this.menuItem.displayDetails.side ||
+           !this.menuItem.displayDetails.allergen ||
+           !this.menuItem.displayDetails.sauce;
   }
 } 

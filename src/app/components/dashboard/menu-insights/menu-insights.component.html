@@ -10,6 +10,7 @@
                     type="date"
                     label="From:"
                     placeholder="From date"
+                    [labelLeft]="true"
                     [(ngModel)]="dateFrom"
                     (ngModelChange)="onDateRangeChange()">
                 </app-form-input>
@@ -20,6 +21,7 @@
                     type="date"
                     label="To:"
                     placeholder="To date"
+                    [labelLeft]="true"
                     [(ngModel)]="dateTo"
                     (ngModelChange)="onDateRangeChange()">
                 </app-form-input>
@@ -80,6 +82,7 @@
                     type="date"
                     label="From:"
                     placeholder="From date"
+                    [labelLeft]="true"
                     [(ngModel)]="dateFrom"
                     (ngModelChange)="onDateRangeChange()">
                 </app-form-input>
@@ -90,6 +93,7 @@
                     type="date"
                     label="To:"
                     placeholder="To date"
+                    [labelLeft]="true"
                     [(ngModel)]="dateTo"
                     (ngModelChange)="onDateRangeChange()">
                 </app-form-input>
@@ -130,35 +134,10 @@
             variant="primary"
             tooltipText="The most viewed category in the selected date range"
         ></app-stats-insight-card>
-
-        <app-stats-insight-card 
-            title="Most Ordered Item" 
-            [subtitle]="getDateRangeText()"
-            [value]="topOrderedItems[0]?.name || 'No data'"
-            type="text-block"
-            variant="secondary"
-            tooltipText="The most ordered item in the selected date range"
-        ></app-stats-insight-card>
     </div>
     <div class="row" *ngIf="!isLoading">
         <app-content-block title="Daily Menu Visits" customClass="biggerBlock">
             <div echarts [options]="chartOptions" class="echart"></div>
-        </app-content-block>
-        <app-content-block title="Sales Overview">
-            <div echarts [options]="chartOptionsCategoryPercentages" class="echart"></div>
-        </app-content-block>
-    </div>
-    <div class="row">
-        <app-content-block title="Most Ordered Items">
-            <div echarts [options]="chartOptionsMostOrderedItems" class="echart"></div>
-        </app-content-block>
-        <app-content-block title="Frequent Item Pairs">
-            <div class="pariholder">
-                <div *ngFor="let pair of frequentItemPairs" class="pair-item">
-                    <span class="pair-text">{{ pair.itemA }} + {{ pair.itemB }}</span>
-                    <span class="pair-count">{{ pair.count }} orders</span>
-                </div>
-            </div>
         </app-content-block>
     </div>
 </div>

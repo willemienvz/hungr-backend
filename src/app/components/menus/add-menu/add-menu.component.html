@@ -34,7 +34,13 @@
 
   <div *ngIf="currentStep === 2">
     <div class="headerBlock">
-      <app-progress-bar [progress]="currentStep" (backButtonClick)="onBackButtonClick()"></app-progress-bar>
+      <app-progress-bar 
+        [showBackButton]="true"
+        [progress]="currentStep" 
+        [backRoute]="'/menus'"
+        (stepClick)="navigateToStep($event)" 
+        (backButtonClick)="onBackButtonClick()">
+      </app-progress-bar>
       <app-step-header
         [stepNumber]="2"
         [stepTitle]="'Create your menu categories'"
@@ -92,6 +98,14 @@
       (menuItemsUploaded)="onMenuItemsUploaded($event)"
     ></app-menu-item-selection>
 
+    <app-step-navigation
+      [showCancel]="true"
+      [showDraft]="true"
+      [showNext]="true"
+      [isSaving]="isSaving"
+      (draft)="setAsDraft()"
+      (next)="nextStep()"
+    ></app-step-navigation>
   </div>
 
   <div *ngIf="currentStep === 4">

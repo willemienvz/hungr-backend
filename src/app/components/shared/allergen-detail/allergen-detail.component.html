@@ -26,15 +26,29 @@
     </div>
     
     <div class="add-input-group">
-      <app-form-input
-        type="text"
-        [placeholder]="config.placeholder"
-        label="press enter to add"
-        [ngModel]="newAllergen"
-        (ngModelChange)="onNewAllergenChange($event)"
-        [ngModelOptions]="{ standalone: true }"
-        (keyup.enter)="onAddAllergen()">
-      </app-form-input>
+      <div class="detail-input-wrapper">
+        <app-form-input
+          type="text"
+          [placeholder]="config.placeholder"
+          [ngModel]="newAllergen"
+          (ngModelChange)="onNewAllergenChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          (keyup.enter)="onAddAllergen()">
+        </app-form-input>
+        
+        <button 
+          type="button"
+          class="add-detail-btn"
+          (mousedown)="$event.preventDefault()"
+          (click)="onAddAllergen(); $event.stopPropagation()"
+          [disabled]="!newAllergen || newAllergen.trim() === ''">
+          <app-svg-icon 
+            iconName="plus" 
+            size="16px" 
+            [color]="'var(--button-primary-color)'">
+          </app-svg-icon>
+        </button>
+      </div>
     </div>
     
     <div class="item-list">

@@ -3,7 +3,7 @@ import { AuthService } from "../../shared/services/auth.service";
 import { FormDataService } from '../../shared/services/signup/form-data.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { EmailService } from '../../shared/services/email.service';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../shared/services/toast.service';
 import { PayFastService } from '../../shared/services/payfast.service';
 import { BehaviorSubject } from 'rxjs';
 
@@ -22,7 +22,7 @@ export class SignUpComponent {
   constructor(
     public authService: AuthService,
     private readonly formDataService: FormDataService,
-    private readonly toastr: ToastrService,
+    private readonly toast: ToastService,
     private readonly auth: AngularFireAuth,
     private readonly emailService: EmailService,
     private readonly payfastService: PayFastService,
@@ -47,7 +47,7 @@ export class SignUpComponent {
       await this.onCheckout();
     } catch (error: any) {
       console.error('Error during signup:', error);
-      this.toastr.error(error.message || 'Failed to complete signup');
+      this.toast.error(error.message || 'Failed to complete signup');
     } finally {
       this.isSaving = false;
     }
@@ -75,7 +75,7 @@ export class SignUpComponent {
       await this.payfastService.createRecurringPayment(paymentData);
     } catch (error) {
       console.error('Error during checkout:', error);
-      this.toastr.error('Failed to initiate payment. Please try again.');
+      this.toast.error('Failed to initiate payment. Please try again.');
       throw error;
     }
   }

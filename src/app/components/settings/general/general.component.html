@@ -3,149 +3,58 @@
     <form
       [formGroup]="accountForm"
       (ngSubmit)="saveAccountDetails()"
-      class="formBlock"
+      class="profile-form"
     >
-      <div class="leftCol">
-
-        <div class="row">
-          <div class="formGroup">
-            <app-form-input
-              label="First name"
-              type="text"
-              placeholder="John"
-              [required]="true"
-              [errorMessage]="getFieldError('name')"
-              formControlName="name">
-            </app-form-input>
-          </div>
-          <div class="formGroup">
-            <app-form-input
-              label="Surname"
-              type="text"
-              placeholder="Smith"
-              [required]="true"
-              [errorMessage]="getFieldError('surname')"
-              formControlName="surname">
-            </app-form-input>
-          </div>
+      <div class="form-grid">
+        <div class="formGroup">
+          <app-form-input
+          class="max-width-100"
+            label="First name"
+            type="text"
+            placeholder="John"
+            [required]="true"
+            [errorMessage]="getFieldError('name')"
+            formControlName="name">
+          </app-form-input>
         </div>
 
-        <div class="row">
-          <div class="formGroup">
-            <app-form-input
-              label="Password"
-              type="password"
-              placeholder="Enter new password"
-              [required]="true"
-              [errorMessage]="getFieldError('password')"
-              formControlName="password">
-            </app-form-input>
-          </div>
+        <div class="formGroup">
+          <app-form-input
+            label="Surname"
+            type="text"
+            placeholder="Smith"
+            class="max-width-100"
+            [required]="true"
+            [errorMessage]="getFieldError('surname')"
+            formControlName="surname">
+          </app-form-input>
         </div>
-      </div>
-      <div class="rightCol">
-        <div class="row">
-          <h6>Contact Details</h6>
+
+        <div class="formGroup">
+          <app-phone-input
+            label="Phone number"
+            class="max-width-100"
+            placeholder="+27 12 234 5678"
+            [required]="true"
+            [errorMessage]="getFieldError('phone')"
+            formControlName="phone">
+          </app-phone-input>
         </div>
-        <div class="row">
-          <div class="formGroup">
-            <app-form-input
-              label="Phone number"
-              type="tel"
-              placeholder="+278212345678"
-              [required]="true"
-              [errorMessage]="getFieldError('phone')"
-              formControlName="phone">
-            </app-form-input>
-          </div>
-        </div>
+
+      
       </div>
     </form>
-    <div class="row btnRow">
-      <button class="hungr-btn hungr-btn-tertiary" (click)="authService.SignOut()">log out</button>
-      <button class="hungr-btn hungr-btn-secondary" (click)="saveAll()">Save Changes</button>
+    <div class="button-row between">
+      <a (click)="onResetPassword()" class="reset-password-link">Reset Password</a>
+      <div class='button-row no-margin'>
+      <button class="hungr-btn hungr-btn-logout" (click)="authService.SignOut()">Log Out</button>
+      <button class="hungr-btn hungr-btn-primary" (click)="saveAll()">Save Changes</button>
+    </div>
     </div>
   </app-content-block>
 
-  <app-content-block title="HUNGR Plan">
-    <div class="row">
-      <div class="rowInner">
-        <div class="subscription-status" *ngIf="subscriptionData">
-          <span class="status-badge" [ngClass]="{
-            'active': subscriptionData.status === 'active',
-            'paused': subscriptionData.status === 'paused',
-            'cancelled': subscriptionData.status === 'cancelled'
-          }">
-            {{ subscriptionData.status | titlecase }}
-          </span>
-          <p>Digital Menu Subscription - R{{ (subscriptionData.amount || subscriptionData.recurringAmount || 99900) / 100 }}/month</p>
-          <p *ngIf="subscriptionData.nextBillingDate">
-            Next billing: {{ subscriptionData.nextBillingDate | date }}
-          </p>
-          <p *ngIf="subscriptionData.pausedAt">
-            Paused since: {{ subscriptionData.pausedAt | date }}
-          </p>
-          <p *ngIf="subscriptionData.cancelledAt">
-            Cancelled on: {{ subscriptionData.cancelledAt | date }}
-          </p>
-        </div>
-        <p *ngIf="!subscriptionData">
-          No active subscription
-        </p>
-        <div class="row btnRow">
-          <a routerLink="/settings/billing" class="hungr-btn hungr-btn-primary">
-            Manage Subscription
-          </a>
-        </div>
-      </div>
-    </div>
-  </app-content-block>
-  <app-content-block title="Billing">
-    <div class="row">
-      <div class="formGroup" style="flex: 3">
-        <app-form-input
-          label="Card Holder Name"
-          type="text"
-          placeholder="JS Smith"
-          [required]="true"
-          [errorMessage]="getFieldError('cardHolderName')">
-        </app-form-input>
-      </div>
-      <div class="formGroup" style="flex: 3">
-        <app-form-input
-          label="Card number"
-          type="text"
-          placeholder="xxxx xxxx 1234"
-          [required]="true"
-          [errorMessage]="getFieldError('cardNumber')">
-        </app-form-input>
-      </div>
-      <div class="formGroup" style="flex: 1">
-        <app-form-input
-          label="CVV"
-          type="text"
-          placeholder="xxx"
-          [required]="true"
-          [errorMessage]="getFieldError('cvv')">
-        </app-form-input>
-      </div>
-      <div class="formGroup" style="flex: 1">
-        <app-form-input
-          label="Expiry Date"
-          type="text"
-          placeholder="mm/yy"
-          [required]="true"
-          [errorMessage]="getFieldError('expiryDate')">
-        </app-form-input>
-      </div>
-    </div>
-
-    <div class="row btnHolder">
-      <button class="hungr-btn hungr-btn-secondary">Save changes</button>
-    </div>
-  </app-content-block>
   <app-content-block title="Notifications" *ngIf="currentUserData">
-    <div class="toggleHolder">
+    <div class="toggle-grid">
       <div class="toggle-container">
         <label>Email Notifications</label>
         <mat-slide-toggle
@@ -169,6 +78,14 @@
           color="#16D3D2"
         ></mat-slide-toggle>
       </div>
+    </div>
+    <div class="button-row">
+      <button 
+        class="hungr-btn hungr-btn-primary" 
+        (click)="saveNotificationSettings()"
+        [disabled]="isSavingNotifications">
+        Save Changes
+      </button>
     </div>
   </app-content-block>
 

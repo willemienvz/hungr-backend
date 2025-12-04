@@ -48,6 +48,7 @@ export class MediaLibraryService {
   private readonly MEDIA_COLLECTION = 'media';
   private readonly MEDIA_USAGE_COLLECTION = 'media_usage';
   private readonly STORAGE_BASE_PATH = 'media';
+  private readonly MAX_STORAGE_PER_USER = 100 * 1024 * 1024; // 100MB in bytes
   
   private mediaCollection: AngularFirestoreCollection<MediaDocument>;
   private usageCollection: AngularFirestoreCollection<MediaUsageDocument>;
@@ -64,6 +65,50 @@ export class MediaLibraryService {
   ) {
     this.mediaCollection = this.firestore.collection<MediaDocument>(this.MEDIA_COLLECTION);
     this.usageCollection = this.firestore.collection<MediaUsageDocument>(this.MEDIA_USAGE_COLLECTION);
+  }
+
+  /**
+   * Checks if user has exceeded storage limit
+   * @param additionalBytes Additional bytes to check against limit
+   * @returns Promise resolving to object with exceeded flag and current usage
+   */
+  async checkStorageLimit(additionalBytes: number = 0): Promise<{ exceeded: boolean; currentBytes: number; maxBytes: number; remainingBytes: number }> {
+    try {
+      const allMedia = await this.getAllMedia();
+      const currentBytes = allMedia.reduce((sum, item) => sum + item.fileSize, 0);
+      const totalWithNewFile = currentBytes + additionalBytes;
+      const exceeded = totalWithNewFile > this.MAX_STORAGE_PER_USER;
+      
+      return {
+        exceeded,
+        currentBytes,
+        maxBytes: this.MAX_STORAGE_PER_USER,
+        remainingBytes: Math.max(0, this.MAX_STORAGE_PER_USER - currentBytes)
+      };
+    } catch (error) {
+      console.error('Error checking storage limit:', error);
+      // If we can't check, allow upload but log the error
+      return {
+        exceeded: false,
+        currentBytes: 0,
+        maxBytes: this.MAX_STORAGE_PER_USER,
+        remainingBytes: this.MAX_STORAGE_PER_USER
+      };
+    }
+  }
+
+  /**
+   * Gets the current user's storage usage
+   * @returns Promise resolving to current storage usage in bytes
+   */
+  async getUserStorageUsage(): Promise<number> {
+    try {
+      const allMedia = await this.getAllMedia();
+      return allMedia.reduce((sum, item) => sum + item.fileSize, 0);
+    } catch (error) {
+      console.error('Error getting user storage usage:', error);
+      return 0;
+    }
   }
 
   /**
@@ -84,6 +129,14 @@ export class MediaLibraryService {
       const user = await this.getCurrentUser();
       if (!user) {
         throw new Error('User must be authenticated to upload media');
+      }
+
+      // Check storage limit before upload
+      const storageCheck = await this.checkStorageLimit(request.file.size);
+      if (storageCheck.exceeded) {
+        const currentMB = (storageCheck.currentBytes / (1024 * 1024)).toFixed(2);
+        const fileMB = (request.file.size / (1024 * 1024)).toFixed(2);
+        throw new Error(`Storage limit exceeded. You have used ${currentMB}MB of 100MB. This file (${fileMB}MB) would exceed your limit. Please delete some media to free up space.`);
       }
 
       // Update upload progress

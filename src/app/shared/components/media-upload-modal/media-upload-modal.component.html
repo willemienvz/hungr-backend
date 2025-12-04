@@ -28,11 +28,11 @@
                (drop)="onFileDropped($event)">
             
             <div class="upload-prompt" *ngIf="!selectedFile">
-              <mat-icon>cloud_upload</mat-icon>
+          
               <h3>Drag and drop your image here</h3>
               <p>or</p>
-              <button class="hungr-btn hungr-btn-secondary" (click)="fileInput.click()">
-                <mat-icon>add</mat-icon>
+              <button class="hungr-btn hungr-btn-primary" (click)="fileInput.click()">
+             
                 Choose File
               </button>
               <input #fileInput type="file" 
@@ -92,16 +92,8 @@
               formControlName="customCategory">
             </app-form-input>
 
-            <app-form-textarea
-              label="Description"
-              placeholder="Enter description..."
-              [rows]="3"
-              formControlName="description">
-            </app-form-textarea>
-
-
             <div class="form-actions">
-              <button class="hungr-btn hungr-btn-tertiary" (click)="closeModal()">Cancel</button>
+              <button class="hungr-btn hungr-btn-secondary" (click)="closeModal()">CANCEL</button>
               <button class="hungr-btn hungr-btn-primary" 
                       (click)="uploadMedia()"
                       [disabled]="uploading || !isValidationValid">
@@ -123,7 +115,7 @@
               <input type="text" 
                      [(ngModel)]="searchQuery"
                      (input)="onSearchChange($any($event.target).value)"
-                     placeholder="Search by name or description..."
+                     placeholder="Search by name..."
                      class="search-input">
             </div>
           </div>
@@ -169,7 +161,7 @@
             <mat-icon>image</mat-icon>
             <h3>No media found</h3>
             <p>Upload your first image to get started</p>
-            <button class="hungr-btn hungr-btn-secondary" (click)="activeTab = 0">
+            <button class="hungr-btn hungr-btn-primary" (click)="activeTab = 0">
               Upload Media
             </button>
           </div>

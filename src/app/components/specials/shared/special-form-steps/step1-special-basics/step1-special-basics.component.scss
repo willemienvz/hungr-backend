@@ -9,34 +9,55 @@
     /* Uses centralized block styling */
   }
 
-  .rowSpecial {
+  ::ng-deep .rowSpecial {
     justify-content: center;
     align-items: center;
     display: flex;
     flex-direction: column;
 
     form {
-      width: 40%;
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
       justify-content: center;
       align-items: center;
       display: flex;
       flex-direction: column;
 
       .formGroup {
-        margin-bottom: var(--spacing-5);
-        gap: 8px;
+        width: 100%;
+        margin-bottom: 1rem;
+        gap: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        app-form-input,
+        app-form-select {
+          width: 100%;
+          display: block;
+        }
+
+        &.dateRow {
+          flex-direction: row;
+          gap: 1em;
+
+          .col {
+            flex: 1;
+            gap: 5px !important;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            app-form-input {
+              width: 100%;
+            }
+          }
+        }
       }
     }
   }
-}
-
-.formGroup {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 15px;
 }
 
 .label {
@@ -44,7 +65,6 @@
   font-weight: 400;
   font-size: 15px;
   line-height: 20.25px;
-  letter-spacing: -0.1%;
 }
 
 .error-message {
@@ -65,8 +85,15 @@
   }
 
   .col {
+    flex: 1;
     gap: 5px !important;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    app-form-input {
+      width: 100%;
+    }
   }
 
   input {
@@ -77,5 +104,6 @@
     padding: 5px var(--spacing-3);
     line-height: 38px;
     font-family: var(--font-family-primary);
+    box-sizing: border-box;
   }
 }

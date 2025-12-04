@@ -11,7 +11,75 @@
   [loading]="isLoading">
 
 
+
   <!-- Active Specials Section -->
+  <app-content-block title="Active Specials">
+    <app-data-table
+      [data]="activeSpecials"
+      [columns]="activeSpecialsColumns"
+      [actions]="activeSpecialsActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No active specials found"
+      (actionClick)="onActiveSpecialAction($event)"
+      (rowClick)="onActiveRowClick($event)">
+
+
+
+    </app-data-table>
+  </app-content-block>
+
+  <!-- Inactive Specials Section -->
+  <app-content-block title="Inactive Specials">
+    <app-data-table
+      [data]="inactiveSpecials"
+      [columns]="inactiveSpecialsColumns"
+      [actions]="inactiveSpecialsActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No inactive specials found"
+      (actionClick)="onInactiveSpecialAction($event)"
+      (rowClick)="onInactiveRowClick($event)">
+
+
+
+    </app-data-table>
+  </app-content-block>
+
+  <!-- Drafts Section -->
+  <app-content-block title="Drafts">
+    <app-data-table
+      [data]="draftSpecials"
+      [columns]="draftSpecialsColumns"
+      [actions]="draftSpecialsActions"
+      [showIndex]="true"
+      [loading]="isLoading"
+      emptyMessage="No draft specials found"
+      (actionClick)="onDraftSpecialAction($event)"
+      (rowClick)="onDraftRowClick($event)">
+
+
+
+    </app-data-table>
+  </app-content-block>
+
+</app-page-layout>
+
+<!-- ORIGINAL TEMPLATE COMMENTED OUT FOR TESTING -->
+<!--
+<app-page-layout
+  title="Specials Management"
+  subtitle="Create and manage promotional offers and specials"
+  [actions]="[
+    {
+      label: '+ Add Special',
+      type: 'primary',
+      routerLink: '/specials/add-new-special'
+    }
+  ]"
+  [loading]="isLoading">
+
+
   <app-content-block
     title="Active Specials"
     [showFilter]="true"
@@ -32,13 +100,9 @@
       emptyMessage="No active specials found"
       (actionClick)="onSpecialAction($event, 'active')"
       (rowClick)="onRowClick($event, 'active')">
-
-
-
     </app-data-table>
   </app-content-block>
 
-  <!-- Inactive Specials Section -->
   <app-content-block title="Inactive Specials">
     <app-data-table
       [data]="inactiveSpecials"
@@ -49,13 +113,9 @@
       emptyMessage="No inactive specials found"
       (actionClick)="onSpecialAction($event, 'inactive')"
       (rowClick)="onRowClick($event, 'inactive')">
-
-
-
     </app-data-table>
   </app-content-block>
 
-  <!-- Drafts Section -->
   <app-content-block title="Drafts">
     <app-data-table
       [data]="draftSpecials"
@@ -66,10 +126,8 @@
       emptyMessage="No draft specials found"
       (actionClick)="onSpecialAction($event, 'draft')"
       (rowClick)="onRowClick($event, 'draft')">
-
-
-
     </app-data-table>
   </app-content-block>
 
 </app-page-layout>
+-->

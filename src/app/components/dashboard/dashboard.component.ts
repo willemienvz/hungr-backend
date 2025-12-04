@@ -206,7 +206,13 @@ export class DashboardComponent implements OnInit {
         this.previousPeriodOrderValue = previousOrderValue;
 
         // Calculate average viewing time in minutes
-        this.averageTime = totalViews > 0 ? Math.round((totalDuration / totalViews) / 60000) : 0;
+        if (totalViews > 0 && totalDuration > 0) {
+          const avgMs = totalDuration / totalViews;
+          const avgMinutes = Math.round(avgMs / 60000);
+          this.averageTime = isNaN(avgMinutes) || !isFinite(avgMinutes) ? 0 : avgMinutes;
+        } else {
+          this.averageTime = 0;
+        }
 
         console.log('📊 Dashboard Analytics Summary:');
         console.log('  - Total views:', totalViews);
@@ -364,6 +370,13 @@ export class DashboardComponent implements OnInit {
 
   get displayAverageTime(): number {
     return isNaN(this.averageTime) ? 0 : this.averageTime;
+  }
+
+  getAverageTimeDisplay(): string {
+    if (!this.averageTime || isNaN(this.averageTime) || this.averageTime === 0) {
+      return 'No data available';
+    }
+    return `${this.averageTime} min`;
   }
 
 

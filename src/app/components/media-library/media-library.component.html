@@ -14,7 +14,8 @@
 
     <app-stats-card
       title="Storage Used"
-      [value]="getTotalStorageSize()"
+      [value]="getStorageUsedDisplay()"
+      [subtitle]="getStorageLimitSubtitle()"
       icon="storage">
     </app-stats-card>
 
@@ -29,12 +30,12 @@
   <app-content-block [showHeader]="false">
     <div class="media-filters">
       <!-- Search Bar -->
-      <div class="filter-group">
+      <div class="filter-group special">
         <app-form-input
           label="Search"
-          placeholder="Search by name or description"
+          placeholder="Search by name"
           [formControl]="searchControl"
-          prefixIcon="search">
+          suffixIcon="search">
         </app-form-input>
       </div>
 
@@ -148,7 +149,6 @@
               </div>
               <div class="list-info">
                 <h4 class="list-title" [title]="media.originalName">{{ media.originalName }}</h4>
-                <p class="list-description" *ngIf="media.description">{{ media.description }}</p>
                 <div class="list-meta">
                   <span class="file-size">{{ media.fileSize | fileSize }}</span>
                   <span class="upload-date">{{ media.uploadedAt | date:'short' }}</span>

@@ -1,13 +1,21 @@
 .step5-container {
   width: 100%;
   position: relative;
+  background-color: #f5f5f5;
+  min-height: 100%;
+
+  ::ng-deep .content-area {
+    background-color: #f5f5f5;
+    max-width: 570px;
+    margin: 0 auto;
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-5);
+  }
 }
 
 .summary-container {
   width: 100%;
-  max-width: 600px;
   margin: 0 auto;
-  padding: var(--spacing-5);
 }
 
 .summary-title {
@@ -15,10 +23,12 @@
   font-weight: 700;
   margin-bottom: var(--spacing-5);
   text-align: center;
+  padding: var(--spacing-4);
+  border-radius: var(--border-radius-base);
 }
 
 .summary-card {
-  background: #f8f9fa;
+  background: #ffffff;
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-5);
   margin-bottom: var(--spacing-5);
@@ -34,28 +44,34 @@
   margin-top: var(--spacing-5);
 }
 
-.promo-section p {
+.promo-section-title {
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: var(--spacing-4);
+  color: var(--color-quaternary);
+  font-size: var(--font-size-base);
 }
 
 .promo-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  padding: var(--spacing-4);
+  background: #ffffff;
+  border-radius: var(--border-radius-base);
+  margin-bottom: var(--spacing-3);
 }
 
 .promo-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .item-name {
   font-weight: 500;
+  color: var(--color-text-primary, #222);
 }
 
 .item-price {
-  color: #666;
-  font-size: 14px;
+  color: var(--color-quaternary);
+  font-size: var(--font-size-base);
+  font-weight: 500;
 } 

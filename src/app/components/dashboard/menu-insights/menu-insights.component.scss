@@ -224,14 +224,31 @@
 
   .date-range-controls {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-4);
+    align-items: flex-end;
+    gap: var(--spacing-5);
     flex-wrap: wrap;
 
     .date-field {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       gap: var(--spacing-2);
+      min-width: 0;
+
+      // Style form-input wrapper to be compact
+      ::ng-deep .form-input-wrapper {
+        margin-bottom: 0;
+
+        .form-label {
+          font-size: var(--font-size-sm);
+          margin-bottom: 0;
+        }
+
+        .form-input {
+          height: var(--form-field-height-sm);
+          font-size: var(--font-size-sm);
+          padding: var(--spacing-1) var(--spacing-2);
+        }
+      }
 
       .date-label {
         color: var(--color-text-secondary);
@@ -244,8 +261,22 @@
       // Legacy .formControl styles removed - now using app-form-input component
     }
 
+    .hungr-btn {
+      height: var(--form-field-height-sm);
+      min-height: auto;
+      min-width: 80px;
+      font-weight: var(--font-weight-medium);
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-sm);
+      padding: var(--spacing-1) var(--spacing-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0;
+    }
+
     .apply-button {
-      height: 36px;
+      height: var(--form-field-height-sm);
       min-width: 80px;
       font-weight: var(--font-weight-medium);
       font-family: var(--font-family-primary);
@@ -254,7 +285,11 @@
       border: none;
       border-radius: 6px;
       transition: all 0.2s ease;
-      font-size: 14px;
+      font-size: var(--font-size-sm);
+      padding: var(--spacing-1) var(--spacing-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &:hover {
         background-color: var(--hungr-secondary-color) !important;

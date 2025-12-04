@@ -34,6 +34,10 @@ export class OverviewComponent implements OnInit {
     { id: 3, name: 'Restaurant Name', description: 'Mains' }
   ];
   chartOptions: any;
+  visitorInsightsChartOptions: any;
+  menuInsightsChartOptions: any;
+  private hourHistogram: { [hour: string]: number } = {};
+  private menuPerformanceData: { [menuId: string]: { name: string; views: number } } = {};
 
   constructor(
     public authService: AuthService,
@@ -146,6 +150,11 @@ export class OverviewComponent implements OnInit {
     const tasks: Array<Promise<{ idx: number; dateKey: string; menuId: string; data: any | null }>> = [];
     const dailyVisits: { [date: string]: { [menuId: string]: number } } = {};
     const hourHistogram: { [hour: string]: number } = {};
+    
+    // Initialize hour histogram
+    for (let h = 0; h < 24; h++) {
+      hourHistogram[h.toString()] = 0;
+    }
 
     for (const [idx, dateKey] of dates.entries()) {
       dailyVisits[dateKey] = {};
@@ -192,12 +201,23 @@ export class OverviewComponent implements OnInit {
       this.viewingTotalPrevious24Hours = prev24h;
 
       // Calculate average viewing time in minutes
-      this.averageTime = totalViews > 0 ? Math.round((totalDuration / totalViews) / 60000) : 0;
+      if (totalViews > 0 && totalDuration > 0) {
+        const avgMs = totalDuration / totalViews;
+        const avgMinutes = Math.round(avgMs / 60000);
+        this.averageTime = isNaN(avgMinutes) || !isFinite(avgMinutes) ? 0 : avgMinutes;
+      } else {
+        this.averageTime = 0;
+      }
 
       // Calculate most popular viewing time from aggregated data
       this.findMostPopularViewingTimeFromAggregates(hourHistogram);
 
+      // Store data for overview charts
+      this.hourHistogram = hourHistogram;
+      this.calculateMenuPerformance(dailyVisits, menuIdToNameMap);
+
       this.updateChartOptions(dailyVisits, menuIdToNameMap);
+      this.updateOverviewCharts();
       this.completeLoading();
     });
   }
@@ -224,6 +244,13 @@ export class OverviewComponent implements OnInit {
           `${parseInt(mostPopularHour)}am`;
 
     this.popularTime = `${defaultDay}, ${hourDisplay}`;
+  }
+
+  getAverageTimeDisplay(): string {
+    if (!this.averageTime || isNaN(this.averageTime) || this.averageTime === 0) {
+      return 'No data available';
+    }
+    return `${this.averageTime} min`;
   }
 
   getWeeklyDifferenceMessage(): string {
@@ -317,5 +344,225 @@ export class OverviewComponent implements OnInit {
       computedStyle.getPropertyValue('--color-error').trim() || '#F44336',
       computedStyle.getPropertyValue('--color-info').trim() || '#2196F3'
     ];
+  }
+
+  calculateMenuPerformance(dailyVisits: { [date: string]: { [menuId: string]: number } }, menuIdToNameMap: { [menuId: string]: string }): void {
+    this.menuPerformanceData = {};
+    
+    Object.keys(dailyVisits).forEach((date) => {
+      const dailyData = dailyVisits[date];
+      Object.keys(dailyData).forEach((menuId) => {
+        if (!this.menuPerformanceData[menuId]) {
+          this.menuPerformanceData[menuId] = {
+            name: menuIdToNameMap[menuId] || menuId,
+            views: 0
+          };
+        }
+        this.menuPerformanceData[menuId].views += dailyData[menuId] || 0;
+      });
+    });
+  }
+
+  updateOverviewCharts(): void {
+    this.updateVisitorInsightsChart();
+    this.updateMenuInsightsChart();
+  }
+
+  updateVisitorInsightsChart(): void {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    const primaryColor = computedStyle.getPropertyValue('--hungr-main-color').trim() || '#FE1B54';
+    const textSecondary = computedStyle.getPropertyValue('--color-text-secondary').trim() || '#444444';
+    const fontFamily = computedStyle.getPropertyValue('--font-family-primary').trim() || 'Poppins, sans-serif';
+
+    // Prepare hourly data
+    const hours = Array.from({ length: 24 }, (_, i) => i);
+    const hourLabels = hours.map(h => {
+      if (h === 0) return '12am';
+      if (h === 12) return '12pm';
+      if (h > 12) return `${h - 12}pm`;
+      return `${h}am`;
+    });
+    const hourData = hours.map(h => this.hourHistogram[h.toString()] || 0);
+
+    // Check if there's any data
+    const hasData = hourData.some(val => val > 0);
+    
+    if (!hasData) {
+      this.visitorInsightsChartOptions = {
+        title: {
+          text: 'No visitor data available',
+          left: 'center',
+          top: 'center',
+          textStyle: {
+            color: textSecondary,
+            fontFamily: fontFamily,
+            fontSize: 14
+          }
+        }
+      };
+      return;
+    }
+
+    this.visitorInsightsChartOptions = {
+      tooltip: {
+        trigger: 'axis',
+        formatter: (params: any) => {
+          const data = params[0];
+          return `${data.name}<br/>Visitors: ${data.value || 0}`;
+        }
+      },
+      xAxis: {
+        type: 'category',
+        data: hourLabels,
+        axisLabel: {
+          color: textSecondary,
+          fontFamily: fontFamily,
+          rotate: 45,
+          interval: 2
+        },
+        axisLine: {
+          lineStyle: {
+            color: textSecondary
+          }
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: 'Visitors',
+        nameTextStyle: {
+          color: textSecondary,
+          fontFamily: fontFamily
+        },
+        axisLabel: {
+          color: textSecondary,
+          fontFamily: fontFamily
+        },
+        axisLine: {
+          lineStyle: {
+            color: textSecondary
+          }
+        }
+      },
+      series: [
+        {
+          type: 'bar',
+          data: hourData,
+          itemStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: primaryColor },
+                { offset: 1, color: primaryColor + '80' }
+              ]
+            }
+          },
+          barWidth: '60%'
+        }
+      ],
+      grid: {
+        left: '10%',
+        right: '10%',
+        bottom: '15%',
+        top: '10%',
+        containLabel: true
+      }
+    };
+  }
+
+  updateMenuInsightsChart(): void {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    const colors = this.getChartColors();
+    const textSecondary = computedStyle.getPropertyValue('--color-text-secondary').trim() || '#444444';
+    const fontFamily = computedStyle.getPropertyValue('--font-family-primary').trim() || 'Poppins, sans-serif';
+
+    // Sort menus by views (descending) and take top 5
+    const sortedMenus = Object.values(this.menuPerformanceData)
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 5);
+
+    if (sortedMenus.length === 0) {
+      this.menuInsightsChartOptions = {
+        title: {
+          text: 'No data available',
+          left: 'center',
+          top: 'center',
+          textStyle: {
+            color: textSecondary,
+            fontFamily: fontFamily
+          }
+        }
+      };
+      return;
+    }
+
+    const menuNames = sortedMenus.map(m => m.name);
+    const menuViews = sortedMenus.map(m => m.views);
+
+    this.menuInsightsChartOptions = {
+      tooltip: {
+        trigger: 'axis',
+        formatter: (params: any) => {
+          const data = params[0];
+          return `${data.name}<br/>Views: ${data.value || 0}`;
+        }
+      },
+      xAxis: {
+        type: 'category',
+        data: menuNames,
+        axisLabel: {
+          color: textSecondary,
+          fontFamily: fontFamily,
+          rotate: 45,
+          interval: 0
+        },
+        axisLine: {
+          lineStyle: {
+            color: textSecondary
+          }
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: 'Total Views',
+        nameTextStyle: {
+          color: textSecondary,
+          fontFamily: fontFamily
+        },
+        axisLabel: {
+          color: textSecondary,
+          fontFamily: fontFamily
+        },
+        axisLine: {
+          lineStyle: {
+            color: textSecondary
+          }
+        }
+      },
+      series: [
+        {
+          type: 'bar',
+          data: menuViews,
+          itemStyle: {
+            color: (params: any) => {
+              return colors[params.dataIndex % colors.length];
+            }
+          },
+          barWidth: '60%'
+        }
+      ],
+      grid: {
+        left: '10%',
+        right: '10%',
+        bottom: '20%',
+        top: '10%',
+        containLabel: true
+      }
+    };
   }
 }

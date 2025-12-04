@@ -26,27 +26,41 @@
     </div>
     
     <div class="add-input-group">
-      <app-form-input
-        type="text"
-        [placeholder]="config.placeholder"
-        label="press enter to add"
-        [ngModel]="newSideName"
-        (ngModelChange)="onNewSideNameChange($event)"
-        [ngModelOptions]="{ standalone: true }"
-        (keyup.enter)="onAddSide()">
-      </app-form-input>
-      
-      <!-- KB: Optional price input for sides -->
-      <div *ngIf="config.showPricing" class="price-input-container">
-        <app-price-input
-          label=""
-          placeholder="R 0.00"
-          [required]="false"
-          [(ngModel)]="newSidePrice"
+      <div class="detail-input-wrapper">
+        <app-form-input
+          type="text"
+          [placeholder]="config.placeholder"
+          [ngModel]="newSideName"
+          (ngModelChange)="onNewSideNameChange($event)"
           [ngModelOptions]="{ standalone: true }"
-          (keyup.enter)="onAddSide()"
-          class="compact">
-        </app-price-input>
+          (keyup.enter)="onAddSide()">
+        </app-form-input>
+        
+        <!-- KB: Optional price input for sides -->
+        <div *ngIf="config.showPricing" class="price-input-container">
+          <app-price-input
+            label=""
+            placeholder="R 0.00"
+            [required]="false"
+            [(ngModel)]="newSidePrice"
+            [ngModelOptions]="{ standalone: true }"
+            (keyup.enter)="onAddSide()"
+            class="compact">
+          </app-price-input>
+        </div>
+        
+        <button 
+          type="button"
+          class="add-detail-btn"
+          (mousedown)="$event.preventDefault()"
+          (click)="onAddSide(); $event.stopPropagation()"
+          [disabled]="!newSideName || newSideName.trim() === ''">
+          <app-svg-icon 
+            iconName="plus" 
+            size="16px" 
+            [color]="'var(--button-primary-color)'">
+          </app-svg-icon>
+        </button>
       </div>
     </div>
     

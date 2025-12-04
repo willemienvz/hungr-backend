@@ -4,6 +4,8 @@ import { reviews } from './reviews';
 import { backfill } from './backfill';
 import { payfastItn } from './payfastItn';
 import { sendCustomEmailVerification, sendEmailWithTemplate } from './emailTemplates';
+import { onUserCreated } from './triggers/userCreated';
+import { onUserPreferencesUpdated } from './triggers/userPreferencesUpdated';
 
 // Initialize Firebase Admin SDK once
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -53,4 +55,11 @@ export { unpauseSubscription } from './unpauseSubscription';
 export { updateSubscription } from './updateSubscription';
 export { getSubscriptionDetails } from './getSubscriptionDetails';
 export { getPaymentHistory } from './getPaymentHistory';
+
+// Export Brevo-related triggers
+export { onUserCreated } from './triggers/userCreated';
+export { onUserPreferencesUpdated } from './triggers/userPreferencesUpdated';
+
+// Export Brevo password reset function
+export { sendPasswordResetEmailFunction } from './brevo/passwordReset';
 

@@ -35,7 +35,6 @@
   font-weight: 500;
   font-size: 13px;
   line-height: 22px;
-  letter-spacing: -0.1%;
   margin-bottom: 8px;
   padding: 8px 50px;
 }
@@ -83,28 +82,75 @@
   padding: 0 6px;
 }
 
+// Backdrop overlay for mobile
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1009; // Below sidebar but above most content
+  display: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+// Close button for mobile
+.sidebar-close-button {
+  display: none;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  z-index: 1011; // Above sidebar
+  padding: 0;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &:active {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .material-icons {
+    font-size: 24px;
+    color: #444444;
+  }
+}
+
 // Mobile Responsive Styles
 @media (max-width: 768px) {
   .sidebar {
     width: 255px;
+    padding-top: 24px; // Reduced padding for mobile
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    z-index: 20; // Ensure sidebar is above content
+    z-index: 1010; // Above back buttons (z-index: 1000) and other content
     
     &.mobile-open {
       transform: translateX(0);
     }
-  }
-  
-  // Add overlay when mobile menu is open
-  .sidebar.mobile-open::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: -1;
+
+    .subsidebarcontainer a, .heading {
+      padding: 8px 20px;
+    }
   }
 }

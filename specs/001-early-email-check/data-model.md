@@ -129,3 +129,5 @@ Available when user corrects email and retries
 - Form data persistence is handled by existing `FormDataService`
 - Email availability check is read-only operation against Firebase Auth
 
+
+

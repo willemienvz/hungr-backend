@@ -23,6 +23,7 @@ export class StepNavigationComponent {
   @Input() nextDisabled: boolean = false;
   @Input() nextText: string = 'Next';
   @Input() submitText: string = 'Submit';
+  @Input() publishText: string = 'PUBLISH MENU';
   @Input() cancelRoute: string = '/menus';
   @Input() isSaving: boolean = false;
   @Input() isLoading: boolean = false;

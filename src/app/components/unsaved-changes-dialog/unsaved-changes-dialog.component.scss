@@ -1,24 +1,20 @@
-/* Ensure proper button styling and layout */
-:host ::ng-deep .mat-mdc-dialog-actions {
-    display: flex !important;
-    gap: var(--spacing-3) !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    flex-wrap: nowrap !important;
-    padding: var(--spacing-4) 24px 24px 24px !important;
-    position: relative !important;
+/* Dialog container */
+.unsaved-changes-dialog {
+    display: flex;
+    flex-direction: column;
 }
 
-:host ::ng-deep .mat-mdc-dialog-actions button {
-    flex-shrink: 0 !important;
-    min-width: 1var(--spacing-5) !important;
-    position: relative !important;
-    /* Override any absolute positioning from Material Dialog */
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
+/* Dialog actions footer - similar to view component */
+.dialog-actions {
+    display: flex;
+  
+    gap: var(--spacing-3);
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-4) 24px 24px 24px;
 }
+
+/* Buttons in dialog actions - Hungr styles will apply naturally since we're using custom footer instead of mat-dialog-actions */
 
 /* Remove the unwanted ::before pseudo-element from dialog title */
 
@@ -30,27 +26,60 @@
     content: none !important;
 }
 
-/* Remove all default Material Design button styling */
-:host ::ng-deep .mat-mdc-dialog-container .mdc-dialog__actions button[color="accent"],
-:host ::ng-deep .mat-mdc-dialog-container .mdc-dialog__actions button.mat-accent,
-:host ::ng-deep .mat-mdc-dialog-container .mdc-dialog__actions button:not([color]),
-:host ::ng-deep .mat-mdc-dialog-container .mdc-dialog__actions button[color="warn"]:not(.mat-primary),
-:host ::ng-deep .mat-mdc-dialog-container [mat-dialog-actions] button[color="accent"],
-:host ::ng-deep .mat-mdc-dialog-container [mat-dialog-actions] button.mat-accent,
-:host ::ng-deep .mat-mdc-dialog-container [mat-dialog-actions] button:not([color]),
-:host ::ng-deep .mat-mdc-dialog-container [mat-dialog-actions] button[color="warn"]:not(.mat-primary) {
-    background: none !important;
-    color: inherit !important;
+
+/* Dialog header with close button */
+.dialog-header {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Center dialog title */
+:host ::ng-deep .mat-mdc-dialog-container .mdc-dialog__title,
+:host ::ng-deep .mat-mdc-dialog-container [mat-dialog-title],
+:host ::ng-deep h2[mat-dialog-title] {
+    text-align: center !important;
+    width: 100% !important;
+    
+    margin: 0 auto !important;
+}
+
+/* Center dialog content */
+:host ::ng-deep .mat-mdc-dialog-container .mdc-dialog__content,
+:host ::ng-deep .mat-mdc-dialog-container [mat-dialog-content],
+:host ::ng-deep mat-dialog-content {
+    text-align: center !important;
+}
+
+/* Close button styling */
+.close-btn {
+    position: absolute !important;
+    top: var(--spacing-4) !important;
+    right: var(--spacing-4) !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: transparent !important;
     border: none !important;
-    box-shadow: none !important;
-    font-family: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    text-transform: none !important;
-    letter-spacing: inherit !important;
-    padding: inherit !important;
-    border-radius: inherit !important;
-    min-width: inherit !important;
-    transition: none !important;
-    transform: none !important;
+    color: var(--color-text-secondary) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: var(--transition-fast) !important;
+    z-index: 1 !important;
+    padding: 0 !important;
+    min-width: auto !important;
+}
+
+.close-btn:hover {
+    background: transparent !important;
+    color: var(--color-text-primary) !important;
+    opacity: 0.7 !important;
+}
+
+.close-btn .material-icons {
+    font-size: 20px !important;
+    line-height: 1 !important;
 }

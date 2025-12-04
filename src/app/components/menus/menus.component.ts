@@ -1,21 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Menu } from '../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Restaurant } from '../../shared/services/restaurant';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../shared/services/toast.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 import { MenuDetailsModalComponent, MenuDetailsData } from '../shared/menu-details-modal/menu-details-modal.component';
 import { TableColumn, TableAction } from '../shared/data-table/data-table.component';
 import { UnsavedChangesDialogComponent } from '../unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-menus',
   templateUrl: './menus.component.html',
   styleUrl: './menus.component.scss'
 })
-export class MenusComponent implements OnInit {
+export class MenusComponent implements OnInit, OnDestroy {
   activeMenus: Menu[] = [];
   draftMenus: Menu[] = [];
   restaurants: Restaurant[] = [];
@@ -26,6 +27,9 @@ export class MenusComponent implements OnInit {
   selectedMenuId: string = '';
   tempRestaurant: Restaurant = {} as Restaurant;
   hasUnsavedChanges: boolean = false;
+  
+  private menusSubscription?: Subscription;
+  private restaurantsSubscription?: Subscription;
 
   // Table configurations
   menuColumns: TableColumn[] = [
@@ -103,7 +107,7 @@ export class MenusComponent implements OnInit {
   ];
   constructor(
     private firestore: AngularFirestore,
-    private toastr: ToastrService,
+    private toast: ToastService,
     private dialog: MatDialog,
     private router: Router
   ) {
@@ -148,7 +152,7 @@ export class MenusComponent implements OnInit {
       .then(() => {
         this.isPopupMenuOpenActive[index] = false;
         this.isPopupMenuOpenDraft[index] = false;
-        this.toastr.success('QR code assignment removed!');
+        this.toast.success('QR code assignment removed!');
       })
       .catch((error) => {
         console.log(error);
@@ -159,24 +163,59 @@ export class MenusComponent implements OnInit {
     const user = JSON.parse(localStorage.getItem('user')!);
     const OwnerID = user.uid;
 
-    // Fetch menus
-    this.firestore.collection<Menu>('menus', ref => ref.where('OwnerID', '==', OwnerID))
-      .valueChanges()
-      .subscribe(menus => {
-        this.activeMenus = menus.filter(menu => !menu.isDraft);
-        this.draftMenus = menus.filter(menu => menu.isDraft);
+    // Unsubscribe from previous subscription if it exists
+    if (this.menusSubscription) {
+      this.menusSubscription.unsubscribe();
+    }
 
-        // Fetch restaurants for the same owner
-        this.fetchRestaurants(OwnerID);
+    // Fetch menus - valueChanges() provides real-time updates, so no need to refetch after deletion
+    // Use idField to include the Firestore document ID for deletion
+    this.menusSubscription = this.firestore.collection<Menu>('menus', ref => ref.where('OwnerID', '==', OwnerID))
+      .valueChanges({ idField: 'firestoreId' })
+      .subscribe({
+        next: (menus: any[]) => {
+          // Ensure each menu has the Firestore document ID available
+          // firestoreId is automatically added by idField option
+          // Map menuID to use the Firestore document ID for delete/update operations
+          const menusWithId = menus.map(menu => ({
+            ...menu,
+            menuID: menu.firestoreId || menu.menuID // Use Firestore document ID for operations
+          }));
+          
+          this.activeMenus = menusWithId.filter(menu => !menu.isDraft);
+          this.draftMenus = menusWithId.filter(menu => menu.isDraft);
+          this.isLoading = false;
+
+          // Fetch restaurants for the same owner (only once or when needed)
+          if (!this.restaurantsSubscription) {
+            this.fetchRestaurants(OwnerID);
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching menus:', error);
+          this.toast.error('Failed to load menus. Please refresh the page.');
+          this.isLoading = false;
+        }
       });
   }
 
   private fetchRestaurants(ownerId: string) {
-    this.firestore.collection<Restaurant>('restaurants', ref => ref.where('ownerID', '==', ownerId))
+    // Unsubscribe from previous subscription if it exists
+    if (this.restaurantsSubscription) {
+      this.restaurantsSubscription.unsubscribe();
+    }
+
+    this.restaurantsSubscription = this.firestore.collection<Restaurant>('restaurants', ref => ref.where('ownerID', '==', ownerId))
       .valueChanges()
-      .subscribe(restaurants => {
-        this.restaurants = restaurants;
-        this.isSaving = false;
+      .subscribe({
+        next: (restaurants) => {
+          this.restaurants = restaurants;
+          this.isSaving = false;
+        },
+        error: (error) => {
+          console.error('Error fetching restaurants:', error);
+          this.isSaving = false;
+        }
       });
   }
 
@@ -227,15 +266,46 @@ export class MenusComponent implements OnInit {
 
   private performMenuDeletion(id: string) {
     this.isSaving = true;
-    this.firestore.doc(`menus/${id}`).delete()
+    
+    // Find the menu to get the correct Firestore document ID
+    // The id parameter might be menuID field or firestoreId
+    const allMenus = [...this.activeMenus, ...this.draftMenus];
+    const menuToDelete = allMenus.find(
+      menu => menu.menuID === id || (menu as any).firestoreId === id || (menu as any).id === id
+    );
+    
+    // Determine the actual Firestore document ID
+    // Prefer firestoreId (from idField), then menuID, then the passed id
+    const documentId = menuToDelete 
+      ? ((menuToDelete as any).firestoreId || menuToDelete.menuID || id)
+      : id;
+    
+    console.log('Deleting menu:', { 
+      passedId: id, 
+      documentId, 
+      menuFound: !!menuToDelete,
+      menuName: menuToDelete?.menuName 
+    });
+    
+    if (!documentId) {
+      console.error('Could not determine document ID for deletion');
+      this.toast.error('Could not find menu to delete. Please refresh the page.');
+      this.isSaving = false;
+      return;
+    }
+    
+    this.firestore.doc(`menus/${documentId}`).delete()
       .then(() => {
-        this.fetchMenus();
+        // No need to call fetchMenus() - valueChanges() will automatically update the UI
         this.closeAllPopups();
-        this.toastr.success('Menu has been deleted!');
+        this.toast.success('Menu has been deleted!');
         this.isSaving = false;
       })
       .catch((error) => {
-        console.log(error);
+        console.error('Error deleting menu:', error);
+        console.error('Document ID attempted:', documentId);
+        const errorMessage = error?.message || error?.code || 'Unknown error';
+        this.toast.error(`Failed to delete menu: ${errorMessage}. Please try again.`);
         this.isSaving = false;
       });
   }
@@ -393,6 +463,16 @@ export class MenusComponent implements OnInit {
       } else {
         this.router.navigate([route]);
       }
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscriptions to prevent memory leaks
+    if (this.menusSubscription) {
+      this.menusSubscription.unsubscribe();
+    }
+    if (this.restaurantsSubscription) {
+      this.restaurantsSubscription.unsubscribe();
     }
   }
 }

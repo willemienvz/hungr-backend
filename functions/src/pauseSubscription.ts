@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { generateApiSignature, getSubscriptionToken, getPayFastConfig } from './payfast';
+import { generateApiSignature, getSubscriptionToken, getPayFastConfig, formatPayFastTimestamp } from './payfast';
 import { retryWithBackoff, logSubscriptionAction, DatabaseRollback } from './subscriptionUtils';
 
 export const pauseSubscription = functions.https.onCall(async (data, context) => {
@@ -40,7 +40,7 @@ export const pauseSubscription = functions.https.onCall(async (data, context) =>
     // Get PayFast configuration
     const payfastConfig = getPayFastConfig();
     const endpoint = `/subscriptions/${token}/pause`;
-    const timestamp = new Date().toISOString();
+    const timestamp = formatPayFastTimestamp();
 
     // Prepare headers
     const headers = {
@@ -53,12 +53,24 @@ export const pauseSubscription = functions.https.onCall(async (data, context) =>
     const body = { cycles: cyclesToPause };
 
     // Generate signature (alphabetical sort)
-    const signatureData = { ...headers, ...body, passphrase: payfastConfig.passphrase };
+    // Note: generateApiSignature adds passphrase internally, so don't include it here
+    const signatureData = { ...headers, ...body };
     const signature = generateApiSignature(signatureData, payfastConfig.passphrase);
 
     // Make API call to PayFast with retry
     const apiCall = async () => {
-      const response = await fetch(`${payfastConfig.apiHost}${endpoint}`, {
+      const apiUrl = payfastConfig.getApiUrl(endpoint);
+      console.log('Making PayFast API call to pause subscription:', {
+        url: apiUrl,
+        method: 'PUT',
+        headers: {
+          ...headers,
+          'signature': signature
+        },
+        body: body
+      });
+
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           ...headers,
@@ -68,7 +80,18 @@ export const pauseSubscription = functions.https.onCall(async (data, context) =>
         body: JSON.stringify(body)
       });
 
-      const result = await response.json();
+      console.log('PayFast API response status:', response.status, response.statusText);
+
+      let result;
+      const responseText = await response.text();
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse PayFast response as JSON:', responseText);
+        throw new Error(`Invalid JSON response from PayFast API: ${response.status} ${response.statusText}. Response: ${responseText.substring(0, 200)}`);
+      }
+
+      console.log('PayFast API response:', JSON.stringify(result, null, 2));
 
       // PayFast API returns { data: { response: {...}, message: "..." } } on success
       // or { data: { message: "error message" } } on error

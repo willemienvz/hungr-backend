@@ -2,13 +2,13 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { catchError, finalize, startWith, map } from 'rxjs/operators';
+import { catchError, finalize, startWith, map, takeUntil } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Menu } from '../../../shared/services/menu';
 import { dateRangeValidator } from '../../../shared/validators/date-range-validator';
 import { timeRangeValidator } from '../../../shared/validators/time-range-validator';
-import { ToastrService } from 'ngx-toastr';
-import { of, Observable, Subscription } from 'rxjs';
+import { ToastService } from '../../../shared/services/toast.service';
+import { of, Observable, Subscription, Subject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MediaUploadModalService } from '../../../shared/services/media-upload-modal.service';
 import { MediaLibraryService } from '../../../shared/services/media-library.service';
@@ -52,6 +52,9 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
   selectedMediaItem: MediaItem | null = null;
   mediaId: string | null = null;
 
+  // Subscription management
+  private destroy$ = new Subject<void>();
+
   // Computed properties for navigation
   get showNextButton(): boolean {
     console.log('showNextButton called, currentStep:', this.currentStep, 'result:', this.currentStep < 5);
@@ -64,7 +67,7 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private fb: FormBuilder,
-    private toastr: ToastrService,
+    private toast: ToastService,
     private dialog: MatDialog,
     private mediaUploadModalService: MediaUploadModalService,
     private mediaLibraryService: MediaLibraryService,
@@ -82,6 +85,10 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
         percentage: [''],
         amount: ['', Validators.required],
         featureSpecialUnder: [''],
+        selectedCategory: [''], // Single category selection for Category Special
+        selectedCategories: [[]],
+        customPromotionalText: ['', [Validators.maxLength(500)]],
+        discountType: ['percentage'],
         timeFrom: ['00:00', Validators.required],
         timeTo: ['00:00', Validators.required],
         isAllDay: [true],
@@ -105,13 +112,16 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cleanup subscriptions if any
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private trackFormChanges() {
-    this.specialForm.valueChanges.subscribe(() => {
-      this.hasUnsavedChanges = true;
-    });
+    this.specialForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.hasUnsavedChanges = true;
+      });
   }
 
   private markAsChanged() {
@@ -129,11 +139,13 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
         disableClose: true
       });
 
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result === true) {
-          this.router.navigate([route]);
-        }
-      });
+      dialogRef.afterClosed()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((result) => {
+          if (result === true) {
+            this.router.navigate([route]);
+          }
+        });
     } else {
       this.router.navigate([route]);
     }
@@ -159,33 +171,35 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
       .then(() => {
         this.isSaving = false;
         this.markAsSaved();
-        this.toastr.success('Draft saved successfully.');
+        this.toast.success('Draft saved successfully.');
       })
       .catch((error) => {
         console.error('Error saving draft to Firestore:', error);
         this.isSaving = false;
-        this.toastr.error('Failed to save draft.');
+        this.toast.error('Failed to save draft.');
       });
   }
 
   fetchSpecialData() {
-    this.specialsService.getSpecialById(this.specialId).subscribe((special) => {
-      if (special) {
-        this.specialData = special;
-        this.specialForm.patchValue(special);
-        this.addedItems = special.addedItems || [];
-        this.selectedDays = special.selectedDays || [];
-        this.uploadedImageUrl = special.imageUrl || null;
-        this.selectedMediaItem = special.mediaItem || null;
-        this.mediaId = special.mediaId || null;
-        this.selectedSpecialType = special.typeSpecial || SpecialType.PERCENTAGE_DISCOUNT;
+    this.specialsService.getSpecialById(this.specialId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((special) => {
+        if (special) {
+          this.specialData = special;
+          this.specialForm.patchValue(special);
+          this.addedItems = special.addedItems || [];
+          this.selectedDays = special.selectedDays || [];
+          this.uploadedImageUrl = special.imageUrl || null;
+          this.selectedMediaItem = special.mediaItem || null;
+          this.mediaId = special.mediaId || null;
+          this.selectedSpecialType = special.typeSpecial || SpecialType.PERCENTAGE_DISCOUNT;
 
-        // Try setting selectedMenu after menus are loaded
-        if (this.menus.length > 0) {
-          this.setSelectedMenu((special as any).menu);
+          // Try setting selectedMenu after menus are loaded
+          if (this.menus.length > 0) {
+            this.setSelectedMenu((special as any).menu);
+          }
         }
-      }
-    });
+      });
   }
 
   fetchMenus() {
@@ -196,6 +210,7 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
     this.firestore
       .collection<Menu>('menus', (ref) => ref.where('OwnerID', '==', OwnerID))
       .valueChanges()
+      .pipe(takeUntil(this.destroy$))
       .subscribe((menus) => {
         this.menus = menus;
 
@@ -228,31 +243,35 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
     }
 
     // Use the new SpecialsService with media library integration
-    this.specialsService.updateSpecial(this.specialId, data).subscribe({
-      next: () => {
-        // Update media usage if media was changed
-        if (this.mediaId && this.mediaId !== this.specialData?.mediaId) {
-          this.specialsService.trackMediaUsage(this.mediaId, this.specialId, 'image').subscribe({
-            next: () => {
-              console.log('Media usage tracked successfully');
-            },
-            error: (error) => {
-              console.warn('Failed to track media usage:', error);
-            }
-          });
-        }
+    this.specialsService.updateSpecial(this.specialId, data)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          // Update media usage if media was changed
+          if (this.mediaId && this.mediaId !== this.specialData?.mediaId) {
+            this.specialsService.trackMediaUsage(this.mediaId, this.specialId, 'image')
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: () => {
+                  console.log('Media usage tracked successfully');
+                },
+                error: (error) => {
+                  console.warn('Failed to track media usage:', error);
+                }
+              });
+          }
 
-        this.isSaving = false;
-        this.markAsSaved();
-        this.showSuccess('Special updated successfully!');
-        this.router.navigate(['/specials']);
-      },
-      error: (error) => {
-        console.error('Error updating special:', error);
-        this.isSaving = false;
-        this.toastr.error('Failed to update special');
-      }
-    });
+          this.isSaving = false;
+          this.markAsSaved();
+          this.showSuccess('Special updated successfully!');
+          this.router.navigate(['/specials']);
+        },
+        error: (error) => {
+          console.error('Error updating special:', error);
+          this.isSaving = false;
+          this.toast.error('Failed to update special');
+        }
+      });
   }
 
   onMenuChange() {
@@ -311,18 +330,28 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
         this.specialForm.get('amount')?.reset();
       }
     } else if (selectedType === SpecialType.CATEGORY_SPECIAL) {
-      // Category Special
-      const categoryName = this.specialForm.get('featureSpecialUnder')?.value;
+      // Category Special - Single category selection
+      const selectedCategory = this.specialForm.get('selectedCategory')?.value;
+      const discountType = this.specialForm.get('discountType')?.value || 'percentage';
       const amount = this.specialForm.get('amount')?.value;
 
-      if (categoryName && amount) {
+      if (selectedCategory && amount) {
+        const category = this.selectedMenu?.categories?.find((cat: any) => (cat.id || cat.name) === selectedCategory);
+        const categoryName = category?.name || selectedCategory;
+
+        const displayAmount = discountType === 'percentage' ? `${amount}%` : `R${amount}`;
+        const itemName = `Category: ${categoryName}`;
+
         this.addedItems.push({
-          name: `Category: ${categoryName}`,
-          categoryId: categoryName, // Add categoryId for category specials
-          amount: amount,
+          name: itemName,
+          categoryId: selectedCategory,
+          amount: displayAmount,
+          discountType: discountType,
+          selectedCategories: [selectedCategory] // Store for backend compatibility
         });
-        this.specialForm.get('featureSpecialUnder')?.reset();
+        this.specialForm.get('selectedCategory')?.reset();
         this.specialForm.get('amount')?.reset();
+        this.specialForm.patchValue({ discountType: 'percentage' });
       }
     } else if (selectedType === SpecialType.COMBO_DEAL) {
       // Combo Special
@@ -371,48 +400,50 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
   openImageUploadModal() {
     const dialogRef = this.mediaUploadModalService.openSpecialImageUpload(this.specialId);
 
-    dialogRef.afterClosed().subscribe({
-      next: (result: any) => {
-        if (result) {
-          // Handle different result formats from the modal
-          let mediaItem: MediaItem | null = null;
-          
-          if (result.id && result.url) {
-            // Direct MediaItem result
-            mediaItem = result;
-          } else if (result.mediaItem) {
-            // Enhanced format with mediaItem property
-            mediaItem = result.mediaItem;
-          } else if (result.action === 'save' && result.existingMediaUrl) {
-            // Existing image kept (no new upload)
-            this.uploadedImageUrl = result.existingMediaUrl;
-            this.markAsChanged();
-            this.toastr.success('Image updated successfully!');
-            return;
-          } else if (result.action === 'remove') {
-            // Image was removed
-            this.selectedMediaItem = null;
-            this.mediaId = null;
-            this.uploadedImageUrl = null;
-            this.markAsChanged();
-            this.toastr.success('Image removed successfully!');
-            return;
-          }
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result: any) => {
+          if (result) {
+            // Handle different result formats from the modal
+            let mediaItem: MediaItem | null = null;
+            
+            if (result.id && result.url) {
+              // Direct MediaItem result
+              mediaItem = result;
+            } else if (result.mediaItem) {
+              // Enhanced format with mediaItem property
+              mediaItem = result.mediaItem;
+            } else if (result.action === 'save' && result.existingMediaUrl) {
+              // Existing image kept (no new upload)
+              this.uploadedImageUrl = result.existingMediaUrl;
+              this.markAsChanged();
+              this.toast.success('Image updated successfully!');
+              return;
+            } else if (result.action === 'remove') {
+              // Image was removed
+              this.selectedMediaItem = null;
+              this.mediaId = null;
+              this.uploadedImageUrl = null;
+              this.markAsChanged();
+              this.toast.success('Image removed successfully!');
+              return;
+            }
 
-          if (mediaItem) {
-            this.selectedMediaItem = mediaItem;
-            this.mediaId = mediaItem.id;
-            this.uploadedImageUrl = mediaItem.url;
-            this.markAsChanged();
-            this.toastr.success('Image uploaded successfully!');
+            if (mediaItem) {
+              this.selectedMediaItem = mediaItem;
+              this.mediaId = mediaItem.id;
+              this.uploadedImageUrl = mediaItem.url;
+              this.markAsChanged();
+              this.toast.success('Image uploaded successfully!');
+            }
           }
+        },
+        error: (error) => {
+          console.error('Error in image upload modal:', error);
+          this.toast.error('Failed to open image upload modal. Please try again.');
         }
-      },
-      error: (error) => {
-        console.error('Error in image upload modal:', error);
-        this.toastr.error('Failed to open image upload modal. Please try again.');
-      }
-    });
+      });
   }
 
   // Add method to handle media deletion
@@ -426,11 +457,11 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
           this.mediaId = null;
           this.uploadedImageUrl = null;
           this.markAsChanged();
-          this.toastr.success('Image deleted successfully!');
+          this.toast.success('Image deleted successfully!');
         })
         .catch((error) => {
           console.error('Error deleting media:', error);
-          this.toastr.error('Failed to delete image. Please try again.');
+          this.toast.error('Failed to delete image. Please try again.');
         });
     } else {
       // Just reset state if no media ID (local upload)
@@ -438,7 +469,7 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
       this.mediaId = null;
       this.uploadedImageUrl = null;
       this.markAsChanged();
-      this.toastr.success('Image removed successfully!');
+      this.toast.success('Image removed successfully!');
     }
   }
 
@@ -526,6 +557,11 @@ export class EditSpecialComponent implements OnInit, OnDestroy {
                       timeTo.toString().trim() !== '';
     
     return !selectedDaysValid || !timesValid || this.specialForm.errors?.['timeRangeInvalid'];
+  }
+
+  isStep3Invalid(): boolean {
+    // Step 3 is invalid if no items have been added
+    return this.addedItems.length === 0;
   }
 
   getSpecialTypeLabel(typeId: number): string {

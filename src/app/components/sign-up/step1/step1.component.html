@@ -52,16 +52,13 @@
                         <div *ngIf="step1Form.get('userEmail')?.hasError('emailCheckFailed') && (step1Form.get('userEmail')?.touched || step1Form.get('userEmail')?.dirty)" class="email-error-message" style="margin-top: 4px; color: #f44336; font-size: 12px;">
                             <span>{{ getFieldError('userEmail') }}</span>
                         </div>
-                        <app-form-input
+                        <app-phone-input
                             label="Cellphone number"
-                            type="tel"
                             placeholder="+27 12 234 5678"
                             [required]="true"
                             [errorMessage]="getFieldError('cellphone')"
-                            (keydown)="onCellphoneKeyDown($event)"
-                            (paste)="onCellphonePaste($event)"
                             formControlName="cellphone">
-                        </app-form-input>
+                        </app-phone-input>
               
                 </div>
                 <div class="auth-form-col">

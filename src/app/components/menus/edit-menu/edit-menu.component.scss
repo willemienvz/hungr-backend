@@ -4,11 +4,8 @@
 // Edit-menu specific styles (if any)
 
 /* KB: Filter section styling */
-.filter-section {
-  background: white;
-  border-radius: var(--spacing-2);
-  padding: var(--spacing-5);
-  margin-bottom: var(--spacing-5);
+.content-block.filter-section {
+  margin-bottom: 24px !important;
   
   h6 {
     margin-bottom: 15px;
@@ -17,26 +14,56 @@
     font-weight: 400;
   }
 
-  label {
-    display:none;
-  }
-  
-  .search-input-container {
-    position: relative;
-    width:100%;
-    
-    .search-input {
-      padding-right: 40px;
+  .col2row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+
+    .col {
+      width: 100%;
+      min-width: 0;
     }
-    
-    .search-icon {
-      position: absolute;
-      right: var(--spacing-3);
-      height: 100%;
-      pointer-events: none;
-      justify-content: center;
-      align-items: center;
-      display:inline-flex;
+
+    .formGroup {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      
+      app-form-select,
+      app-form-input {
+        width: 100%;
+        display: block;
+        
+        ::ng-deep .form-select-wrapper,
+        ::ng-deep .form-input-wrapper {
+          width: 100%;
+        }
+        
+        ::ng-deep .mat-mdc-form-field {
+          width: 100%;
+        }
+        
+        /* Ensure Material form field wrapper is full width */
+        ::ng-deep .mat-mdc-text-field-wrapper {
+          width: 100% !important;
+        }
+        
+        /* Ensure input element is full width */
+        ::ng-deep .form-input {
+          width: 100% !important;
+        }
+        
+        /* Ensure select trigger is full width */
+        ::ng-deep .mat-mdc-select-trigger {
+          width: 100%;
+        }
+      }
+    }
+
+    // Mobile: stack columns vertically
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
     }
   }
 }
@@ -85,6 +112,8 @@
 
 /* KB: CDK drag and drop styling for menu item reordering */
 .menu-items-container {
+  margin-top: 24px; /* Ensure spacing after filter section */
+  
   .menu-item-drag-container {
     /* Transform transitions removed for consistency with modal system */
     

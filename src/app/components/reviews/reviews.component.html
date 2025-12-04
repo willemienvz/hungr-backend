@@ -12,28 +12,23 @@
         </app-form-input>
       </div>
       <div class="filter-dropdown">
-        <mat-select 
-          [placeholder]="'Filter by status'" 
-          [value]="currentFilter"
-          (selectionChange)="onFilterChange($event.value)">
-          <mat-option 
-            *ngFor="let option of reviewFilterOptions" 
-            [value]="option.value">
-            {{ option.label }}
-          </mat-option>
-        </mat-select>
+        <app-form-select
+          [placeholder]="'Filter by status'"
+          [options]="reviewFilterSelectOptions"
+          [(ngModel)]="currentFilter"
+          (selectionChange)="onFilterChange($event.value)"
+          appearance="outline">
+        </app-form-select>
         <mat-icon class="filter-icon">filter_list</mat-icon>
       </div>
       <div class="filter-dropdown">
-        <mat-select 
+        <app-form-select
           [placeholder]="'Filter by menu item'"
-          [value]="'all'"
-          (selectionChange)="onMenuItemFilterChange($event.value)">
-          <mat-option [value]="'all'">All menu items</mat-option>
-          <mat-option *ngFor="let menuItem of menuItems" [value]="menuItem.itemId">
-            {{ menuItem.name }}
-          </mat-option>
-        </mat-select>
+          [options]="menuItemFilterSelectOptions"
+          [(ngModel)]="menuItemFilter"
+          (selectionChange)="onMenuItemFilterChange($event.value)"
+          appearance="outline">
+        </app-form-select>
         <mat-icon class="filter-icon">restaurant_menu</mat-icon>
       </div>
     </div>

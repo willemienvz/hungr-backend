@@ -21,6 +21,14 @@
   justify-content: center;
   align-content: center;
   display: flex;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  // Prevent horizontal overflow on mobile
+  @media (max-width: 768px) {
+    overflow-x: hidden;
+    padding: var(--spacing-4);
+  }
 
 
   .header-actions {
@@ -217,13 +225,29 @@
 }
 
 .menu-item-form {
+  // Prevent horizontal overflow on mobile
+  @media (max-width: 768px) {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
 
   .itemFormGrid { 
     display: grid;
     grid-template-columns: repeat(12,1fr);
     gap: 15px;
     margin-bottom: 15px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden; // Prevent horizontal overflow
 
+    .col {
+      min-width: 0; // Prevent grid overflow
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      contain: layout; // Isolate grid columns from each other
+    }
 
     .first {
       grid-column: 1 / 4;
@@ -240,27 +264,187 @@
       grid-column: 11 / 13;
     }
 
+    .add_tag_col {
+      grid-row: 2;
+      grid-column: 1 / 4;
+      display: block; // Ensure it's not flex, let grid handle layout
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden; // Prevent content from overflowing into adjacent columns
+      contain: layout style; // Isolate this column from affecting others
+    }
+
     .fifth {
       grid-row: 2;
       grid-column: 4 / 10;
+      display: block; // Ensure it's not flex, let grid handle layout
+      width: 100%;
+      max-width: 100%;
+      
+      .fieldHolder {
+        app-form-textarea {
+          ::ng-deep .form-textarea {
+            padding: var(--spacing-3) var(--spacing-4);
+          }
+        }
+      }
     }
 
     .sixth {
       grid-row: 2;
       grid-column: 10 / 13;
+      display: block; // Ensure it's not flex, let grid handle layout
+      width: 100%;
+      max-width: 100%;
     }
 
-    .add_tag_col {
-      grid-column: 1 / 4;
+    // Tablet responsive styles
+    @media (max-width: 1024px) and (min-width: 769px) {
+      // Adjust column spans for tablet
+      .first {
+        grid-column: 1 / 5;
+      }
+
+      .second {
+        grid-column: 5 / 9;
+      }
+
+      .third {
+        grid-column: 9 / 11;
+      }
+
+      .fourth {
+        grid-column: 11 / 13;
+      }
+
+      .add_tag_col {
+        grid-row: 2;
+        grid-column: 1 / 5;
+      }
+
+      .fifth {
+        grid-row: 2;
+        grid-column: 5 / 13;
+      }
+
+      .sixth {
+        grid-row: 3;
+        grid-column: 1 / 13;
+      }
     }
-    
+
+    // Mobile responsive styles
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      
+      // All columns span full width on mobile
+      .first,
+      .second,
+      .third,
+      .fourth,
+      .fifth,
+      .sixth,
+      .add_tag_col {
+        grid-column: 1 / -1;
+        grid-row: auto;
+      }
+
+      // Reorder fields for mobile using CSS order property
+      .second {
+        order: 1; // Item Name first
+      }
+
+      .third {
+        order: 2; // Price second
+      }
+
+      .first {
+        order: 3; // Category third
+      }
+
+      .add_tag_col {
+        order: 4; // Labels fourth
+      }
+
+      .fifth {
+        order: 5; // Description fifth (right after labels)
+      }
+
+      .fourth {
+        order: 6; // Image Upload sixth
+      }
+
+      .sixth {
+        order: 7; // Image Preview seventh (right after upload)
+      }
+    }
     
   }
 
+  .add-input-group {
+    .label-input-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: flex-end; /* Align button with bottom of input field */
+
+      app-form-input {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .add-label-btn {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        border-radius: var(--border-radius-base);
+        background: var(--button-primary-bg);
+        color: var(--button-primary-color);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+        flex-grow: 0;
+        margin-bottom: 0; /* Align with bottom of input field */
+
+        &:hover:not(:disabled) {
+          transform: scale(1.05);
+        }
+
+        &:active:not(:disabled) {
+          transform: scale(0.95);
+        }
+
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+
+        app-svg-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
 
   .detail-label-add {
-  
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
     
+    @media (max-width: 768px) {
+      gap: 6px;
+      margin-top: 8px;
+    }
       
     .item-tag {
       width:100%;
@@ -276,12 +460,19 @@
       font-family: var(--hungr-font-family);
      // border: 1px solid var(--hungr-quinary-color);
       width:100%;
+      box-sizing: border-box;
       
-   
+      @media (max-width: 768px) {
+        width: 100%;
+        max-width: 100%;
+      }
       
       span {
         color: var(--hungr-darker-grey);
         font-weight: 300;
+        flex: 1;
+        min-width: 0;
+        word-wrap: break-word;
       }
       
       .remove-btn {
@@ -297,6 +488,7 @@
         width: var(--spacing-4);
         height: var(--spacing-4);
         transition: all 0.2s ease;
+        flex-shrink: 0;
         
         &:hover {
        
@@ -317,6 +509,7 @@
     flex-direction: row;
     gap: 15px;
     margin-bottom: 15px;
+    align-items: flex-start; /* Align columns at the top */
     
     .col {
       flex: 1;
@@ -325,6 +518,12 @@
       
       &.priceContainer {
         max-width: 200px;
+      }
+      
+      /* Ensure form components align properly */
+      app-form-input,
+      app-price-input {
+        width: 100%;
       }
     }
   }
@@ -347,11 +546,13 @@
   /* KB: Detail section styles moved to app-menu-item-detail component */
 
   .image-upload {
-    margin-top: 15px;
+    margin-top: 0; /* Remove top margin to align with other fields */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     
     .upload-btn {
-      background-color: var(--hungr-light-grey-2);
-
+      background-color: #e4e4e4;
       padding: var(--spacing-5);
       text-align: center;
       border-radius: var(--spacing-2);
@@ -360,32 +561,39 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 3var(--spacing-2);
-      margin-top: 25px;
-      gap:6px;
+      height: calc(var(--form-field-height) + 8px); /* Make it a little taller */
+      margin-top: calc(var(--form-label-font-size, 14px) + var(--form-label-margin-bottom, 8px)); /* Align with input field (after label) */
+      gap: 6px;
       
       &:hover:not(.disabled) {
-        border-color: var(--color-secondary);
-        background-color: #f0fffe;
+        background-color: var(--button-primary-bg, var(--color-secondary));
+        color: var(--button-primary-color, white);
+        
+        i {
+          color: var(--button-primary-color, white);
+        }
+        
+        p {
+          color: var(--button-primary-color, white);
+        }
       }
       
       /* KB: Disabled state for upload button during operations */
       &.disabled {
         opacity: 0.6;
         cursor: not-allowed;
-        background-color: var(--hungr-light-grey-2);
+        background-color: #e4e4e4;
       }
       
       i {
-        font-size: 1var(--spacing-2);
-        color: var(--hungr-darker-grey);
-      
+        font-size: 18px; /* Smaller icon */
+        color: #181818; /* Darker color */
         display: block;
       }
       
       p {
         margin: 0;
-        color: #666;
+        color: #181818; /* Darker color to match icon */
         font-size: 14px;
       }
     }

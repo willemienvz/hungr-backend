@@ -3,20 +3,14 @@
     <div class="addCol">
 
       <div class="formGroup">
-        <div class="label-tooltip-container">
-          <div class="tooltip-wrapper">
-            <i class="material-icons tooltip-icon">help_outline</i>
-            <div class="tooltip-text">
-              Create categories to organize your menu items (e.g., Appetizers, Main Courses, Desserts)
-            </div>
-          </div>
-        </div>
         <app-form-input
           type="text"
           label="Add a Menu Category"
           placeholder="Name your category"
+          class="full-width"
           [ngModel]="newCategoryName"
-          (ngModelChange)="onNewCategoryNameChange($event)">
+          (ngModelChange)="onNewCategoryNameChange($event)"
+          tooltipText="Create categories to organize your menu items (e.g., Appetizers, Main Courses, Desserts)">
         </app-form-input>
       </div>
       <button class="hungr-btn hungr-btn-primary" (click)="onAddCategory()">
@@ -37,14 +31,28 @@
       </div>
       <div class="subcategory-wrapper">
       <div class="inputBox">
-        <app-form-input
-          type="text"
-          placeholder="Type sub-category name here"
-          [ngModel]="newSubcategoryName[i]"
-          (ngModelChange)="onNewSubcategoryNameChange(i, $event)"
-          (keyup.enter)="onAddSubCategory(i)">
-        </app-form-input>
-        <label>press enter to add</label>
+        <div class="subcategory-input-wrapper">
+          <app-form-input
+            type="text"
+            placeholder="Type sub-category name here"
+            [ngModel]="newSubcategoryName[i]"
+            (ngModelChange)="onNewSubcategoryNameChange(i, $event)"
+            (keyup.enter)="onAddSubCategory(i)">
+          </app-form-input>
+          <button 
+            type="button"
+            class="add-subcategory-btn"
+            (mousedown)="$event.preventDefault()"
+            (click)="onAddSubCategory(i); $event.stopPropagation()"
+            [disabled]="!newSubcategoryName[i] || newSubcategoryName[i].trim() === ''">
+            <app-svg-icon 
+              iconName="plus" 
+              size="16px" 
+              [color]="'var(--button-primary-color)'">
+            </app-svg-icon>
+          </button>
+        </div>
+        
       </div>
 
       <div *ngFor="let subcategory of category.subcategories; let j = index" class="subcategory">

@@ -17,18 +17,55 @@
   color: var(--color-error);
 }
 
+.col3row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: row;
+  gap: 20px;
+
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+
+  .col {
+    //width: calc(33.333% - 10px);
+    display: flex;
+    flex-direction: column;
+  }
+
+@media (max-width: 1024px) {
+ 
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  
+}
+}
+
 .restaurant-col {
   display: flex;
   flex-direction: column;
+  width: 100%;
 
+  .formGroup {
+    width: 100%;
+
+    ::ng-deep {
+      app-form-select {
+        width: 100%;
+        display: block;
+      }
+    }
+  }
 }
+
 .col-resturant-set {
-  margin-top: 26px;
   &.pLine {
-    height:38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 26px; // Aligns text with form input fields
   }
 }
 // Additional styles specific to menu form step
@@ -69,7 +106,6 @@
       font-size: 14px;
       font-weight: 400;
       line-height: 16.5px;
-      letter-spacing: -0.02em;
       color: #2e3646;
       cursor: pointer;
 

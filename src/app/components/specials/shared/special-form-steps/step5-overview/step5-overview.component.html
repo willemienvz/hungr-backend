@@ -33,12 +33,12 @@
 
       <!-- Promotional Items Section -->
       <div class="promo-section">
-        <p>Promotional Items</p>
+        <h4 class="promo-section-title">Promotional Items</h4>
         <div *ngFor="let item of addedItems" class="promo-item">
           <span class="item-name">{{ item.name }}</span>
-          <span class="item-price"
-            >Promotional Price: R {{ item.amount }}</span
-          >
+          <span class="item-price">
+            {{ getPromotionalLabel() }}: {{ selectedSpecialType === SpecialType.PERCENTAGE_DISCOUNT ? (item.amount.toString().endsWith('%') ? item.amount : item.amount + '%') : 'R ' + item.amount }}
+          </span>
         </div>
       </div>
     </div>
