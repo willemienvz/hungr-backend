@@ -98,7 +98,7 @@ export class RestaurantFormComponent implements OnInit {
     this.fetchMenus();
     this.fetchCurrentUser();
     this.setupFormTracking();
-    this.initializeOptions();
+    this.initializeProvinceOptions();
   }
 
   private setupFormTracking() {
@@ -163,6 +163,8 @@ export class RestaurantFormComponent implements OnInit {
       .valueChanges()
       .subscribe((menus) => {
         this.menus = menus;
+        // Initialize menu options after menus are loaded
+        this.initializeMenuOptions();
       });
   }
 
@@ -554,13 +556,15 @@ export class RestaurantFormComponent implements OnInit {
     return labels[fieldName] || fieldName;
   }
 
-  private initializeOptions() {
+  private initializeProvinceOptions() {
     // Initialize province options
     this.provinceOptions = this.saProvinces.map(province => ({
       value: province,
       label: province
     }));
+  }
 
+  private initializeMenuOptions() {
     // Initialize menu options
     this.menuOptions = this.menus.map(menu => ({
       value: menu.menuID,

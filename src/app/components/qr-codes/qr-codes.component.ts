@@ -26,6 +26,7 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
   selectedMenuId: string = '';
   tempRestaurant: Restaurant = {} as Restaurant;
   public qrCodeDownloadLink: SafeUrl = "";
+  private processingRowId: string | null = null;
 
   // Table configurations
   menuColumns: TableColumn[] = [
@@ -96,17 +97,8 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
               // Show existing QR - this would require implementing a view modal
               console.log('Menu already has QR assigned');
             } else {
-              // Show add QR modal for this specific menu
-              this.addQrComponent.openPopup();
-              // Pre-select the menu if the add component supports it
-              setTimeout(() => {
-                if (this.addQrComponent.filteredMenus && this.addQrComponent.filteredMenus.length > 0) {
-                  const targetMenu = this.addQrComponent.filteredMenus.find(m => m.menuID === showMenuId);
-                  if (targetMenu) {
-                    this.addQrComponent.selectMenu(targetMenu);
-                  }
-                }
-              }, 100);
+              // Show add QR modal for this specific menu - pass menu directly
+              this.addQrComponent.openPopup(menu);
             }
           }
         }, 500); // Wait for menus to load
@@ -181,27 +173,28 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
    * Handle menu table actions
    */
   onMenuAction(event: any) {
-    const { action, row, index } = event;
+    try {
+      const { action, row, index } = event;
 
-    switch (action.key) {
-      case 'view':
-        this.viewQR.openPopup(row.menuID);
-        break;
-      case 'download':
-        this.downloadQRCode(row.menuID, row.menuName);
-        break;
-      case 'create':
-        this.openAddQrModal();
-        // Optionally pre-select the menu
-        setTimeout(() => {
-          if (this.addQrComponent && this.addQrComponent.filteredMenus) {
-            const targetMenu = this.addQrComponent.filteredMenus.find((m: Menu) => m.menuID === row.menuID);
-            if (targetMenu) {
-              this.addQrComponent.selectMenu(targetMenu);
-            }
+      switch (action.key) {
+        case 'view':
+          if (this.viewQR) {
+            this.viewQR.openPopup(row.menuID);
           }
-        }, 100);
-        break;
+          break;
+        case 'download':
+          this.downloadQRCode(row.menuID, row.menuName);
+          break;
+        case 'create':
+          if (this.addQrComponent) {
+            // Open modal directly with the selected menu - no dropdown needed
+            this.addQrComponent.openPopup(row);
+          }
+          break;
+      }
+    } catch (error) {
+      console.error('Error handling menu action:', error);
+      this.processingRowId = null; // Reset flag on error
     }
   }
 
@@ -211,13 +204,38 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
   onRowClick(event: any) {
     const { row, index } = event;
 
+    // Get unique identifier for this row
+    const rowId = row.menuID || row.id || `row-${index}`;
+
+    // Prevent infinite loops by checking if we're already processing this specific row
+    // Also check if modal is already open (dropdown might cause re-renders)
+    if (this.processingRowId === rowId || 
+        this.isSaving || 
+        (this.addQrComponent && this.addQrComponent.showPopup)) {
+      return;
+    }
+
     // Find the first available action for this row
     const firstAvailableAction = this.menuActions.find(action =>
       action.visible ? action.visible(row) : true
     );
 
     if (firstAvailableAction) {
-      this.onMenuAction({ action: firstAvailableAction, row, index });
+      // Mark this row as being processed
+      this.processingRowId = rowId;
+      
+      // Execute the action
+      try {
+        this.onMenuAction({ action: firstAvailableAction, row, index });
+      } catch (error) {
+        console.error('Error in onMenuAction:', error);
+        this.processingRowId = null; // Reset on error
+      } finally {
+        // Reset the flag after modal has time to open (longer delay to prevent re-triggering)
+        setTimeout(() => {
+          this.processingRowId = null;
+        }, 2000); // Increased to 2 seconds to ensure modal is fully open and dropdown initialized
+      }
     }
   }
 
@@ -253,8 +271,8 @@ export class QrCodesComponent implements OnInit, AfterViewInit {
     this.isPopupMenuOpen[index] = !this.isPopupMenuOpen[index];
   }
 
-  openAddQrModal() {
-    this.addQrComponent.openPopup();
+  openAddQrModal(menu?: Menu) {
+    this.addQrComponent.openPopup(menu);
   }
 
 }

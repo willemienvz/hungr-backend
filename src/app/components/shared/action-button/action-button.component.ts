@@ -73,6 +73,7 @@ export class ActionButtonComponent {
     onClick(event: Event): void {
         if (this.stopPropagation) {
             event.stopPropagation();
+            event.preventDefault();
         }
 
         if (!this.disabled && !this.loading && !this.routerLink) {

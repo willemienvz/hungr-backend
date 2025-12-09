@@ -146,11 +146,8 @@ label {
   }
 
   .menu-select-container {
-    width: 32%;
-
-    @media (max-width: 768px) {
-      width: 100%;
-    }
+    width: 100%;
+    margin-bottom: var(--spacing-3);
   }
 
   mat-form-field {
@@ -166,19 +163,34 @@ label {
     }
   }
 
-  // Responsive mixin for flex-direction: column on mobile devices
-  @media (max-width: 768px) {
+  .create-menu-link {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    margin-top: var(--spacing-2);
+    margin-bottom: 0;
 
-      flex-direction: column;
-      gap: var(--spacing-3);
-
-      .displaced {
-        align-self: flex-start;
-        margin-bottom: 0;
-      }
-    
+    a { 
+      color: var(--color-secondary);
+      cursor: pointer;
+    }
   }
+}
 
+.create-menu-link {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  margin-top: 1rem;
+  margin-bottom: 0;
+
+  a { 
+    color: var(--color-secondary);
+    cursor: pointer;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .blockItems {

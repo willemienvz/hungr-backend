@@ -15,6 +15,7 @@ import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsa
 import { MenuService, MenuItemInterface, SideItem, PreparationItem, VariationItem, SauceItem } from '../shared/menu.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-add-menu',
@@ -631,9 +632,19 @@ export class AddMenuComponent implements OnInit {
     this.menuService.saveMenu(menuData)
       .then((menuId) => {
         this.currentMenuID = menuId;
+        // Auto-assign QR code immediately after menu creation
+        // QR code URL format: environment.menuUrl + menuId
+        const qrUrl = environment.menuUrl + menuId;
         this.firestore.collection('menus').doc(menuId).update({ 
           menuID: menuId,
-          id: menuId 
+          id: menuId,
+          qrAssigned: true,
+          qrUrl: qrUrl
+        })
+        .catch((error) => {
+          console.error('QR code assignment failed:', error);
+          // Menu is still saved successfully, QR code can be assigned manually later
+          // Graceful degradation: menu save succeeds even if QR assignment fails
         });
         this.isSaving = false;
         this.menuSaved = true;
@@ -682,9 +693,19 @@ export class AddMenuComponent implements OnInit {
 
     this.menuService.saveMenu(menuData)
       .then((menuId) => {
+        // Auto-assign QR code immediately after draft menu creation
+        // QR code URL format: environment.menuUrl + menuId
+        const qrUrl = environment.menuUrl + menuId;
         this.firestore.collection('menus').doc(menuId).update({ 
           menuID: menuId,
-          id: menuId 
+          id: menuId,
+          qrAssigned: true,
+          qrUrl: qrUrl
+        })
+        .catch((error) => {
+          console.error('QR code assignment failed:', error);
+          // Menu is still saved successfully, QR code can be assigned manually later
+          // Graceful degradation: menu save succeeds even if QR assignment fails
         });
         this.isSaving = false;
         this.setAsDraftSaved = true;

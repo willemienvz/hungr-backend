@@ -2,35 +2,26 @@
     <div class="popup-content">
       <i class="material-icons popup-close" (click)="closePopup()">close</i>
       <div class="authBlock">
-        <h3>QR Code</h3>
+        <h3>Generate QR Code</h3>
+        <p *ngIf="selectedMenu">For: {{selectedMenu.menuName}}</p>
       </div>
-      <div class="row">
+      <div class="row" *ngIf="selectedMenu">
         <div class="col">
-          <div class="colInner" *ngIf="selectedMenu">
+          <div class="colInner">
             <qrcode [qrdata]="getQRCodeData(selectedMenu.menuID)" (qrCodeURL)="onChangeURL($event)" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
-              <div class="formGroup btnHolder">
-                <button class="hungr-btn hungr-btn-tertiary" (click)="closePopup()">Cancel</button>
-                <button class="hungr-btn hungr-btn-primary" (click)="saveSettings()">Save</button>
-              </div>
-          </div>
-        </div>
-        <div class="col">
-          <div>
-            <p>Assign this code to...</p>
-            <p *ngIf="filteredMenus.length < 1">There are no unassigned menus</p>
-            <app-form-select
-              *ngIf="filteredMenus.length > 0"
-              label="Select Menu"
-              placeholder="Select a menu..."
-              [options]="menuOptions"
-              [(ngModel)]="selectedMenu"
-              (selectionChange)="selectMenu($event.value)">
-            </app-form-select>
-            <p class="error-message" *ngIf="validationError">Please select a menu to assign</p>
+            <p class="error-message" *ngIf="validationError">Please wait for QR code to generate</p>
             <p class="success-message" *ngIf="saveSuccess">QR code assigned to {{selectedMenu?.menuName}}</p>
-          </div>
-          <div class="formGroup btnHolder">
-            <a class="hungr-btn hungr-btn-secondary" [href]="qrCodeDownloadLink" download="qrcode">SAVE & Download</a>
+            <div class="formGroup btnHolder">
+              <button class="hungr-btn hungr-btn-tertiary" (click)="closePopup()">Cancel</button>
+              <button class="hungr-btn hungr-btn-primary" 
+                      (click)="saveSettings()" 
+                      [disabled]="!qrCodeDownloadLink || isSaving">
+                Save & Assign
+              </button>
+            </div>
+            <div class="formGroup btnHolder" *ngIf="qrCodeDownloadLink">
+              <a class="hungr-btn hungr-btn-secondary" [href]="qrCodeDownloadLink" download="qrcode">Download QR Code</a>
+            </div>
           </div>
         </div>
       </div>

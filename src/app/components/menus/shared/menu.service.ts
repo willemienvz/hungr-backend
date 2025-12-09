@@ -143,12 +143,22 @@ export class MenuService {
 
   addSubCategory(categories: Category[], categoryIndex: number, subcategoryName: string): Category[] {
     if (subcategoryName?.trim()) {
-      const updatedCategories = [...categories];
-      const category = updatedCategories[categoryIndex];
-      const newSubId = this.getNextUniqueId(updatedCategories);
-      category.subcategories.push({
-        id: newSubId,
-        name: subcategoryName.trim(),
+      const updatedCategories = categories.map((cat, idx) => {
+        if (idx === categoryIndex) {
+          // Create a new category object with a new subcategories array
+          const newSubId = this.getNextUniqueId(categories);
+          return {
+            ...cat,
+            subcategories: [
+              ...cat.subcategories,
+              {
+                id: newSubId,
+                name: subcategoryName.trim(),
+              }
+            ]
+          };
+        }
+        return cat;
       });
       return updatedCategories;
     }

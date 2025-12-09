@@ -93,6 +93,7 @@ export class DataTableComponent {
             'edit': 'edit',
             'delete': 'delete',
             'add': 'add',
+            'create': 'add', // Map 'create' to 'add' type
             'toggle': 'toggle',
             'download': 'download',
             'upload': 'upload',
@@ -145,11 +146,28 @@ export class DataTableComponent {
         this.sortChange.emit({ column, direction: this.sortDirection });
     }
 
-    onActionClick(action: TableAction, row: TableRow, index: number): void {
+    onActionClick(action: TableAction, row: TableRow, index: number, event?: Event): void {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
         this.actionClick.emit({ action, row, index } as TableActionEvent);
     }
 
-    onRowClick(row: TableRow, index: number): void {
+    onRowClick(row: TableRow, index: number, event?: Event): void {
+        if (event) {
+            // Don't trigger row click if clicking on action buttons or their container
+            const target = event.target as HTMLElement;
+            // Check for action button component, action button class, or actions cell
+            if (target.closest('app-action-button') || 
+                target.closest('.actions-cell') || 
+                target.closest('.action-button') ||
+                target.closest('.action-buttons')) {
+                return;
+            }
+            // Stop propagation to prevent any parent handlers
+            event.stopPropagation();
+        }
         this.rowClick.emit({ row, index });
     }
 

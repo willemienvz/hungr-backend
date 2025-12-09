@@ -3070,3 +3070,15 @@ input[type="submit"]:disabled {
   border: none;
   color: inherit;
 }
+
+/* ===============================================
+   MATERIAL UI DROPDOWN LETTER SPACING RESET
+   Global override to remove excessive letter spacing from all dropdown menus
+   =============================================== */
+
+.mat-mdc-select-panel,
+.mat-mdc-select-panel .mat-mdc-option,
+.mat-mdc-select-trigger,
+.mat-mdc-select-value {
+  letter-spacing: normal !important;
+}

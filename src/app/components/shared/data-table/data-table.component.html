@@ -56,7 +56,7 @@
         <!-- Data Rows -->
         <tr *ngFor="let row of sortedData; let i = index; trackBy: trackByFn"
             [class.clickable]="rowClick.observers.length > 0"
-            (click)="onRowClick(row, i)">
+            (click)="onRowClick(row, i, $event)">
 
           <!-- Index Cell -->
           <td *ngIf="showIndex" class="index-cell">
@@ -90,17 +90,18 @@
           </td>
 
           <!-- Actions Cell -->
-          <td *ngIf="hasActions" class="actions-cell">
+          <td *ngIf="hasActions" class="actions-cell" (click)="$event.stopPropagation()">
             <div class="action-buttons">
-              <app-action-button *ngFor="let action of actions"
-                                [type]="getActionButtonType(action)"
-                                [disabled]="isActionDisabled(action, row)"
-                                [hidden]="!isActionVisible(action, row)"
-                                [title]="action.label"
-                                [customIcon]="action.icon"
-                                [customColor]="getActionButtonColor(action)"
-                                (actionClick)="onActionClick(action, row, i)">
-              </app-action-button>
+              <ng-container *ngFor="let action of actions">
+                <app-action-button *ngIf="isActionVisible(action, row)"
+                                  [type]="getActionButtonType(action)"
+                                  [disabled]="isActionDisabled(action, row)"
+                                  [title]="action.label"
+                                  [customIcon]="action.icon"
+                                  [customColor]="getActionButtonColor(action)"
+                                  (actionClick)="onActionClick(action, row, i, $event)">
+                </app-action-button>
+              </ng-container>
             </div>
           </td>
         </tr>

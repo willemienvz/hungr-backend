@@ -574,7 +574,7 @@ export class MenuItemFormComponent implements OnInit, OnChanges {
       category.subcategories?.forEach(subcategory => {
         options.push({
           value: subcategory.id,
-          label: `  ${subcategory.name}`
+          label: ` - ${subcategory.name}`
         });
       });
     });

@@ -438,11 +438,11 @@
   .detail-label-add {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
+    gap: .5rem;
+    margin-top: 0px;
     
     @media (max-width: 768px) {
-      gap: 6px;
+      gap: 0.8rem;
       margin-top: 8px;
     }
       

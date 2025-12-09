@@ -56,3 +56,7 @@ email-lamda/serviceAccountKey.json
 .vscode
 /docs
 .cursorrules
+functions/setup-brevo-config.sh
+functions/README-BREVO-SETUP.md
+functions/setup-brevo-config-firebase-cli.sh
+/specs

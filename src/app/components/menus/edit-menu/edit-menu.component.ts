@@ -15,6 +15,7 @@ import { UnsavedChangesDialogComponent } from '../../unsaved-changes-dialog/unsa
 import { DeleteConfirmationModalComponent, DeleteConfirmationData } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-edit-menu',
@@ -70,6 +71,10 @@ export class EditMenuComponent implements OnInit, OnDestroy {
   
   // Menu status tracking
   isMenuPublished: boolean = false;
+  
+  // QR code state tracking
+  currentMenuQrAssigned: boolean = false;
+  currentMenuQrUrl: string = '';
   
   constructor(
     private readonly firestore: AngularFirestore,
@@ -374,6 +379,10 @@ export class EditMenuComponent implements OnInit, OnDestroy {
           status !== false;
         console.log('Menu status check:', { isDraft: menu.isDraft, Status: status, isMenuPublished: this.isMenuPublished });
         
+        // Store QR code state for preservation checks
+        this.currentMenuQrAssigned = menu.qrAssigned || false;
+        this.currentMenuQrUrl = menu.qrUrl || '';
+        
         // Check for ID conflicts in the original data
         const originalCategories = menu.categories || [];
         const conflictCheck = this.menuService.checkCategoryIdConflicts(originalCategories);
@@ -676,18 +685,31 @@ export class EditMenuComponent implements OnInit, OnDestroy {
       this.updateCategorySelectOptions();
     }
 
+    // QR code preservation: Only auto-assign if missing, preserve existing QR codes
+    // This ensures existing QR codes (which may be printed/distributed) remain unchanged
+    const shouldAssignQR = !this.currentMenuQrAssigned || !this.currentMenuQrUrl;
+    
     const updatedMenu = {
       menuName: this.menuName,
       restaurantID: this.addRestaurantLater ? '' : this.selectedRestaurant,
       categories: this.categories,
       items: this.menuItems,
-      addRestaurantLater: this.addRestaurantLater
+      addRestaurantLater: this.addRestaurantLater,
+      ...(shouldAssignQR && {
+        qrAssigned: true,
+        qrUrl: environment.menuUrl + this.menuID
+      })
     };
 
     console.log('Saving menu with fixed categories:', this.categories);
 
     this.menuService.updateMenu(this.menuID, updatedMenu)
       .then(() => {
+        // Update local state if QR code was assigned
+        if (shouldAssignQR) {
+          this.currentMenuQrAssigned = true;
+          this.currentMenuQrUrl = environment.menuUrl + this.menuID;
+        }
         this.isSaving = false;
         this.markAsSaved();
         console.log('Menu updated successfully with fixed category IDs!');
@@ -709,6 +731,7 @@ export class EditMenuComponent implements OnInit, OnDestroy {
   addSubCategory(categoryIndex: number) {
     this.categories = this.menuService.addSubCategory(this.categories, categoryIndex, this.newSubcategoryName[categoryIndex]);
     this.newSubcategoryName[categoryIndex] = '';
+    this.isAddInputVisible[categoryIndex] = false;
     this.markAsChanged();
   }
 
@@ -778,6 +801,9 @@ export class EditMenuComponent implements OnInit, OnDestroy {
   }
 
   setAsDraft() {
+    // Check if QR code needs assignment (preserve existing if present)
+    const shouldAssignQR = !this.currentMenuQrAssigned || !this.currentMenuQrUrl;
+    
     const updatedMenu = {
       menuName: this.menuName,
       restaurantID: this.addRestaurantLater ? '' : this.selectedRestaurant,
@@ -785,14 +811,34 @@ export class EditMenuComponent implements OnInit, OnDestroy {
       items: this.menuItems,
       isDraft: true,
       Status: 'draft',
-      addRestaurantLater: this.addRestaurantLater
+      addRestaurantLater: this.addRestaurantLater,
+      ...(shouldAssignQR && {
+        qrAssigned: true,
+        qrUrl: environment.menuUrl + this.menuID
+      })
     };
-    this.menuService.updateMenu(this.menuID, updatedMenu);
-    this.isMenuPublished = false;
-    this.markAsSaved();
+    
+    this.menuService.updateMenu(this.menuID, updatedMenu)
+      .then(() => {
+        // Update local state if QR code was assigned
+        if (shouldAssignQR) {
+          this.currentMenuQrAssigned = true;
+          this.currentMenuQrUrl = environment.menuUrl + this.menuID;
+        }
+        this.isMenuPublished = false;
+        this.markAsSaved();
+      })
+      .catch((error) => {
+        console.error('Error updating menu:', error);
+        // Menu update failed, but QR code assignment is non-critical
+        // User can retry or assign QR code manually later
+      });
   }
 
   setAsPublished() {
+    // Check if QR code needs assignment (preserve existing if present)
+    const shouldAssignQR = !this.currentMenuQrAssigned || !this.currentMenuQrUrl;
+    
     const updatedMenu = {
       menuName: this.menuName,
       restaurantID: this.addRestaurantLater ? '' : this.selectedRestaurant,
@@ -800,11 +846,28 @@ export class EditMenuComponent implements OnInit, OnDestroy {
       items: this.menuItems,
       isDraft: false,
       Status: 'published',
-      addRestaurantLater: this.addRestaurantLater
+      addRestaurantLater: this.addRestaurantLater,
+      ...(shouldAssignQR && {
+        qrAssigned: true,
+        qrUrl: environment.menuUrl + this.menuID
+      })
     };
-    this.menuService.updateMenu(this.menuID, updatedMenu);
-    this.isMenuPublished = true;
-    this.markAsSaved();
+    
+    this.menuService.updateMenu(this.menuID, updatedMenu)
+      .then(() => {
+        // Update local state if QR code was assigned
+        if (shouldAssignQR) {
+          this.currentMenuQrAssigned = true;
+          this.currentMenuQrUrl = environment.menuUrl + this.menuID;
+        }
+        this.isMenuPublished = true;
+        this.markAsSaved();
+      })
+      .catch((error) => {
+        console.error('Error updating menu:', error);
+        // Menu update failed, but QR code assignment is non-critical
+        // User can retry or assign QR code manually later
+      });
   }
 
   addMenuItem() {

@@ -87,28 +87,25 @@
     <div class="col">
       <app-content-block title="Assign menu" [ngStyle]="{'gap': '0'}">
       
-        <div class="rowMenu space-between">
-          <div class="menu-select-container">
-            <app-form-select
-              label="Please assign a menu to this restaurant."
-              placeholder="Choose a menu"
-              [options]="menuOptions"
-              class="full-width"
-              [(ngModel)]="selectedMenu"
-              (selectionChange)="selectMenu($event.value)"
-              name="selectedMenu">
-            </app-form-select>
-          </div>
-          <p class="displaced">
-            Need to create a new menu for this restaurant?
-            <a
-              (click)="onAddMenuClick($event)"
-              class="mainLink"
-              style="width: 100%; text-align: right"
-              >Click here</a
-            >
-          </p>
+        <div class="menu-select-container">
+          <app-form-select
+            label="Please assign a menu to this restaurant."
+            placeholder="Choose a menu"
+            [options]="menuOptions"
+            class="full-width"
+            [(ngModel)]="selectedMenu"
+            (selectionChange)="selectMenu($event.value)"
+            name="selectedMenu">
+          </app-form-select>
         </div>
+        <p class="create-menu-link">
+          Need to create a new menu for this restaurant?
+          <a
+            (click)="onAddMenuClick($event)"
+            class="mainLink"
+            >Click here</a
+          >
+        </p>
       </app-content-block>
 
 

@@ -3,7 +3,6 @@ import { SafeUrl } from '@angular/platform-browser';
 import { Menu } from '../../../shared/services/menu';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { environment } from '../../../../environments/environment';
-import { SelectOption } from '../../shared/form-select/form-select.component';
 
 @Component({
   selector: 'app-add-qr',
@@ -15,7 +14,6 @@ export class AddQrComponent {
   showPopup: boolean = false;
   isSaving: boolean = false;
   public qrCodeDownloadLink: SafeUrl = "";
-  filteredMenus: Menu[] = [];
   selectedMenu: Menu | undefined;
   validationError: boolean = false;
   saveSuccess: boolean = false;
@@ -30,35 +28,27 @@ export class AddQrComponent {
     this.qrCodeDownloadLink = url;
   }
 
-  openPopup() {
-    this.filteredMenus = this.menus.filter(menu => !menu.qrAssigned);
+  openPopup(menu?: Menu) {
+    if (menu) {
+      this.selectedMenu = menu;
+      this.validationError = false;
+      this.saveSuccess = false;
+    }
     this.showPopup = true;
   }
 
   closePopup() {
     this.showPopup = false;
-  }
-
-  selectMenu(menuValue: any) {
-    // Handle both Menu object and menu ID
-    const menu = typeof menuValue === 'object' ? menuValue : this.filteredMenus.find(m => m.menuID === menuValue);
-    if (menu) {
-      this.selectedMenu = menu;
-      this.validationError = false;
-    }
-  }
-
-  // Get menu options for app-form-select
-  get menuOptions(): SelectOption[] {
-    return this.filteredMenus.map(menu => ({
-      value: menu,
-      label: menu.menuName
-    }));
+    this.selectedMenu = undefined;
+    this.qrCodeDownloadLink = "";
+    this.validationError = false;
+    this.saveSuccess = false;
   }
 
   saveSettings() {
-    if (this.selectedMenu) {
+    if (this.selectedMenu && this.qrCodeDownloadLink) {
       this.validationError = false;
+      this.isSaving = true;
       this.updateMenuQrData(this.selectedMenu.menuID, this.qrCodeDownloadLink);
     } else {
       this.validationError = true;
@@ -76,9 +66,15 @@ export class AddQrComponent {
     this.firestore.doc(`menus/${menuId}`).update(dataToUpdate)
       .then(() => {
         this.saveSuccess = true;
+        this.isSaving = false;
+        // Auto-close after a short delay
+        setTimeout(() => {
+          this.closePopup();
+        }, 1500);
       })
       .catch((error) => {
         this.saveSuccess = false;
+        this.isSaving = false;
         console.log(error);
       });
   }
